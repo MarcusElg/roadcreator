@@ -8,6 +8,7 @@ A free road creation tool for unity. It's currently in early alpha
 - Options are changed per-segment which allows for more control like the road having a extra lane before a intersection
 - Curve smoothing to avoid sharp turns between curves (currently buggy)
 - Includes a prefab line tool to place prefabs along a series of curves
+- Includes a bunch of roads and road related assets like turn markings
 
 **Planned features:**
 - Terrain deforming
