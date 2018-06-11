@@ -11,6 +11,8 @@ public class RoadEditor : Editor
     Vector3[] points = null;
     GameObject objectToMove, extraObjectToMove;
     Tool lastTool;
+    Event guiEvent;
+    Vector3 hitPosition;
 
     private void OnEnable()
     {
@@ -43,6 +45,8 @@ public class RoadEditor : Editor
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
+
+        Undo.undoRedoPerformed += UndoUpdate;
     }
 
     private void OnDisable()
@@ -144,14 +148,14 @@ public class RoadEditor : Editor
     public void OnSceneGUI()
     {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        Event guiEvent = Event.current;
+        guiEvent = Event.current;
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
         RaycastHit raycastHit;
         if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.layer)))
         {
-            Vector3 hitPosition = raycastHit.point;
+            hitPosition = raycastHit.point;
 
             if (guiEvent.control == true)
             {
@@ -164,7 +168,7 @@ public class RoadEditor : Editor
                 {
                     if (guiEvent.shift == true)
                     {
-                        CreatePoints(hitPosition);
+                        CreatePoints();
                     }
                 }
                 else if (guiEvent.button == 1 && guiEvent.shift == true)
@@ -175,12 +179,12 @@ public class RoadEditor : Editor
 
             if (roadCreator.currentSegment != null && roadCreator.currentSegment.transform.GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
             {
-                points = CalculatePoints(guiEvent, hitPosition);
+                points = CalculatePoints();
             }
 
             if (roadCreator.transform.childCount > 0)
             {
-                Draw(guiEvent, hitPosition);
+                Draw();
             }
         }
 
@@ -195,24 +199,29 @@ public class RoadEditor : Editor
 
             if (guiEvent.shift == false)
             {
-                MovePoints(guiEvent, raycastHit, hitPosition);
+                MovePoints(raycastHit);
             }
         }
     }
 
-    private void CreatePoints(Vector3 hitPosition)
+    private void UndoUpdate ()
+    {
+        UpdateMesh();
+    }
+
+    private void CreatePoints()
     {
         if (roadCreator.currentSegment != null)
         {
             if (roadCreator.currentSegment.transform.GetChild(0).childCount == 1)
             {
                 // Create control point
-                Undo.RecordObject(CreatePoint("Control Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
+                CreatePoint("Control Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition);
             }
             else if (roadCreator.currentSegment.transform.GetChild(0).childCount == 2)
             {
                 // Create end point
-                Undo.RecordObject(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
+                CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition);
                 roadCreator.currentSegment = null;
                 UpdateMesh();
             }
@@ -289,7 +298,7 @@ public class RoadEditor : Editor
         return segment;
     }
 
-    private void MovePoints(Event guiEvent, RaycastHit raycastHit, Vector3 hitPosition)
+    private void MovePoints(RaycastHit raycastHit)
     {
         if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
         {
@@ -323,11 +332,12 @@ public class RoadEditor : Editor
         }
         else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
         {
-            Undo.RecordObject(objectToMove, "Moved Point");
+            Undo.RecordObject(objectToMove.transform, "Moved Point");
             objectToMove.transform.position = hitPosition;
 
             if (extraObjectToMove != null)
             {
+                Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                 extraObjectToMove.transform.position = hitPosition;
             }
         }
@@ -384,7 +394,7 @@ public class RoadEditor : Editor
         }
     }
 
-    private void Draw(Event guiEvent, Vector3 hitPosition)
+    private void Draw()
     {
         // Mouse position
         Handles.color = Color.blue;
@@ -475,7 +485,7 @@ public class RoadEditor : Editor
         return points.ToArray();
     }
 
-    private Vector3[] CalculatePoints(Event guiEvent, Vector3 hitPosition)
+    private Vector3[] CalculatePoints()
     {
         float divisions = Misc.CalculateDistance(roadCreator.currentSegment.transform.GetChild(0).GetChild(0).position, roadCreator.currentSegment.transform.GetChild(0).GetChild(1).position, hitPosition);
         divisions = Mathf.Max(2, divisions);
