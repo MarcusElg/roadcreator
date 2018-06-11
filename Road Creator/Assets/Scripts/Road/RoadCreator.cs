@@ -11,7 +11,6 @@ public class RoadCreator : MonoBehaviour {
     public float heightOffset = 0.02f;
     public int smoothnessAmount = 3;
 
-    [HideInInspector]
     public GlobalSettings globalSettings;
 
 }

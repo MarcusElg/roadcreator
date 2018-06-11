@@ -56,7 +56,22 @@ public class RoadEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        EditorGUI.BeginChangeCheck();
+        roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Height Offset", roadCreator.heightOffset));
+        roadCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", roadCreator.smoothnessAmount));
+
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
+        GUILayout.Label("");
+        GUILayout.Label("Default segment options", guiStyle);
+
+        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default road material", roadCreator.defaultRoadMaterial, typeof(Material));
+        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default shoulder material", roadCreator.defaultShoulderMaterial, typeof(Material));
+
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            UpdateMesh();
+        }
 
         if (GUILayout.Button("Reset road"))
         {
@@ -134,7 +149,7 @@ public class RoadEditor : Editor
 
     IEnumerator FixTextureStretch(float length, int i)
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.3f);
         float textureRepeat = length * roadCreator.globalSettings.resolution * 0.07f;
 
         for (int j = 0; j < 3; j++)

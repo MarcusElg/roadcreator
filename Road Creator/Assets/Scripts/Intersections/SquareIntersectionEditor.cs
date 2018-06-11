@@ -16,7 +16,6 @@ public class SquareIntersectionEditor : Editor
         if (intersection.sideVariables == null)
         {
             intersection.sideVariables = new List<Key>();
-            intersection.oldSideVariables = new List<Key>();
         }
 
         if (intersection.globalSettings == null)
@@ -74,10 +73,6 @@ public class SquareIntersectionEditor : Editor
         intersection.sideVariables.Add(new Key(name + " Height", 1));
         intersection.sideVariables.Add(new Key(name + " Width", 1));
         intersection.sideVariables.Add(new Key(name + " Lower Width", 1));
-        intersection.oldSideVariables.Add(new Key(name, true));
-        intersection.oldSideVariables.Add(new Key(name + " Height", 1));
-        intersection.oldSideVariables.Add(new Key(name + " Width", 1));
-        intersection.oldSideVariables.Add(new Key(name + " Lower Width", 1));
     }
 
     private void OnDisable()
@@ -111,25 +106,6 @@ public class SquareIntersectionEditor : Editor
 
     private void OnSceneGUI()
     {
-        if (intersection.oldWidth != intersection.width)
-        {
-            GenerateMeshes();
-            intersection.oldWidth = intersection.width;
-        }
-
-        if (intersection.oldHeight != intersection.height)
-        {
-            GenerateMeshes();
-            intersection.oldHeight = intersection.height;
-        }
-
-        for (int i = 0; i < intersection.sideVariables.Count; i++)
-        {
-            if (intersection.sideVariables[i] != intersection.oldSideVariables[i])
-            {
-                intersection.oldSideVariables[i] = intersection.sideVariables[i];
-            }
-        }
     }
 
     private void GenerateMeshes()

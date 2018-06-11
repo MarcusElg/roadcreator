@@ -43,6 +43,8 @@ public class PrefabLineEditor : Editor
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
+
+        Undo.undoRedoPerformed += UndoUpdate;
     }
 
     private void OnDisable()
@@ -52,7 +54,23 @@ public class PrefabLineEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        EditorGUI.BeginChangeCheck();
+        prefabCreator.spacing = Mathf.Max(0, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
+        prefabCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", prefabCreator.smoothnessAmount));
+
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
+        GUILayout.Label("");
+        GUILayout.Label("Prefab options", guiStyle);
+        
+        prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject));
+        prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab scale", prefabCreator.scale));
+        prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongt Curve", prefabCreator.rotateAlongCurve);
+
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            PlacePrefabs();
+        }
 
         if (GUILayout.Button("Reset"))
         {
@@ -123,8 +141,8 @@ public class PrefabLineEditor : Editor
                         g.transform.position = nextPoints[smoothnessAmount];
                         g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                         g.transform.position = originalControlPoint;*/
-                    }
-                    currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
+    }
+    currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
                     nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
 
                     PlacePrefabsInSegment(currentPoints, nextPoints, true);
@@ -169,23 +187,9 @@ public class PrefabLineEditor : Editor
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
         Event guiEvent = Event.current;
 
-        if (prefabCreator.spacing != prefabCreator.oldSpacing)
+        if (guiEvent.type == EventType.Repaint)
         {
             PlacePrefabs();
-            prefabCreator.spacing = Mathf.Clamp(prefabCreator.spacing, 0.001f, 1000000f);
-            prefabCreator.oldSpacing = prefabCreator.spacing;
-        }
-
-        if (prefabCreator.rotateAlongCurve != prefabCreator.oldRotateAlongCurve)
-        {
-            PlacePrefabs();
-            prefabCreator.oldRotateAlongCurve = prefabCreator.rotateAlongCurve;
-        }
-
-        if (prefabCreator.scale != prefabCreator.oldScale)
-        {
-            PlacePrefabs();
-            prefabCreator.oldScale = prefabCreator.scale;
         }
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
@@ -239,6 +243,11 @@ public class PrefabLineEditor : Editor
         }
     }
 
+    private void UndoUpdate()
+    {
+        PlacePrefabs();
+    }
+
     private void CreatePoints(Vector3 hitPosition)
     {
         if (prefabCreator.prefab == null)
@@ -287,6 +296,7 @@ public class PrefabLineEditor : Editor
         }
         else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
         {
+            Undo.RecordObject(objectToMove.transform, "Moved Point");
             objectToMove.transform.position = hitPosition;
         }
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
