@@ -65,8 +65,8 @@ public class RoadEditor : Editor
         GUILayout.Label("");
         GUILayout.Label("Default segment options", guiStyle);
 
-        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default road material", roadCreator.defaultRoadMaterial, typeof(Material));
-        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default shoulder material", roadCreator.defaultShoulderMaterial, typeof(Material));
+        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default road material", roadCreator.defaultRoadMaterial, typeof(Material), false);
+        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default shoulder material", roadCreator.defaultShoulderMaterial, typeof(Material), false);
 
         if (EditorGUI.EndChangeCheck() == true)
         {
