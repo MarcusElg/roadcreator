@@ -245,6 +245,11 @@ public class PrefabLineEditor : Editor
 
     private void UndoUpdate()
     {
+        if (prefabCreator.currentPoint == null && prefabCreator.transform.GetChild(0).childCount > 0)
+        {
+            prefabCreator.currentPoint = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).gameObject;
+        }
+
         PlacePrefabs();
     }
 
@@ -259,11 +264,13 @@ public class PrefabLineEditor : Editor
             if (prefabCreator.currentPoint != null && prefabCreator.currentPoint.name == "Point")
             {
                 prefabCreator.currentPoint = CreatePoint("Control Point", hitPosition);
+                Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
             }
             else
             {
                 prefabCreator.currentPoint = CreatePoint("Point", hitPosition);
                 PlacePrefabs();
+                Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
             }
         }
     }
@@ -313,7 +320,7 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.currentPoint != null)
             {
-                DestroyImmediate(prefabCreator.currentPoint.gameObject);
+                Undo.DestroyObjectImmediate(prefabCreator.currentPoint.gameObject);
                 if (prefabCreator.transform.GetChild(0).childCount > 0)
                 {
                     prefabCreator.currentPoint = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).gameObject;
