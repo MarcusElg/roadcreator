@@ -17,6 +17,8 @@ public class RoadEditor : Editor
     private void OnEnable()
     {
         roadCreator = (RoadCreator)target;
+        roadCreator.roadEditor = this;
+
         if (roadCreator.transform.childCount == 0)
         {
             GameObject segments = new GameObject("Segments");
