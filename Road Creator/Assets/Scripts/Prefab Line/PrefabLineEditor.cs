@@ -162,7 +162,7 @@ public class PrefabLineEditor : Editor
 
     private void PlacePrefabsInSegment(Vector3[] currentPoints, Vector3[] nextPoints, bool removeLastPoint)
     {
-        int max = currentPoints.Length - 1;
+        int max = currentPoints.Length;
         if (removeLastPoint == true)
         {
             max -= 1;
@@ -394,7 +394,7 @@ public class PrefabLineEditor : Editor
 
         for (float t = 0; t <= 1; t += distancePerDivision)
         {
-            if (t > (1 - distancePerDivision))
+            if (t > 1)
             {
                 t = 1;
             }

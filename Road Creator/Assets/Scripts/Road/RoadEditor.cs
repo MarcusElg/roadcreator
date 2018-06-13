@@ -74,7 +74,7 @@ public class RoadEditor : Editor
         {
             GUILayout.Label("");
             GUILayout.Label("Debug", guiStyle);
-            EditorGUILayout.ObjectField(roadCreator.currentSegment, typeof(RoadSegment));
+            EditorGUILayout.ObjectField(roadCreator.currentSegment, typeof(RoadSegment), true);
         }
 
         if (GUILayout.Button("Reset road"))
