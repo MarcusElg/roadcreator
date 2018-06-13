@@ -154,14 +154,14 @@ public class SquareIntersectionEditor : Editor
         {
             intersection.transform.GetChild(0).GetChild(2).localPosition = new Vector3(-intersection.width / 2, 0, 0);
             intersection.transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, intersection.leftConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight));
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-intersection.height / 2, intersection.heightOffset, 0), new Vector3(intersection.height / 2, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight));
         }
 
         if (intersection.rightConnection == true)
         {
             intersection.transform.GetChild(0).GetChild(3).localPosition = new Vector3(intersection.width / 2, 0, 0);
             intersection.transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, intersection.rightConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight));
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-intersection.height / 2, intersection.heightOffset, 0), new Vector3(intersection.height / 2, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight));
         }
     }
 
