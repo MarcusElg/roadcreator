@@ -78,7 +78,45 @@ public class SquareIntersectionEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
-        base.OnInspectorGUI();
+        intersection.width = Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", intersection.width));
+        intersection.height = Mathf.Max(0.1f, EditorGUILayout.FloatField("Height", intersection.height));
+        intersection.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.heightOffset));
+
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
+
+        GUILayout.Label("");
+        GUILayout.Label("Up Connection", guiStyle);
+        intersection.upConnection = EditorGUILayout.Toggle("Up Connection", intersection.upConnection);
+        if (intersection.upConnection == true)
+        {
+            intersection.upConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Up Connection Height", intersection.upConnectionHeight));
+        }
+
+        GUILayout.Label("");
+        GUILayout.Label("Down Connection", guiStyle);
+        intersection.downConnection = EditorGUILayout.Toggle("Dpwn Connection", intersection.downConnection);
+        if (intersection.downConnection == true)
+        {
+            intersection.downConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Height", intersection.downConnectionHeight));
+        }
+
+        GUILayout.Label("");
+        GUILayout.Label("Left Connection", guiStyle);
+        intersection.leftConnection = EditorGUILayout.Toggle("Left Connection", intersection.leftConnection);
+        if (intersection.leftConnection == true)
+        {
+            intersection.leftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Height", intersection.leftConnectionHeight));
+        }
+
+        GUILayout.Label("");
+        GUILayout.Label("Right Connection", guiStyle);
+        intersection.rightConnection = EditorGUILayout.Toggle("Right Connection", intersection.rightConnection);
+        if (intersection.rightConnection == true)
+        {
+            intersection.rightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Height", intersection.rightConnectionHeight));
+        }
+
         if (EditorGUI.EndChangeCheck() == true)
         {
             GenerateMeshes();

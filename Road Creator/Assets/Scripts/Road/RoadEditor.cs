@@ -59,7 +59,7 @@ public class RoadEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
-        roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Height Offset", roadCreator.heightOffset));
+        roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadCreator.heightOffset));
         roadCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", roadCreator.smoothnessAmount));
 
         GUIStyle guiStyle = new GUIStyle();
@@ -67,8 +67,8 @@ public class RoadEditor : Editor
         GUILayout.Label("");
         GUILayout.Label("Default segment options", guiStyle);
 
-        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default road material", roadCreator.defaultRoadMaterial, typeof(Material), false);
-        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default shoulder material", roadCreator.defaultShoulderMaterial, typeof(Material), false);
+        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default Road Material", roadCreator.defaultRoadMaterial, typeof(Material), false);
+        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default Shoulder Material", roadCreator.defaultShoulderMaterial, typeof(Material), false);
 
         if (EditorGUI.EndChangeCheck() == true)
         {

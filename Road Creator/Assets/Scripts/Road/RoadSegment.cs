@@ -9,13 +9,11 @@ public class RoadSegment : MonoBehaviour
     public float roadWidth = 3;
     public bool flipped = false;
 
-    [Header("Left Shoulder")]
     public bool leftShoulder = false;
     public float leftShoulderWidth = 1;
     public float leftShoulderHeightOffset = 0;
     public Material leftShoulderMaterial;
 
-    [Header("Right Shoulder")]
     public bool rightShoulder = false;
     public float rightShoulderWidth = 1;
     public float rightShoulderHeightOffset = 0;
