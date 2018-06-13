@@ -113,9 +113,19 @@ public class RoadEditor : Editor
         {
             if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).childCount == 3)
             {
+                Vector3 previousPoint = Misc.MaxVector3;
+
                 if (i == 0)
                 {
                     currentPoints = CalculatePoints(roadCreator.transform.GetChild(0).GetChild(i));
+
+                    if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection != null)
+                    {
+                        previousPoint = roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.position;
+                    }
+                } else
+                {
+                    previousPoint = Misc.MaxVector3;
                 }
 
                 if (i < roadCreator.transform.GetChild(0).childCount - 1 && roadCreator.transform.GetChild(0).GetChild(i + 1).GetChild(0).childCount == 3)
@@ -148,8 +158,8 @@ public class RoadEditor : Editor
                     currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
                     //currentPoints[currentPoints.Length - smoothnessAmount - 2] = Misc.GetCenter(currentPoints[currentPoints.Length - smoothnessAmount - 3], currentPoints[currentPoints.Length - smoothnessAmount - 1]);
                     nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
-                    
-                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), smoothnessAmount);
+
+                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), smoothnessAmount);
                     roadCreator.StartCoroutine(FixTextureStretch(Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                     currentPoints = nextPoints;
                 }
@@ -163,7 +173,7 @@ public class RoadEditor : Editor
                         nextPoints[0] = roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.position;
                     }
 
-                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), 0);
+                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), 0);
                     roadCreator.StartCoroutine(FixTextureStretch(Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                 }
             }

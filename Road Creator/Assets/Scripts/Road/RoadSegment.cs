@@ -19,14 +19,14 @@ public class RoadSegment : MonoBehaviour
     public float rightShoulderHeightOffset = 0;
     public Material rightShoulderMaterial;
 
-    public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, float heightOffset, Transform segment, int smoothnessAmount)
+    public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, int smoothnessAmount)
     {
-        GenerateMesh(points, nextSegmentPoints, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount);
-        GenerateMesh(points, nextSegmentPoints, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, leftShoulder);
-        GenerateMesh(points, nextSegmentPoints, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, rightShoulder);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, leftShoulder);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, rightShoulder);
     }
     
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, bool generate = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, bool generate = true)
     {
         if (generate == true)
         {
@@ -39,7 +39,7 @@ public class RoadSegment : MonoBehaviour
 
             for (int i = 0; i < points.Length; i++)
             {
-                Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, i);
+                Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
 
                 if (name == "Road")
                 {

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Misc{
 
+    public static Vector3 MaxVector3 = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+
 	public static Vector3 Lerp3 (Vector3 start, Vector3 middle, Vector3 end, float time)
     {
         Vector3 startToMiddle = Vector3.Lerp(start, middle, time);
@@ -26,12 +28,19 @@ public class Misc{
         return distance;
     }
 
-    public static Vector3 CalculateLeft (Vector3[] points, Vector3[] nextSegmentPoints, int index)
+    public static Vector3 CalculateLeft (Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index)
     {
         Vector3 forward;
         if (index < points.Length - 1)
         {
-            forward = points[index + 1] - points[index];
+            if (index == 0 && prevoiusPoint != MaxVector3)
+            {
+                forward = points[0] - prevoiusPoint;
+            }
+            else
+            {
+                forward = points[index + 1] - points[index];
+            }
         }
         else
         {

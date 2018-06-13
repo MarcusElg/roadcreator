@@ -173,7 +173,7 @@ public class PrefabLineEditor : Editor
             prefab.name = "Prefab";
             prefab.layer = prefabCreator.globalSettings.layer;
             prefab.transform.localScale = new Vector3(prefabCreator.scale, prefabCreator.scale, prefabCreator.scale);
-            Vector3 left = Misc.CalculateLeft(currentPoints, nextPoints, j);
+            Vector3 left = Misc.CalculateLeft(currentPoints, nextPoints, Misc.MaxVector3, j);
 
             if (prefabCreator.rotateAlongCurve == true)
             {
