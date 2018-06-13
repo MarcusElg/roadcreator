@@ -8,6 +8,9 @@ public class SquareIntersection : MonoBehaviour {
     public float height = 4;
     public float heightOffset = 0.02f;
 
+    public Material centerMaterial;
+    public Material connectionMaterial;
+
     public bool upConnection = true;
     public float upConnectionWidth = 1.5f;
     public float upConnectionHeight = 1;
