@@ -62,7 +62,7 @@ public class PrefabLineEditor : Editor
         guiStyle.fontStyle = FontStyle.Bold;
         GUILayout.Label("");
         GUILayout.Label("Prefab options", guiStyle);
-        
+
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab scale", prefabCreator.scale));
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongt Curve", prefabCreator.rotateAlongCurve);
@@ -110,48 +110,51 @@ public class PrefabLineEditor : Editor
                     currentPoints = CalculatePoints(i);
                 }
 
-                if (i < prefabCreator.transform.GetChild(0).childCount - 4)
+                if (prefabCreator.transform.GetChild(0).GetChild(i).name == "Point")
                 {
-                    Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
-                    nextPoints = CalculatePoints(i + 2);
-
-                    // Fix seams
-                    int smoothnessAmount = prefabCreator.smoothnessAmount;
-                    if ((currentPoints.Length / 2) < smoothnessAmount)
+                    if (i < prefabCreator.transform.GetChild(0).childCount - 4)
                     {
-                        smoothnessAmount = currentPoints.Length / 2;
+                        Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
+                        nextPoints = CalculatePoints(i + 2);
+
+                        // Fix seams
+                        int smoothnessAmount = prefabCreator.smoothnessAmount;
+                        if ((currentPoints.Length / 2) < smoothnessAmount)
+                        {
+                            smoothnessAmount = currentPoints.Length / 2;
+                        }
+
+                        if ((nextPoints.Length / 2) < smoothnessAmount)
+                        {
+                            smoothnessAmount = nextPoints.Length / 2;
+                        }
+
+                        float distanceSection = 1f / ((smoothnessAmount * 2));
+                        for (float t = distanceSection; t < 0.5; t += distanceSection)
+                        {
+                            // First section
+                            currentPoints[(currentPoints.Length - 1 - smoothnessAmount) + (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], t);
+
+                            // Second section
+                            nextPoints[smoothnessAmount - (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 1 - t);
+                            /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                            g.transform.position = currentPoints[currentPoints.Length - 1 - smoothnessAmount];
+                            g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                            g.transform.position = nextPoints[smoothnessAmount];
+                            g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                            g.transform.position = originalControlPoint;*/
+                        }
+                        currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
+                        nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
+
+                        PlacePrefabsInSegment(currentPoints, nextPoints, true);
+
+                        currentPoints = nextPoints;
                     }
-
-                    if ((nextPoints.Length / 2) < smoothnessAmount)
+                    else if ((i < prefabCreator.transform.GetChild(0).childCount - 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Point") || i < prefabCreator.transform.GetChild(0).childCount - 2)
                     {
-                        smoothnessAmount = nextPoints.Length / 2;
+                        PlacePrefabsInSegment(currentPoints, null, false);
                     }
-
-                    float distanceSection = 1f / ((smoothnessAmount * 2));
-                    for (float t = distanceSection; t < 0.5; t += distanceSection)
-                    {
-                        // First section
-                        currentPoints[(currentPoints.Length - 1 - smoothnessAmount) + (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], t);
-
-                        // Second section
-                        nextPoints[smoothnessAmount - (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 1 - t);
-                        /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                        g.transform.position = currentPoints[currentPoints.Length - 1 - smoothnessAmount];
-                        g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                        g.transform.position = nextPoints[smoothnessAmount];
-                        g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                        g.transform.position = originalControlPoint;*/
-    }
-    currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
-                    nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
-
-                    PlacePrefabsInSegment(currentPoints, nextPoints, true);
-
-                    currentPoints = nextPoints;
-                }
-                else
-                {
-                    PlacePrefabsInSegment(currentPoints, null, false);
                 }
             }
         }
@@ -186,11 +189,6 @@ public class PrefabLineEditor : Editor
     {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
         Event guiEvent = Event.current;
-
-        if (guiEvent.type == EventType.Repaint)
-        {
-            PlacePrefabs();
-        }
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
