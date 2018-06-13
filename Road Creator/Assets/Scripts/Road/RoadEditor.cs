@@ -155,7 +155,15 @@ public class RoadEditor : Editor
                 }
                 else
                 {
-                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, null, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), 0);
+                    Vector3[] nextPoints = null;
+
+                    if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection != null)
+                    {
+                        nextPoints = new Vector3[1];
+                        nextPoints[0] = roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.position;
+                    }
+
+                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), 0);
                     roadCreator.StartCoroutine(FixTextureStretch(Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                 }
             }

@@ -43,18 +43,18 @@ public class RoadSegment : MonoBehaviour
 
                 if (name == "Road")
                 {
-                    vertices[verticeIndex] = (points[i] + left * roadWidth * 0.5f + new Vector3(0, heightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth * 0.5f + new Vector3(0, heightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
                 }
                 else if (name == "Left Shoulder")
                 {
-                    vertices[verticeIndex] = (points[i] + left * roadWidth * 0.5f + left * leftShoulderWidth + new Vector3(0, heightOffset + leftShoulderHeightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] + left * roadWidth * 0.5f + new Vector3(0, heightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] + left * roadWidth + left * leftShoulderWidth + new Vector3(0, heightOffset + leftShoulderHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] + left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
                 }
                 else if (name == "Right Shoulder")
                 {
-                    vertices[verticeIndex] = (points[i] - left * roadWidth * 0.5f + new Vector3(0, heightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth * 0.5f - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] - left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
 
                 if (i < points.Length - 1)

@@ -91,6 +91,7 @@ public class SquareIntersectionEditor : Editor
         if (intersection.upConnection == true)
         {
             intersection.upConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Up Connection Height", intersection.upConnectionHeight));
+            intersection.upConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Up Connection Width", intersection.upConnectionWidth));
         }
 
         GUILayout.Label("");
@@ -99,6 +100,7 @@ public class SquareIntersectionEditor : Editor
         if (intersection.downConnection == true)
         {
             intersection.downConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Height", intersection.downConnectionHeight));
+            intersection.downConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Width", intersection.downConnectionWidth));
         }
 
         GUILayout.Label("");
@@ -107,6 +109,7 @@ public class SquareIntersectionEditor : Editor
         if (intersection.leftConnection == true)
         {
             intersection.leftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Height", intersection.leftConnectionHeight));
+            intersection.leftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Width", intersection.leftConnectionWidth));
         }
 
         GUILayout.Label("");
@@ -115,6 +118,7 @@ public class SquareIntersectionEditor : Editor
         if (intersection.rightConnection == true)
         {
             intersection.rightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Height", intersection.rightConnectionHeight));
+            intersection.rightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Width", intersection.rightConnectionWidth));
         }
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -123,13 +127,14 @@ public class SquareIntersectionEditor : Editor
 
             // Update connections
             Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
-            for (int i = 0; i < gameObjects.Length; i++) {
+            for (int i = 0; i < gameObjects.Length; i++)
+            {
                 if (gameObjects[i].intersectionConnection != null)
                 {
                     gameObjects[i].transform.position = gameObjects[i].intersectionConnection.transform.position;
                     gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().roadEditor.UpdateMesh();
                 }
-            } 
+            }
         }
 
         if (GUILayout.Button("Generate intersection"))
@@ -156,38 +161,38 @@ public class SquareIntersectionEditor : Editor
             return;
         }
 
-        GenerateMesh(intersection.transform.GetChild(1), new Vector3(-intersection.width / 2, intersection.heightOffset, -intersection.height / 2), new Vector3(intersection.width / 2, intersection.heightOffset, -intersection.height / 2), new Vector3(-intersection.width / 2, intersection.heightOffset, intersection.height / 2), new Vector3(intersection.width / 2, intersection.heightOffset, intersection.height / 2), intersection.centerMaterial);
+        GenerateMesh(intersection.transform.GetChild(1), new Vector3(-intersection.width, intersection.heightOffset, -intersection.height), new Vector3(intersection.width, intersection.heightOffset, -intersection.height), new Vector3(-intersection.width, intersection.heightOffset, intersection.height), new Vector3(intersection.width, intersection.heightOffset, intersection.height), intersection.centerMaterial);
 
         if (intersection.upConnection == true)
         {
-            intersection.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, intersection.height / 2);
+            intersection.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, intersection.height);
             intersection.transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, intersection.upConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), new Vector3(intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), intersection.connectionMaterial);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-intersection.width, intersection.heightOffset, 0), new Vector3(intersection.width, intersection.heightOffset, 0), new Vector3(-intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), new Vector3(intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), intersection.connectionMaterial);
         }
 
         if (intersection.downConnection == true)
         {
-            intersection.transform.GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, -intersection.height / 2);
+            intersection.transform.GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, -intersection.height);
             intersection.transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, intersection.downConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), new Vector3(intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), intersection.connectionMaterial);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-intersection.width, intersection.heightOffset, 0), new Vector3(intersection.width, intersection.heightOffset, 0), new Vector3(-intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), new Vector3(intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), intersection.connectionMaterial);
         }
 
         if (intersection.leftConnection == true)
         {
-            intersection.transform.GetChild(0).GetChild(2).localPosition = new Vector3(-intersection.width / 2, 0, 0);
+            intersection.transform.GetChild(0).GetChild(2).localPosition = new Vector3(-intersection.width, 0, 0);
             intersection.transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, intersection.leftConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-intersection.height / 2, intersection.heightOffset, 0), new Vector3(intersection.height / 2, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), intersection.connectionMaterial);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-intersection.height, intersection.heightOffset, 0), new Vector3(intersection.height, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), intersection.connectionMaterial);
         }
 
         if (intersection.rightConnection == true)
         {
-            intersection.transform.GetChild(0).GetChild(3).localPosition = new Vector3(intersection.width / 2, 0, 0);
+            intersection.transform.GetChild(0).GetChild(3).localPosition = new Vector3(intersection.width, 0, 0);
             intersection.transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, intersection.rightConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-intersection.height / 2, intersection.heightOffset, 0), new Vector3(intersection.height / 2, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), intersection.connectionMaterial);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-intersection.height, intersection.heightOffset, 0), new Vector3(intersection.height, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), intersection.connectionMaterial);
         }
     }
 
-    private void GenerateMesh (Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour, Material material)
+    private void GenerateMesh(Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour, Material material)
     {
         Vector3[] vertices = new Vector3[4];
         Vector2[] uvs = new Vector2[4];

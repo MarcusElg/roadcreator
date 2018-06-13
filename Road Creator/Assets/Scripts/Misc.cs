@@ -38,7 +38,13 @@ public class Misc{
             // Last vertices
             if (nextSegmentPoints != null)
             {
-                forward = nextSegmentPoints[1] - points[points.Length - 1];
+                if (nextSegmentPoints.Length > 1)
+                {
+                    forward = nextSegmentPoints[1] - points[points.Length - 1];
+                } else
+                {
+                    forward = nextSegmentPoints[0] - points[points.Length - 1];
+                }
             }
             else
             {
