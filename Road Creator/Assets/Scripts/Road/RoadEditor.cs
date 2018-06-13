@@ -17,7 +17,10 @@ public class RoadEditor : Editor
     private void OnEnable()
     {
         roadCreator = (RoadCreator)target;
-        roadCreator.roadEditor = this;
+        if (roadCreator.roadEditor == null)
+        {
+            roadCreator.roadEditor = this;
+        }
 
         if (roadCreator.transform.childCount == 0)
         {
@@ -34,15 +37,6 @@ public class RoadEditor : Editor
             {
                 roadCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
             }
-        }
-
-        if (roadCreator.defaultRoadMaterial == null) {
-            roadCreator.defaultRoadMaterial = roadCreator.globalSettings.defaultRoadMaterial;
-        }
-
-        if (roadCreator.defaultShoulderMaterial == null)
-        {
-            roadCreator.defaultShoulderMaterial = roadCreator.globalSettings.defaultShoulderMaterial;
         }
 
         lastTool = Tools.current;
@@ -75,6 +69,13 @@ public class RoadEditor : Editor
             UpdateMesh();
         }
 
+        if (roadCreator.globalSettings.debug == true)
+        {
+            GUILayout.Label("");
+            GUILayout.Label("Debug", guiStyle);
+            EditorGUILayout.LabelField(roadCreator.roadEditor.ToString());
+        }
+
         if (GUILayout.Button("Reset road"))
         {
             roadCreator.currentSegment = null;
@@ -94,6 +95,18 @@ public class RoadEditor : Editor
 
     public void UpdateMesh()
     {
+        if (roadCreator.defaultRoadMaterial == null)
+        {
+            Debug.Log("You have to select a default road material before generating the road mesh");
+            return;
+        }
+
+        if (roadCreator.defaultShoulderMaterial == null)
+        {
+            Debug.Log("You have to select a default shoulder material before generating the road mesh");
+            return;
+        }
+
         Vector3[] currentPoints = null;
 
         for (int i = 0; i < roadCreator.transform.GetChild(0).childCount; i++)
@@ -269,6 +282,8 @@ public class RoadEditor : Editor
             roadCreator.currentSegment = roadCreator.points[roadCreator.points.Count - 1].transform.parent.parent.GetComponent<RoadSegment>();
         }
 
+        DetectIntersectionConnections();
+
         UpdateMesh();
     }
 
@@ -324,6 +339,7 @@ public class RoadEditor : Editor
         point.transform.SetParent(parent);
         point.transform.position = position;
         point.layer = roadCreator.globalSettings.layer;
+        point.AddComponent<Point>();
         roadCreator.points.Add(point);
         return point;
     }
@@ -417,6 +433,12 @@ public class RoadEditor : Editor
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
         {
             objectToMove.GetComponent<BoxCollider>().enabled = true;
+
+            if (objectToMove == roadCreator.points[roadCreator.points.Count - 1] || objectToMove == roadCreator.points[0])
+            {
+                DetectIntersectionConnections();
+            }
+
             objectToMove = null;
 
             if (extraObjectToMove != null)
@@ -426,6 +448,32 @@ public class RoadEditor : Editor
             }
 
             UpdateMesh();
+        }
+    }
+
+    private void DetectIntersectionConnections ()
+    {
+        if (roadCreator.points != null && roadCreator.points.Count > 0)
+        {
+            DetectIntersectionConnection(roadCreator.points[0]);
+            DetectIntersectionConnection(roadCreator.points[roadCreator.points.Count - 1]);
+        } 
+    }
+
+    private void DetectIntersectionConnection(GameObject gameObject)
+    {
+        RaycastHit raycastHit2;
+        if (Physics.Raycast(new Ray(gameObject.transform.position + Vector3.up, Vector3.down), out raycastHit2, 100f, ~(1 << roadCreator.globalSettings.layer)))
+        {
+            if (raycastHit2.collider.name.Contains("Connection Point"))
+            {
+                gameObject.GetComponent<Point>().intersectionConnection = raycastHit2.collider.gameObject;
+                gameObject.transform.position = raycastHit2.collider.transform.position;
+            }
+            else
+            {
+                gameObject.GetComponent<Point>().intersectionConnection = null;
+            }
         }
     }
 

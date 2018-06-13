@@ -13,9 +13,15 @@ public class GlobalSettingsEditor : Editor {
         settings = ((GlobalSettings)target);
     }
 
-    private void OnSceneGUI()
+    public override void OnInspectorGUI()
     {
-        if (settings.pointSize != settings.oldPointSize)
+        EditorGUI.BeginChangeCheck();
+        settings.pointSize = Mathf.Max(0.2f, EditorGUILayout.FloatField("Point Size", settings.pointSize));
+        settings.resolution = Mathf.Max(0.2f, EditorGUILayout.FloatField("Resolution", settings.resolution));
+        settings.layer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.layer), 9, 31);
+        settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
+
+        if (EditorGUI.EndChangeCheck() == true)
         {
             Transform[] objects = GameObject.FindObjectsOfType<Transform>();
 
@@ -26,8 +32,6 @@ public class GlobalSettingsEditor : Editor {
                     objects[i].GetComponent<BoxCollider>().size = new Vector3(settings.pointSize, settings.pointSize, settings.pointSize);
                 }
             }
-
-            settings.oldPointSize = settings.pointSize;
         }
     }
 

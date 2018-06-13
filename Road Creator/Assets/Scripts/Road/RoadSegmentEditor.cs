@@ -45,10 +45,7 @@ public class RoadSegmentEditor : Editor {
 
         if (EditorGUI.EndChangeCheck())
         {
-            if (((RoadSegment)target).transform.parent.parent.GetComponent<RoadCreator>().roadEditor != null)
-            {
-                ((RoadSegment)target).transform.parent.parent.GetComponent<RoadCreator>().roadEditor.UpdateMesh();
-            }
+            segment.transform.parent.parent.GetComponent<RoadCreator>().roadEditor.UpdateMesh();
         }
     }
 
