@@ -65,25 +65,27 @@
     <Compile Include="Assets\Scripts\Intersections\SquareIntersectionEditor.cs" />
     <Compile Include="Assets\Scripts\Key.cs" />
     <Compile Include="Assets\Scripts\Misc.cs" />
+    <Compile Include="Assets\Scripts\Point.cs" />
     <Compile Include="Assets\Scripts\Prefab Line\PrefabLineCreator.cs" />
     <Compile Include="Assets\Scripts\Prefab Line\PrefabLineEditor.cs" />
     <Compile Include="Assets\Scripts\Road\RoadCreator.cs" />
     <Compile Include="Assets\Scripts\Road\RoadEditor.cs" />
     <Compile Include="Assets\Scripts\Road\RoadSegment.cs" />
+    <Compile Include="Assets\Scripts\Road\RoadSegmentEditor.cs" />
     <Compile Include="Assets\Scripts\Road\RoadSystem.cs" />
     <Compile Include="Assets\Scripts\Road\RoadSystemEditor.cs" />
     <Compile Include="Assets\Scripts\RoadSystemCreator.cs" />
     <Reference Include="UnityEditor.StandardEvents">
-      <HintPath>C:/Users/Marcus/Road Creator/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+      <HintPath>C:/Users/Marcus/Documents/GitHub/roadcreator/Road Creator/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Users/Marcus/Road Creator/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>C:/Users/Marcus/Documents/GitHub/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/Users/Marcus/Road Creator/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>C:/Users/Marcus/Documents/GitHub/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/Marcus/Road Creator/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:/Users/Marcus/Documents/GitHub/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.2.0b6/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
