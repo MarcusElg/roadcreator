@@ -21,7 +21,7 @@ public class GlobalSettingsEditor : Editor {
 
             for (int i = 0; i < objects.Length; i++)
             {
-                if (objects[i].name == "Start Point" || objects[i].name == "Control Point" || objects[i].name == "End Point")
+                if (objects[i].name.Contains("Connection Point") || objects[i].name == "Start Point" || objects[i].name == "Control Point" || objects[i].name == "End Point")
                 {
                     objects[i].GetComponent<BoxCollider>().size = new Vector3(settings.pointSize, settings.pointSize, settings.pointSize);
                 }

@@ -33,6 +33,12 @@ public class RoadSystemEditor : Editor {
             gameObject.transform.parent = roadSystem.transform;
             Selection.activeGameObject = gameObject;
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Intersection");
+
+            RaycastHit raycastHit;
+            if (Physics.Raycast(HandleUtility.GUIPointToWorldRay(new Vector2(SceneView.lastActiveSceneView.position.x, SceneView.lastActiveSceneView.position.y)).origin, SceneView.lastActiveSceneView.rotation * Vector3.forward, out raycastHit, 100))
+            {
+                gameObject.transform.position = raycastHit.point;
+            }
         }
 
         if (GUILayout.Button("Create line of prefabs"))

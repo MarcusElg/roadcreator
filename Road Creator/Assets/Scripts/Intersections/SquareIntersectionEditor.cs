@@ -13,10 +13,6 @@ public class SquareIntersectionEditor : Editor
     private void OnEnable()
     {
         intersection = (SquareIntersection)target;
-        if (intersection.sideVariables == null)
-        {
-            intersection.sideVariables = new List<Key>();
-        }
 
         if (intersection.globalSettings == null)
         {
@@ -37,9 +33,9 @@ public class SquareIntersectionEditor : Editor
             sides.transform.localPosition = Vector3.zero;
 
             AddSide("Up");
-            AddSide("Down");
-            AddSide("Left");
-            AddSide("Right");
+            AddSide("Down").transform.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));
+            AddSide("Left").transform.localRotation = Quaternion.Euler(new Vector3(0, 270, 0));
+            AddSide("Right").transform.localRotation = Quaternion.Euler(new Vector3(0, 90, 0));
 
             GameObject mainMesh = new GameObject("Main Mesh");
             mainMesh.transform.SetParent(intersection.transform);
@@ -51,9 +47,11 @@ public class SquareIntersectionEditor : Editor
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
+
+        GenerateMeshes();
     }
 
-    private void AddSide(string name)
+    private GameObject AddSide(string name)
     {
         GameObject side = new GameObject(name + " Side");
         side.transform.SetParent(intersection.transform.GetChild(0));
@@ -64,15 +62,12 @@ public class SquareIntersectionEditor : Editor
         mesh.AddComponent<MeshCollider>();
         mesh.transform.SetParent(side.transform);
 
-        GameObject connectionPoint = new GameObject(name + " Connnection Point");
+        GameObject connectionPoint = new GameObject(name + " Connection Point");
         connectionPoint.AddComponent<BoxCollider>();
         connectionPoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
         connectionPoint.transform.SetParent(side.transform);
 
-        intersection.sideVariables.Add(new Key(name, true));
-        intersection.sideVariables.Add(new Key(name + " Height", 1));
-        intersection.sideVariables.Add(new Key(name + " Width", 1));
-        intersection.sideVariables.Add(new Key(name + " Lower Width", 1));
+        return side;
     }
 
     private void OnDisable()
@@ -82,25 +77,16 @@ public class SquareIntersectionEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        EditorGUI.BeginChangeCheck();
         base.OnInspectorGUI();
-
-        if (GUILayout.Button("Generate intersection"))
+        if (EditorGUI.EndChangeCheck() == true)
         {
             GenerateMeshes();
         }
 
-        for (int i = 0; i < intersection.sideVariables.Count; i++)
+        if (GUILayout.Button("Generate intersection"))
         {
-            float outFloat;
-            bool outBool;
-
-            if (float.TryParse(intersection.sideVariables[i].value.ToString(), out outFloat) != false)
-            {
-                intersection.sideVariables[i].value = EditorGUILayout.FloatField(intersection.sideVariables[i].name, outFloat);
-            } else if (bool.TryParse(intersection.sideVariables[i].value.ToString(), out outBool) != false)
-            {
-                intersection.sideVariables[i].value = GUILayout.Toggle(outBool, intersection.sideVariables[i].name);
-            }
+            GenerateMeshes();
         }
     }
 
@@ -110,24 +96,46 @@ public class SquareIntersectionEditor : Editor
 
     private void GenerateMeshes()
     {
-        GenerateMesh(intersection.transform.GetChild(1), Vector3.zero, intersection.height, intersection.width, intersection.width);
+        GenerateMesh(intersection.transform.GetChild(1), new Vector3(-intersection.width / 2, intersection.heightOffset, -intersection.height / 2), new Vector3(intersection.width / 2, intersection.heightOffset, -intersection.height / 2), new Vector3(-intersection.width / 2, intersection.heightOffset, intersection.height / 2), new Vector3(intersection.width / 2, intersection.heightOffset, intersection.height / 2));
 
-        if (bool.Parse(intersection.sideVariables[0].value.ToString()) == true)
+        if (intersection.upConnection == true)
         {
-            intersection.transform.GetChild(0).GetChild(0).position = new Vector3(0, 0, intersection.height);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(0, 0, 0.2f), float.Parse(intersection.sideVariables[1].value.ToString()), float.Parse(intersection.sideVariables[2].value.ToString()), float.Parse(intersection.sideVariables[3].value.ToString()));
+            intersection.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, intersection.height / 2);
+            intersection.transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, intersection.upConnectionHeight);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), new Vector3(intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight));
+        }
+
+        if (intersection.downConnection == true)
+        {
+            intersection.transform.GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, -intersection.height / 2);
+            intersection.transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, intersection.downConnectionHeight);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), new Vector3(intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight));
+        }
+
+        if (intersection.leftConnection == true)
+        {
+            intersection.transform.GetChild(0).GetChild(2).localPosition = new Vector3(-intersection.width / 2, 0, 0);
+            intersection.transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, intersection.leftConnectionHeight);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight));
+        }
+
+        if (intersection.rightConnection == true)
+        {
+            intersection.transform.GetChild(0).GetChild(3).localPosition = new Vector3(intersection.width / 2, 0, 0);
+            intersection.transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, intersection.rightConnectionHeight);
+            GenerateMesh(intersection.transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-intersection.width / 2, intersection.heightOffset, 0), new Vector3(intersection.width / 2, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight));
         }
     }
 
-    private void GenerateMesh (Transform meshOwner, Vector3 offset, float height, float width, float secondWidth)
+    private void GenerateMesh (Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour)
     {
         Vector3[] vertices = new Vector3[4];
         Vector2[] uvs = new Vector2[4];
 
-        vertices[0] = new Vector3(-height, 0, -width);
-        vertices[1] = new Vector3(-height, 0, width);
-        vertices[2] = new Vector3(height, 0, -secondWidth) + offset;
-        vertices[3] = new Vector3(height, 0, secondWidth) + offset;
+        vertices[0] = pointOne;
+        vertices[1] = pointTwo;
+        vertices[2] = pointThree;
+        vertices[3] = pointFour;
 
         for (int i = 0; i < 4; i++)
         {
@@ -136,7 +144,7 @@ public class SquareIntersectionEditor : Editor
 
         Mesh mesh = new Mesh();
         mesh.vertices = vertices;
-        mesh.triangles = new int[] { 0, 1, 2, 3, 2, 1 };
+        mesh.triangles = new int[] { 2, 1, 0, 1, 2, 3 };
         mesh.uv = uvs;
 
         meshOwner.GetComponent<MeshFilter>().sharedMesh = mesh;
