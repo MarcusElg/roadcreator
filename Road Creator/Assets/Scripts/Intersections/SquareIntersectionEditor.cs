@@ -143,10 +143,6 @@ public class SquareIntersectionEditor : Editor
         }
     }
 
-    private void OnSceneGUI()
-    {
-    }
-
     private void GenerateMeshes()
     {
         if (intersection.centerMaterial == null)
@@ -168,6 +164,10 @@ public class SquareIntersectionEditor : Editor
             intersection.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, intersection.height);
             intersection.transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, intersection.upConnectionHeight);
             GenerateMesh(intersection.transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-intersection.width, intersection.heightOffset, 0), new Vector3(intersection.width, intersection.heightOffset, 0), new Vector3(-intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), new Vector3(intersection.upConnectionWidth, intersection.heightOffset, intersection.upConnectionHeight), intersection.connectionMaterial);
+        } else
+        {
+            intersection.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
+            intersection.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
         }
 
         if (intersection.downConnection == true)
@@ -176,6 +176,11 @@ public class SquareIntersectionEditor : Editor
             intersection.transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, intersection.downConnectionHeight);
             GenerateMesh(intersection.transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-intersection.width, intersection.heightOffset, 0), new Vector3(intersection.width, intersection.heightOffset, 0), new Vector3(-intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), new Vector3(intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), intersection.connectionMaterial);
         }
+        else
+        {
+            intersection.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
+            intersection.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
+        }
 
         if (intersection.leftConnection == true)
         {
@@ -183,12 +188,22 @@ public class SquareIntersectionEditor : Editor
             intersection.transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, intersection.leftConnectionHeight);
             GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-intersection.height, intersection.heightOffset, 0), new Vector3(intersection.height, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), intersection.connectionMaterial);
         }
+        else
+        {
+            intersection.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
+            intersection.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
+        }
 
         if (intersection.rightConnection == true)
         {
             intersection.transform.GetChild(0).GetChild(3).localPosition = new Vector3(intersection.width, 0, 0);
             intersection.transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, intersection.rightConnectionHeight);
             GenerateMesh(intersection.transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-intersection.height, intersection.heightOffset, 0), new Vector3(intersection.height, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), intersection.connectionMaterial);
+        }
+        else
+        {
+            intersection.transform.GetChild(0).GetChild(3).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
+            intersection.transform.GetChild(0).GetChild(3).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
         }
     }
 

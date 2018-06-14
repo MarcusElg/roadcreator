@@ -62,7 +62,7 @@ public class RoadEditor : Editor
         GUILayout.Label("");
         GUILayout.Label("Default segment options", guiStyle);
 
-        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default Road aterial", roadCreator.defaultRoadMaterial, typeof(Material), false);
+        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default Road Material", roadCreator.defaultRoadMaterial, typeof(Material), false);
         roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default Shoulder Material", roadCreator.defaultShoulderMaterial, typeof(Material), false);
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -203,7 +203,6 @@ public class RoadEditor : Editor
                 Material material = new Material(roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
                 material.mainTextureScale = new Vector2(1, textureRepeat);
                 roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
-                Debug.Log(textureRepeat);
             }
         }
     }
@@ -331,6 +330,7 @@ public class RoadEditor : Editor
                 Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
                 roadCreator.currentSegment = null;
                 UpdateMesh();
+                DetectIntersectionConnections();
             }
         }
         else
@@ -341,6 +341,7 @@ public class RoadEditor : Editor
                 RoadSegment segment = CreateSegment(hitPosition);
                 Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
                 Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), hitPosition), "Create Point");
+                DetectIntersectionConnections();
             }
             else
             {

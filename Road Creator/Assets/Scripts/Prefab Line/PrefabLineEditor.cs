@@ -64,8 +64,9 @@ public class PrefabLineEditor : Editor
         GUILayout.Label("Prefab options", guiStyle);
 
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
-        prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab scale", prefabCreator.scale));
+        prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale));
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongt Curve", prefabCreator.rotateAlongCurve);
+        prefabCreator.offsetPrefabWidth = EditorGUILayout.Toggle("Offset Prefab Width", prefabCreator.offsetPrefabWidth);
 
         if (EditorGUI.EndChangeCheck() == true)
         {
@@ -107,7 +108,13 @@ public class PrefabLineEditor : Editor
             {
                 if (i == 0)
                 {
-                    currentPoints = CalculatePoints(i);
+                    if (prefabCreator.offsetPrefabWidth == true)
+                    {
+                        currentPoints = CalculatePoints(i, Misc.GetPrefabOffset(prefabCreator.prefab));
+                    } else
+                    {
+                        currentPoints = CalculatePoints(i, 0);
+                    }
                 }
 
                 if (prefabCreator.transform.GetChild(0).GetChild(i).name == "Point")
@@ -115,7 +122,13 @@ public class PrefabLineEditor : Editor
                     if (i < prefabCreator.transform.GetChild(0).childCount - 4)
                     {
                         Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
-                        nextPoints = CalculatePoints(i + 2);
+                        if (prefabCreator.offsetPrefabWidth == true)
+                        {
+                            nextPoints = CalculatePoints(i + 2, Misc.GetPrefabOffset(prefabCreator.prefab));
+                        } else
+                        {
+                            nextPoints = CalculatePoints(i + 2, 0);
+                        }
 
                         // Fix seams
                         int smoothnessAmount = prefabCreator.smoothnessAmount;
@@ -382,7 +395,7 @@ public class PrefabLineEditor : Editor
         }
     }
 
-    public Vector3[] CalculatePoints(int i)
+    public Vector3[] CalculatePoints(int i, float offset)
     {
         List<Vector3> points = new List<Vector3>();
         float distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position);
@@ -392,7 +405,7 @@ public class PrefabLineEditor : Editor
 
         float distancePerDivision = 1 / divisions;
 
-        for (float t = 0; t <= 1; t += distancePerDivision)
+        for (float t = offset; t <= 1; t += distancePerDivision)
         {
             if (t > 1)
             {

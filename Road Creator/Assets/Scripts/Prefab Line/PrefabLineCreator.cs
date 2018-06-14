@@ -11,6 +11,7 @@ public class PrefabLineCreator : MonoBehaviour {
     public bool rotateAlongCurve = true;
     public float scale = 1;
     public int smoothnessAmount = 3;
+    public bool offsetPrefabWidth = true;
 
     public GlobalSettings globalSettings;
 
