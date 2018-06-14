@@ -80,7 +80,6 @@ public class RoadEditor : Editor
         if (GUILayout.Button("Reset road"))
         {
             roadCreator.currentSegment = null;
-            roadCreator.points.Clear();
 
             for (int i = roadCreator.transform.GetChild(0).childCount - 1; i >= 0; i--)
             {
@@ -268,51 +267,20 @@ public class RoadEditor : Editor
 
     private void UndoUpdate()
     {
-        RemoveNullPoint();
-        RemoveNullPoint();
-
-        if (roadCreator.transform.GetChild(0).childCount > 0)
-        {
-            Transform lastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1);
-
-            if (lastSegment.transform.GetChild(0).childCount > 0)
-            {
-                if (lastSegment.transform.GetChild(0).childCount > 1)
-                {
-                    if (roadCreator.points.Count < 2 || (roadCreator.points != null && roadCreator.points[roadCreator.points.Count - 2] != lastSegment.GetChild(0).GetChild(lastSegment.GetChild(0).childCount - 2).gameObject))
-                    {
-                        roadCreator.points.Add(lastSegment.GetChild(0).GetChild(lastSegment.GetChild(0).childCount - 2).gameObject);
-                    }
-                }
-
-                if (roadCreator.points.Count == 0 || (roadCreator.points != null && roadCreator.points[roadCreator.points.Count - 1] != roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount - 1).gameObject))
-                {
-                    roadCreator.points.Add(lastSegment.GetChild(0).GetChild(lastSegment.GetChild(0).childCount - 1).gameObject);
-                }
-            }
-        }
-
         if (roadCreator.currentSegment != null && roadCreator.currentSegment.transform.GetChild(0).childCount == 3)
         {
             roadCreator.currentSegment = null;
         }
 
-        if (roadCreator.points != null && roadCreator.points.Count > 0 && roadCreator.points[roadCreator.points.Count - 1].transform.parent.childCount < 3)
+        Transform lastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1);
+        if (roadCreator.transform.GetChild(0).childCount > 0 && lastSegment.GetChild(0).childCount < 3)
         {
-            roadCreator.currentSegment = roadCreator.points[roadCreator.points.Count - 1].transform.parent.parent.GetComponent<RoadSegment>();
+            roadCreator.currentSegment = lastSegment.GetComponent<RoadSegment>();
         }
 
         DetectIntersectionConnections();
 
         UpdateMesh();
-    }
-
-    private void RemoveNullPoint()
-    {
-        if (roadCreator.points != null && roadCreator.points.Count > 0 && roadCreator.points[roadCreator.points.Count - 1] == null)
-        {
-            roadCreator.points.RemoveAt(roadCreator.points.Count - 1);
-        }
     }
 
     private void CreatePoints()
@@ -362,7 +330,6 @@ public class RoadEditor : Editor
         point.transform.position = position;
         point.layer = roadCreator.globalSettings.layer;
         point.AddComponent<Point>();
-        roadCreator.points.Add(point);
         return point;
     }
 
@@ -455,12 +422,7 @@ public class RoadEditor : Editor
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
         {
             objectToMove.GetComponent<BoxCollider>().enabled = true;
-
-            if (objectToMove == roadCreator.points[roadCreator.points.Count - 1] || objectToMove == roadCreator.points[0])
-            {
-                DetectIntersectionConnections();
-            }
-
+            DetectIntersectionConnections();
             objectToMove = null;
 
             if (extraObjectToMove != null)
@@ -475,10 +437,15 @@ public class RoadEditor : Editor
 
     private void DetectIntersectionConnections()
     {
-        if (roadCreator.points != null && roadCreator.points.Count > 0)
+        if (roadCreator.transform.GetChild(0).childCount > 0)
         {
-            DetectIntersectionConnection(roadCreator.points[0]);
-            DetectIntersectionConnection(roadCreator.points[roadCreator.points.Count - 1]);
+            DetectIntersectionConnection(roadCreator.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject);
+
+            Transform lastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1);
+            if (lastSegment.GetChild(0).childCount == 3)
+            {
+                DetectIntersectionConnection(lastSegment.transform.GetChild(0).GetChild(2).gameObject);
+            }
         }
     }
 
@@ -508,19 +475,16 @@ public class RoadEditor : Editor
                 if (roadCreator.currentSegment.transform.GetChild(0).childCount == 2)
                 {
                     Undo.DestroyObjectImmediate(roadCreator.currentSegment.transform.GetChild(0).GetChild(1).gameObject);
-                    roadCreator.points.Remove(roadCreator.points[roadCreator.points.Count - 1]);
                 }
                 else if (roadCreator.currentSegment.transform.GetChild(0).childCount == 1)
                 {
                     Undo.DestroyObjectImmediate(roadCreator.currentSegment.gameObject);
-                    roadCreator.points.Remove(roadCreator.points[roadCreator.points.Count - 1]);
 
                     if (roadCreator.transform.GetChild(0).childCount > 0)
                     {
                         roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
                         roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
                         Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
-                        roadCreator.points.Remove(roadCreator.points[roadCreator.points.Count - 1]);
                         roadCreator.currentSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
                     }
                     else
@@ -534,7 +498,6 @@ public class RoadEditor : Editor
                 roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
                 roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
                 Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
-                roadCreator.points.Remove(roadCreator.points[roadCreator.points.Count - 1]);
                 roadCreator.currentSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
             }
         }
@@ -546,23 +509,20 @@ public class RoadEditor : Editor
         Handles.color = Color.blue;
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
 
-        if (roadCreator.points != null)
+        for (int i = 0; i < roadCreator.transform.GetChild(0).childCount; i++)
         {
-            for (int i = 0; i < roadCreator.points.Count; i++)
+            for (int j = 0; j < roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).childCount; j++)
             {
-                if (roadCreator.points[i] != null)
+                if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).name != "Control Point")
                 {
-                    if (roadCreator.points[i].name != "Control Point")
-                    {
-                        Handles.color = Color.red;
-                        Handles.CylinderHandleCap(0, roadCreator.points[i].transform.position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
-                    }
-                    else
-                    {
-                        Handles.color = Color.yellow;
-                        Handles.CylinderHandleCap(0, roadCreator.points[i].transform.position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
-                    }
+                    Handles.color = Color.red;
                 }
+                else
+                {
+                    Handles.color = Color.yellow;
+                }
+
+                Handles.CylinderHandleCap(0, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).transform.position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
             }
         }
 

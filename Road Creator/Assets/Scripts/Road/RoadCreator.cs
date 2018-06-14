@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class RoadCreator : MonoBehaviour {
 
-    public List<GameObject> points = new List<GameObject>();
     public Material defaultRoadMaterial = null;
     public Material defaultShoulderMaterial = null;
     public RoadSegment currentSegment;
