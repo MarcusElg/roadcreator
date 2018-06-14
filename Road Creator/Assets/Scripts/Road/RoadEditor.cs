@@ -17,10 +17,6 @@ public class RoadEditor : Editor
     private void OnEnable()
     {
         roadCreator = (RoadCreator)target;
-        if (roadCreator.roadEditor == null)
-        {
-            roadCreator.roadEditor = this;
-        }
 
         if (roadCreator.transform.childCount == 0)
         {
@@ -67,7 +63,7 @@ public class RoadEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            UpdateMesh();
+            roadCreator.UpdateMesh();
         }
 
         if (roadCreator.globalSettings.debug == true)
@@ -89,120 +85,7 @@ public class RoadEditor : Editor
 
         if (GUILayout.Button("Generate road"))
         {
-            UpdateMesh();
-        }
-    }
-
-    public void UpdateMesh()
-    {
-        if (roadCreator.defaultRoadMaterial == null)
-        {
-            Debug.Log("You have to select a default road material before generating the road mesh");
-            return;
-        }
-
-        if (roadCreator.defaultShoulderMaterial == null)
-        {
-            Debug.Log("You have to select a default shoulder material before generating the road mesh");
-            return;
-        }
-
-        Vector3[] currentPoints = null;
-
-        for (int i = 0; i < roadCreator.transform.GetChild(0).childCount; i++)
-        {
-            if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).childCount == 3)
-            {
-                Vector3 previousPoint = Misc.MaxVector3;
-
-                if (i == 0)
-                {
-                    currentPoints = CalculatePoints(roadCreator.transform.GetChild(0).GetChild(i));
-
-                    if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection != null)
-                    {
-                        previousPoint = roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.position;
-                    }
-                }
-                else
-                {
-                    previousPoint = Misc.MaxVector3;
-                }
-
-                if (i < roadCreator.transform.GetChild(0).childCount - 1 && roadCreator.transform.GetChild(0).GetChild(i + 1).GetChild(0).childCount == 3)
-                {
-                    Vector3[] nextPoints = CalculatePoints(roadCreator.transform.GetChild(0).GetChild(i + 1));
-                    Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
-
-                    int smoothnessAmount = roadCreator.smoothnessAmount;
-                    if ((currentPoints.Length / 2) < smoothnessAmount)
-                    {
-                        smoothnessAmount = currentPoints.Length / 2;
-                    }
-
-                    if ((nextPoints.Length / 2) < smoothnessAmount)
-                    {
-                        smoothnessAmount = nextPoints.Length / 2;
-                    }
-
-                    float distanceSection = 1f / ((smoothnessAmount * 2));
-                    for (float t = distanceSection; t < 0.5; t += distanceSection)
-                    {
-                        // First sectiond
-                        currentPoints[currentPoints.Length - 1 - smoothnessAmount + (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], t);
-
-                        // Second section
-                        nextPoints[smoothnessAmount - (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 1 - t);
-                    }
-
-                    // First and last points
-                    currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
-                    //currentPoints[currentPoints.Length - smoothnessAmount - 2] = Misc.GetCenter(currentPoints[currentPoints.Length - smoothnessAmount - 3], currentPoints[currentPoints.Length - smoothnessAmount - 1]);
-                    nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
-
-                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), smoothnessAmount);
-                    roadCreator.StartCoroutine(FixTextureStretch(Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
-                    currentPoints = nextPoints;
-                }
-                else
-                {
-                    Vector3[] nextPoints = null;
-
-                    if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection != null)
-                    {
-                        nextPoints = new Vector3[1];
-                        nextPoints[0] = roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.position;
-                    }
-
-                    roadCreator.transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, roadCreator.heightOffset, roadCreator.transform.GetChild(0).GetChild(i), 0);
-                    roadCreator.StartCoroutine(FixTextureStretch(Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
-                }
-            }
-            else
-            {
-                for (int j = 0; j < roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
-                {
-                    roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
-                    roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
-                }
-            }
-        }
-    }
-
-    IEnumerator FixTextureStretch(float length, int i)
-    {
-        yield return new WaitForSeconds(0.1f);
-
-        if (roadCreator.transform.GetChild(0).childCount > i)
-        {
-            float textureRepeat = length * roadCreator.globalSettings.resolution;
-
-            for (int j = 0; j < 3; j++)
-            {
-                Material material = new Material(roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
-                material.mainTextureScale = new Vector2(1, textureRepeat);
-                roadCreator.transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
-            }
+            roadCreator.UpdateMesh();
         }
     }
 
@@ -240,7 +123,7 @@ public class RoadEditor : Editor
 
             if (roadCreator.currentSegment != null && roadCreator.currentSegment.transform.GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
             {
-                points = CalculatePoints();
+                points = CalculateTemporaryPoints(hitPosition);
             }
 
             if (roadCreator.transform.childCount > 0)
@@ -280,7 +163,7 @@ public class RoadEditor : Editor
 
         DetectIntersectionConnections();
 
-        UpdateMesh();
+        roadCreator.UpdateMesh();
     }
 
     private void CreatePoints()
@@ -297,7 +180,7 @@ public class RoadEditor : Editor
                 // Create end point
                 Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
                 roadCreator.currentSegment = null;
-                UpdateMesh();
+                roadCreator.UpdateMesh();
                 DetectIntersectionConnections();
             }
         }
@@ -431,7 +314,7 @@ public class RoadEditor : Editor
                 extraObjectToMove = null;
             }
 
-            UpdateMesh();
+            roadCreator.UpdateMesh();
         }
     }
 
@@ -570,35 +453,7 @@ public class RoadEditor : Editor
         }
     }
 
-    public Vector3[] CalculatePoints(Transform segment)
-    {
-        float divisions = Misc.CalculateDistance(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position);
-        divisions = Mathf.Max(2, divisions);
-        List<Vector3> points = new List<Vector3>();
-        float distancePerDivision = 1 / divisions;
-
-        for (float t = 0; t <= 1; t += distancePerDivision)
-        {
-            if (t > 1 - distancePerDivision)
-            {
-                t = 1;
-            }
-
-            Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
-
-            RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.layer)))
-            {
-                position.y = raycastHit.point.y;
-            }
-
-            points.Add(position);
-        }
-
-        return points.ToArray();
-    }
-
-    private Vector3[] CalculatePoints()
+    public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)
     {
         float divisions = Misc.CalculateDistance(roadCreator.currentSegment.transform.GetChild(0).GetChild(0).position, roadCreator.currentSegment.transform.GetChild(0).GetChild(1).position, hitPosition);
         divisions = Mathf.Max(2, divisions);

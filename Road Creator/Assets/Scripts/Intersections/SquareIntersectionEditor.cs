@@ -132,7 +132,7 @@ public class SquareIntersectionEditor : Editor
                 if (gameObjects[i].intersectionConnection != null)
                 {
                     gameObjects[i].transform.position = gameObjects[i].intersectionConnection.transform.position;
-                    gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().roadEditor.UpdateMesh();
+                    gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateMesh();
                 }
             }
         }
