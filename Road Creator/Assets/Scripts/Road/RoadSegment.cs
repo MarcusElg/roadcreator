@@ -8,6 +8,7 @@ public class RoadSegment : MonoBehaviour
     public Material roadMaterial;
     public float roadWidth = 3;
     public bool flipped = false;
+    public bool deformTerrain = true;
 
     public bool leftShoulder = false;
     public float leftShoulderWidth = 1;
@@ -19,14 +20,14 @@ public class RoadSegment : MonoBehaviour
     public float rightShoulderHeightOffset = 0;
     public Material rightShoulderMaterial;
 
-    public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, int smoothnessAmount)
+    public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, int smoothnessAmount, RoadCreator roadCreator)
     {
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount);
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, leftShoulder);
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, rightShoulder);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, roadCreator, leftShoulder);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, roadCreator, rightShoulder);
     }
-    
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, bool generate = true)
+
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, bool generate = true)
     {
         if (generate == true)
         {
@@ -56,6 +57,29 @@ public class RoadSegment : MonoBehaviour
                     vertices[verticeIndex] = (points[i] - left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
                     vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
+
+                /*if (deformTerrain == true)
+                {
+                    // Change y position
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(vertices[verticeIndex] + segment.position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.roadLayer)))
+                    {
+                        Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
+                        if (terrain != null)
+                        {
+                            TerrainData terrainData = terrain.terrainData;
+
+                            int terrainPointX = (int)((raycastHit.point.x / terrainData.size.x) * terrainData.heightmapWidth);
+                            int terrainPointY = (int)((vertices[verticeIndex] + segment.position).y * terrainData.size.y);
+                            int terrainPointZ = (int)((raycastHit.point.z / terrainData.size.z) * terrainData.heightmapWidth);
+                            Debug.Log(terrainPointX + ", " + terrainPointZ);
+                            float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+                            modifiedHeights[terrainPointX - (int)terrain.transform.position.x, terrainPointZ - (int)terrain.transform.position.z] = terrainPointY;
+                            terrainData.SetHeights(0, 0, modifiedHeights);
+                        }
+                    }
+                }*/
 
                 if (i < points.Length - 1)
                 {
@@ -96,7 +120,8 @@ public class RoadSegment : MonoBehaviour
 
             mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
             mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
-        } else
+        }
+        else
         {
             mesh.GetComponent<MeshFilter>().sharedMesh = null;
             mesh.GetComponent<MeshCollider>().sharedMesh = null;
@@ -105,7 +130,7 @@ public class RoadSegment : MonoBehaviour
         mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
     }
 
-    private Vector2[] GenerateUvs (Vector2[] uvs, Vector3[] vertices)
+    private Vector2[] GenerateUvs(Vector2[] uvs, Vector3[] vertices)
     {
         // Calculate total distance
         float totalDistanceLeft = 0;
@@ -145,7 +170,8 @@ public class RoadSegment : MonoBehaviour
             if (i > 1)
             {
                 currentDistance += Vector3.Distance(vertices[i - 2], vertices[i]);
-            } else
+            }
+            else
             {
                 currentDistance = 0;
             }

@@ -97,7 +97,7 @@ public class RoadEditor : Editor
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.layer)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
         {
             hitPosition = raycastHit.point;
 
@@ -211,7 +211,7 @@ public class RoadEditor : Editor
         point.GetComponent<BoxCollider>().size = new Vector3(roadCreator.globalSettings.pointSize, roadCreator.globalSettings.pointSize, roadCreator.globalSettings.pointSize);
         point.transform.SetParent(parent);
         point.transform.position = position;
-        point.layer = roadCreator.globalSettings.layer;
+        point.layer = roadCreator.globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
         return point;
     }
@@ -239,6 +239,7 @@ public class RoadEditor : Editor
         mainMesh.AddComponent<MeshRenderer>();
         mainMesh.AddComponent<MeshFilter>();
         mainMesh.AddComponent<MeshCollider>();
+        mainMesh.layer = roadCreator.globalSettings.roadLayer;
 
         GameObject leftShoulderMesh = new GameObject("Left Shoulder Mesh");
         leftShoulderMesh.transform.SetParent(meshes.transform);
@@ -246,6 +247,7 @@ public class RoadEditor : Editor
         leftShoulderMesh.AddComponent<MeshRenderer>();
         leftShoulderMesh.AddComponent<MeshFilter>();
         leftShoulderMesh.AddComponent<MeshCollider>();
+        leftShoulderMesh.layer = roadCreator.globalSettings.roadLayer;
 
         GameObject rightShoulderMesh = new GameObject("Right Shoulder Mesh");
         rightShoulderMesh.transform.SetParent(meshes.transform);
@@ -253,6 +255,7 @@ public class RoadEditor : Editor
         rightShoulderMesh.AddComponent<MeshRenderer>();
         rightShoulderMesh.AddComponent<MeshFilter>();
         rightShoulderMesh.AddComponent<MeshCollider>();
+        rightShoulderMesh.layer = roadCreator.globalSettings.roadLayer;
 
         roadCreator.currentSegment = segment;
 
@@ -335,7 +338,7 @@ public class RoadEditor : Editor
     private void DetectIntersectionConnection(GameObject gameObject)
     {
         RaycastHit raycastHit2;
-        if (Physics.Raycast(new Ray(gameObject.transform.position + Vector3.up, Vector3.down), out raycastHit2, 100f, ~(1 << roadCreator.globalSettings.layer)))
+        if (Physics.Raycast(new Ray(gameObject.transform.position + Vector3.up, Vector3.down), out raycastHit2, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
         {
             if (raycastHit2.collider.name.Contains("Connection Point"))
             {
@@ -470,7 +473,7 @@ public class RoadEditor : Editor
             Vector3 position = Misc.Lerp3(roadCreator.currentSegment.transform.GetChild(0).GetChild(0).position, roadCreator.currentSegment.transform.GetChild(0).GetChild(1).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.layer)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
             {
                 position.y = raycastHit.point.y;
             }

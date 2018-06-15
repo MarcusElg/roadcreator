@@ -18,7 +18,8 @@ public class GlobalSettingsEditor : Editor {
         EditorGUI.BeginChangeCheck();
         settings.pointSize = Mathf.Max(0.2f, EditorGUILayout.FloatField("Point Size", settings.pointSize));
         settings.resolution = Mathf.Max(0.2f, EditorGUILayout.FloatField("Resolution", settings.resolution));
-        settings.layer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.layer), 9, 31);
+        settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
+        settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
         settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
 
         if (EditorGUI.EndChangeCheck() == true)

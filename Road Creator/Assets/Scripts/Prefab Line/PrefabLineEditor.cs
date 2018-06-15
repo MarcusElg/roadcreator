@@ -66,6 +66,11 @@ public class PrefabLineEditor : Editor
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale));
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongt Curve", prefabCreator.rotateAlongCurve);
+        if (prefabCreator.rotateAlongCurve == true)
+        {
+            prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
+        }
+
         prefabCreator.offsetPrefabWidth = EditorGUILayout.Toggle("Offset Prefab Width", prefabCreator.offsetPrefabWidth);
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -187,13 +192,26 @@ public class PrefabLineEditor : Editor
             prefab.transform.SetParent(prefabCreator.transform.GetChild(1));
             prefab.transform.position = currentPoints[j];
             prefab.name = "Prefab";
-            prefab.layer = prefabCreator.globalSettings.layer;
+            prefab.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
             prefab.transform.localScale = new Vector3(prefabCreator.scale, prefabCreator.scale, prefabCreator.scale);
             Vector3 left = Misc.CalculateLeft(currentPoints, nextPoints, Misc.MaxVector3, j);
+            Vector3 forward = new Vector3(left.z, 0, -left.x);
 
             if (prefabCreator.rotateAlongCurve == true)
             {
-                prefab.transform.rotation = Quaternion.LookRotation(left);
+                if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.forward)
+                {
+                    prefab.transform.rotation = Quaternion.LookRotation(forward);
+                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.backward)
+                {
+                    prefab.transform.rotation = Quaternion.LookRotation(-forward);
+                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
+                {
+                    prefab.transform.rotation = Quaternion.LookRotation(left);
+                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
+                {
+                    prefab.transform.rotation = Quaternion.LookRotation(-left);
+                }
             }
         }
     }
@@ -206,7 +224,7 @@ public class PrefabLineEditor : Editor
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.layer)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -293,7 +311,7 @@ public class PrefabLineEditor : Editor
         point.GetComponent<BoxCollider>().size = new Vector3(prefabCreator.globalSettings.pointSize, prefabCreator.globalSettings.pointSize, prefabCreator.globalSettings.pointSize);
         point.transform.SetParent(prefabCreator.transform.GetChild(0));
         point.transform.position = raycastHit;
-        point.layer = prefabCreator.globalSettings.layer;
+        point.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
         return point;
     }
 
@@ -415,7 +433,7 @@ public class PrefabLineEditor : Editor
             Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.layer)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
             {
                 position.y = raycastHit.point.y;
             }
@@ -450,7 +468,7 @@ public class PrefabLineEditor : Editor
             Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(lastIndex - 1).position, prefabCreator.transform.GetChild(0).GetChild(lastIndex).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.layer)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
             {
                 position.y = raycastHit.point.y;
             }
