@@ -137,7 +137,7 @@ public class SquareIntersectionEditor : Editor
             }
         }
 
-        if (GUILayout.Button("Generate intersection"))
+        if (GUILayout.Button("Generate Intersection"))
         {
             GenerateMeshes();
         }

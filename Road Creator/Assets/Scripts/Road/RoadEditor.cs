@@ -56,10 +56,10 @@ public class RoadEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
         GUILayout.Label("");
-        GUILayout.Label("Default segment options", guiStyle);
+        GUILayout.Label("First Segment Options", guiStyle);
 
-        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("Default Road Material", roadCreator.defaultRoadMaterial, typeof(Material), false);
-        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("Default Shoulder Material", roadCreator.defaultShoulderMaterial, typeof(Material), false);
+        roadCreator.defaultRoadMaterial = (Material)EditorGUILayout.ObjectField("First Segment Road Material", roadCreator.defaultRoadMaterial, typeof(Material), false);
+        roadCreator.defaultShoulderMaterial = (Material)EditorGUILayout.ObjectField("First Segment Shoulder Material", roadCreator.defaultShoulderMaterial, typeof(Material), false);
 
         if (EditorGUI.EndChangeCheck() == true)
         {
@@ -73,7 +73,7 @@ public class RoadEditor : Editor
             EditorGUILayout.ObjectField(roadCreator.currentSegment, typeof(RoadSegment), true);
         }
 
-        if (GUILayout.Button("Reset road"))
+        if (GUILayout.Button("Reset Road"))
         {
             roadCreator.currentSegment = null;
 
@@ -83,7 +83,7 @@ public class RoadEditor : Editor
             }
         }
 
-        if (GUILayout.Button("Generate road"))
+        if (GUILayout.Button("Generate Road"))
         {
             roadCreator.UpdateMesh();
         }

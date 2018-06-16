@@ -60,7 +60,7 @@ public class PrefabLineEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
         GUILayout.Label("");
-        GUILayout.Label("Prefab options", guiStyle);
+        GUILayout.Label("Prefab Options", guiStyle);
 
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale));
@@ -90,7 +90,7 @@ public class PrefabLineEditor : Editor
             }
         }
 
-        if (GUILayout.Button("Place prefabs"))
+        if (GUILayout.Button("Place Prefabs"))
         {
             PlacePrefabs();
         }
