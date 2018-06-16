@@ -15,18 +15,6 @@ public class RoadCreator : MonoBehaviour
 
     public void UpdateMesh()
     {
-        if (defaultRoadMaterial == null)
-        {
-            Debug.Log("You have to select a default road material before generating the road mesh");
-            return;
-        }
-
-        if (defaultShoulderMaterial == null)
-        {
-            Debug.Log("You have to select a default shoulder material before generating the road mesh");
-            return;
-        }
-
         Vector3[] currentPoints = null;
 
         for (int i = 0; i < transform.GetChild(0).childCount; i++)

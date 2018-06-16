@@ -112,6 +112,18 @@ public class RoadEditor : Editor
                 {
                     if (guiEvent.shift == true)
                     {
+                        if (roadCreator.defaultRoadMaterial == null)
+                        {
+                            Debug.Log("You have to select a default road material before creating points");
+                            return;
+                        }
+
+                        if (roadCreator.defaultShoulderMaterial == null)
+                        {
+                            Debug.Log("You have to select a default shoulder material before creating points");
+                            return;
+                        }
+
                         CreatePoints();
                     }
                 }
