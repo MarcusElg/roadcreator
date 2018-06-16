@@ -233,9 +233,30 @@ public class RoadEditor : Editor
         RoadSegment segment = new GameObject("Segment").AddComponent<RoadSegment>();
         segment.transform.SetParent(roadCreator.transform.GetChild(0), false);
         segment.transform.position = position;
-        segment.roadMaterial = roadCreator.defaultRoadMaterial;
-        segment.leftShoulderMaterial = roadCreator.defaultShoulderMaterial;
-        segment.rightShoulderMaterial = roadCreator.defaultShoulderMaterial;
+
+        if (roadCreator.transform.GetChild(0).childCount > 1)
+        {
+            RoadSegment oldLastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
+            segment.roadMaterial = oldLastSegment.roadMaterial;
+            segment.roadWidth = oldLastSegment.roadWidth;
+            segment.flipped = oldLastSegment.flipped;
+            segment.terrainOption = oldLastSegment.terrainOption;
+
+            segment.leftShoulderMaterial = oldLastSegment.leftShoulderMaterial;
+            segment.leftShoulder = oldLastSegment.leftShoulder;
+            segment.leftShoulderWidth = oldLastSegment.leftShoulderWidth;
+            segment.leftShoulderHeightOffset = oldLastSegment.leftShoulderHeightOffset;
+
+            segment.rightShoulderMaterial = oldLastSegment.rightShoulderMaterial;
+            segment.rightShoulder = oldLastSegment.rightShoulder;
+            segment.rightShoulderWidth = oldLastSegment.rightShoulderWidth;
+            segment.rightShoulderHeightOffset = oldLastSegment.rightShoulderHeightOffset;
+        } else
+        {
+            segment.roadMaterial = roadCreator.defaultRoadMaterial;
+            segment.leftShoulderMaterial = roadCreator.defaultShoulderMaterial;
+            segment.rightShoulderMaterial = roadCreator.defaultShoulderMaterial;
+        }
 
         GameObject points = new GameObject("Points");
         points.transform.SetParent(segment.transform);
@@ -382,6 +403,11 @@ public class RoadEditor : Editor
                     {
                         roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
                         roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
+                        roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshFilter>().sharedMesh = null;
+                        roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshCollider>().sharedMesh = null;
+                        roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshFilter>().sharedMesh = null;
+                        roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshCollider>().sharedMesh = null;
+
                         Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
                         roadCreator.currentSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
                     }
@@ -395,6 +421,11 @@ public class RoadEditor : Editor
             {
                 roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
                 roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
+                roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshFilter>().sharedMesh = null;
+                roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshCollider>().sharedMesh = null;
+                roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshFilter>().sharedMesh = null;
+                roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshCollider>().sharedMesh = null;
+
                 Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
                 roadCreator.currentSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
             }
