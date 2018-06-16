@@ -34,8 +34,18 @@ public class RoadSystemEditor : Editor
         if (GUILayout.Button("Create Intersection"))
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<SquareIntersection>();
-            gameObject.name = "Square Intersection";
+
+            if (roadSystem.intersectionType == RoadSystem.IntersectionType.square)
+            {
+                gameObject.AddComponent<SquareIntersection>();
+                gameObject.name = "Square Intersection";
+            }
+            else if (roadSystem.intersectionType == RoadSystem.IntersectionType.triangle)
+            {
+                gameObject.AddComponent<TriangleIntersection>();
+                gameObject.name = "Triangle Intersection";
+            }
+
             gameObject.transform.SetParent(roadSystem.transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Intersection");
 
