@@ -73,13 +73,10 @@ public class Misc
         return (one + (difference / 2));
     }
 
-    public static float GetPrefabOffset(GameObject prefab)
+    public static float GetPrefabOffset(GameObject prefab, float scale, float offset)
     {
         Mesh mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
-        Vector3 firstVertex = mesh.vertices[0];
-        Vector3 lastVertex = mesh.vertices[mesh.vertices.Length - 1];
-        Debug.Log(firstVertex + ", " + lastVertex);
-        return Mathf.Abs((lastVertex - firstVertex).x / 2);
+        return ((mesh.bounds.size.x * scale) - offset) / 2;
     }
 
 }

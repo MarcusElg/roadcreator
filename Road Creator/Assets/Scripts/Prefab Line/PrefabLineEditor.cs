@@ -55,7 +55,7 @@ public class PrefabLineEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
-        prefabCreator.spacing = Mathf.Max(0, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
+        prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
@@ -63,7 +63,7 @@ public class PrefabLineEditor : Editor
         GUILayout.Label("Prefab Options", guiStyle);
 
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
-        prefabCreator.scale = Mathf.Clamp01(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale));
+        prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0, 10);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongt Curve", prefabCreator.rotateAlongCurve);
         if (prefabCreator.rotateAlongCurve == true)
         {
@@ -114,7 +114,7 @@ public class PrefabLineEditor : Editor
                 {
                     if (prefabCreator.offsetPrefabWidth == true)
                     {
-                        currentPoints = CalculatePoints(i, Misc.GetPrefabOffset(prefabCreator.prefab));
+                        currentPoints = CalculatePoints(i, Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
                     } else
                     {
                         currentPoints = CalculatePoints(i, 0);
@@ -127,7 +127,7 @@ public class PrefabLineEditor : Editor
                     {
                         if (prefabCreator.offsetPrefabWidth == true)
                         {
-                            nextPoints = CalculatePoints(i + 2, Misc.GetPrefabOffset(prefabCreator.prefab));
+                            nextPoints = CalculatePoints(i + 2, Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
                         } else
                         {
                             nextPoints = CalculatePoints(i + 2, 0);
@@ -390,8 +390,9 @@ public class PrefabLineEditor : Editor
         divisions = Mathf.Max(2, divisions);
 
         float distancePerDivision = 1 / divisions;
+        offset /= distance;
 
-        for (float t = offset; t <= 1; t += distancePerDivision)
+        for (float t = offset; t < 1 - offset; t += distancePerDivision)
         {
             if (t > 1)
             {
