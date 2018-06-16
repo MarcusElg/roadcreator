@@ -8,7 +8,9 @@ public class RoadSegment : MonoBehaviour
     public Material roadMaterial;
     public float roadWidth = 3;
     public bool flipped = false;
-    public bool deformTerrain = true;
+
+    public enum TerrainOption { adapt, deform, ignore };
+    public TerrainOption terrainOption;
 
     public bool leftShoulder = false;
     public float leftShoulderWidth = 1;
@@ -58,7 +60,7 @@ public class RoadSegment : MonoBehaviour
                     vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
 
-                /*if (deformTerrain == true)
+                /*if (terrainOption == TerrainOption.deform)
                 {
                     // Change y position
                     RaycastHit raycastHit;

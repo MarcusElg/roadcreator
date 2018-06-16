@@ -142,10 +142,13 @@ public class RoadCreator : MonoBehaviour
 
             Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
 
-            RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
+            if (segment.GetComponent<RoadSegment>().terrainOption == RoadSegment.TerrainOption.adapt)
             {
-                position.y = raycastHit.point.y;
+                RaycastHit raycastHit;
+                if (Physics.Raycast(position + new Vector3(0, 100, 0), Vector3.down, out raycastHit, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
+                {
+                    position.y = raycastHit.point.y;
+                }
             }
 
             points.Add(position);
