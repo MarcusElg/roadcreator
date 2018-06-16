@@ -56,7 +56,6 @@ public class PrefabLineEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         prefabCreator.spacing = Mathf.Max(0, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
-        prefabCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", prefabCreator.smoothnessAmount));
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
@@ -126,7 +125,6 @@ public class PrefabLineEditor : Editor
                 {
                     if (i < prefabCreator.transform.GetChild(0).childCount - 4)
                     {
-                        Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
                         if (prefabCreator.offsetPrefabWidth == true)
                         {
                             nextPoints = CalculatePoints(i + 2, Misc.GetPrefabOffset(prefabCreator.prefab));
@@ -134,36 +132,6 @@ public class PrefabLineEditor : Editor
                         {
                             nextPoints = CalculatePoints(i + 2, 0);
                         }
-
-                        // Fix seams
-                        int smoothnessAmount = prefabCreator.smoothnessAmount;
-                        if ((currentPoints.Length / 2) < smoothnessAmount)
-                        {
-                            smoothnessAmount = currentPoints.Length / 2;
-                        }
-
-                        if ((nextPoints.Length / 2) < smoothnessAmount)
-                        {
-                            smoothnessAmount = nextPoints.Length / 2;
-                        }
-
-                        float distanceSection = 1f / ((smoothnessAmount * 2));
-                        for (float t = distanceSection; t < 0.5; t += distanceSection)
-                        {
-                            // First section
-                            currentPoints[(currentPoints.Length - 1 - smoothnessAmount) + (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], t);
-
-                            // Second section
-                            nextPoints[smoothnessAmount - (int)(t * 2 * smoothnessAmount)] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 1 - t);
-                            /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                            g.transform.position = currentPoints[currentPoints.Length - 1 - smoothnessAmount];
-                            g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                            g.transform.position = nextPoints[smoothnessAmount];
-                            g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                            g.transform.position = originalControlPoint;*/
-                        }
-                        currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
-                        nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 0.5f);
 
                         PlacePrefabsInSegment(currentPoints, nextPoints, true);
 

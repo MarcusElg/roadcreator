@@ -13,7 +13,6 @@ public class PrefabLineCreator : MonoBehaviour
     public enum RotationDirection { forward, backward, left, right };
     public RotationDirection rotationDirection;
     public float scale = 1;
-    public int smoothnessAmount = 3;
     public bool offsetPrefabWidth = true;
 
     public GlobalSettings globalSettings;
