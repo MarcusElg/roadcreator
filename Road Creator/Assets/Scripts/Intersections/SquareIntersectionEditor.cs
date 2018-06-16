@@ -53,17 +53,20 @@ public class SquareIntersectionEditor : Editor
     {
         GameObject side = new GameObject(name + " Side");
         side.transform.SetParent(intersection.transform.GetChild(0));
+        side.transform.localPosition = Vector3.zero;
 
         GameObject mesh = new GameObject(name + " Mesh");
         mesh.AddComponent<MeshFilter>();
         mesh.AddComponent<MeshRenderer>();
         mesh.AddComponent<MeshCollider>();
         mesh.transform.SetParent(side.transform);
+        mesh.transform.localPosition = Vector3.zero;
 
         GameObject connectionPoint = new GameObject(name + " Connection Point");
         connectionPoint.AddComponent<BoxCollider>();
         connectionPoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
         connectionPoint.transform.SetParent(side.transform);
+        connectionPoint.transform.localPosition = Vector3.zero;
 
         return side;
     }
