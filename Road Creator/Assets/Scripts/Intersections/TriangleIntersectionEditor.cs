@@ -116,7 +116,7 @@ public class TriangleIntersectionEditor : Editor {
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            GenerateMeshes();
+            intersection.GenerateMeshes();
 
             // Update connections
             Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
@@ -132,122 +132,8 @@ public class TriangleIntersectionEditor : Editor {
 
         if (GUILayout.Button("Generate Intersection"))
         {
-            GenerateMeshes();
+            intersection.GenerateMeshes();
         }
-    }
-
-    private void GenerateMeshes()
-    {
-        if (intersection.centerMaterial == null)
-        {
-            Debug.Log("You have to select a center material before generating the intersection");
-            return;
-        }
-
-        if (intersection.connectionMaterial == null)
-        {
-            Debug.Log("You have to select a connection material before generating the intersection");
-            return;
-        }
-
-        GenerateCenterMesh();
-
-        if (intersection.downConnection == true)
-        {
-            intersection.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, -intersection.height);
-            intersection.transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, intersection.downConnectionHeight);
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-intersection.width, intersection.heightOffset, 0), new Vector3(intersection.width, intersection.heightOffset, 0), new Vector3(-intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), new Vector3(intersection.downConnectionWidth, intersection.heightOffset, intersection.downConnectionHeight), intersection.connectionMaterial);
-        }
-        else
-        {
-            intersection.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
-            intersection.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
-        }
-
-        if (intersection.leftConnection == true)
-        {
-            intersection.transform.GetChild(0).GetChild(1).localPosition = Misc.GetCenter(new Vector3(-intersection.width, intersection.heightOffset, -intersection.height), new Vector3(0, intersection.heightOffset, intersection.height));
-            intersection.transform.GetChild(0).GetChild(1).rotation = Quaternion.FromToRotation(Vector3.right, new Vector3(0, intersection.heightOffset, intersection.height) - new Vector3(-intersection.width, intersection.heightOffset, -intersection.height));
-            intersection.transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, intersection.leftConnectionHeight);
-            float connectionHeight = Vector3.Distance(new Vector3(-intersection.width, intersection.heightOffset, -intersection.height), new Vector3(0, intersection.heightOffset, intersection.height)) / 2;
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-connectionHeight, intersection.heightOffset, 0), new Vector3(connectionHeight, intersection.heightOffset, 0), new Vector3(-intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), new Vector3(intersection.leftConnectionWidth, intersection.heightOffset, intersection.leftConnectionHeight), intersection.connectionMaterial);
-        }
-        else
-        {
-            intersection.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
-            intersection.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
-        }
-
-        if (intersection.rightConnection == true)
-        {
-            intersection.transform.GetChild(0).GetChild(2).localPosition = Misc.GetCenter(new Vector3(intersection.width, intersection.heightOffset, -intersection.height), new Vector3(0, intersection.heightOffset, intersection.height));
-            intersection.transform.GetChild(0).GetChild(2).rotation = Quaternion.FromToRotation(Vector3.left, new Vector3(0, intersection.heightOffset, intersection.height) - new Vector3(intersection.width, intersection.heightOffset, -intersection.height));
-            intersection.transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, intersection.rightConnectionHeight);
-            float connectionHeight = Vector3.Distance(new Vector3(-intersection.width, intersection.heightOffset, -intersection.height), new Vector3(0, intersection.heightOffset, intersection.height)) / 2;
-            GenerateMesh(intersection.transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-connectionHeight, intersection.heightOffset, 0), new Vector3(connectionHeight, intersection.heightOffset, 0), new Vector3(-intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), new Vector3(intersection.rightConnectionWidth, intersection.heightOffset, intersection.rightConnectionHeight), intersection.connectionMaterial);
-        }
-        else
-        {
-            intersection.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
-            intersection.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
-        }
-    }
-
-    private void GenerateCenterMesh ()
-    {
-        //GenerateMesh(new Vector3(-intersection.width, intersection.heightOffset, -intersection.height), new Vector3(intersection.width, intersection.heightOffset, -intersection.height), new Vector3(-intersection.width, intersection.heightOffset, intersection.height), new Vector3(intersection.width, intersection.heightOffset, intersection.height));
-        Vector3[] vertices = new Vector3[3];
-        Vector2[] uvs = new Vector2[3];
-
-        vertices[0] = new Vector3(-intersection.width, intersection.heightOffset, -intersection.height);
-        vertices[1] = new Vector3(intersection.width, intersection.heightOffset, -intersection.height);
-        vertices[2] = new Vector3(0, intersection.heightOffset, intersection.height);
-
-        uvs[0] = new Vector2(0, 0);
-        uvs[1] = new Vector2(1, 0);
-        uvs[2] = new Vector2(0.5f, 1);
-
-        Mesh mesh = new Mesh();
-        mesh.vertices = vertices;
-        mesh.triangles = new int[] { 2, 1, 0 };
-        mesh.uv = uvs;
-
-        intersection.transform.GetChild(1).GetComponent<MeshFilter>().sharedMesh = mesh;
-        Material newMaterial = intersection.centerMaterial;
-        Texture texture = newMaterial.mainTexture;
-        texture.wrapMode = TextureWrapMode.Clamp;
-        newMaterial.mainTexture = texture;
-        intersection.transform.GetChild(1).GetComponent<MeshRenderer>().sharedMaterial = intersection.centerMaterial;
-        intersection.transform.GetChild(1).GetComponent<MeshCollider>().sharedMesh = mesh;
-    }
-
-    private void GenerateMesh(Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour, Material material)
-    {
-        Vector3[] vertices = new Vector3[4];
-        Vector2[] uvs = new Vector2[4];
-
-        vertices[0] = pointOne;
-        vertices[1] = pointTwo;
-        vertices[2] = pointThree;
-        vertices[3] = pointFour;
-
-        uvs[0] = new Vector2(0, 0);
-        uvs[1] = new Vector2(1, 0);
-        uvs[2] = new Vector2(0, 1);
-        uvs[3] = new Vector2(1, 1);
-
-        Mesh mesh = new Mesh();
-        mesh.vertices = vertices;
-        mesh.triangles = new int[] { 2, 1, 0, 1, 2, 3 };
-        mesh.uv = uvs;
-
-        meshOwner.GetComponent<MeshFilter>().sharedMesh = mesh;
-        Material newMaterial = material;
-        Texture texture = newMaterial.mainTexture;
-        texture.wrapMode = TextureWrapMode.Clamp;
-        newMaterial.mainTexture = texture;
-        meshOwner.GetComponent<MeshRenderer>().sharedMaterial = material;
-        meshOwner.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
 }

@@ -135,7 +135,6 @@ public class RoadCreator : MonoBehaviour
                 RaycastHit raycastHit;
                 if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer) | (1 << globalSettings.intersectionPointsLayer))))
                 {
-                    Debug.Log(raycastHit.transform.name);
                     position.y = raycastHit.point.y;
                 }
             }
