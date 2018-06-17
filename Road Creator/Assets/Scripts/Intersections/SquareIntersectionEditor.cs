@@ -66,7 +66,7 @@ public class SquareIntersectionEditor : Editor
         connectionPoint.AddComponent<BoxCollider>();
         connectionPoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
         connectionPoint.transform.SetParent(side.transform);
-        connectionPoint.transform.localPosition = Vector3.zero;
+        connectionPoint.layer = intersection.globalSettings.intersectionPointsLayer;
 
         return side;
     }

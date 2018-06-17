@@ -133,8 +133,9 @@ public class RoadCreator : MonoBehaviour
             if (segment.GetComponent<RoadSegment>().terrainOption == RoadSegment.TerrainOption.adapt)
             {
                 RaycastHit raycastHit;
-                if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~(1 << globalSettings.roadLayer)))
+                if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer) | (1 << globalSettings.intersectionPointsLayer))))
                 {
+                    Debug.Log(raycastHit.transform.name);
                     position.y = raycastHit.point.y;
                 }
             }

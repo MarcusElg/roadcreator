@@ -31,7 +31,7 @@ public class TriangleIntersectionEditor : Editor {
             sides.transform.SetParent(intersection.transform);
             sides.transform.localPosition = Vector3.zero;
 
-            AddSide("Down");
+            AddSide("Down").transform.localRotation = Quaternion.Euler(0, 180, 0);
             AddSide("Left");
             AddSide("Right");
 
@@ -65,6 +65,7 @@ public class TriangleIntersectionEditor : Editor {
         connectionPoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
         connectionPoint.transform.SetParent(side.transform);
         connectionPoint.transform.localPosition = Vector3.zero;
+        connectionPoint.layer = intersection.globalSettings.intersectionPointsLayer;
 
         return side;
     }

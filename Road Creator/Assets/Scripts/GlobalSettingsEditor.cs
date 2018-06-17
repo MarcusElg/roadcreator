@@ -20,6 +20,7 @@ public class GlobalSettingsEditor : Editor {
         settings.resolution = Mathf.Max(0.2f, EditorGUILayout.FloatField("Resolution", settings.resolution));
         settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
         settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
+        settings.intersectionPointsLayer = Mathf.Clamp(EditorGUILayout.IntField("Intersection Points Layer", settings.intersectionPointsLayer), 9, 31);
         settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
 
         if (EditorGUI.EndChangeCheck() == true)
