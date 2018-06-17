@@ -79,7 +79,7 @@ public class RoadCreator : MonoBehaviour
                     if (transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection != null)
                     {
                         nextPoints = new Vector3[1];
-                        nextPoints[0] = transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.position;
+                        nextPoints[0] = GetIntersectionPoint(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.parent.gameObject, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.name);
                     }
 
                     transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, heightOffset, transform.GetChild(0).GetChild(i), 0, this);
@@ -95,6 +95,34 @@ public class RoadCreator : MonoBehaviour
                 }
             }
         }
+    }
+
+    private Vector3 GetIntersectionPoint(GameObject intersection, string connectionPointName)
+    {
+        SquareIntersection squareIntersection = intersection.GetComponent<SquareIntersection>();
+        TriangleIntersection triangleIntersection = intersection.GetComponent<TriangleIntersection>();
+
+        if (squareIntersection != null)
+        {
+            return intersection.transform.position;
+        }
+        else if (triangleIntersection != null)
+        {
+            if (connectionPointName == "Down Connection Point")
+            {
+                return intersection.transform.position + new Vector3(0, 0, -triangleIntersection.height);
+            }
+            else if (connectionPointName == "Left Connection Point")
+            {
+                return intersection.transform.position + Misc.GetCenter(new Vector3(-triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
+            }
+            else if (connectionPointName == "Right Connection Point")
+            {
+                return intersection.transform.position + Misc.GetCenter(new Vector3(triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
+            }
+        }
+
+        return Misc.MaxVector3;
     }
 
     IEnumerator FixTextureStretch(float length, int i)

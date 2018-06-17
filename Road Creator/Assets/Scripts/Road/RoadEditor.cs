@@ -383,7 +383,7 @@ public class RoadEditor : Editor
                 SquareIntersection squareIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<SquareIntersection>();
                 TriangleIntersection triangleIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<TriangleIntersection>();
                 string connectionName = raycastHit2.collider.name;
-                Debug.Log(triangleIntersection);
+
                 if (squareIntersection != null)
                 {
                     if (connectionName == "Up Connection Point")
