@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(TriangleIntersection))]
-public class TriangleIntersectionEditor : Editor {
+public class TriangleIntersectionEditor : Editor
+{
 
     private TriangleIntersection intersection;
     private Tool lastTool;
@@ -133,6 +134,19 @@ public class TriangleIntersectionEditor : Editor {
         if (GUILayout.Button("Generate Intersection"))
         {
             intersection.GenerateMeshes();
+        }
+    }
+
+    private void OnSceneGUI()
+    {
+        // Draw
+        if (intersection.centerMaterial != null && intersection.connectionMaterial != null)
+        {
+            for (int i = 0; i < intersection.transform.GetChild(0).childCount; i++)
+            {
+                Handles.color = Color.green;
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
         }
     }
 

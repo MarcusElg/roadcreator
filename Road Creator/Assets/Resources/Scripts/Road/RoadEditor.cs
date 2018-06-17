@@ -38,7 +38,7 @@ public class RoadEditor : Editor
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
-
+        
         Undo.undoRedoPerformed += UndoUpdate;
     }
 
@@ -92,7 +92,6 @@ public class RoadEditor : Editor
         guiEvent = Event.current;
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
-
         RaycastHit raycastHit;
         if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
         {
