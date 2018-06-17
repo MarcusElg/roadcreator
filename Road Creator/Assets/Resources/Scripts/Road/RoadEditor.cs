@@ -527,6 +527,20 @@ public class RoadEditor : Editor
                 Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).position, hitPosition);
             }
         }
+
+        // Intersection connections
+        Transform[] objects = GameObject.FindObjectsOfType<Transform>();
+        Handles.color = Color.green;
+        for (int i = 0; i < objects.Length; i++)
+        {
+            if (objects[i].name.Contains("Intersection"))
+            {
+                for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
+                {
+                    Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).GetChild(1).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                }
+            }
+        }
     }
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)
