@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RoadSystem : MonoBehaviour {
 
-    public enum IntersectionType { square, triangle };
+    public enum IntersectionType { square, triangle, diamond };
     public IntersectionType intersectionType;
 
 }

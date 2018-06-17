@@ -366,6 +366,7 @@ public class RoadEditor : Editor
                 // Change width/height
                 SquareIntersection squareIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<SquareIntersection>();
                 TriangleIntersection triangleIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<TriangleIntersection>();
+                DiamondIntersection diamondIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<DiamondIntersection>();
                 string connectionName = raycastHit2.collider.name;
 
                 if (squareIntersection != null)
@@ -405,6 +406,26 @@ public class RoadEditor : Editor
                     }
 
                     triangleIntersection.GenerateMeshes();
+                } else if (diamondIntersection != null)
+                {
+                    if (connectionName == "Upper Left Connection Point")
+                    {
+                        diamondIntersection.upperLeftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Upper Right Connection Point")
+                    {
+                        diamondIntersection.upperRightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Lower Left Connection Point")
+                    {
+                        diamondIntersection.lowerLeftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Lower Right Connection Point")
+                    {
+                        diamondIntersection.lowerRightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+
+                    diamondIntersection.GenerateMeshes();
                 }
             }
             else

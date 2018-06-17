@@ -45,6 +45,11 @@ public class RoadSystemEditor : Editor
                 gameObject.AddComponent<TriangleIntersection>();
                 gameObject.name = "Triangle Intersection";
             }
+            else if (roadSystem.intersectionType == RoadSystem.IntersectionType.diamond)
+            {
+                gameObject.AddComponent<DiamondIntersection>();
+                gameObject.name = "Diamond Intersection";
+            }
 
             gameObject.transform.SetParent(roadSystem.transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Intersection");

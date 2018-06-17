@@ -99,6 +99,7 @@ public class RoadCreator : MonoBehaviour
     {
         SquareIntersection squareIntersection = intersection.GetComponent<SquareIntersection>();
         TriangleIntersection triangleIntersection = intersection.GetComponent<TriangleIntersection>();
+        DiamondIntersection diamondIntersection = intersection.GetComponent<DiamondIntersection>();
 
         if (squareIntersection != null)
         {
@@ -117,6 +118,25 @@ public class RoadCreator : MonoBehaviour
             else if (connectionPointName == "Right Connection Point")
             {
                 return intersection.transform.position + Misc.GetCenter(new Vector3(triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
+            }
+        }
+        else if (diamondIntersection != null)
+        {
+            if (connectionPointName == "Upper Left Connection Point")
+            {
+                return intersection.transform.position + Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset, 0));
+            }
+            else if (connectionPointName == "Upper Right Connection Point")
+            {
+                return intersection.transform.position + Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
+            }
+            else if (connectionPointName == "Lower Left Connection Point")
+            {
+                return intersection.transform.position + Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset, 0));
+            }
+            else if (connectionPointName == "Lower Right Connection Point")
+            {
+                return intersection.transform.position + Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
             }
         }
 
