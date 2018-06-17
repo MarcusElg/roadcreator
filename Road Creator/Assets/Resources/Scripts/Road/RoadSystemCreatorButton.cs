@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class RoadRootCreator : MonoBehaviour {
+public class RoadRootCreator : MonoBehaviour
+{
 
-    [MenuItem("GameObject/3D Object/Road System", false, 10)]
+    [MenuItem("GameObject/3D Object/Roads/Road System", false, 0)]
     static void CreateCustomGameObject(MenuCommand menuCommand)
     {
         GameObject gameObject = new GameObject("Road System");
