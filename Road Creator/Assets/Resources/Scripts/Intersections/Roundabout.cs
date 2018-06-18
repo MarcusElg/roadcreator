@@ -23,7 +23,7 @@ public class Roundabout : MonoBehaviour
     {
         if (centerMaterial == null)
         {
-            centerMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+            centerMaterial = Resources.Load("Materials/Intersections/Roundabouts/2L Roundabout") as Material;
         }
 
         if (connectionMaterial == null)
