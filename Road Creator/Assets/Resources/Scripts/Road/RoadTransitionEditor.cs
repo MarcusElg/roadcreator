@@ -64,6 +64,7 @@ public class RoadTransitionEditor : Editor {
         roadTransition.rightWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Width", roadTransition.rightWidth));
         roadTransition.height = Mathf.Max(0.1f, EditorGUILayout.FloatField("Height", roadTransition.height));
         roadTransition.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadTransition.heightOffset));
+        roadTransition.flipped = GUILayout.Toggle(roadTransition.flipped, "Flipped");
 
         if (EditorGUI.EndChangeCheck() == true)
         {

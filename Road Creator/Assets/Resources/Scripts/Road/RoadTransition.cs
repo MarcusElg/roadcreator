@@ -8,6 +8,7 @@ public class RoadTransition : MonoBehaviour {
     public float rightWidth = 3;
     public float height = 3;
     public float heightOffset = 0.02f;
+    public bool flipped = false;
 
     public Material material;
 
@@ -31,10 +32,19 @@ public class RoadTransition : MonoBehaviour {
         vertices[2] = new Vector3(-rightWidth, heightOffset, height);
         vertices[3] = new Vector3(rightWidth, heightOffset, height);
 
-        uvs[0] = new Vector2(0, 0);
-        uvs[1] = new Vector2(1, 0);
-        uvs[2] = new Vector2(0, 1);
-        uvs[3] = new Vector2(1, 1);
+        if (flipped == false)
+        {
+            uvs[0] = new Vector2(0, 0);
+            uvs[1] = new Vector2(1, 0);
+            uvs[2] = new Vector2(0, 1);
+            uvs[3] = new Vector2(1, 1);
+        } else
+        {
+            uvs[0] = new Vector2(1, 0);
+            uvs[1] = new Vector2(0, 0);
+            uvs[2] = new Vector2(1, 1);
+            uvs[3] = new Vector2(0, 1);
+        }
 
         Mesh mesh = new Mesh();
         mesh.vertices = vertices;
