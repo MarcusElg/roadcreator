@@ -90,6 +90,17 @@ public class RoadSystemEditor : Editor
             lastPlacedObject = gameObject;
         }
 
+        if (GUILayout.Button("Create Road Transition"))
+        {
+            GameObject gameObject = new GameObject();
+            gameObject.AddComponent<RoadTransition>();
+            gameObject.name = "Road Transition";
+            gameObject.transform.SetParent(roadSystem.transform);
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create Road Transition");
+
+            lastPlacedObject = gameObject;
+        }
+
         GUILayout.Label("");
 
         if (GUILayout.Button("Reset"))

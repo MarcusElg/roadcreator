@@ -449,7 +449,7 @@ public class RoadEditor : Editor
                 {
                     Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).GetChild(1).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
                 }
-            } else if (objects[i].name == "Road Splitter") {
+            } else if (objects[i].name == "Road Splitter" || objects[i].name == "Road Transition") {
                 for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
                 {
                     Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);

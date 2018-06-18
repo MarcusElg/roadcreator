@@ -126,6 +126,7 @@ public class RoadCreator : MonoBehaviour
                 DiamondIntersection diamondIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<DiamondIntersection>();
                 Roundabout roundabout = raycastHit2.collider.transform.parent.parent.parent.GetComponent<Roundabout>();
                 RoadSplitter roadSplitter = raycastHit2.collider.transform.parent.parent.GetComponent<RoadSplitter>();
+                RoadTransition roadTransition = raycastHit2.collider.transform.parent.parent.GetComponent<RoadTransition>();
                 string connectionName = raycastHit2.collider.name;
 
                 if (squareIntersection != null)
@@ -197,6 +198,17 @@ public class RoadCreator : MonoBehaviour
                     roadSplitter.leftWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
 
                     roadSplitter.GenerateMesh();
+                } else if (roadTransition != null)
+                {
+                    if (connectionName == "Left Connection Point")
+                    {
+                        roadTransition.leftWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    } else if (connectionName == "Right Connection Point")
+                    {
+                        roadTransition.rightWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+
+                    roadTransition.GenerateMesh();
                 }
             }
             else
@@ -213,6 +225,7 @@ public class RoadCreator : MonoBehaviour
         DiamondIntersection diamondIntersection = intersection.transform.parent.GetComponent<DiamondIntersection>();
         Roundabout roundabout = intersection.transform.parent.GetComponent<Roundabout>();
         RoadSplitter roadSplitter = intersection.GetComponent<RoadSplitter>();
+        RoadTransition roadTransition = intersection.GetComponent<RoadTransition>();
 
         if (squareIntersection != null || roundabout != null)
         {
@@ -268,6 +281,9 @@ public class RoadCreator : MonoBehaviour
                 Vector3 right = roadSplitter.transform.right * roadSplitter.rightWidth * 0.5f;
                 return intersection.transform.position + center + right + new Vector3(0, heightOffset, 0);
             }
+        } else if (roadTransition != null) {
+            Vector3 center = roadTransition.transform.forward * roadTransition.height * 0.5f;
+            return intersection.transform.position + center;
         }
 
         return Misc.MaxVector3;
