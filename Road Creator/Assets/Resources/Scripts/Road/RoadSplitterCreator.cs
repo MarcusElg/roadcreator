@@ -13,7 +13,7 @@ public class RoadSplitterCreator : MonoBehaviour {
         if (roadSystem != null)
         {
             GameObject gameObject = new GameObject("Road Splitter");
-            gameObject.AddComponent<Roundabout>();
+            gameObject.AddComponent<RoadSplitter>();
 
             if (menuCommand.context != null && (menuCommand.context as GameObject).GetComponent<RoadSystem>() != null)
             {
