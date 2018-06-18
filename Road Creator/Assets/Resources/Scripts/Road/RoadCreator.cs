@@ -13,6 +13,7 @@ public class RoadCreator : MonoBehaviour
 
     public void UpdateMesh()
     {
+        DetectIntersectionConnections();
         Vector3[] currentPoints = null;
 
         for (int i = 0; i < transform.GetChild(0).childCount; i++)
@@ -95,13 +96,118 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
+    private void DetectIntersectionConnections()
+    {
+        if (transform.GetChild(0).childCount > 0)
+        {
+            DetectIntersectionConnection(transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject);
+
+            Transform lastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1);
+            if (lastSegment.GetChild(0).childCount == 3)
+            {
+                DetectIntersectionConnection(lastSegment.transform.GetChild(0).GetChild(2).gameObject);
+            }
+        }
+    }
+
+    private void DetectIntersectionConnection(GameObject gameObject)
+    {
+        RaycastHit raycastHit2;
+        if (Physics.Raycast(new Ray(gameObject.transform.position + Vector3.up, Vector3.down), out raycastHit2, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
+        {
+            if (raycastHit2.collider.name.Contains("Connection Point"))
+            {
+                gameObject.GetComponent<Point>().intersectionConnection = raycastHit2.collider.gameObject;
+                gameObject.transform.position = raycastHit2.collider.transform.position;
+
+                // Change width/height
+                SquareIntersection squareIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<SquareIntersection>();
+                TriangleIntersection triangleIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<TriangleIntersection>();
+                DiamondIntersection diamondIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<DiamondIntersection>();
+                Roundabout roundabout = raycastHit2.collider.transform.parent.parent.parent.GetComponent<Roundabout>();
+                string connectionName = raycastHit2.collider.name;
+
+                if (squareIntersection != null)
+                {
+                    if (connectionName == "Up Connection Point")
+                    {
+                        squareIntersection.upConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Down Connection Point")
+                    {
+                        squareIntersection.downConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Left Connection Point")
+                    {
+                        squareIntersection.leftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Right Connection Point")
+                    {
+                        squareIntersection.rightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+
+                    squareIntersection.GenerateMeshes();
+                }
+                else if (triangleIntersection != null)
+                {
+                    if (connectionName == "Down Connection Point")
+                    {
+                        triangleIntersection.downConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Left Connection Point")
+                    {
+                        triangleIntersection.leftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Right Connection Point")
+                    {
+                        triangleIntersection.rightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+
+                    triangleIntersection.GenerateMeshes();
+                }
+                else if (diamondIntersection != null)
+                {
+                    if (connectionName == "Upper Left Connection Point")
+                    {
+                        diamondIntersection.upperLeftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Upper Right Connection Point")
+                    {
+                        diamondIntersection.upperRightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Lower Left Connection Point")
+                    {
+                        diamondIntersection.lowerLeftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+                    else if (connectionName == "Lower Right Connection Point")
+                    {
+                        diamondIntersection.lowerRightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+                    }
+
+                    diamondIntersection.GenerateMeshes();
+                }
+                else if (roundabout != null)
+                {
+                    roundabout.connectionWidth[raycastHit2.transform.GetSiblingIndex() - 1] = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
+
+                    roundabout.GenerateMeshes();
+                }
+            }
+            else
+            {
+                gameObject.GetComponent<Point>().intersectionConnection = null;
+            }
+        }
+    }
+
     private Vector3 GetIntersectionPoint(GameObject intersection, string connectionPointName)
     {
         SquareIntersection squareIntersection = intersection.GetComponent<SquareIntersection>();
         TriangleIntersection triangleIntersection = intersection.GetComponent<TriangleIntersection>();
         DiamondIntersection diamondIntersection = intersection.GetComponent<DiamondIntersection>();
+        Roundabout roundabout = intersection.GetComponent<Roundabout>();
 
-        if (squareIntersection != null)
+        if (squareIntersection != null || roundabout != null)
         {
             return intersection.transform.position;
         }

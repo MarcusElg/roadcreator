@@ -129,10 +129,6 @@ public class TriangleIntersection : MonoBehaviour {
         mesh.uv = uvs;
 
         meshOwner.GetComponent<MeshFilter>().sharedMesh = mesh;
-        Material newMaterial = material;
-        Texture texture = newMaterial.mainTexture;
-        texture.wrapMode = TextureWrapMode.Clamp;
-        newMaterial.mainTexture = texture;
         meshOwner.GetComponent<MeshRenderer>().sharedMaterial = material;
         meshOwner.GetComponent<MeshCollider>().sharedMesh = mesh;
     }

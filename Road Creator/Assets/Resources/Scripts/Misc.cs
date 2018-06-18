@@ -29,7 +29,7 @@ public class Misc
         return distance;
     }
 
-    public static Vector3 CalculateLeft(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index)
+    public static Vector3 CalculateLeft(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index, bool circle = false)
     {
         Vector3 forward;
         if (index < points.Length - 1)
@@ -45,21 +45,28 @@ public class Misc
         }
         else
         {
-            // Last vertices
-            if (nextSegmentPoints != null)
+            if (circle == true)
             {
-                if (nextSegmentPoints.Length > 1)
-                {
-                    forward = nextSegmentPoints[1] - points[points.Length - 1];
-                }
-                else
-                {
-                    forward = nextSegmentPoints[0] - points[points.Length - 1];
-                }
+                forward = points[1] - points[points.Length - 1];
             }
             else
             {
-                forward = points[index] - points[index - 1];
+                // Last vertices
+                if (nextSegmentPoints != null)
+                {
+                    if (nextSegmentPoints.Length > 1)
+                    {
+                        forward = nextSegmentPoints[1] - points[points.Length - 1];
+                    }
+                    else
+                    {
+                        forward = nextSegmentPoints[0] - points[points.Length - 1];
+                    }
+                }
+                else
+                {
+                    forward = points[index] - points[index - 1];
+                }
             }
         }
         forward.Normalize();
@@ -77,6 +84,11 @@ public class Misc
     {
         Mesh mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
         return ((mesh.bounds.size.x * scale) - offset) / 2;
+    }
+
+    public static Vector3 FindPointInCircle(float radius, int i, float degreesPerStep)
+    {
+        return Quaternion.AngleAxis(degreesPerStep * i, Vector3.up) * (Vector3.right * radius);
     }
 
 }

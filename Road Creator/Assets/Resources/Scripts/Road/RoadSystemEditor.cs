@@ -55,6 +55,11 @@ public class RoadSystemEditor : Editor
                 gameObject.AddComponent<DiamondIntersection>();
                 gameObject.name = "Diamond Intersection";
             }
+            else if (roadSystem.intersectionType == RoadSystem.IntersectionType.roundabout)
+            {
+                gameObject.AddComponent<Roundabout>();
+                gameObject.name = "Roundabout";
+            }
 
             gameObject.transform.SetParent(roadSystem.transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Intersection");
@@ -90,20 +95,13 @@ public class RoadSystemEditor : Editor
         // Fix position
         if (lastPlacedObject != null && lastPlacedObject.transform.position == Vector3.zero)
         {
-            if (SceneView.lastActiveSceneView != null)
+            RaycastHit raycastHit;
+            Ray ray = Camera.current.ScreenPointToRay(new Vector3(Input.mousePosition.x + Camera.current.pixelWidth / 2, Input.mousePosition.y + Camera.current.pixelHeight / 2, Input.mousePosition.z));
+            if (Physics.Raycast(ray, out raycastHit, 100))
             {
-                RaycastHit raycastHit;
-                Ray ray = Camera.current.ScreenPointToRay(new Vector3(Input.mousePosition.x + Camera.current.pixelWidth / 2, Input.mousePosition.y + Camera.current.pixelHeight / 2, Input.mousePosition.z));
-                if (Physics.Raycast(ray, out raycastHit, 100))
-                {
-                    lastPlacedObject.transform.position = raycastHit.point;
-                    Selection.activeGameObject = lastPlacedObject;
-                    lastPlacedObject = null;
-                }
-            }
-            else
-            {
-                Debug.Log("Last active scene view is null, placing object at 0, 0, 0");
+                lastPlacedObject.transform.position = raycastHit.point;
+                Selection.activeGameObject = lastPlacedObject;
+                lastPlacedObject = null;
             }
         }
     }

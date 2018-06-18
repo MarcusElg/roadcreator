@@ -150,8 +150,6 @@ public class RoadEditor : Editor
             roadCreator.currentSegment = lastSegment.GetComponent<RoadSegment>();
         }
 
-        DetectIntersectionConnections();
-
         roadCreator.UpdateMesh();
     }
 
@@ -170,7 +168,6 @@ public class RoadEditor : Editor
                 Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
                 roadCreator.currentSegment = null;
                 roadCreator.UpdateMesh();
-                DetectIntersectionConnections();
             }
         }
         else
@@ -181,7 +178,6 @@ public class RoadEditor : Editor
                 RoadSegment segment = CreateSegment(hitPosition);
                 Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
                 Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), hitPosition), "Create Point");
-                DetectIntersectionConnections();
             }
             else
             {
@@ -319,7 +315,6 @@ public class RoadEditor : Editor
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
         {
             objectToMove.GetComponent<BoxCollider>().enabled = true;
-            DetectIntersectionConnections();
             objectToMove = null;
 
             if (extraObjectToMove != null)
@@ -329,103 +324,6 @@ public class RoadEditor : Editor
             }
 
             roadCreator.UpdateMesh();
-        }
-    }
-
-    private void DetectIntersectionConnections()
-    {
-        if (roadCreator.transform.GetChild(0).childCount > 0)
-        {
-            DetectIntersectionConnection(roadCreator.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject);
-
-            Transform lastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1);
-            if (lastSegment.GetChild(0).childCount == 3)
-            {
-                DetectIntersectionConnection(lastSegment.transform.GetChild(0).GetChild(2).gameObject);
-            }
-        }
-    }
-
-    private void DetectIntersectionConnection(GameObject gameObject)
-    {
-        RaycastHit raycastHit2;
-        if (Physics.Raycast(new Ray(gameObject.transform.position + Vector3.up, Vector3.down), out raycastHit2, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
-        {
-            if (raycastHit2.collider.name.Contains("Connection Point"))
-            {
-                gameObject.GetComponent<Point>().intersectionConnection = raycastHit2.collider.gameObject;
-                gameObject.transform.position = raycastHit2.collider.transform.position;
-
-                // Change width/height
-                SquareIntersection squareIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<SquareIntersection>();
-                TriangleIntersection triangleIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<TriangleIntersection>();
-                DiamondIntersection diamondIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<DiamondIntersection>();
-                string connectionName = raycastHit2.collider.name;
-
-                if (squareIntersection != null)
-                {
-                    if (connectionName == "Up Connection Point")
-                    {
-                        squareIntersection.upConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Down Connection Point")
-                    {
-                        squareIntersection.downConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Left Connection Point")
-                    {
-                        squareIntersection.leftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Right Connection Point")
-                    {
-                        squareIntersection.rightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-
-                    squareIntersection.GenerateMeshes();
-                }
-                else if (triangleIntersection != null)
-                {
-                    if (connectionName == "Down Connection Point")
-                    {
-                        triangleIntersection.downConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Left Connection Point")
-                    {
-                        triangleIntersection.leftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Right Connection Point")
-                    {
-                        triangleIntersection.rightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-
-                    triangleIntersection.GenerateMeshes();
-                }
-                else if (diamondIntersection != null)
-                {
-                    if (connectionName == "Upper Left Connection Point")
-                    {
-                        diamondIntersection.upperLeftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Upper Right Connection Point")
-                    {
-                        diamondIntersection.upperRightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Lower Left Connection Point")
-                    {
-                        diamondIntersection.lowerLeftConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-                    else if (connectionName == "Lower Right Connection Point")
-                    {
-                        diamondIntersection.lowerRightConnectionWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().roadWidth;
-                    }
-
-                    diamondIntersection.GenerateMeshes();
-                }
-            }
-            else
-            {
-                gameObject.GetComponent<Point>().intersectionConnection = null;
-            }
         }
     }
 
@@ -547,7 +445,7 @@ public class RoadEditor : Editor
         Handles.color = Color.green;
         for (int i = 0; i < objects.Length; i++)
         {
-            if (objects[i].name.Contains("Intersection"))
+            if (objects[i].name.Contains("Intersection") || objects[i].name == "Roundabout")
             {
                 for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
                 {
