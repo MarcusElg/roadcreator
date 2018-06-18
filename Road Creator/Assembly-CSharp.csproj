@@ -61,22 +61,31 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\GlobalSettings.cs" />
     <Compile Include="Assets\Resources\Scripts\GlobalSettingsEditor.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\DiamondIntersection.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\DiamondIntersectionCreatorButton.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\DiamondIntersectionEditor.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\Roundabout.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\RoundaboutCreatorButton.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\RoundaboutEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Intersections\SquareIntersection.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\SquareIntersectionCreatorButton.cs" />
     <Compile Include="Assets\Resources\Scripts\Intersections\SquareIntersectionEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Intersections\TriangleIntersection.cs" />
+    <Compile Include="Assets\Resources\Scripts\Intersections\TriangleIntersectionCreatorButton.cs" />
     <Compile Include="Assets\Resources\Scripts\Intersections\TriangleIntersectionEditor.cs" />
-    <Compile Include="Assets\Resources\Scripts\Key.cs" />
     <Compile Include="Assets\Resources\Scripts\Misc.cs" />
     <Compile Include="Assets\Resources\Scripts\Point.cs" />
     <Compile Include="Assets\Resources\Scripts\Prefab Line\PrefabLineCreator.cs" />
+    <Compile Include="Assets\Resources\Scripts\Prefab Line\PrefabLineCreatorButton.cs" />
     <Compile Include="Assets\Resources\Scripts\Prefab Line\PrefabLineEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadCreator.cs" />
+    <Compile Include="Assets\Resources\Scripts\Road\RoadCreatorButton.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSegment.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSegmentEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSystem.cs" />
+    <Compile Include="Assets\Resources\Scripts\Road\RoadSystemCreatorButton.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSystemEditor.cs" />
-    <Compile Include="Assets\Resources\Scripts\RoadSystemCreator.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Marcus/Documents/GitHub/roadcreator/Road Creator/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
