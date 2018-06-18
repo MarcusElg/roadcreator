@@ -79,6 +79,17 @@ public class RoadSystemEditor : Editor
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Prefab Line");
         }
 
+        if (GUILayout.Button("Create Road Splitter"))
+        {
+            GameObject gameObject = new GameObject();
+            gameObject.AddComponent<RoadSplitter>();
+            gameObject.name = "Road Splitter";
+            gameObject.transform.SetParent(roadSystem.transform);
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create Road Splitter");
+
+            lastPlacedObject = gameObject;
+        }
+
         GUILayout.Label("");
 
         if (GUILayout.Button("Reset"))
