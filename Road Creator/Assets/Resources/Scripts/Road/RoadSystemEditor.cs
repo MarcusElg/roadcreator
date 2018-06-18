@@ -93,7 +93,8 @@ public class RoadSystemEditor : Editor
             if (SceneView.lastActiveSceneView != null)
             {
                 RaycastHit raycastHit;
-                if (Physics.Raycast(Camera.current.transform.position + Vector3.up, Vector3.Scale(Vector3.down, Camera.current.transform.rotation.eulerAngles), out raycastHit, 100))
+                Ray ray = Camera.current.ScreenPointToRay(new Vector3(Input.mousePosition.x + Camera.current.pixelWidth / 2, Input.mousePosition.y + Camera.current.pixelHeight / 2, Input.mousePosition.z));
+                if (Physics.Raycast(ray, out raycastHit, 100))
                 {
                     lastPlacedObject.transform.position = raycastHit.point;
                     Selection.activeGameObject = lastPlacedObject;
