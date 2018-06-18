@@ -6,7 +6,7 @@ public class RoadSegment : MonoBehaviour
 {
 
     public Material roadMaterial;
-    public float roadWidth = 3;
+    public float roadWidth = 2;
     public bool flipped = false;
 
     public enum TerrainOption { adapt, deform, ignore };

@@ -5,8 +5,8 @@ using UnityEngine;
 public class DiamondIntersection : MonoBehaviour
 {
 
-    public float width = 4;
-    public float height = 4;
+    public float width = 3;
+    public float height = 3;
     public float heightOffset = 0.02f;
 
     public Material centerMaterial;
