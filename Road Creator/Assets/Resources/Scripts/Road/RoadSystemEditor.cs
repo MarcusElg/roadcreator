@@ -14,6 +14,11 @@ public class RoadSystemEditor : Editor
     private void OnEnable()
     {
         roadSystem = (RoadSystem)target;
+
+        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        {
+            new GameObject("Global Settings").AddComponent<GlobalSettings>();
+        }
     }
 
     public override void OnInspectorGUI()

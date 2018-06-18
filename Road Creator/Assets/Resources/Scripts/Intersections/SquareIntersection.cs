@@ -33,14 +33,12 @@ public class SquareIntersection : MonoBehaviour {
     {
         if (centerMaterial == null)
         {
-            Debug.Log("You have to select a center material before generating the intersection");
-            return;
+            centerMaterial = Resources.Load("Materials/Intersections/Grid Intersection") as Material;
         }
 
         if (connectionMaterial == null)
         {
-            Debug.Log("You have to select a connection material before generating the intersection");
-            return;
+            connectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
         }
 
         GenerateMesh(transform.GetChild(1), new Vector3(-width, heightOffset, -height), new Vector3(width, heightOffset, -height), new Vector3(-width, heightOffset, height), new Vector3(width, heightOffset, height), centerMaterial);

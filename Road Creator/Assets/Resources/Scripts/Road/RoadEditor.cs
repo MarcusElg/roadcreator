@@ -26,19 +26,12 @@ public class RoadEditor : Editor
 
         if (roadCreator.globalSettings == null)
         {
-            if (GameObject.FindObjectOfType<GlobalSettings>() == null)
-            {
-                roadCreator.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-            }
-            else
-            {
-                roadCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
-            }
+            roadCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
         }
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
-        
+
         Undo.undoRedoPerformed += UndoUpdate;
     }
 
@@ -406,7 +399,8 @@ public class RoadEditor : Editor
                     }
 
                     triangleIntersection.GenerateMeshes();
-                } else if (diamondIntersection != null)
+                }
+                else if (diamondIntersection != null)
                 {
                     if (connectionName == "Upper Left Connection Point")
                     {

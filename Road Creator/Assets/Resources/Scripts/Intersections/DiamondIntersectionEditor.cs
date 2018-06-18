@@ -16,14 +16,7 @@ public class DiamondIntersectionEditor : Editor
 
         if (intersection.globalSettings == null)
         {
-            if (GameObject.FindObjectOfType<GlobalSettings>() == null)
-            {
-                intersection.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-            }
-            else
-            {
-                intersection.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
-            }
+            intersection.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
         }
 
         if (intersection.transform.childCount == 0)
@@ -47,6 +40,8 @@ public class DiamondIntersectionEditor : Editor
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
+
+        intersection.GenerateMeshes();
     }
 
     private GameObject AddSide(string name)

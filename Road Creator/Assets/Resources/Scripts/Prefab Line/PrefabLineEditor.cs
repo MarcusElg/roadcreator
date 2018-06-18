@@ -18,14 +18,7 @@ public class PrefabLineEditor : Editor
 
         if (prefabCreator.globalSettings == null)
         {
-            if (GameObject.FindObjectOfType<GlobalSettings>() == null)
-            {
-                prefabCreator.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-            }
-            else
-            {
-                prefabCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
-            }
+            prefabCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
         }
 
         if (prefabCreator.transform.childCount == 0 || prefabCreator.transform.GetChild(0).name != "Points")
