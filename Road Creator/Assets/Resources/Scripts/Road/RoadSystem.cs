@@ -31,7 +31,7 @@ public class RoadSystem : MonoBehaviour {
         }
 
         Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 295, SceneView.lastActiveSceneView.position.height - 50, 285, 40);
-        windowRect = GUILayout.Window(0, windowRect, DrawWindow, "");
+        windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Ui/Object Creator Gui Skin") as GUISkin).window);
 
         // Detect click
         if (ClickedButton(1) == true)
