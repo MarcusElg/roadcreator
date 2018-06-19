@@ -51,7 +51,7 @@ public class RoadEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            roadCreator.UpdateMesh();
+            roadCreator.CreateMesh();
         }
 
         if (roadCreator.globalSettings.debug == true)
@@ -73,7 +73,7 @@ public class RoadEditor : Editor
 
         if (GUILayout.Button("Generate Road"))
         {
-            roadCreator.UpdateMesh();
+            roadCreator.CreateMesh();
         }
     }
 
@@ -148,7 +148,7 @@ public class RoadEditor : Editor
             roadCreator.currentSegment = lastSegment.GetComponent<RoadSegment>();
         }
 
-        roadCreator.UpdateMesh();
+        roadCreator.CreateMesh();
     }
 
     private void CreatePoints()
@@ -165,7 +165,7 @@ public class RoadEditor : Editor
                 // Create end point
                 Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
                 roadCreator.currentSegment = null;
-                roadCreator.UpdateMesh();
+                roadCreator.CreateMesh();
             }
         }
         else
@@ -321,7 +321,7 @@ public class RoadEditor : Editor
                 extraObjectToMove = null;
             }
 
-            roadCreator.UpdateMesh();
+            roadCreator.CreateMesh();
         }
     }
 

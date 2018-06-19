@@ -115,6 +115,13 @@ public class RoadSegment : MonoBehaviour
                 vertices[(vertices.Length - (2 * (points.Length - 1 - smoothnessAmount))) - 2] = centerPosition;*/
             }
 
+            if (nextSegmentPoints.Length == 1)
+            {
+                // Intersection connection
+                vertices[vertices.Length - 3] = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 5]);
+                vertices[vertices.Length - 4] = Misc.GetCenter(vertices[vertices.Length - 2], vertices[vertices.Length - 6]);
+            }
+
             Mesh generatedMesh = new Mesh();
             generatedMesh.vertices = vertices;
             generatedMesh.triangles = triangles;

@@ -11,7 +11,7 @@ public class RoadCreator : MonoBehaviour
 
     public GlobalSettings globalSettings;
 
-    public void UpdateMesh()
+    public void CreateMesh()
     {
         DetectIntersectionConnections();
         Vector3[] currentPoints = null;

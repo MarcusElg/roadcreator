@@ -50,7 +50,7 @@ public class RoadSegmentEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
-            segment.transform.parent.parent.GetComponent<RoadCreator>().UpdateMesh();
+            segment.transform.parent.parent.GetComponent<RoadCreator>().CreateMesh();
         }
     }
 
