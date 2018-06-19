@@ -104,8 +104,6 @@ public class RoundaboutEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            roundabout.GenerateMeshes();
-
             // Update connections
             Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
             for (int i = 0; i < gameObjects.Length; i++)
@@ -116,6 +114,8 @@ public class RoundaboutEditor : Editor
                     gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateMesh();
                 }
             }
+
+            roundabout.GenerateMeshes();
         }
 
         if (GUILayout.Button("Generate Roundabout"))

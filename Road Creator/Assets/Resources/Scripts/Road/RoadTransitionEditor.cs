@@ -68,8 +68,6 @@ public class RoadTransitionEditor : Editor {
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            roadTransition.GenerateMesh();
-
             // Update connections
             Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
             for (int i = 0; i < gameObjects.Length; i++)
@@ -80,6 +78,8 @@ public class RoadTransitionEditor : Editor {
                     gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateMesh();
                 }
             }
+
+            roadTransition.GenerateMesh();
         }
 
         if (GUILayout.Button("Generate Mesh"))

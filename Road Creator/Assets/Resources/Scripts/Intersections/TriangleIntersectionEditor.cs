@@ -112,8 +112,6 @@ public class TriangleIntersectionEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            intersection.GenerateMeshes();
-
             // Update connections
             Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
             for (int i = 0; i < gameObjects.Length; i++)
@@ -124,6 +122,8 @@ public class TriangleIntersectionEditor : Editor
                     gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateMesh();
                 }
             }
+
+            intersection.GenerateMeshes();
         }
 
         if (GUILayout.Button("Generate Intersection"))
