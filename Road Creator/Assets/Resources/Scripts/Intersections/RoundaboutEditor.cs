@@ -135,6 +135,8 @@ public class RoundaboutEditor : Editor
                 Handles.CylinderHandleCap(0, roundabout.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), roundabout.globalSettings.pointSize, EventType.Repaint);
             }
         }
+
+        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
 }

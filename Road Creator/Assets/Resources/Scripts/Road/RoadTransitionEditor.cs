@@ -99,6 +99,8 @@ public class RoadTransitionEditor : Editor {
                 Handles.CylinderHandleCap(0, roadTransition.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), roadTransition.globalSettings.pointSize, EventType.Repaint);
             }
         }
+
+        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
 }

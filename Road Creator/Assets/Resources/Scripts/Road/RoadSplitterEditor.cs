@@ -99,6 +99,8 @@ public class RoadSplitterEditor : Editor {
                 Handles.CylinderHandleCap(0, roadSplitter.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), roadSplitter.globalSettings.pointSize, EventType.Repaint);
             }
         }
+
+        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
 }

@@ -231,6 +231,8 @@ public class PrefabLineEditor : Editor
                 MovePoints(guiEvent, raycastHit, hitPosition);
             }
         }
+
+        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
     private void UndoUpdate()

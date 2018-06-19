@@ -133,6 +133,8 @@ public class RoadEditor : Editor
                 MovePoints(raycastHit);
             }
         }
+
+        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
     private void UndoUpdate()

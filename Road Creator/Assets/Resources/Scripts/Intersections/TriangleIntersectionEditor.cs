@@ -143,6 +143,8 @@ public class TriangleIntersectionEditor : Editor
                 Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
             }
         }
+
+        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
 }
