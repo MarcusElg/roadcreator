@@ -150,7 +150,8 @@ public class RoadSystem : MonoBehaviour {
     private void SetPosition(GameObject gameObject)
     {
         RaycastHit raycastHit;
-        Ray ray = Camera.current.ScreenPointToRay(new Vector3(Input.mousePosition.x + Camera.current.pixelWidth / 2, Input.mousePosition.y + Camera.current.pixelHeight / 2, Input.mousePosition.z));
+
+        Ray ray = Camera.current.ScreenPointToRay(new Vector3(Camera.current.pixelWidth / 2, Camera.current.pixelHeight / 2, 0));
         if (Physics.Raycast(ray, out raycastHit, 100))
         {
             gameObject.transform.position = raycastHit.point;
