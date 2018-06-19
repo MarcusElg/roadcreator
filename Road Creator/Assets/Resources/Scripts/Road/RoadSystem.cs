@@ -17,6 +17,7 @@ public class RoadSystem : MonoBehaviour {
     public void ShowCreationButtons ()
     {
         SceneView.lastActiveSceneView.Focus();
+        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
 
         if (createRoadTexture == null)
         {
@@ -137,7 +138,7 @@ public class RoadSystem : MonoBehaviour {
             float MouseX = Event.current.mousePosition.x;
             float MouseY = Event.current.mousePosition.y;
             float MinX = 5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 295;
-            float MinY = SceneView.lastActiveSceneView.position.height - 50;
+            float MinY = SceneView.lastActiveSceneView.position.height - 50 - 15;
 
             if (MouseX > MinX && MouseX < MinX + 30 && MouseY > MinY && MouseY < MinY + 30)
             {

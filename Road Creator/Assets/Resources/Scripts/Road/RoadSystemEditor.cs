@@ -42,8 +42,6 @@ public class RoadSystemEditor : Editor
 
     private void OnSceneGUI()
     {
-        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-
         roadSystem.ShowCreationButtons();
     }
 
