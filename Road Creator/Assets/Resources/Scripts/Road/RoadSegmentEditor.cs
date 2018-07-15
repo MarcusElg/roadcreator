@@ -27,7 +27,7 @@ public class RoadSegmentEditor : Editor
         if (serializedObject.FindProperty("leftShoulder").boolValue == true)
         {
             serializedObject.FindProperty("leftShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Left Shoulder Material", serializedObject.FindProperty("leftShoulderMaterial").objectReferenceValue, typeof(Material), false);
-            serializedObject.FindProperty("leftShoulderWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Shoulder Width", serializedObject.FindProperty("leftShoulderWidth").floatValue));
+            serializedObject.FindProperty("leftShoulderWidth").floatValue = Mathf.Max(0f, EditorGUILayout.FloatField("Left Shoulder Width", serializedObject.FindProperty("leftShoulderWidth").floatValue));
             serializedObject.FindProperty("leftShoulderHeightOffset").floatValue = EditorGUILayout.FloatField("Left Shoulder Y Offset", serializedObject.FindProperty("leftShoulderHeightOffset").floatValue);
         }
 
@@ -37,7 +37,7 @@ public class RoadSegmentEditor : Editor
         if (serializedObject.FindProperty("rightShoulder").boolValue == true)
         {
             serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Right Shoulder Material", serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue, typeof(Material), false);
-            serializedObject.FindProperty("rightShoulderWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Shoulder Width", serializedObject.FindProperty("rightShoulderWidth").floatValue));
+            serializedObject.FindProperty("rightShoulderWidth").floatValue = Mathf.Max(0f, EditorGUILayout.FloatField("Right Shoulder Width", serializedObject.FindProperty("rightShoulderWidth").floatValue));
             serializedObject.FindProperty("rightShoulderHeightOffset").floatValue = EditorGUILayout.FloatField("Right Shoulder Y Offset", serializedObject.FindProperty("rightShoulderHeightOffset").floatValue);
         }
 

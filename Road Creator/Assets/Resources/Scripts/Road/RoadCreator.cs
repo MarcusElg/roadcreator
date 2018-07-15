@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.Presets;
 
 public class RoadCreator : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class RoadCreator : MonoBehaviour
     public int smoothnessAmount = 3;
 
     public GlobalSettings globalSettings;
+
+    public Preset segmentPreset;
 
     public void CreateMesh()
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Presets;
 
 [CustomEditor(typeof(RoadCreator))]
 public class RoadEditor : Editor
@@ -45,6 +46,7 @@ public class RoadEditor : Editor
         EditorGUI.BeginChangeCheck();
         roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadCreator.heightOffset));
         roadCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", roadCreator.smoothnessAmount));
+        roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", serializedObject.FindProperty("segmentPreset").objectReferenceValue, typeof(Preset), false);
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
@@ -254,30 +256,37 @@ public class RoadEditor : Editor
         segment.transform.SetParent(roadCreator.transform.GetChild(0), false);
         segment.transform.position = position;
 
-        if (roadCreator.transform.GetChild(0).childCount > 1)
+        if (roadCreator.segmentPreset == null)
         {
-            RoadSegment oldLastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
-            segment.roadMaterial = oldLastSegment.roadMaterial;
-            segment.startRoadWidth = oldLastSegment.startRoadWidth;
-            segment.endRoadWidth = oldLastSegment.endRoadWidth;
-            segment.flipped = oldLastSegment.flipped;
-            segment.terrainOption = oldLastSegment.terrainOption;
+            if (roadCreator.transform.GetChild(0).childCount > 1)
+            {
+                RoadSegment oldLastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
+                segment.roadMaterial = oldLastSegment.roadMaterial;
+                segment.startRoadWidth = oldLastSegment.startRoadWidth;
+                segment.endRoadWidth = oldLastSegment.endRoadWidth;
+                segment.flipped = oldLastSegment.flipped;
+                segment.terrainOption = oldLastSegment.terrainOption;
 
-            segment.leftShoulderMaterial = oldLastSegment.leftShoulderMaterial;
-            segment.leftShoulder = oldLastSegment.leftShoulder;
-            segment.leftShoulderWidth = oldLastSegment.leftShoulderWidth;
-            segment.leftShoulderHeightOffset = oldLastSegment.leftShoulderHeightOffset;
+                segment.leftShoulderMaterial = oldLastSegment.leftShoulderMaterial;
+                segment.leftShoulder = oldLastSegment.leftShoulder;
+                segment.leftShoulderWidth = oldLastSegment.leftShoulderWidth;
+                segment.leftShoulderHeightOffset = oldLastSegment.leftShoulderHeightOffset;
 
-            segment.rightShoulderMaterial = oldLastSegment.rightShoulderMaterial;
-            segment.rightShoulder = oldLastSegment.rightShoulder;
-            segment.rightShoulderWidth = oldLastSegment.rightShoulderWidth;
-            segment.rightShoulderHeightOffset = oldLastSegment.rightShoulderHeightOffset;
+                segment.rightShoulderMaterial = oldLastSegment.rightShoulderMaterial;
+                segment.rightShoulder = oldLastSegment.rightShoulder;
+                segment.rightShoulderWidth = oldLastSegment.rightShoulderWidth;
+                segment.rightShoulderHeightOffset = oldLastSegment.rightShoulderHeightOffset;
+            }
+            else
+            {
+                segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+                segment.leftShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+                segment.rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+            }
         }
         else
         {
-            segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
-            segment.leftShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
-            segment.rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+            roadCreator.segmentPreset.ApplyTo(segment);
         }
 
         GameObject points = new GameObject("Points");

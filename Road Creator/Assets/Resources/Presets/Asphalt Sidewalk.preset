@@ -1,0 +1,310 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Asphalt Sidewalk
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: b4866ad5cf586dd459d140dcdf0a22aa,
+      type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_Name
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: roadMaterial
+    value: 
+    objectReference: {fileID: 2100000, guid: 7569a10e4f620e24098e34597b537251, type: 2}
+  - target: {fileID: 0}
+    propertyPath: startRoadWidth
+    value: 0.7
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endRoadWidth
+    value: 0.7
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: flipped
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: terrainOption
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: leftShoulder
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: leftShoulderWidth
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: leftShoulderHeightOffset
+    value: -0.2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: leftShoulderMaterial
+    value: 
+    objectReference: {fileID: 2100000, guid: dbb68210e0450c144b465d92d987d333, type: 2}
+  - target: {fileID: 0}
+    propertyPath: rightShoulder
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: rightShoulderWidth
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: rightShoulderHeightOffset
+    value: -0.2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: rightShoulderMaterial
+    value: 
+    objectReference: {fileID: 2100000, guid: dbb68210e0450c144b465d92d987d333, type: 2}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.size
+    value: 6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[0].x
+    value: 459
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[0].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[0].z
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[1].x
+    value: 461
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[1].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[1].z
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[2].x
+    value: 457
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[2].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[2].z
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[3].x
+    value: 463
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[3].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[3].z
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[4].x
+    value: 455
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[4].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[4].z
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[5].x
+    value: 465
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[5].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: startGuidelinePoints.Array.data[5].z
+    value: 200
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.size
+    value: 6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[0].x
+    value: 459
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[0].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[0].z
+    value: 205
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[1].x
+    value: 461
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[1].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[1].z
+    value: 205
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[2].x
+    value: 457
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[2].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[2].z
+    value: 205
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[3].x
+    value: 463
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[3].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[3].z
+    value: 205
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[4].x
+    value: 455
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[4].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[4].z
+    value: 205
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[5].x
+    value: 465
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[5].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: centerGuidelinePoints.Array.data[5].z
+    value: 205
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.size
+    value: 6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[0].x
+    value: 459
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[0].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[0].z
+    value: 210
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[1].x
+    value: 461
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[1].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[1].z
+    value: 210
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[2].x
+    value: 457
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[2].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[2].z
+    value: 210
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[3].x
+    value: 463
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[3].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[3].z
+    value: 210
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[4].x
+    value: 455
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[4].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[4].z
+    value: 210
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[5].x
+    value: 465
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[5].y
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: endGuidelinePoints.Array.data[5].z
+    value: 210
+    objectReference: {fileID: 0}
