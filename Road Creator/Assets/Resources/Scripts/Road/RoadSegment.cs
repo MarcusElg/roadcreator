@@ -25,6 +25,21 @@ public class RoadSegment : MonoBehaviour
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, int smoothnessAmount, RoadCreator roadCreator)
     {
+        if (roadMaterial == null)
+        {
+            roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+        }
+
+        if (leftShoulderMaterial == null)
+        {
+            leftShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+        }
+
+        if (rightShoulderMaterial == null)
+        {
+            rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+        }
+
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator);
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, roadCreator, leftShoulder);
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, roadCreator, rightShoulder);
