@@ -49,6 +49,13 @@ public class PrefabLineEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
+        if (GUILayout.Button("Calculate Spacing") == true)
+        {
+            if (prefabCreator.prefab != null)
+            {
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x;
+            }
+        }
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
