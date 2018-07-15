@@ -222,7 +222,54 @@ public class PrefabLineEditor : Editor
 
             if (guiEvent.control == true)
             {
-                hitPosition = Misc.Round(hitPosition);
+                bool snapToGuidelines = false;
+                RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
+                for (int i = 0; i < roadSegments.Length; i++)
+                {
+                    if (roadSegments[i].startGuidelinePoints != null)
+                    {
+                        for (int j = 0; j < roadSegments[i].startGuidelinePoints.Length; j++)
+                        {
+                            if (Vector3.Distance(hitPosition, roadSegments[i].startGuidelinePoints[j]) < 1f)
+                            {
+                                hitPosition = roadSegments[i].startGuidelinePoints[j];
+                                snapToGuidelines = true;
+                                continue;
+                            }
+                        }
+                    }
+
+                    if (roadSegments[i].centerGuidelinePoints != null)
+                    {
+                        for (int j = 0; j < roadSegments[i].centerGuidelinePoints.Length; j++)
+                        {
+                            if (Vector3.Distance(hitPosition, roadSegments[i].centerGuidelinePoints[j]) < 1f)
+                            {
+                                hitPosition = roadSegments[i].centerGuidelinePoints[j];
+                                snapToGuidelines = true;
+                                continue;
+                            }
+                        }
+                    }
+
+                    if (roadSegments[i].endGuidelinePoints != null)
+                    {
+                        for (int j = 0; j < roadSegments[i].endGuidelinePoints.Length; j++)
+                        {
+                            if (Vector3.Distance(hitPosition, roadSegments[i].endGuidelinePoints[j]) < 1f)
+                            {
+                                hitPosition = roadSegments[i].endGuidelinePoints[j];
+                                snapToGuidelines = true;
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                if (snapToGuidelines == false)
+                {
+                    hitPosition = Misc.Round(hitPosition);
+                }
             }
 
             if (guiEvent.type == EventType.MouseDown)
@@ -356,9 +403,49 @@ public class PrefabLineEditor : Editor
 
     private void Draw(Event guiEvent, Vector3 hitPosition)
     {
-        // Mouse position
-        Handles.color = Color.blue;
-        Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
+        // Guidelines
+        RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
+        for (int i = 0; i < roadSegments.Length; i++)
+        {
+            if (roadSegments[i].transform.GetChild(0).childCount == 3)
+            {
+                Handles.color = Misc.lightGreen;
+                if (roadSegments[i].startGuidelinePoints != null && roadSegments[i].startGuidelinePoints.Length > 0 && (Vector3.Distance(hitPosition, roadSegments[i].transform.GetChild(0).GetChild(0).position) < 10))
+                {
+                    Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(0).position, roadSegments[i].startGuidelinePoints[roadSegments[i].startGuidelinePoints.Length - 2]);
+                    Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(0).position, roadSegments[i].startGuidelinePoints[roadSegments[i].startGuidelinePoints.Length - 1]);
+
+                    for (int j = 0; j < roadSegments[i].startGuidelinePoints.Length; j++)
+                    {
+                        Handles.DrawSolidDisc(roadSegments[i].startGuidelinePoints[j], Vector3.up, prefabCreator.globalSettings.pointSize * 0.75f);
+                    }
+                }
+
+                Handles.color = Misc.darkGreen;
+                if (roadSegments[i].centerGuidelinePoints != null && roadSegments[i].centerGuidelinePoints.Length > 0 && (Vector3.Distance(hitPosition, roadSegments[i].transform.GetChild(0).GetChild(1).position) < 10))
+                {
+                    Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(1).position, roadSegments[i].centerGuidelinePoints[roadSegments[i].centerGuidelinePoints.Length - 2]);
+                    Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(1).position, roadSegments[i].centerGuidelinePoints[roadSegments[i].centerGuidelinePoints.Length - 1]);
+
+                    for (int j = 0; j < roadSegments[i].centerGuidelinePoints.Length; j++)
+                    {
+                        Handles.DrawSolidDisc(roadSegments[i].centerGuidelinePoints[j], Vector3.up, prefabCreator.globalSettings.pointSize * 0.75f);
+                    }
+                }
+
+                Handles.color = Misc.lightGreen;
+                if (roadSegments[i].endGuidelinePoints != null && roadSegments[i].endGuidelinePoints.Length > 0 && (Vector3.Distance(hitPosition, roadSegments[i].transform.GetChild(0).GetChild(2).position) < 10))
+                {
+                    Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(2).position, roadSegments[i].endGuidelinePoints[roadSegments[i].endGuidelinePoints.Length - 2]);
+                    Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(2).position, roadSegments[i].endGuidelinePoints[roadSegments[i].endGuidelinePoints.Length - 1]);
+
+                    for (int j = 0; j < roadSegments[i].endGuidelinePoints.Length; j++)
+                    {
+                        Handles.DrawSolidDisc(roadSegments[i].endGuidelinePoints[j], Vector3.up, prefabCreator.globalSettings.pointSize * 0.75f);
+                    }
+                }
+            }
+        }
 
         for (int i = 0; i < prefabCreator.transform.GetChild(0).childCount; i++)
         {
@@ -405,6 +492,10 @@ public class PrefabLineEditor : Editor
                 }
             }
         }
+
+        // Mouse position
+        Handles.color = Color.blue;
+        Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
     }
 
     public Vector3[] CalculatePoints(int i, float offset)

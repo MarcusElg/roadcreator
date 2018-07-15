@@ -23,6 +23,10 @@ public class RoadSegment : MonoBehaviour
     public float rightShoulderHeightOffset = 0;
     public Material rightShoulderMaterial;
 
+    public Vector3[] startGuidelinePoints;
+    public Vector3[] centerGuidelinePoints;
+    public Vector3[] endGuidelinePoints;
+
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, int smoothnessAmount, RoadCreator roadCreator)
     {
         if (roadMaterial == null)
@@ -39,10 +43,76 @@ public class RoadSegment : MonoBehaviour
         {
             rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
         }
+        if (segment.GetSiblingIndex() == 0)
+        {
+            SetGuidelines(points, nextSegmentPoints, true);
+        } else
+        {
+            SetGuidelines(points, nextSegmentPoints, false);
+        }
 
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator);
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, roadCreator, leftShoulder);
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, roadCreator, rightShoulder);
+    }
+
+    private void SetGuidelines(Vector3[] currentPoints, Vector3[] nextPoints, bool first)
+    {
+        // Start Guidelines
+        Vector3 forward;
+        Vector3 left;
+        int guidelineAmount = transform.parent.parent.GetComponent<RoadCreator>().globalSettings.amountRoadGuidelines;
+
+        if (guidelineAmount > 0)
+        {
+            if (first == true)
+            {
+                forward = currentPoints[1] - currentPoints[0];
+                left = new Vector3(-forward.z, 0, forward.x).normalized;
+
+                startGuidelinePoints = new Vector3[guidelineAmount * 2];
+                for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
+                {
+                    startGuidelinePoints[i] = transform.GetChild(0).GetChild(0).position + left * (i + 1);
+                    startGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(0).position - left * (i + 1);
+                }
+            }
+
+            // Center Guidelines
+            forward = transform.GetChild(0).GetChild(2).position - transform.GetChild(0).GetChild(0).position;
+            left = new Vector3(-forward.z, 0, forward.x).normalized;
+
+            centerGuidelinePoints = new Vector3[guidelineAmount * 2];
+            for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
+            {
+                centerGuidelinePoints[i] = transform.GetChild(0).GetChild(1).position + left * (i + 1);
+                centerGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(1).position - left * (i + 1);
+            }
+
+            // End guidelines
+            endGuidelinePoints = new Vector3[guidelineAmount * 2];
+
+            if (nextPoints == null)
+            {
+                forward = currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2];
+                left = new Vector3(-forward.z, 0, forward.x).normalized;
+            }
+            else if (nextPoints.Length > 1)
+            {
+                forward = nextPoints[1] - currentPoints[currentPoints.Length - 1];
+                left = new Vector3(-forward.z, 0, forward.x).normalized;
+            } else
+            {
+                endGuidelinePoints = new Vector3[0];
+                return;
+            }
+
+            for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
+            {
+                endGuidelinePoints[i] = transform.GetChild(0).GetChild(2).position + left * (i + 1);
+                endGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(2).position - left * (i + 1);
+            }
+        }
     }
 
     private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, bool generate = true)

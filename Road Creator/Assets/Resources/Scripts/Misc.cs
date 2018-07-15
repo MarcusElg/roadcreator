@@ -6,6 +6,8 @@ public class Misc
 {
 
     public static Vector3 MaxVector3 = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+    public static Color lightGreen = new Color(0.34f, 1, 0.44f);
+    public static Color darkGreen = new Color(0.11f, 0.35f, 0.13f);
 
     public static Vector3 Lerp3(Vector3 start, Vector3 middle, Vector3 end, float time)
     {

@@ -21,6 +21,7 @@ public class GlobalSettingsEditor : Editor {
         settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
         settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
         settings.intersectionPointsLayer = Mathf.Clamp(EditorGUILayout.IntField("Intersection Points Layer", settings.intersectionPointsLayer), 9, 31);
+        settings.amountRoadGuidelines = Mathf.Clamp(EditorGUILayout.IntField("Amount Of Road Guidelines (each side)", settings.amountRoadGuidelines), 0, 15);
         settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -32,6 +33,11 @@ public class GlobalSettingsEditor : Editor {
                 if (objects[i].name.Contains("Connection Point") || objects[i].name == "Start Point" || objects[i].name == "Control Point" || objects[i].name == "End Point")
                 {
                     objects[i].GetComponent<BoxCollider>().size = new Vector3(settings.pointSize, settings.pointSize, settings.pointSize);
+                }
+
+                if (objects[i].GetComponent<RoadCreator>() != null)
+                {
+                    objects[i].GetComponent<RoadCreator>().CreateMesh();
                 }
             }
         }
