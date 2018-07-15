@@ -49,11 +49,19 @@ public class PrefabLineEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
-        if (GUILayout.Button("Calculate Spacing") == true)
+        if (GUILayout.Button("Calculate Spacing (X)") == true)
         {
             if (prefabCreator.prefab != null)
             {
                 prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x;
+            }
+        }
+
+        if (GUILayout.Button("Calculate Spacing (Z)") == true)
+        {
+            if (prefabCreator.prefab != null)
+            {
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z;
             }
         }
 
@@ -76,6 +84,8 @@ public class PrefabLineEditor : Editor
         {
             PlacePrefabs();
         }
+
+        GUILayout.Label("");
 
         if (GUILayout.Button("Reset"))
         {
