@@ -10,8 +10,8 @@ public class RoadSplitter : MonoBehaviour {
     public float heightOffset = 0.02f;
 
     public float rightXOffset = 0;
-    public float lowerRightXOffset = 0;
-    public float upperRightXOffset = 0;
+    public float lowerRightXOffset = -0.75f;
+    public float upperRightXOffset = 0.75f;
 
     public Material material;
 
@@ -20,8 +20,23 @@ public class RoadSplitter : MonoBehaviour {
     public void GenerateMesh()
     {
         transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, heightOffset, 0);
-        transform.GetChild(0).GetChild(1).transform.localPosition = new Vector3(-rightWidth / 2 + rightXOffset + upperRightXOffset, heightOffset, height);
-        transform.GetChild(0).GetChild(2).transform.localPosition = new Vector3(rightWidth / 2 + rightXOffset + lowerRightXOffset, heightOffset, height);
+        transform.GetChild(0).GetChild(1).transform.localPosition = new Vector3(rightXOffset - upperRightXOffset, heightOffset, height);
+        transform.GetChild(0).GetChild(2).transform.localPosition = new Vector3(rightXOffset - lowerRightXOffset, heightOffset, height);
+
+        Point[] objects = GameObject.FindObjectsOfType<Point>();
+        for (int i = 0; i < objects.Length; i++)
+        {
+            if (objects[i].intersectionConnection != null)
+            {
+                if (objects[i].intersectionConnection == transform.GetChild(0).GetChild(1).gameObject)
+                {
+                    objects[i].transform.position = transform.GetChild(0).GetChild(1).transform.position;
+                } else if (objects[i].intersectionConnection == transform.GetChild(0).GetChild(2).gameObject)
+                {
+                    objects[i].transform.position = transform.GetChild(0).GetChild(2).transform.position;
+                }
+            }
+        }
 
         if (material == null)
         {

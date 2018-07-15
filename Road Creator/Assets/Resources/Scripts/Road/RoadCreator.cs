@@ -198,10 +198,18 @@ public class RoadCreator : MonoBehaviour
                     roundabout.connectionWidth[raycastHit2.transform.GetSiblingIndex() - 1] = roadWidth;
 
                     roundabout.GenerateMeshes();
-                } else if (roadSplitter != null && connectionName == "Left Connection Point")
+                } else if (roadSplitter != null)
                 {
-                    roadSplitter.leftWidth = roadWidth;
-
+                    if (connectionName == "Left Connection Point")
+                    {
+                        roadSplitter.leftWidth = roadWidth;
+                    } else if (connectionName == "Lower Right Connection Point")
+                    {
+                        roadSplitter.lowerRightXOffset = -roadSplitter.rightWidth + roadWidth;
+                    } else if (connectionName == "Upper Right Connection Point")
+                    {
+                        roadSplitter.upperRightXOffset = roadSplitter.rightWidth - roadWidth;
+                    }
                     roadSplitter.GenerateMesh();
                 }
             }
@@ -265,14 +273,14 @@ public class RoadCreator : MonoBehaviour
                 return intersection.transform.position + center;
             } else if (connectionPointName == "Upper Right Connection Point")
             {
-                Vector3 center = roadSplitter.transform.forward * roadSplitter.height * 0.5f;
-                Vector3 right = roadSplitter.transform.right * roadSplitter.rightWidth * 0.5f;
-                return intersection.transform.position + center - right + new Vector3(0, heightOffset, 0);
+                Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
+                Vector3 left = new Vector3(-up.z, 0, up.x);
+                return roadSplitter.transform.GetChild(0).GetChild(1).position + left + new Vector3(0, heightOffset, 0);
             } else if (connectionPointName == "Lower Right Connection Point")
             {
-                Vector3 center = roadSplitter.transform.forward * roadSplitter.height * 0.5f;
-                Vector3 right = roadSplitter.transform.right * roadSplitter.rightWidth * 0.5f;
-                return intersection.transform.position + center + right + new Vector3(0, heightOffset, 0);
+                Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
+                Vector3 left = new Vector3(-up.z, 0, up.x);
+                return roadSplitter.transform.GetChild(0).GetChild(2).position + left + new Vector3(0, heightOffset, 0);
             }
         }
 
