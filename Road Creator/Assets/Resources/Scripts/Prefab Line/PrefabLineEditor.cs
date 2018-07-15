@@ -149,7 +149,12 @@ public class PrefabLineEditor : Editor
 
                         currentPoints = nextPoints;
                     }
-                    else if ((i < prefabCreator.transform.GetChild(0).childCount - 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Point") || i < prefabCreator.transform.GetChild(0).childCount - 2)
+                    else if ((i < prefabCreator.transform.GetChild(0).childCount - 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Point"))
+                    {
+                        nextPoints = new Vector3[1];
+                        nextPoints[0] = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).position;
+                        PlacePrefabsInSegment(currentPoints, nextPoints, false);
+                    } else if (i < prefabCreator.transform.GetChild(0).childCount - 2)
                     {
                         PlacePrefabsInSegment(currentPoints, null, false);
                     }
