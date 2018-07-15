@@ -66,6 +66,10 @@ public class RoadSplitterEditor : Editor {
         roadSplitter.height = Mathf.Max(0.1f, EditorGUILayout.FloatField("Height", roadSplitter.height));
         roadSplitter.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadSplitter.heightOffset));
 
+        roadSplitter.rightXOffset = EditorGUILayout.FloatField("Right X Offset", roadSplitter.rightXOffset);
+        roadSplitter.lowerRightXOffset = EditorGUILayout.FloatField("Lower Right X Offset", roadSplitter.lowerRightXOffset);
+        roadSplitter.upperRightXOffset = EditorGUILayout.FloatField("Upper Right X Offset", roadSplitter.upperRightXOffset);
+
         if (EditorGUI.EndChangeCheck() == true)
         {
             // Update connections

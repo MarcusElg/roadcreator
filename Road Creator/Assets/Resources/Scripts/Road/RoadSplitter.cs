@@ -9,6 +9,10 @@ public class RoadSplitter : MonoBehaviour {
     public float height = 3;
     public float heightOffset = 0.02f;
 
+    public float rightXOffset = 0;
+    public float lowerRightXOffset = 0;
+    public float upperRightXOffset = 0;
+
     public Material material;
 
     public GlobalSettings globalSettings;
@@ -16,8 +20,8 @@ public class RoadSplitter : MonoBehaviour {
     public void GenerateMesh()
     {
         transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, heightOffset, 0);
-        transform.GetChild(0).GetChild(1).transform.localPosition = new Vector3(-rightWidth * 0.5f, heightOffset, height);
-        transform.GetChild(0).GetChild(2).transform.localPosition = new Vector3(rightWidth * 0.5f, heightOffset, height);
+        transform.GetChild(0).GetChild(1).transform.localPosition = new Vector3(-rightWidth / 2 + rightXOffset + upperRightXOffset, heightOffset, height);
+        transform.GetChild(0).GetChild(2).transform.localPosition = new Vector3(rightWidth / 2 + rightXOffset + lowerRightXOffset, heightOffset, height);
 
         if (material == null)
         {
@@ -29,8 +33,8 @@ public class RoadSplitter : MonoBehaviour {
 
         vertices[0] = new Vector3(-leftWidth, heightOffset, 0);
         vertices[1] = new Vector3(leftWidth, heightOffset, 0);
-        vertices[2] = new Vector3(-rightWidth, heightOffset, height);
-        vertices[3] = new Vector3(rightWidth, heightOffset, height);
+        vertices[2] = new Vector3(-rightWidth + rightXOffset, heightOffset, height);
+        vertices[3] = new Vector3(rightWidth + rightXOffset, heightOffset, height);
 
         uvs[0] = new Vector2(0, 0);
         uvs[1] = new Vector2(1, 0);
