@@ -6,7 +6,8 @@ public class RoadSegment : MonoBehaviour
 {
 
     public Material roadMaterial;
-    public float roadWidth = 2;
+    public float startRoadWidth = 2;
+    public float endRoadWidth = 2;
     public bool flipped = false;
 
     public enum TerrainOption { adapt, deform, ignore };
@@ -39,10 +40,24 @@ public class RoadSegment : MonoBehaviour
             int[] triangles = new int[numTriangles * 3];
             int verticeIndex = 0;
             int triangleIndex = 0;
+            float totalDistance = 0;
+            float currentDistance = 0;
+
+            for (int i = 1; i < points.Length; i++)
+            {
+                totalDistance += Vector3.Distance(points[i - 1], points[i]);
+            }
 
             for (int i = 0; i < points.Length; i++)
             {
                 Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
+
+                if (i > 0)
+                {
+                    currentDistance += Vector3.Distance(points[i - 1], points[i]);
+                }
+
+                float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
 
                 if (name == "Road")
                 {
@@ -115,7 +130,7 @@ public class RoadSegment : MonoBehaviour
                 vertices[(vertices.Length - (2 * (points.Length - 1 - smoothnessAmount))) - 2] = centerPosition;*/
             }
 
-            if (nextSegmentPoints.Length == 1)
+            if (nextSegmentPoints != null && nextSegmentPoints.Length == 1)
             {
                 // Intersection connection
                 vertices[vertices.Length - 3] = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 5]);
@@ -146,7 +161,6 @@ public class RoadSegment : MonoBehaviour
         float totalDistanceRight = 0;
         float currentDistance = 0;
 
-        // Left
         for (int i = 2; i < vertices.Length; i += 2)
         {
             totalDistanceLeft += Vector3.Distance(vertices[i - 2], vertices[i]);

@@ -9,18 +9,12 @@ using UnityEditor;
 public class RoadSegmentEditor : Editor
 {
 
-    public RoadSegment segment;
-
-    private void OnEnable()
-    {
-        segment = (RoadSegment)target;
-    }
-
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
         serializedObject.FindProperty("roadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Road Material", serializedObject.FindProperty("roadMaterial").objectReferenceValue, typeof(Material), false);
-        serializedObject.FindProperty("roadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Road Width", serializedObject.FindProperty("roadWidth").floatValue));
+        serializedObject.FindProperty("startRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Start Road Width", serializedObject.FindProperty("startRoadWidth").floatValue));
+        serializedObject.FindProperty("endRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("End Road Width", serializedObject.FindProperty("endRoadWidth").floatValue));
         serializedObject.FindProperty("flipped").boolValue = EditorGUILayout.Toggle("Road Flipped", serializedObject.FindProperty("flipped").boolValue);
         serializedObject.FindProperty("terrainOption").enumValueIndex = (int)(RoadSegment.TerrainOption)EditorGUILayout.EnumPopup("Terrain Option", (RoadSegment.TerrainOption)Enum.GetValues(typeof(RoadSegment.TerrainOption)).GetValue(serializedObject.FindProperty("terrainOption").enumValueIndex));
 
@@ -40,7 +34,7 @@ public class RoadSegmentEditor : Editor
         GUILayout.Label("");
         GUILayout.Label("Right Shoulder", guiStyle);
         serializedObject.FindProperty("rightShoulder").boolValue = EditorGUILayout.Toggle("Right Shoulder", serializedObject.FindProperty("rightShoulder").boolValue);
-        if (segment.rightShoulder == true)
+        if (serializedObject.FindProperty("rightShoulder").boolValue == true)
         {
             serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Right Shoulder Material", serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue, typeof(Material), false);
             serializedObject.FindProperty("rightShoulderWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Shoulder Width", serializedObject.FindProperty("rightShoulderWidth").floatValue));
@@ -50,7 +44,39 @@ public class RoadSegmentEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
-            segment.transform.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+
+            for (int i = 0; i < targets.Length; i++)
+            {
+                ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+            }
+        }
+
+        GUILayout.Label("");
+        if (GUILayout.Button("Detach Connections"))
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection = null;
+
+                if (((RoadSegment)targets[i]).transform.GetChild(0).childCount == 3)
+                {
+                    ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection = null;
+                }
+            }
+        }
+
+        if (GUILayout.Button("Straighten"))
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                Transform points = ((RoadSegment)targets[i]).transform.GetChild(0);
+                if (points.childCount == 3)
+                {
+                    points.GetChild(1).position = Misc.GetCenter(points.GetChild(0).position, points.GetChild(2).position);
+                }
+
+                points.parent.GetComponent<RoadCreator>().CreateMesh();
+            }
         }
     }
 

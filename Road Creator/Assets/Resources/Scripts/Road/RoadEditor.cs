@@ -211,7 +211,8 @@ public class RoadEditor : Editor
         {
             RoadSegment oldLastSegment = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
             segment.roadMaterial = oldLastSegment.roadMaterial;
-            segment.roadWidth = oldLastSegment.roadWidth;
+            segment.startRoadWidth = oldLastSegment.startRoadWidth;
+            segment.endRoadWidth = oldLastSegment.endRoadWidth;
             segment.flipped = oldLastSegment.flipped;
             segment.terrainOption = oldLastSegment.terrainOption;
 

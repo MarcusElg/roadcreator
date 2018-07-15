@@ -12,7 +12,6 @@ public class RoadSystem : MonoBehaviour {
     Texture createDiamondIntersection;
     Texture createRoundabout;
     Texture createRoadSplitter;
-    Texture createRoadTransition;
 
     public void ShowCreationButtons ()
     {
@@ -28,10 +27,9 @@ public class RoadSystem : MonoBehaviour {
             createDiamondIntersection = Resources.Load("Textures/Ui/creatediamondintersection") as Texture;
             createRoundabout = Resources.Load("Textures/Ui/createroundabout") as Texture;
             createRoadSplitter = Resources.Load("Textures/Ui/createroadsplitter") as Texture;
-            createRoadTransition = Resources.Load("Textures/Ui/createroadtransition") as Texture;
         }
 
-        Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 295, SceneView.lastActiveSceneView.position.height - 50, 285, 40);
+        Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 260, SceneView.lastActiveSceneView.position.height - 50, 250, 40);
         windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Ui/Object Creator Gui Skin") as GUISkin).window);
 
         // Detect click
@@ -96,16 +94,6 @@ public class RoadSystem : MonoBehaviour {
         else if (ClickedButton(7) == true)
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<RoadTransition>();
-            gameObject.name = "Road Transition";
-            gameObject.transform.SetParent(transform);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create Road Transition");
-
-            SetPosition(gameObject);
-        }
-        else if (ClickedButton(8) == true)
-        {
-            GameObject gameObject = new GameObject();
             gameObject.AddComponent<RoadSplitter>();
             gameObject.name = "Road Splitter";
             gameObject.transform.SetParent(transform);
@@ -125,8 +113,7 @@ public class RoadSystem : MonoBehaviour {
         GUI.DrawTexture(new Rect(110, 5, 30, 30), createTriangleIntersection);
         GUI.DrawTexture(new Rect(145, 5, 30, 30), createDiamondIntersection);
         GUI.DrawTexture(new Rect(180, 5, 30, 30), createRoundabout);
-        GUI.DrawTexture(new Rect(215, 5, 30, 30), createRoadTransition);
-        GUI.DrawTexture(new Rect(250, 5, 30, 30), createRoadSplitter);
+        GUI.DrawTexture(new Rect(215, 5, 30, 30), createRoadSplitter);
 
         GUILayout.EndHorizontal();
     }
@@ -137,7 +124,7 @@ public class RoadSystem : MonoBehaviour {
         {
             float MouseX = Event.current.mousePosition.x;
             float MouseY = Event.current.mousePosition.y;
-            float MinX = 5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 295;
+            float MinX = 5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 260;
             float MinY = SceneView.lastActiveSceneView.position.height - 50 - 15;
 
             if (MouseX > MinX && MouseX < MinX + 30 && MouseY > MinY && MouseY < MinY + 30)
