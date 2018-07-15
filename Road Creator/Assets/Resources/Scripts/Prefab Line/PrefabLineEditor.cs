@@ -53,7 +53,7 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.prefab != null)
             {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x;
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
             }
         }
 
@@ -61,7 +61,7 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.prefab != null)
             {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z;
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2;
             }
         }
 
@@ -125,7 +125,8 @@ public class PrefabLineEditor : Editor
                     if (prefabCreator.offsetPrefabWidth == true)
                     {
                         currentPoints = CalculatePoints(i, Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
-                    } else
+                    }
+                    else
                     {
                         currentPoints = CalculatePoints(i, 0);
                     }
@@ -138,7 +139,8 @@ public class PrefabLineEditor : Editor
                         if (prefabCreator.offsetPrefabWidth == true)
                         {
                             nextPoints = CalculatePoints(i + 2, Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
-                        } else
+                        }
+                        else
                         {
                             nextPoints = CalculatePoints(i + 2, 0);
                         }
@@ -180,16 +182,20 @@ public class PrefabLineEditor : Editor
                 if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.forward)
                 {
                     prefab.transform.rotation = Quaternion.LookRotation(forward);
-                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.backward)
+                }
+                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.backward)
                 {
                     prefab.transform.rotation = Quaternion.LookRotation(-forward);
-                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
+                }
+                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
                 {
                     prefab.transform.rotation = Quaternion.LookRotation(left);
-                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
+                }
+                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
                 {
                     prefab.transform.rotation = Quaternion.LookRotation(-left);
-                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.randomY)
+                }
+                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.randomY)
                 {
                     prefab.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
                 }
@@ -407,22 +413,30 @@ public class PrefabLineEditor : Editor
         float distancePerDivision = 1 / divisions;
         offset /= distance;
 
-        for (float t = offset; t < 1 - offset; t += distancePerDivision)
+        points.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, offset));
+        Vector3 lastPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, offset);
+        for (float t = 0; t < 1 - offset; t += distancePerDivision / 10)
         {
             if (t > 1)
             {
                 t = 1;
             }
 
-            Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
-
-            RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+            Vector3 currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
+            float currentDistance = Vector3.Distance(lastPoint, currentPoint);
+            
+            if (currentDistance > prefabCreator.spacing)
             {
-                position.y = raycastHit.point.y;
-            }
+                // Add point
+                RaycastHit raycastHit2;
+                if (Physics.Raycast(currentPoint, Vector3.down, out raycastHit2, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+                {
+                    currentPoint.y = raycastHit2.point.y;
+                }
 
-            points.Add(position);
+                points.Add(currentPoint);
+                lastPoint = currentPoint;
+            }
         }
         return points.ToArray();
     }
