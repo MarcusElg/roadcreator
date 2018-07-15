@@ -172,6 +172,9 @@ public class PrefabLineEditor : Editor
                 } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
                 {
                     prefab.transform.rotation = Quaternion.LookRotation(-left);
+                } else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.randomY)
+                {
+                    prefab.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
                 }
             }
         }

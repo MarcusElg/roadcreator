@@ -11,7 +11,7 @@ public class PrefabLineCreator : MonoBehaviour
     public float spacing = 1;
     public bool rotateAlongCurve = true;
 
-    public enum RotationDirection { forward, backward, left, right };
+    public enum RotationDirection { forward, backward, left, right, randomY };
     public RotationDirection rotationDirection;
 
     public float scale = 1;
