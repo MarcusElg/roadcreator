@@ -160,6 +160,28 @@ public class RoadSegment : MonoBehaviour
                     vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
 
+                if (i > 1)
+                {
+                    // Third point and forward
+                    // Left side
+                    float distanceFirstSecond = Vector3.Distance(vertices[verticeIndex - 4], vertices[verticeIndex - 2]);
+                    float distanceFirstThird = Vector3.Distance(vertices[verticeIndex - 4], vertices[verticeIndex]);
+
+                    if (distanceFirstThird < distanceFirstSecond)
+                    {
+                        vertices[verticeIndex - 2] = Misc.GetCenter(vertices[verticeIndex - 4], vertices[verticeIndex]);
+                    }
+
+                    // Right side
+                    distanceFirstSecond = Vector3.Distance(vertices[verticeIndex - 3], vertices[verticeIndex - 1]);
+                    distanceFirstThird = Vector3.Distance(vertices[verticeIndex - 3], vertices[verticeIndex + 1]);
+
+                    if (distanceFirstThird < distanceFirstSecond)
+                    {
+                        vertices[verticeIndex - 1] = Misc.GetCenter(vertices[verticeIndex - 3], vertices[verticeIndex + 1]);
+                    }
+                }
+
                 /*if (terrainOption == TerrainOption.deform)
                 {
                     // Change y position
