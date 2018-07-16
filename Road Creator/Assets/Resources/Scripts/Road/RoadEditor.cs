@@ -10,7 +10,8 @@ public class RoadEditor : Editor
 
     RoadCreator roadCreator;
     Vector3[] points = null;
-    GameObject objectToMove, extraObjectToMove;
+    GameObject objectToMove = null;
+    GameObject extraObjectToMove = null;
     Tool lastTool;
     Event guiEvent;
     Vector3 hitPosition;
@@ -440,7 +441,7 @@ public class RoadEditor : Editor
             if (roadSegments[i].transform.GetChild(0).childCount == 3)
             {
                 Handles.color = Misc.lightGreen;
-                if (roadSegments[i].startGuidelinePoints != null && roadSegments[i].startGuidelinePoints.Length > 0 && (Vector3.Distance(mousePosition, roadSegments[i].transform.GetChild(0).GetChild(0).position) < 10))
+                if (roadSegments[i].startGuidelinePoints != null && roadSegments[i].startGuidelinePoints.Length > 0 && (Vector3.Distance(mousePosition, roadSegments[i].transform.GetChild(0).GetChild(0).position) < 10) && roadSegments[i].transform.GetChild(0).GetChild(0).gameObject != objectToMove)
                 {
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(0).position, roadSegments[i].startGuidelinePoints[roadSegments[i].startGuidelinePoints.Length - 2]);
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(0).position, roadSegments[i].startGuidelinePoints[roadSegments[i].startGuidelinePoints.Length - 1]);
@@ -452,7 +453,7 @@ public class RoadEditor : Editor
                 }
 
                 Handles.color = Misc.darkGreen;
-                if (roadSegments[i].centerGuidelinePoints != null && roadSegments[i].centerGuidelinePoints.Length > 0 && (Vector3.Distance(mousePosition, roadSegments[i].transform.GetChild(0).GetChild(1).position) < 10))
+                if (roadSegments[i].centerGuidelinePoints != null && roadSegments[i].centerGuidelinePoints.Length > 0 && (Vector3.Distance(mousePosition, roadSegments[i].transform.GetChild(0).GetChild(1).position) < 10) && roadSegments[i].transform.GetChild(0).GetChild(1).gameObject != objectToMove)
                 {
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(1).position, roadSegments[i].centerGuidelinePoints[roadSegments[i].centerGuidelinePoints.Length - 2]);
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(1).position, roadSegments[i].centerGuidelinePoints[roadSegments[i].centerGuidelinePoints.Length - 1]);
@@ -464,7 +465,7 @@ public class RoadEditor : Editor
                 }
 
                 Handles.color = Misc.lightGreen;
-                if (roadSegments[i].endGuidelinePoints != null && roadSegments[i].endGuidelinePoints.Length > 0 && (Vector3.Distance(mousePosition, roadSegments[i].transform.GetChild(0).GetChild(2).position) < 10))
+                if (roadSegments[i].endGuidelinePoints != null && roadSegments[i].endGuidelinePoints.Length > 0 && (Vector3.Distance(mousePosition, roadSegments[i].transform.GetChild(0).GetChild(2).position) < 10) && roadSegments[i].transform.GetChild(0).GetChild(2).gameObject != objectToMove)
                 {
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(2).position, roadSegments[i].endGuidelinePoints[roadSegments[i].endGuidelinePoints.Length - 2]);
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(2).position, roadSegments[i].endGuidelinePoints[roadSegments[i].endGuidelinePoints.Length - 1]);
