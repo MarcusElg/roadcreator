@@ -9,6 +9,7 @@ public class RoadSegment : MonoBehaviour
     public float startRoadWidth = 2;
     public float endRoadWidth = 2;
     public bool flipped = false;
+    public bool curved = true;
 
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
@@ -112,6 +113,11 @@ public class RoadSegment : MonoBehaviour
                 endGuidelinePoints[i] = transform.GetChild(0).GetChild(2).position + left * (i + 1);
                 endGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(2).position - left * (i + 1);
             }
+        } else
+        {
+            startGuidelinePoints = null;
+            centerGuidelinePoints = null;
+            endGuidelinePoints = null;
         }
     }
 

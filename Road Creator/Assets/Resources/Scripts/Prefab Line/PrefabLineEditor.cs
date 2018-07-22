@@ -310,8 +310,18 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.currentPoint != null && prefabCreator.currentPoint.name == "Point")
             {
-                prefabCreator.currentPoint = CreatePoint("Control Point", hitPosition);
-                Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
+                if (prefabCreator.globalSettings.roadCurved == true)
+                {
+                    prefabCreator.currentPoint = CreatePoint("Control Point", hitPosition);
+                    Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
+                } else
+                {
+                    prefabCreator.currentPoint = CreatePoint("Control Point", Misc.GetCenter(prefabCreator.currentPoint.transform.position, hitPosition));
+                    Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
+                    prefabCreator.currentPoint = CreatePoint("Point", hitPosition);
+                    Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
+                    PlacePrefabs();
+                }
             }
             else
             {

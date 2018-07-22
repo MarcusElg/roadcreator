@@ -17,13 +17,6 @@ public class GlobalSettingsEditor : Editor {
     {
         EditorGUI.BeginChangeCheck();
         settings.pointSize = Mathf.Max(0.2f, EditorGUILayout.FloatField("Point Size", settings.pointSize));
-        settings.resolution = Mathf.Max(0.2f, EditorGUILayout.FloatField("Resolution", settings.resolution));
-        settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
-        settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
-        settings.intersectionPointsLayer = Mathf.Clamp(EditorGUILayout.IntField("Intersection Points Layer", settings.intersectionPointsLayer), 9, 31);
-        settings.amountRoadGuidelines = Mathf.Clamp(EditorGUILayout.IntField("Amount Of Road Guidelines (each side)", settings.amountRoadGuidelines), 0, 15);
-        settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
-
         if (EditorGUI.EndChangeCheck() == true)
         {
             Transform[] objects = GameObject.FindObjectsOfType<Transform>();
@@ -34,13 +27,22 @@ public class GlobalSettingsEditor : Editor {
                 {
                     objects[i].GetComponent<BoxCollider>().size = new Vector3(settings.pointSize, settings.pointSize, settings.pointSize);
                 }
-
-                if (objects[i].GetComponent<RoadCreator>() != null)
-                {
-                    objects[i].GetComponent<RoadCreator>().CreateMesh();
-                }
             }
         }
+
+        settings.resolution = Mathf.Max(0.2f, EditorGUILayout.FloatField("Resolution", settings.resolution));
+        settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
+        settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
+        settings.intersectionPointsLayer = Mathf.Clamp(EditorGUILayout.IntField("Intersection Points Layer", settings.intersectionPointsLayer), 9, 31);
+
+        EditorGUI.BeginChangeCheck();
+        settings.amountRoadGuidelines = Mathf.Clamp(EditorGUILayout.IntField("Amount Of Road Guidelines (each side)", settings.amountRoadGuidelines), 0, 15);
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            settings.UpdateRoadGuidelines();
+        }
+
+        settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
     }
 
 }

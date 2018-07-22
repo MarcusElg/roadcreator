@@ -13,5 +13,16 @@ public class GlobalSettings : MonoBehaviour
     public int amountRoadGuidelines = 5;
 
     public bool debug;
+    public bool roadCurved = true;
+
+    public void UpdateRoadGuidelines()
+    {
+        RoadCreator[] objects = GameObject.FindObjectsOfType<RoadCreator>();
+
+        for (int i = 0; i < objects.Length; i++)
+        {
+            objects[i].CreateMesh();
+        }
+    }
 
 }

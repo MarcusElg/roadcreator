@@ -20,6 +20,12 @@ public class RoadSystemEditor : Editor
             new GameObject("Global Settings").AddComponent<GlobalSettings>();
         }
 
+        if (roadSystem.globalSettings == null)
+        {
+            roadSystem.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+            Debug.Log(roadSystem.globalSettings);
+        }
+
         lastTool = Tools.current;
         Tools.current = Tool.None;
     }
