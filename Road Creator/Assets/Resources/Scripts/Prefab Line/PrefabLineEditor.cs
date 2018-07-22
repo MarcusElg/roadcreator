@@ -48,7 +48,10 @@ public class PrefabLineEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
+        prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
+
         prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
+
         if (GUILayout.Button("Calculate Spacing (X)") == true)
         {
             if (prefabCreator.prefab != null)
@@ -63,6 +66,10 @@ public class PrefabLineEditor : Editor
             {
                 prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2;
             }
+        }
+        if (prefabCreator.bendObjects == true)
+        {
+            prefabCreator.bendMultiplier = Mathf.Max(0, EditorGUILayout.FloatField("Bend Multiplier", prefabCreator.bendMultiplier));
         }
 
         GUIStyle guiStyle = new GUIStyle();
@@ -108,101 +115,71 @@ public class PrefabLineEditor : Editor
 
     public void PlacePrefabs()
     {
-        for (int i = prefabCreator.transform.GetChild(1).childCount - 1; i >= 0; i--)
-        {
-            DestroyImmediate(prefabCreator.transform.GetChild(1).GetChild(i).gameObject);
-        }
-
         if (prefabCreator.transform.GetChild(0).childCount > 2)
         {
-            Vector3[] currentPoints = null;
-            Vector3[] nextPoints;
-
-            for (int i = 0; i < prefabCreator.transform.GetChild(0).childCount; i += 2)
+            for (int i = prefabCreator.transform.GetChild(1).childCount - 1; i >= 0; i--)
             {
-                if (i == 0)
-                {
-                    if (prefabCreator.offsetPrefabWidth == true)
-                    {
-                        currentPoints = CalculatePoints(i, Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
-                    }
-                    else
-                    {
-                        currentPoints = CalculatePoints(i, 0);
-                    }
-                }
-
-                if (prefabCreator.transform.GetChild(0).GetChild(i).name == "Point")
-                {
-                    if (i < prefabCreator.transform.GetChild(0).childCount - 4)
-                    {
-                        if (prefabCreator.offsetPrefabWidth == true)
-                        {
-                            nextPoints = CalculatePoints(i + 2, Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
-                        }
-                        else
-                        {
-                            nextPoints = CalculatePoints(i + 2, 0);
-                        }
-
-                        PlacePrefabsInSegment(currentPoints, nextPoints, true);
-
-                        currentPoints = nextPoints;
-                    }
-                    else if ((i < prefabCreator.transform.GetChild(0).childCount - 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Point"))
-                    {
-                        nextPoints = new Vector3[1];
-                        nextPoints[0] = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).position;
-                        PlacePrefabsInSegment(currentPoints, nextPoints, false);
-                    } else if (i < prefabCreator.transform.GetChild(0).childCount - 2)
-                    {
-                        PlacePrefabsInSegment(currentPoints, null, false);
-                    }
-                }
+                DestroyImmediate(prefabCreator.transform.GetChild(1).GetChild(i).gameObject);
             }
-        }
-    }
 
-    private void PlacePrefabsInSegment(Vector3[] currentPoints, Vector3[] nextPoints, bool removeLastPoint)
-    {
-        int max = currentPoints.Length;
-        if (removeLastPoint == true)
-        {
-            max -= 1;
-        }
-
-        for (int j = 0; j < max; j++)
-        {
-            GameObject prefab = Instantiate(prefabCreator.prefab);
-            prefab.transform.SetParent(prefabCreator.transform.GetChild(1));
-            prefab.transform.position = currentPoints[j];
-            prefab.name = "Prefab";
-            prefab.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
-            prefab.transform.localScale = new Vector3(prefabCreator.scale, prefabCreator.scale, prefabCreator.scale);
-            Vector3 left = Misc.CalculateLeft(currentPoints, nextPoints, Misc.MaxVector3, j);
-            Vector3 forward = new Vector3(left.z, 0, -left.x);
-
-            if (prefabCreator.rotateAlongCurve == true)
+            PointPackage currentPoints = CalculatePoints(Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
+            for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {
-                if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.forward)
+                GameObject prefab = Instantiate(prefabCreator.prefab);
+                prefab.transform.SetParent(prefabCreator.transform.GetChild(1));
+                prefab.transform.position = currentPoints.prefabPoints[j];
+                prefab.name = "Prefab";
+                prefab.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
+                prefab.transform.localScale = new Vector3(prefabCreator.scale, prefabCreator.scale, prefabCreator.scale);
+                Vector3 left = Misc.CalculateLeft(currentPoints.startPoints[j], currentPoints.endPoints[j]);
+                Vector3 forward = new Vector3(left.z, 0, -left.x);
+
+                if (prefabCreator.rotateAlongCurve == true)
                 {
-                    prefab.transform.rotation = Quaternion.LookRotation(forward);
+                    if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.forward)
+                    {
+                        prefab.transform.rotation = Quaternion.LookRotation(forward);
+                    }
+                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.backward)
+                    {
+                        prefab.transform.rotation = Quaternion.LookRotation(-forward);
+                    }
+                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
+                    {
+                        prefab.transform.rotation = Quaternion.LookRotation(left);
+                    }
+                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
+                    {
+                        prefab.transform.rotation = Quaternion.LookRotation(-left);
+                    }
+                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.randomY)
+                    {
+                        prefab.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+                    }
                 }
-                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.backward)
+
+                if (prefabCreator.bendObjects == true)
                 {
-                    prefab.transform.rotation = Quaternion.LookRotation(-forward);
-                }
-                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
-                {
-                    prefab.transform.rotation = Quaternion.LookRotation(left);
-                }
-                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
-                {
-                    prefab.transform.rotation = Quaternion.LookRotation(-left);
-                }
-                else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.randomY)
-                {
-                    prefab.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+                    Mesh mesh = GameObject.Instantiate(prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh);
+                    Vector3[] vertices = mesh.vertices;
+
+                    // Calculate distance to change
+                    Vector3 center = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
+                    float distanceToChange = Vector3.Distance(center, currentPoints.prefabPoints[j]);
+
+                    Vector3 controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * prefabCreator.bendMultiplier);
+
+                    for (var i = 0; i < vertices.Length; i++)
+                    {
+                        float distance = Mathf.Abs(vertices[i].x - mesh.bounds.min.x);
+                        float distanceCovered = (distance / mesh.bounds.size.x);
+                        Vector3 lerpedPoint = Misc.Lerp3(new Vector3(-mesh.bounds.extents.x, 0, 0), controlPoint, new Vector3(mesh.bounds.extents.x, 0, 0), distanceCovered);
+                        vertices[i].z = vertices[i].z - (lerpedPoint).z;
+                    }
+
+                    mesh.vertices = vertices;
+                    mesh.RecalculateBounds();
+                    prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
                 }
             }
         }
@@ -498,43 +475,79 @@ public class PrefabLineEditor : Editor
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
     }
 
-    public Vector3[] CalculatePoints(int i, float offset)
+    public PointPackage CalculatePoints(float offset)
     {
-        List<Vector3> points = new List<Vector3>();
-        float distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position);
+        List<Vector3> prefabPoints = new List<Vector3>();
+        List<Vector3> startPoints = new List<Vector3>();
+        List<Vector3> endPoints = new List<Vector3>();
 
-        float divisions = distance / prefabCreator.spacing;
-        divisions = Mathf.Max(2, divisions);
-
-        float distancePerDivision = 1 / divisions;
+        Vector3 lastEndPoint = Vector3.zero;
+        float distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position);
         offset /= distance;
 
-        points.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, offset));
-        Vector3 lastPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, offset);
-        for (float t = 0; t < 1 - offset; t += distancePerDivision / 10)
+        prefabPoints.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset));
+        startPoints.Add(prefabCreator.transform.GetChild(0).GetChild(0).position);
+        Vector3 lastPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset);
+        bool endPointAdded = false;
+
+        Vector3 currentPoint = Vector3.zero;
+
+        for (int i = 0; i < prefabCreator.transform.GetChild(0).childCount - 2; i += 2)
         {
-            if (t > 1)
+            distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position);
+            float divisions = distance / prefabCreator.spacing;
+            divisions = Mathf.Max(2, divisions);
+            float distancePerDivision = 1 / divisions;
+            offset /= distance;
+
+            float startOffset = 0;
+            if (i == 0)
             {
-                t = 1;
+                startOffset = offset;
             }
 
-            Vector3 currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
-            float currentDistance = Vector3.Distance(lastPoint, currentPoint);
-            
-            if (currentDistance > prefabCreator.spacing)
+            for (float t = startOffset; t < 1; t += distancePerDivision / 10)
             {
-                // Add point
-                RaycastHit raycastHit2;
-                if (Physics.Raycast(currentPoint, Vector3.down, out raycastHit2, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+                if (t > 1)
                 {
-                    currentPoint.y = raycastHit2.point.y;
+                    t = 1;
                 }
 
-                points.Add(currentPoint);
-                lastPoint = currentPoint;
+                currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
+                float currentDistance = Vector3.Distance(lastPoint, currentPoint);
+
+                if (currentDistance > prefabCreator.spacing / 2 && endPointAdded == false)
+                {
+                    endPoints.Add(currentPoint);
+                    lastEndPoint = currentPoint;
+                    endPointAdded = true;
+                }
+
+                if (currentDistance > prefabCreator.spacing)
+                {
+                    // Add point
+                    RaycastHit raycastHit2;
+                    if (Physics.Raycast(currentPoint, Vector3.down, out raycastHit2, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+                    {
+                        currentPoint.y = raycastHit2.point.y;
+                    }
+
+                    prefabPoints.Add(currentPoint);
+                    lastPoint = currentPoint;
+
+                    startPoints.Add(lastEndPoint);
+
+                    endPointAdded = false;
+                }
+            }
+
+            if (endPoints.Count < prefabPoints.Count && (i + 2) >= prefabCreator.transform.GetChild(0).childCount - 2)
+            {
+                endPoints.Add(currentPoint);
             }
         }
-        return points.ToArray();
+
+        return new PointPackage(prefabPoints.ToArray(), startPoints.ToArray(), endPoints.ToArray());
     }
 
     private Vector3[] CalculatePoints(Event guiEvent, Vector3 hitPosition)

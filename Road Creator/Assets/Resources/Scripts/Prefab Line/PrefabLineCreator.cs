@@ -8,6 +8,8 @@ public class PrefabLineCreator : MonoBehaviour
     public GameObject prefab;
     public GameObject currentPoint;
 
+    public bool bendObjects = true;
+    public float bendMultiplier = 1;
     public float spacing = 1;
     public bool rotateAlongCurve = true;
 

@@ -160,7 +160,7 @@ public class RoadSegment : MonoBehaviour
                     vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
 
-                if (i > 1)
+                if (i > 1 && (nextSegmentPoints == null || nextSegmentPoints.Length > 1))
                 {
                     // Third point and forward
                     // Left side
