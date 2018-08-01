@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class Misc
+public static class Misc
 {
 
     public static Vector3 MaxVector3 = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
@@ -108,30 +108,34 @@ public class Misc
 
         for (int i = 0; i < roadSegments.Length; i++)
         {
-            Vector3[] guidelines = new Vector3[roadSegments[i].startGuidelinePoints.Length + roadSegments[i].centerGuidelinePoints.Length + roadSegments[i].endGuidelinePoints.Length];
-            roadSegments[i].startGuidelinePoints.CopyTo(guidelines, 0);
-            roadSegments[i].centerGuidelinePoints.CopyTo(guidelines, roadSegments[i].startGuidelinePoints.Length);
-            roadSegments[i].endGuidelinePoints.CopyTo(guidelines, roadSegments[i].centerGuidelinePoints.Length);
-            Vector3 nearestVector = MaxVector3;
-            float nearestDistanceInSegment = float.MaxValue;
-
-            if (guidelines != null)
+            if (roadSegments[i].startGuidelinePoints != null && roadSegments[i].centerGuidelinePoints != null && roadSegments[i].endGuidelinePoints != null)
             {
-                for (int j = 0; j < guidelines.Length; j++)
+                Vector3[] guidelines = new Vector3[roadSegments[i].startGuidelinePoints.Length + roadSegments[i].centerGuidelinePoints.Length + roadSegments[i].endGuidelinePoints.Length];
+                roadSegments[i].startGuidelinePoints.CopyTo(guidelines, 0);
+                roadSegments[i].centerGuidelinePoints.CopyTo(guidelines, roadSegments[i].startGuidelinePoints.Length);
+                roadSegments[i].endGuidelinePoints.CopyTo(guidelines, roadSegments[i].startGuidelinePoints.Length + roadSegments[i].centerGuidelinePoints.Length);
+
+                Vector3 nearestVector = MaxVector3;
+                float nearestDistanceInSegment = float.MaxValue;
+
+                if (guidelines != null)
                 {
-                    float distance = Vector3.Distance(hitPosition, guidelines[j]);
-                    if (distance < 1f && distance < nearestDistanceInSegment)
+                    for (int j = 0; j < guidelines.Length; j++)
                     {
-                        nearestVector = guidelines[j];
-                        nearestDistanceInSegment = distance;
+                        float distance = Vector3.Distance(hitPosition, guidelines[j]);
+                        if (distance < 1f && distance < nearestDistanceInSegment)
+                        {
+                            nearestVector = guidelines[j];
+                            nearestDistanceInSegment = distance;
+                        }
                     }
                 }
-            }
 
-            if (nearestDistanceInSegment < nearestDistance)
-            {
-                nearestDistance = nearestDistanceInSegment;
-                nearest = nearestVector;
+                if (nearestDistanceInSegment < nearestDistance)
+                {
+                    nearestDistance = nearestDistanceInSegment;
+                    nearest = nearestVector;
+                }
             }
         }
 
