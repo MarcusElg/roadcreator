@@ -199,15 +199,12 @@ public class PrefabLineEditor : Editor
 
             if (guiEvent.control == true)
             {
-                bool snapToGuidelines = false;
                 Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
                 if (nearestGuideline != Misc.MaxVector3)
                 {
-                    snapToGuidelines = true;
                     hitPosition = nearestGuideline;
                 }
-
-                if (snapToGuidelines == false)
+                else
                 {
                     hitPosition = Misc.Round(hitPosition);
                 }
