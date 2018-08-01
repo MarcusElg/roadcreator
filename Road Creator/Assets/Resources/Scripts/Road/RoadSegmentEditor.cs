@@ -72,10 +72,11 @@ public class RoadSegmentEditor : Editor
                 Transform points = ((RoadSegment)targets[i]).transform.GetChild(0);
                 if (points.childCount == 3)
                 {
+                    points.parent.GetComponent<RoadSegment>().curved = false;
                     points.GetChild(1).position = Misc.GetCenter(points.GetChild(0).position, points.GetChild(2).position);
                 }
 
-                points.parent.GetComponent<RoadCreator>().CreateMesh();
+                points.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
             }
         }
 

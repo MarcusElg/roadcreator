@@ -402,9 +402,16 @@ public class RoadEditor : Editor
         {
             if (objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
             {
-                if (objectToMove.transform.parent.childCount == 3)
+                if (objectToMove.transform.GetSiblingIndex() == 1)
                 {
-                    objectToMove.transform.parent.GetChild(1).position = Misc.GetCenter(objectToMove.transform.parent.GetChild(0).position, objectToMove.transform.parent.GetChild(2).position);
+                    objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved = true;
+                }
+                else
+                {
+                    if (objectToMove.transform.parent.childCount == 3)
+                    {
+                        objectToMove.transform.parent.GetChild(1).position = Misc.GetCenter(objectToMove.transform.parent.GetChild(0).position, objectToMove.transform.parent.GetChild(2).position);
+                    }
                 }
             }
 

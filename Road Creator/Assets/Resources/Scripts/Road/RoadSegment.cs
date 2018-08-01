@@ -80,8 +80,8 @@ public class RoadSegment : MonoBehaviour
             }
 
             // Center Guidelines
-            forward = transform.GetChild(0).GetChild(2).position - transform.GetChild(0).GetChild(0).position;
-            left = new Vector3(-forward.z, 0, forward.x).normalized;
+            Vector3 center = Misc.GetCenter(transform.GetChild(0).GetChild(2).position, transform.GetChild(0).GetChild(0).position);
+            left = (transform.GetChild(0).GetChild(1).position - center).normalized;
 
             centerGuidelinePoints = new Vector3[guidelineAmount * 2];
             for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
