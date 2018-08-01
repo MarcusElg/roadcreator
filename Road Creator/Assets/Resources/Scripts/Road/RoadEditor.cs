@@ -94,47 +94,11 @@ public class RoadEditor : Editor
             if (guiEvent.control == true)
             {
                 bool snapToGuidelines = false;
-                RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
-                for (int i = 0; i < roadSegments.Length; i++)
+                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                if (nearestGuideline != Misc.MaxVector3)
                 {
-                    if (roadSegments[i].startGuidelinePoints != null)
-                    {
-                        for (int j = 0; j < roadSegments[i].startGuidelinePoints.Length; j++)
-                        {
-                            if (Vector3.Distance(hitPosition, roadSegments[i].startGuidelinePoints[j]) < 1f)
-                            {
-                                hitPosition = roadSegments[i].startGuidelinePoints[j];
-                                snapToGuidelines = true;
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (roadSegments[i].centerGuidelinePoints != null)
-                    {
-                        for (int j = 0; j < roadSegments[i].centerGuidelinePoints.Length; j++)
-                        {
-                            if (Vector3.Distance(hitPosition, roadSegments[i].centerGuidelinePoints[j]) < 1f)
-                            {
-                                hitPosition = roadSegments[i].centerGuidelinePoints[j];
-                                snapToGuidelines = true;
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (roadSegments[i].endGuidelinePoints != null)
-                    {
-                        for (int j = 0; j < roadSegments[i].endGuidelinePoints.Length; j++)
-                        {
-                            if (Vector3.Distance(hitPosition, roadSegments[i].endGuidelinePoints[j]) < 1f)
-                            {
-                                hitPosition = roadSegments[i].endGuidelinePoints[j];
-                                snapToGuidelines = true;
-                                continue;
-                            }
-                        }
-                    }
+                    snapToGuidelines = true;
+                    hitPosition = nearestGuideline;
                 }
 
                 if (snapToGuidelines == false)
@@ -518,6 +482,8 @@ public class RoadEditor : Editor
                 {
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(0).position, roadSegments[i].startGuidelinePoints[roadSegments[i].startGuidelinePoints.Length - 2]);
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(0).position, roadSegments[i].startGuidelinePoints[roadSegments[i].startGuidelinePoints.Length - 1]);
+                    Vector3 left = Misc.CalculateLeft(roadSegments[i].startGuidelinePoints[0], roadSegments[i].startGuidelinePoints[2]);
+                    Handles.DrawLine((left * roadCreator.globalSettings.pointSize) + roadSegments[i].transform.GetChild(0).GetChild(0).position, (-left * roadCreator.globalSettings.pointSize) + roadSegments[i].transform.GetChild(0).GetChild(0).position);
 
                     for (int j = 0; j < roadSegments[i].startGuidelinePoints.Length; j++)
                     {
@@ -530,6 +496,8 @@ public class RoadEditor : Editor
                 {
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(1).position, roadSegments[i].centerGuidelinePoints[roadSegments[i].centerGuidelinePoints.Length - 2]);
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(1).position, roadSegments[i].centerGuidelinePoints[roadSegments[i].centerGuidelinePoints.Length - 1]);
+                    Vector3 left = Misc.CalculateLeft(roadSegments[i].centerGuidelinePoints[0], roadSegments[i].centerGuidelinePoints[2]);
+                    Handles.DrawLine((left * roadCreator.globalSettings.pointSize) + roadSegments[i].transform.GetChild(0).GetChild(1).position, (-left * roadCreator.globalSettings.pointSize) + roadSegments[i].transform.GetChild(0).GetChild(1).position);
 
                     for (int j = 0; j < roadSegments[i].centerGuidelinePoints.Length; j++)
                     {
@@ -542,6 +510,8 @@ public class RoadEditor : Editor
                 {
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(2).position, roadSegments[i].endGuidelinePoints[roadSegments[i].endGuidelinePoints.Length - 2]);
                     Handles.DrawLine(roadSegments[i].transform.GetChild(0).GetChild(2).position, roadSegments[i].endGuidelinePoints[roadSegments[i].endGuidelinePoints.Length - 1]);
+                    Vector3 left = Misc.CalculateLeft(roadSegments[i].endGuidelinePoints[0], roadSegments[i].endGuidelinePoints[2]);
+                    Handles.DrawLine((left * roadCreator.globalSettings.pointSize) + roadSegments[i].transform.GetChild(0).GetChild(2).position, (-left * roadCreator.globalSettings.pointSize) + roadSegments[i].transform.GetChild(0).GetChild(2).position);
 
                     for (int j = 0; j < roadSegments[i].endGuidelinePoints.Length; j++)
                     {

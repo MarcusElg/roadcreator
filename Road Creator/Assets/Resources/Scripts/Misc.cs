@@ -99,4 +99,42 @@ public class Misc
         return Quaternion.AngleAxis(degreesPerStep * i, Vector3.up) * (Vector3.right * radius);
     }
 
+    public static Vector3 GetNearestGuidelinePoint(Vector3 hitPosition)
+    {
+        RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
+        Vector3 nearest = MaxVector3;
+        float nearestDistance = float.MaxValue;
+
+        for (int i = 0; i < roadSegments.Length; i++)
+        {
+            Vector3[] guidelines = new Vector3[roadSegments[i].startGuidelinePoints.Length + roadSegments[i].centerGuidelinePoints.Length + roadSegments[i].endGuidelinePoints.Length];
+            roadSegments[i].startGuidelinePoints.CopyTo(guidelines, 0);
+            roadSegments[i].centerGuidelinePoints.CopyTo(guidelines, roadSegments[i].startGuidelinePoints.Length);
+            roadSegments[i].endGuidelinePoints.CopyTo(guidelines, roadSegments[i].centerGuidelinePoints.Length);
+            Vector3 nearestVector = MaxVector3;
+            float nearestDistanceInSegment = float.MaxValue;
+
+            if (guidelines != null)
+            {
+                for (int j = 0; j < guidelines.Length; j++)
+                {
+                    float distance = Vector3.Distance(hitPosition, guidelines[j]);
+                    if (distance < 1f && distance < nearestDistanceInSegment)
+                    {
+                        nearestVector = guidelines[j];
+                        nearestDistanceInSegment = distance;
+                    }
+                }
+            }
+
+            if (nearestDistanceInSegment < nearestDistance)
+            {
+                nearestDistance = nearestDistanceInSegment;
+                nearest = nearestVector;
+            }
+        }
+
+        return nearest;
+    }
+
 }

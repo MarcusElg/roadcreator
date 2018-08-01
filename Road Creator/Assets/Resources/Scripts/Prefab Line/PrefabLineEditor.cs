@@ -200,47 +200,11 @@ public class PrefabLineEditor : Editor
             if (guiEvent.control == true)
             {
                 bool snapToGuidelines = false;
-                RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
-                for (int i = 0; i < roadSegments.Length; i++)
+                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                if (nearestGuideline != Misc.MaxVector3)
                 {
-                    if (roadSegments[i].startGuidelinePoints != null)
-                    {
-                        for (int j = 0; j < roadSegments[i].startGuidelinePoints.Length; j++)
-                        {
-                            if (Vector3.Distance(hitPosition, roadSegments[i].startGuidelinePoints[j]) < 1f)
-                            {
-                                hitPosition = roadSegments[i].startGuidelinePoints[j];
-                                snapToGuidelines = true;
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (roadSegments[i].centerGuidelinePoints != null)
-                    {
-                        for (int j = 0; j < roadSegments[i].centerGuidelinePoints.Length; j++)
-                        {
-                            if (Vector3.Distance(hitPosition, roadSegments[i].centerGuidelinePoints[j]) < 1f)
-                            {
-                                hitPosition = roadSegments[i].centerGuidelinePoints[j];
-                                snapToGuidelines = true;
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (roadSegments[i].endGuidelinePoints != null)
-                    {
-                        for (int j = 0; j < roadSegments[i].endGuidelinePoints.Length; j++)
-                        {
-                            if (Vector3.Distance(hitPosition, roadSegments[i].endGuidelinePoints[j]) < 1f)
-                            {
-                                hitPosition = roadSegments[i].endGuidelinePoints[j];
-                                snapToGuidelines = true;
-                                continue;
-                            }
-                        }
-                    }
+                    snapToGuidelines = true;
+                    hitPosition = nearestGuideline;
                 }
 
                 if (snapToGuidelines == false)
