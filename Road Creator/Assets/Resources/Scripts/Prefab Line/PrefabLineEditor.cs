@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(PrefabLineCreator))]
 public class PrefabLineEditor : Editor
@@ -167,7 +166,14 @@ public class PrefabLineEditor : Editor
                     Vector3 center = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
                     float distanceToChange = Vector3.Distance(center, currentPoints.prefabPoints[j]);
 
-                    Vector3 controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * prefabCreator.bendMultiplier);
+                    Vector3 controlPoint;
+                    if (currentPoints.rotateTowardsLeft[j] == true)
+                    {
+                        controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * prefabCreator.bendMultiplier);
+                    } else
+                    {
+                        controlPoint = mesh.bounds.center + new Vector3(0, 0, -(distanceToChange * prefabCreator.bendMultiplier));
+                    }
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
