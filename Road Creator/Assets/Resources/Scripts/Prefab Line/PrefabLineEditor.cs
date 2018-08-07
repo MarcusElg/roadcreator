@@ -434,11 +434,13 @@ public class PrefabLineEditor : Editor
             divisions = Mathf.Max(2, divisions);
             float distancePerDivision = 1 / divisions;
             offset /= distance;
+            bool isSegmentLeft = IsSegmentLeft(i);
 
             float startOffset = 0;
             if (i == 0)
             {
                 startOffset = offset;
+                rotateTowardsLeft.Add(isSegmentLeft);
             }
 
             for (float t = startOffset; t < 1; t += distancePerDivision / 10)
@@ -469,10 +471,11 @@ public class PrefabLineEditor : Editor
 
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
-
                     startPoints.Add(lastEndPoint);
 
                     endPointAdded = false;
+
+                    rotateTowardsLeft.Add(isSegmentLeft);
                 }
             }
 
@@ -482,7 +485,24 @@ public class PrefabLineEditor : Editor
             }
         }
 
-        return new PointPackage(prefabPoints.ToArray(), startPoints.ToArray(), endPoints.ToArray());
+        return new PointPackage(prefabPoints.ToArray(), startPoints.ToArray(), endPoints.ToArray(), rotateTowardsLeft.ToArray());
+    }
+
+    private bool IsSegmentLeft(int startIndex)
+    {
+        Vector3 forward = (prefabCreator.transform.GetChild(0).GetChild(startIndex).position - prefabCreator.transform.GetChild(0).GetChild(startIndex + 2).position).normalized;
+        Vector3 center = Misc.GetCenter(prefabCreator.transform.GetChild(0).GetChild(startIndex).position, prefabCreator.transform.GetChild(0).GetChild(startIndex + 2).position);
+        Vector3 right = Vector3.Cross(forward, (prefabCreator.transform.GetChild(0).GetChild(startIndex + 1).position - center).normalized);
+        float direction = Vector3.Dot(right, Vector3.up);
+
+        if (direction > 0.0f)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     private Vector3[] CalculatePoints(Event guiEvent, Vector3 hitPosition)
