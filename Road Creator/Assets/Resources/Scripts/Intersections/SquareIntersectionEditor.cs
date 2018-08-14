@@ -24,8 +24,9 @@ public class SquareIntersectionEditor : Editor
             GameObject sides = new GameObject("Sides");
             sides.transform.SetParent(intersection.transform);
             sides.transform.localPosition = Vector3.zero;
+            sides.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
-            AddSide("Up");
+            AddSide("Up").transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
             AddSide("Down").transform.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));
             AddSide("Left").transform.localRotation = Quaternion.Euler(new Vector3(0, 270, 0));
             AddSide("Right").transform.localRotation = Quaternion.Euler(new Vector3(0, 90, 0));
@@ -33,6 +34,7 @@ public class SquareIntersectionEditor : Editor
             GameObject mainMesh = new GameObject("Main Mesh");
             mainMesh.transform.SetParent(intersection.transform);
             mainMesh.transform.localPosition = Vector3.zero;
+            mainMesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
             mainMesh.AddComponent<MeshFilter>();
             mainMesh.AddComponent<MeshRenderer>();
             mainMesh.AddComponent<MeshCollider>();

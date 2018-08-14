@@ -47,7 +47,7 @@ public class DiamondIntersection : MonoBehaviour
         if (upperLeftConnection == true)
         {
             transform.GetChild(0).GetChild(0).localPosition = Misc.GetCenter(new Vector3(-width, 0, 0), new Vector3(0, 0, height));
-            transform.GetChild(0).GetChild(0).rotation = Quaternion.FromToRotation(Vector3.left, new Vector3(-width, heightOffset, 0) - new Vector3(0, heightOffset, height));
+            transform.GetChild(0).GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.left, new Vector3(-width, heightOffset, 0) - new Vector3(0, heightOffset, height));
             transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, upperLeftConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(-width, heightOffset, 0), new Vector3(0, heightOffset, height)) / 2;
             GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-upperLeftConnectionWidth, heightOffset, upperLeftConnectionHeight), new Vector3(upperLeftConnectionWidth, heightOffset, upperLeftConnectionHeight), connectionMaterial);
@@ -61,7 +61,7 @@ public class DiamondIntersection : MonoBehaviour
         if (upperRightConnection == true)
         {
             transform.GetChild(0).GetChild(1).localPosition = Misc.GetCenter(new Vector3(width, 0, 0), new Vector3(0, 0, height));
-            transform.GetChild(0).GetChild(1).rotation = Quaternion.FromToRotation(Vector3.right, new Vector3(width, heightOffset, 0) - new Vector3(0, heightOffset, height));
+            transform.GetChild(0).GetChild(1).localRotation = Quaternion.FromToRotation(Vector3.right, new Vector3(width, heightOffset, 0) - new Vector3(0, heightOffset, height));
             transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, upperRightConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(width, heightOffset, 0), new Vector3(0, heightOffset, height)) / 2;
             GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-upperRightConnectionWidth, heightOffset, upperRightConnectionHeight), new Vector3(upperRightConnectionWidth, heightOffset, upperRightConnectionHeight), connectionMaterial);
@@ -75,7 +75,7 @@ public class DiamondIntersection : MonoBehaviour
         if (lowerLeftConnection == true)
         {
             transform.GetChild(0).GetChild(2).localPosition = Misc.GetCenter(new Vector3(-width, 0, 0), new Vector3(0, 0, -height));
-            transform.GetChild(0).GetChild(2).rotation = Quaternion.FromToRotation(Vector3.left, new Vector3(0, heightOffset, -height) - new Vector3(-width, heightOffset, 0));
+            transform.GetChild(0).GetChild(2).localRotation = Quaternion.FromToRotation(Vector3.left, new Vector3(0, heightOffset, -height) - new Vector3(-width, heightOffset, 0));
             transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, lowerLeftConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(-width, heightOffset, 0), new Vector3(0, heightOffset, -height)) / 2;
             GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-lowerLeftConnectionWidth, heightOffset, lowerLeftConnectionHeight), new Vector3(lowerLeftConnectionWidth, heightOffset, lowerLeftConnectionHeight), connectionMaterial);
@@ -89,7 +89,7 @@ public class DiamondIntersection : MonoBehaviour
         if (lowerRightConnection == true)
         {
             transform.GetChild(0).GetChild(3).localPosition = Misc.GetCenter(new Vector3(width, 0, 0), new Vector3(0, 0, -height));
-            transform.GetChild(0).GetChild(3).rotation = Quaternion.FromToRotation(Vector3.right, new Vector3(0, heightOffset, -height) - new Vector3(width, heightOffset, 0));
+            transform.GetChild(0).GetChild(3).localRotation = Quaternion.FromToRotation(Vector3.right, new Vector3(0, heightOffset, -height) - new Vector3(width, heightOffset, 0));
             transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, lowerRightConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(width, heightOffset, 0), new Vector3(0, heightOffset, -height)) / 2;
             GenerateMesh(transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-lowerRightConnectionWidth, heightOffset, lowerRightConnectionHeight), new Vector3(lowerRightConnectionWidth, heightOffset, lowerRightConnectionHeight), connectionMaterial);

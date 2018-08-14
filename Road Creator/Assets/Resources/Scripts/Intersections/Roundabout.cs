@@ -95,7 +95,7 @@ public class Roundabout : MonoBehaviour
     {
         transform.GetChild(0).GetChild(objectIndex).transform.localPosition = Misc.FindPointInCircle(diameter / 2, i, 360f / (points.Length - 1));
         Vector3 rotation = new Vector3(0, (360f / (points.Length - 1)) * i + 90, 0);
-        transform.GetChild(0).GetChild(objectIndex).transform.rotation = Quaternion.Euler(rotation);
+        transform.GetChild(0).GetChild(objectIndex).transform.localRotation = Quaternion.Euler(rotation);
         transform.GetChild(0).GetChild(objectIndex).GetChild(1).localPosition = new Vector3(0, 0, width);
 
         Vector3[] vertices = new Vector3[4];

@@ -24,10 +24,12 @@ public class RoundaboutEditor : Editor
             GameObject connections = new GameObject("Connections");
             connections.transform.SetParent(roundabout.transform);
             connections.transform.localPosition = Vector3.zero;
+            connections.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
             GameObject mainMesh = new GameObject("Main Mesh");
             mainMesh.transform.SetParent(roundabout.transform);
             mainMesh.transform.localPosition = new Vector3(0, 0.001f, 0);
+            mainMesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
             mainMesh.AddComponent<MeshFilter>();
             mainMesh.AddComponent<MeshRenderer>();
             mainMesh.AddComponent<MeshCollider>();
