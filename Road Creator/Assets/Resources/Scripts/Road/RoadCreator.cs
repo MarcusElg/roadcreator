@@ -313,8 +313,10 @@ public class RoadCreator : MonoBehaviour
         divisions = Mathf.Max(2, divisions);
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;
+        Vector3 lastPosition = segment.transform.GetChild(0).GetChild(0).position;
+        points.Add(lastPosition);
 
-        for (float t = 0; t <= 1; t += distancePerDivision)
+        for (float t = 0; t <= 1; t += distancePerDivision / 10)
         {
             if (t > 1 - distancePerDivision)
             {
@@ -322,17 +324,30 @@ public class RoadCreator : MonoBehaviour
             }
 
             Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
-
-            if (segment.GetComponent<RoadSegment>().terrainOption == RoadSegment.TerrainOption.adapt)
+            float distance = Vector3.Distance(position, lastPosition);
+            if (distance > distancePerDivision * divisions)
             {
-                RaycastHit raycastHit;
-                if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer) | (1 << globalSettings.intersectionPointsLayer))))
-                {
-                    position.y = raycastHit.point.y;
-                }
-            }
+                lastPosition = position;
 
-            points.Add(position);
+                if (segment.GetComponent<RoadSegment>().terrainOption == RoadSegment.TerrainOption.adapt)
+                {
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer) | (1 << globalSettings.intersectionPointsLayer))))
+                    {
+                        position.y = raycastHit.point.y;
+                    }
+                }
+
+                points.Add(position);
+            }
+        }
+
+        if (Vector3.Distance(lastPosition, segment.transform.GetChild(0).GetChild(2).position) > (distancePerDivision * divisions) / 2)
+        {
+            points.Add(segment.transform.GetChild(0).GetChild(2).position);
+        } else
+        {
+            points[points.Count - 1] = segment.transform.GetChild(0).GetChild(2).position;
         }
 
         return points.ToArray();
