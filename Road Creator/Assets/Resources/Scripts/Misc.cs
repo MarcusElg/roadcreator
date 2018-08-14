@@ -180,4 +180,23 @@ public static class Misc
         }
     }
 
+    public static void UpdateAllIntersectionConnections ()
+    {
+        Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
+        for (int i = 0; i < gameObjects.Length; i++)
+        {
+            if (gameObjects[i].intersectionConnection != null)
+            {
+                gameObjects[i].transform.position = gameObjects[i].intersectionConnection.transform.position;
+
+                if (gameObjects[i].transform.parent.childCount == 3)
+                {
+                    gameObjects[i].transform.parent.GetChild(1).position = Misc.GetCenter(gameObjects[i].transform.parent.GetChild(0).position, gameObjects[i].transform.parent.GetChild(2).position);
+                }
+
+                gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+            }
+        }
+    }
+
 }

@@ -122,17 +122,7 @@ public class SquareIntersectionEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            // Update connections
-            Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
-            for (int i = 0; i < gameObjects.Length; i++)
-            {
-                if (gameObjects[i].intersectionConnection != null)
-                {
-                    gameObjects[i].transform.position = gameObjects[i].intersectionConnection.transform.position;
-                    gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
-                }
-            }
-
+            Misc.UpdateAllIntersectionConnections();
             intersection.GenerateMeshes();
         }
 
