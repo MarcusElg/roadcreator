@@ -10,6 +10,7 @@ public class PrefabLineCreator : MonoBehaviour
 
     public bool bendObjects = true;
     public float bendMultiplier = 1;
+    public bool fillGap = true;
     public float spacing = 1;
     public bool rotateAlongCurve = true;
 

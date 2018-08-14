@@ -48,24 +48,29 @@ public class PrefabLineEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
+        prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
 
-        prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
-
-        if (GUILayout.Button("Calculate Spacing (X)") == true)
+        if (prefabCreator.fillGap == false)
         {
-            if (prefabCreator.prefab != null)
+            prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
+
+            if (GUILayout.Button("Calculate Spacing (X)") == true)
             {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
+                if (prefabCreator.prefab != null)
+                {
+                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
+                }
+            }
+
+            if (GUILayout.Button("Calculate Spacing (Z)") == true)
+            {
+                if (prefabCreator.prefab != null)
+                {
+                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2;
+                }
             }
         }
 
-        if (GUILayout.Button("Calculate Spacing (Z)") == true)
-        {
-            if (prefabCreator.prefab != null)
-            {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2;
-            }
-        }
         if (prefabCreator.bendObjects == true)
         {
             prefabCreator.bendMultiplier = Mathf.Max(0, EditorGUILayout.FloatField("Bend Multiplier", prefabCreator.bendMultiplier));
@@ -88,6 +93,16 @@ public class PrefabLineEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
+            if (prefabCreator.fillGap == true)
+            {
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
+
+                if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left /*&& prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right*/)
+                {
+                    prefabCreator.rotationDirection = PrefabLineCreator.RotationDirection.left;
+                }
+            }
+
             PlacePrefabs();
         }
 
@@ -187,6 +202,56 @@ public class PrefabLineEditor : Editor
                     mesh.RecalculateBounds();
                     prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
                 }
+
+                if (prefabCreator.fillGap == true && j > 0)
+                {
+                    // Add last vertices
+                    List<Vector3> lastVertexPositions = new List<Vector3>();
+                    Vector3[] lastVertices = prefabCreator.transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
+                    for (int i = 0; i < lastVertices.Length; i++)
+                    {
+                        if (lastVertices[i].x == prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x && (i > 0 || lastVertices[i - 1] != lastVertices[i]))
+                        {
+                            lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * lastVertices[i]) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
+                        }
+                    }
+
+                    // Move current vertices to last ones
+                    Mesh mesh = GameObject.Instantiate(prefab.GetComponent<MeshFilter>().sharedMesh);
+                    Vector3[] vertices = mesh.vertices;
+                    for (int i = 0; i < mesh.vertices.Length; i++)
+                    {
+                        if (vertices[i].x == prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x)
+                        {
+                            Vector3 nearestVertex = Vector3.zero;
+                            float currentDistance = float.MaxValue;
+
+                            for (int k = 0; k < lastVertexPositions.Count; k++)
+                            {
+                                float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * vertices[i]) + prefab.transform.position);
+                                if (calculatedDistance < currentDistance)
+                                {
+                                    currentDistance = calculatedDistance;
+                                    nearestVertex = lastVertexPositions[k];
+                                }
+                            }
+
+                            vertices[i] = ((Quaternion.Euler(0, 0, 0) * nearestVertex) - prefab.transform.position);
+                        }
+                    }
+
+                    mesh.vertices = vertices;
+                    prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+                    prefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+
+                    // Change collider to match
+                    System.Type type = prefab.GetComponent<Collider>().GetType();
+                    if (type != null)
+                    {
+                        DestroyImmediate(prefab.GetComponent<Collider>());
+                        prefab.AddComponent(type);
+                    }
+                }
             }
         }
     }
@@ -281,7 +346,8 @@ public class PrefabLineEditor : Editor
                 {
                     prefabCreator.currentPoint = CreatePoint("Control Point", hitPosition);
                     Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
-                } else
+                }
+                else
                 {
                     prefabCreator.currentPoint = CreatePoint("Control Point", Misc.GetCenter(prefabCreator.currentPoint.transform.position, hitPosition));
                     Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
@@ -415,11 +481,12 @@ public class PrefabLineEditor : Editor
         List<Vector3> prefabPoints = new List<Vector3>();
         List<Vector3> startPoints = new List<Vector3>();
         List<Vector3> endPoints = new List<Vector3>();
+        List<bool> rotateTowardsLeft = new List<bool>();
 
         Vector3 lastEndPoint = Vector3.zero;
         float distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position);
         offset /= distance;
-
+        
         prefabPoints.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset));
         startPoints.Add(prefabCreator.transform.GetChild(0).GetChild(0).position);
         Vector3 lastPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset);
