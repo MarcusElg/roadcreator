@@ -47,7 +47,8 @@ public class RoadSegment : MonoBehaviour
         if (segment.GetSiblingIndex() == 0)
         {
             SetGuidelines(points, nextSegmentPoints, true);
-        } else
+        }
+        else
         {
             SetGuidelines(points, nextSegmentPoints, false);
         }
@@ -101,7 +102,8 @@ public class RoadSegment : MonoBehaviour
             {
                 forward = nextPoints[1] - currentPoints[currentPoints.Length - 1];
                 left = new Vector3(-forward.z, 0, forward.x).normalized;
-            } else
+            }
+            else
             {
                 endGuidelinePoints = new Vector3[0];
                 return;
@@ -112,7 +114,8 @@ public class RoadSegment : MonoBehaviour
                 endGuidelinePoints[i] = transform.GetChild(0).GetChild(2).position + left * (i + 1);
                 endGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(2).position - left * (i + 1);
             }
-        } else
+        }
+        else
         {
             startGuidelinePoints = null;
             centerGuidelinePoints = null;
@@ -165,28 +168,6 @@ public class RoadSegment : MonoBehaviour
                     vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
 
-                if (i > 1 && (nextSegmentPoints == null || nextSegmentPoints.Length > 1))
-                {
-                    // Third point and forward
-                    // Left side
-                    float distanceFirstSecond = Vector3.Distance(vertices[verticeIndex - 4], vertices[verticeIndex - 2]);
-                    float distanceFirstThird = Vector3.Distance(vertices[verticeIndex - 4], vertices[verticeIndex]);
-
-                    if (distanceFirstThird < distanceFirstSecond)
-                    {
-                        vertices[verticeIndex - 2] = Misc.GetCenter(vertices[verticeIndex - 4], vertices[verticeIndex]);
-                    }
-
-                    // Right side
-                    distanceFirstSecond = Vector3.Distance(vertices[verticeIndex - 3], vertices[verticeIndex - 1]);
-                    distanceFirstThird = Vector3.Distance(vertices[verticeIndex - 3], vertices[verticeIndex + 1]);
-
-                    if (distanceFirstThird < distanceFirstSecond)
-                    {
-                        vertices[verticeIndex - 1] = Misc.GetCenter(vertices[verticeIndex - 3], vertices[verticeIndex + 1]);
-                    }
-                }
-
                 /*if (terrainOption == TerrainOption.deform)
                 {
                     // Change y position
@@ -225,28 +206,17 @@ public class RoadSegment : MonoBehaviour
                 triangleIndex += 6;
             }
 
-            // Fix indent
-            if (nextSegmentPoints != null)
-            {
-                // NOT WORKING :C
-                /*Vector3 startPosition = vertices[vertices.Length - 2 * ( smoothnessAmount + 1) - 1];
-                Vector3 endPosition = vertices[vertices.Length - 2 * (smoothnessAmount + 1) + 3];
-                Vector3 centerPosition = Misc.GetCenter(startPosition, endPosition);
-                vertices[(vertices.Length - (2 * (points.Length - 1 - smoothnessAmount))) - 1] = centerPosition;
-                GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                g.transform.position = vertices[(vertices.Length - 1 - (2 * smoothnessAmount))] + segment.position;
-                g.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                startPosition = vertices[(vertices.Length - 2 * (points.Length - 1 - smoothnessAmount) - 1) + 1];
-                endPosition = vertices[(vertices.Length - 2 * (points.Length - 1 - smoothnessAmount) - 1) - 3];
-                centerPosition = Misc.GetCenter(startPosition, endPosition);
-                vertices[(vertices.Length - (2 * (points.Length - 1 - smoothnessAmount))) - 2] = centerPosition;*/
-            }
-
+            // Fix texture overlapping with intersections
             if (nextSegmentPoints != null && nextSegmentPoints.Length == 1)
             {
-                // Intersection connection
-                vertices[vertices.Length - 3] = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 5]);
-                vertices[vertices.Length - 4] = Misc.GetCenter(vertices[vertices.Length - 2], vertices[vertices.Length - 6]);
+                vertices = fixVertices(0, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator);
+                vertices = fixVertices(-1, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator);
+            }
+
+            if (previousPoint != Misc.MaxVector3)
+            {
+               vertices = fixVerticesBeggining(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
+                vertices = fixVerticesBeggining(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
             }
 
             Mesh generatedMesh = new Mesh();
@@ -264,6 +234,67 @@ public class RoadSegment : MonoBehaviour
         }
 
         mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
+    }
+
+    private Vector3[] fixVertices(int offset, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator)
+    {
+        int startVertex = 0;
+        for (int i = vertices.Length - 1 + offset; startVertex == 0; i -= 2)
+        {
+            if (i < 1)
+            {
+                return vertices;
+            }
+
+            float direction = Vector3.Dot(forward.normalized, (vertices[vertices.Length - 1 + offset] - vertices[i]).normalized);
+            if (direction > 0.0f)
+            {
+                startVertex = i += 2;
+            }
+
+        }
+        int amount = vertices.Length - 1 - startVertex + offset;
+        float part = 1f / amount;
+        float index = 0;
+
+        for (int i = startVertex; i < vertices.Length - 1 + offset; i += 2)
+        {
+            vertices[i] = Vector3.Lerp(vertices[startVertex - 2], vertices[vertices.Length - 1 + offset], part * index);
+            index += 1;
+        }
+
+        return vertices;
+    }
+
+    private Vector3[] fixVerticesBeggining(int offset, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator)
+    {
+        int startVertex = 0;
+        int t = 0;
+        for (int i = offset; startVertex == 0 && t < 10; i += 2)
+        {
+            if (i > vertices.Length - 1)
+            {
+                return vertices;
+            }
+
+            float direction = Vector3.Dot(forward.normalized, (vertices[i] - vertices[offset]).normalized);
+            if (direction > 0.0f)
+            {
+                startVertex = i -= 2;
+            }
+            t += 1;
+        }
+        int amount = startVertex - offset;
+        float part = 1f / amount;
+        float index = 0;
+
+        for (int i = startVertex; i > offset; i -= 2)
+        {
+            vertices[i] = Vector3.Lerp(vertices[startVertex + 2], vertices[offset], part * index);
+            index += 1;
+        }
+
+        return vertices;
     }
 
     private Vector2[] GenerateUvs(Vector2[] uvs, Vector3[] vertices)
