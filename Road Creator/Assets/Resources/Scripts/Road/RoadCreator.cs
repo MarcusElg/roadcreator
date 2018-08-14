@@ -231,9 +231,13 @@ public class RoadCreator : MonoBehaviour
         Roundabout roundabout = intersection.transform.parent.GetComponent<Roundabout>();
         RoadSplitter roadSplitter = intersection.GetComponent<RoadSplitter>();
 
-        if (squareIntersection != null || roundabout != null)
+        if (squareIntersection != null)
         {
-            return intersection.transform.position;
+            return intersection.transform.position + new Vector3(0, squareIntersection.heightOffset, 0);
+        }
+        else if (roundabout != null)
+        {
+            return roundabout.transform.position + new Vector3(0, roundabout.heightOffset, 0);
         }
         else if (triangleIntersection != null)
         {

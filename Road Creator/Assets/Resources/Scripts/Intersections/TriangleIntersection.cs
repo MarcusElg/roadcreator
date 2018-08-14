@@ -53,7 +53,7 @@ public class TriangleIntersection : MonoBehaviour {
 
         if (leftConnection == true)
         {
-            transform.GetChild(0).GetChild(1).localPosition = Misc.GetCenter(new Vector3(-width, heightOffset, -height), new Vector3(0, heightOffset, height));
+            transform.GetChild(0).GetChild(1).localPosition = Misc.GetCenter(new Vector3(-width, 0, -height), new Vector3(0, 0, height));
             transform.GetChild(0).GetChild(1).localRotation = Quaternion.FromToRotation(Vector3.right, new Vector3(0, heightOffset, height) - new Vector3(-width, heightOffset, -height));
             transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, leftConnectionHeight);
             float connectionHeight = Vector3.Distance(new Vector3(-width, heightOffset, -height), new Vector3(0, heightOffset, height)) / 2;
@@ -67,7 +67,7 @@ public class TriangleIntersection : MonoBehaviour {
 
         if (rightConnection == true)
         {
-            transform.GetChild(0).GetChild(2).localPosition = Misc.GetCenter(new Vector3(width, heightOffset, -height), new Vector3(0, heightOffset, height));
+            transform.GetChild(0).GetChild(2).localPosition = Misc.GetCenter(new Vector3(width, 0, -height), new Vector3(0, 0, height));
             transform.GetChild(0).GetChild(2).localRotation = Quaternion.FromToRotation(Vector3.left, new Vector3(0, heightOffset, height) - new Vector3(width, heightOffset, -height));
             transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, rightConnectionHeight);
             float connectionHeight = Vector3.Distance(new Vector3(-width, heightOffset, -height), new Vector3(0, heightOffset, height)) / 2;

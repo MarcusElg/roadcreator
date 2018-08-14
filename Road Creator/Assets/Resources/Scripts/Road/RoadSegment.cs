@@ -154,6 +154,11 @@ public class RoadSegment : MonoBehaviour
 
                 if (name == "Road")
                 {
+                    if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
+                    {
+                        heightOffset = nextSegmentPoints[0].y;
+                    }
+
                     vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
                     vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
                 }
