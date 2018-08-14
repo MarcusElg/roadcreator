@@ -41,7 +41,7 @@ public class Roundabout : MonoBehaviour
 
     private void GenerateCircle()
     {
-        points = new Vector3[Mathf.RoundToInt(globalSettings.resolution * (diameter + width)) * 4];
+        points = new Vector3[Mathf.RoundToInt(globalSettings.resolution * (diameter + width)) * 8];
         for (int i = 0; i < points.Length; i++)
         {
             points[i] = Misc.FindPointInCircle(diameter / 2, i, 360f / (points.Length - 1));
