@@ -215,8 +215,14 @@ public class RoadSegment : MonoBehaviour
 
             if (previousPoint != Misc.MaxVector3)
             {
-               vertices = fixVerticesBeggining(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
+                vertices = fixVerticesBeggining(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
                 vertices = fixVerticesBeggining(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
+            }
+
+            if (smoothnessAmount > 0)
+            {
+                vertices = fixVerticesBeggining(vertices.Length - 3 - (2 * smoothnessAmount), vertices, (points[points.Length - smoothnessAmount] - points[points.Length - smoothnessAmount - 2]).normalized, segment, roadCreator);
+                vertices = fixVerticesBeggining(vertices.Length - 4 - (2 * smoothnessAmount), vertices, (points[points.Length - smoothnessAmount] - points[points.Length - smoothnessAmount - 2]).normalized, segment, roadCreator);
             }
 
             Mesh generatedMesh = new Mesh();
