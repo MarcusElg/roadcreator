@@ -122,10 +122,11 @@ public class DiamondIntersectionEditor : Editor
             intersection.lowerRightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Right Connection Width", intersection.lowerRightConnectionWidth));
         }
 
-        if (EditorGUI.EndChangeCheck() == true)
+        if (EditorGUI.EndChangeCheck() == true || intersection.transform.hasChanged == true)
         {
             Misc.UpdateAllIntersectionConnections();
             intersection.GenerateMeshes();
+            intersection.transform.hasChanged = false;
         }
 
         if (GUILayout.Button("Generate Intersection"))

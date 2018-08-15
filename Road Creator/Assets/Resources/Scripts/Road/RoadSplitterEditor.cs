@@ -72,20 +72,11 @@ public class RoadSplitterEditor : Editor {
         roadSplitter.lowerRightXOffset = EditorGUILayout.FloatField("Lower Right X Offset", roadSplitter.lowerRightXOffset);
         roadSplitter.upperRightXOffset = EditorGUILayout.FloatField("Upper Right X Offset", roadSplitter.upperRightXOffset);
 
-        if (EditorGUI.EndChangeCheck() == true)
+        if (EditorGUI.EndChangeCheck() == true || roadSplitter.transform.hasChanged == true)
         {
-            // Update connections
-            Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
-            for (int i = 0; i < gameObjects.Length; i++)
-            {
-                if (gameObjects[i].intersectionConnection != null)
-                {
-                    gameObjects[i].transform.position = gameObjects[i].intersectionConnection.transform.position;
-                    gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
-                }
-            }
-
+            Misc.UpdateAllIntersectionConnections();
             roadSplitter.GenerateMesh();
+            roadSplitter.transform.hasChanged = false;
         }
 
         if (GUILayout.Button("Generate Mesh"))

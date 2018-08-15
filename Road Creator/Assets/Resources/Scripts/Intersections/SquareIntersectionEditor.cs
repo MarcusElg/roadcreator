@@ -122,10 +122,11 @@ public class SquareIntersectionEditor : Editor
             intersection.rightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Width", intersection.rightConnectionWidth));
         }
 
-        if (EditorGUI.EndChangeCheck() == true)
+        if (EditorGUI.EndChangeCheck() == true || intersection.transform.hasChanged == true)
         {
             Misc.UpdateAllIntersectionConnections();
             intersection.GenerateMeshes();
+            intersection.transform.hasChanged = false;
         }
 
         if (GUILayout.Button("Generate Intersection"))

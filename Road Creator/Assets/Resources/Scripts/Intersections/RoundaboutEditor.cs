@@ -104,10 +104,11 @@ public class RoundaboutEditor : Editor
             connectionPoint.layer = roundabout.globalSettings.intersectionPointsLayer;
         }
 
-        if (EditorGUI.EndChangeCheck() == true)
+        if (EditorGUI.EndChangeCheck() == true || roundabout.transform.hasChanged == true)
         {
             Misc.UpdateAllIntersectionConnections();
             roundabout.GenerateMeshes();
+            roundabout.transform.hasChanged = false;
         }
 
         if (GUILayout.Button("Generate Roundabout"))
