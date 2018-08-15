@@ -144,6 +144,7 @@ public class RoadSegment : MonoBehaviour
             for (int i = 0; i < points.Length; i++)
             {
                 Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
+                float correctedHeightOffset = heightOffset;
 
                 if (i > 0)
                 {
@@ -152,25 +153,29 @@ public class RoadSegment : MonoBehaviour
 
                 float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
 
+                if (i == 0 && previousPoint != Misc.MaxVector3)
+                {
+                    correctedHeightOffset = (previousPoint.y - segment.position.y);
+                }
+                else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
+                {
+                    correctedHeightOffset = (nextSegmentPoints[0].y - segment.position.y);
+                }
+
                 if (name == "Road")
                 {
-                    if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
-                    {
-                        heightOffset = nextSegmentPoints[0].y;
-                    }
-
-                    vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
                 }
                 else if (name == "Left Shoulder")
                 {
-                    vertices[verticeIndex] = (points[i] + left * roadWidth + left * leftShoulderWidth + new Vector3(0, heightOffset + leftShoulderHeightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] + left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] + left * roadWidth + left * leftShoulderWidth + new Vector3(0, correctedHeightOffset + leftShoulderHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
                 }
                 else if (name == "Right Shoulder")
                 {
-                    vertices[verticeIndex] = (points[i] - left * roadWidth + new Vector3(0, heightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, heightOffset + rightShoulderHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, correctedHeightOffset + rightShoulderHeightOffset, 0)) - segment.position;
                 }
 
                 /*if (terrainOption == TerrainOption.deform)

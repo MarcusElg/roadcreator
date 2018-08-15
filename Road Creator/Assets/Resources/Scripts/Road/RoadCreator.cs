@@ -67,9 +67,7 @@ public class RoadCreator : MonoBehaviour
 
                     // First and last points
                     currentPoints[currentPoints.Length - 1] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], 0.5f);
-                    //currentPoints[currentPoints.Length - actualSmoothnessAmount - 2] = Misc.GetCenter(currentPoints[currentPoints.Length - actualSmoothnessAmount - 3], currentPoints[currentPoints.Length - actualSmoothnessAmount - 1]);
                     nextPoints[0] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], 0.5f);
-
                     transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, heightOffset, transform.GetChild(0).GetChild(i), actualSmoothnessAmount, this);
                     StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                     currentPoints = nextPoints;
