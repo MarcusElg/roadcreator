@@ -187,7 +187,7 @@ public class RoadEditor : Editor
             else if (roadCreator.currentSegment.transform.GetChild(0).childCount == 2)
             {
                 // Create end point
-                Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", roadCreator.currentSegment.transform.GetChild(0), hitPosition), "Created Point");
                 roadCreator.currentSegment = null;
                 roadCreator.CreateMesh();
             }
@@ -199,7 +199,7 @@ public class RoadEditor : Editor
                 // Create first segment
                 RoadSegment segment = CreateSegment(hitPosition);
                 Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
-                Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), hitPosition), "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), hitPosition), "Created Point");
 
                 if (roadCreator.globalSettings.roadCurved == false)
                 {
@@ -210,11 +210,11 @@ public class RoadEditor : Editor
             {
                 RoadSegment segment = CreateSegment(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).position);
                 Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
-                Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), segment.transform.position), "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), segment.transform.position), "Created Point");
 
                 if (roadCreator.globalSettings.roadCurved == true)
                 {
-                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), hitPosition), "Create Point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), hitPosition), "Created Point");
                 }
                 else
                 {
