@@ -41,7 +41,7 @@ public class RoadSystemEditor : Editor
         {
             for (int i = roadSystem.transform.childCount - 1; i >= 0; i--)
             {
-                DestroyImmediate(roadSystem.transform.GetChild(i).gameObject);
+                Undo.DestroyObjectImmediate(roadSystem.transform.GetChild(i).gameObject);
             }
         }
     }

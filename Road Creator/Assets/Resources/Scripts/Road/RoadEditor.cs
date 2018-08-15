@@ -70,7 +70,7 @@ public class RoadEditor : Editor
 
             for (int i = roadCreator.transform.GetChild(0).childCount - 1; i >= 0; i--)
             {
-                DestroyImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
+                Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
             }
         }
 

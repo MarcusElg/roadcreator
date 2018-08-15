@@ -13,7 +13,7 @@ public class GlobalSettings : MonoBehaviour
     public int oldAmountRoadGuidelines = 5;
     public int amountRoadGuidelines = 5;
 
-    public bool debug;
+    public bool debug = false;
     public bool roadCurved = true;
 
     public void UpdateRoadGuidelines()

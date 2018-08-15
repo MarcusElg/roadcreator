@@ -116,7 +116,7 @@ public class PrefabLineEditor : Editor
             {
                 for (int j = prefabCreator.transform.GetChild(i).childCount - 1; j >= 0; j--)
                 {
-                    DestroyImmediate(prefabCreator.transform.GetChild(i).GetChild(j).gameObject);
+                    Undo.DestroyObjectImmediate(prefabCreator.transform.GetChild(i).GetChild(j).gameObject);
                 }
             }
         }
