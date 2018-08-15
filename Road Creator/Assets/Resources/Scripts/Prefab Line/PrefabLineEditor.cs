@@ -83,7 +83,7 @@ public class PrefabLineEditor : Editor
 
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0, 10);
-        prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongt Curve", prefabCreator.rotateAlongCurve);
+        prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
         if (prefabCreator.rotateAlongCurve == true)
         {
             prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
