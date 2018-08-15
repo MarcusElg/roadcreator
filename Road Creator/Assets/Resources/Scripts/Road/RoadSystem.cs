@@ -71,11 +71,12 @@ public class RoadSystem : MonoBehaviour
         {
             if (globalSettings.amountRoadGuidelines > 0)
             {
+                globalSettings.oldAmountRoadGuidelines = globalSettings.amountRoadGuidelines;
                 globalSettings.amountRoadGuidelines = 0;
             }
             else
             {
-                globalSettings.amountRoadGuidelines = 5;
+                globalSettings.amountRoadGuidelines = globalSettings.oldAmountRoadGuidelines;
             }
 
             globalSettings.UpdateRoadGuidelines();
