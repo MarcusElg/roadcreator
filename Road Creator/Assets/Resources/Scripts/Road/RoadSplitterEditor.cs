@@ -23,6 +23,7 @@ public class RoadSplitterEditor : Editor {
             GameObject connections = new GameObject("Connections");
             connections.transform.SetParent(roadSplitter.transform);
             connections.transform.localPosition = Vector3.zero;
+            connections.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
             AddConnection("Left");
             AddConnection("Upper Right");
@@ -31,6 +32,7 @@ public class RoadSplitterEditor : Editor {
             GameObject mesh = new GameObject("Mesh");
             mesh.transform.SetParent(roadSplitter.transform);
             mesh.transform.localPosition = Vector3.zero;
+            mesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
             mesh.AddComponent<MeshFilter>();
             mesh.AddComponent<MeshRenderer>();
             mesh.AddComponent<MeshCollider>();
