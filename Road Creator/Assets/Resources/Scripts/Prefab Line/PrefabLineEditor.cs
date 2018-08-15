@@ -129,13 +129,13 @@ public class PrefabLineEditor : Editor
 
     public void PlacePrefabs()
     {
+        for (int i = prefabCreator.transform.GetChild(1).childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(prefabCreator.transform.GetChild(1).GetChild(i).gameObject);
+        }
+
         if (prefabCreator.transform.GetChild(0).childCount > 2)
         {
-            for (int i = prefabCreator.transform.GetChild(1).childCount - 1; i >= 0; i--)
-            {
-                DestroyImmediate(prefabCreator.transform.GetChild(1).GetChild(i).gameObject);
-            }
-
             PointPackage currentPoints = CalculatePoints(Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
             for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {
