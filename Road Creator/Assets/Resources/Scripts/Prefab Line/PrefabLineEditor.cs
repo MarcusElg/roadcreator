@@ -143,7 +143,7 @@ public class PrefabLineEditor : Editor
                 prefab.transform.SetParent(prefabCreator.transform.GetChild(1));
                 prefab.transform.position = currentPoints.prefabPoints[j];
                 prefab.name = "Prefab";
-                prefab.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
+                prefab.layer = prefabCreator.globalSettings.roadLayer;
                 prefab.transform.localScale = new Vector3(prefabCreator.scale, prefabCreator.scale, prefabCreator.scale);
                 Vector3 left = Misc.CalculateLeft(currentPoints.startPoints[j], currentPoints.endPoints[j]);
                 Vector3 forward = new Vector3(left.z, 0, -left.x);
@@ -185,7 +185,8 @@ public class PrefabLineEditor : Editor
                     if (currentPoints.rotateTowardsLeft[j] == true)
                     {
                         controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * prefabCreator.bendMultiplier);
-                    } else
+                    }
+                    else
                     {
                         controlPoint = mesh.bounds.center + new Vector3(0, 0, -(distanceToChange * prefabCreator.bendMultiplier));
                     }
@@ -264,7 +265,7 @@ public class PrefabLineEditor : Editor
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -304,7 +305,7 @@ public class PrefabLineEditor : Editor
             Draw(guiEvent, hitPosition);
         }
 
-        if (Physics.Raycast(ray, out raycastHit, 100f))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -486,7 +487,7 @@ public class PrefabLineEditor : Editor
         Vector3 lastEndPoint = Vector3.zero;
         float distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position);
         offset /= distance;
-        
+
         prefabPoints.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset));
         startPoints.Add(prefabCreator.transform.GetChild(0).GetChild(0).position);
         Vector3 lastPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset);
@@ -597,7 +598,7 @@ public class PrefabLineEditor : Editor
             Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(lastIndex - 1).position, prefabCreator.transform.GetChild(0).GetChild(lastIndex).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
             {
                 position.y = raycastHit.point.y;
             }
