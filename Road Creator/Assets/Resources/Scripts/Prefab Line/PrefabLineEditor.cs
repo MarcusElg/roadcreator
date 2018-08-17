@@ -50,7 +50,7 @@ public class PrefabLineEditor : Editor
         prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
         prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
 
-        if (prefabCreator.fillGap == false)
+        if (prefabCreator.fillGap == false && prefabCreator.bendObjects == false)
         {
             prefabCreator.spacing = Mathf.Max(0.1f, EditorGUILayout.FloatField("Spacing", prefabCreator.spacing));
 

@@ -330,6 +330,7 @@ public class RoadSegment : MonoBehaviour
             totalDistanceRight += Vector3.Distance(vertices[i - 2], vertices[i]);
         }
 
+        // Left
         for (int i = 0; i < uvs.Length; i += 2)
         {
             if (i > 0)
@@ -347,6 +348,7 @@ public class RoadSegment : MonoBehaviour
             }
         }
 
+        // Right
         for (int i = 1; i < uvs.Length; i += 2)
         {
             if (i > 1)
