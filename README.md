@@ -12,7 +12,6 @@ Road Creation:
 Prefab Line Tool:
 - Includes a prefab line tool to place prefabs along a series of curves (can also curve the mesh to get a smoother curve)
 - Options to curve the mesh and also to fill in the gap between them to get a smootly curved and connected line of prefabs
-- 
 
 Intersections Etc:
 - Generate intersections with 1 - 4 connections (square, triangle and diamond intersections)
