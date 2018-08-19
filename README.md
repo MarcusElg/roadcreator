@@ -1,5 +1,5 @@
 # Roadcreator
-A free road creation tool for unity. It's currently in early alpha
+A free road creation tool for unity. It's currently in alpha
 
 **Features:**
 Road Creation:
