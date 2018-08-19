@@ -93,11 +93,11 @@ public class PrefabLineEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            if (prefabCreator.fillGap == true)
+            if (prefabCreator.fillGap == true || prefabCreator.bendObjects == true)
             {
                 prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
 
-                if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left /*&& prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right*/)
+                if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left/* && prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right*/)
                 {
                     prefabCreator.rotationDirection = PrefabLineCreator.RotationDirection.left;
                 }
@@ -211,7 +211,7 @@ public class PrefabLineEditor : Editor
                     Vector3[] lastVertices = prefabCreator.transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
                     for (int i = 0; i < lastVertices.Length; i++)
                     {
-                        if (lastVertices[i].x == prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x && (i > 0 || lastVertices[i - 1] != lastVertices[i]))
+                        if (lastVertices[i].x == prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x)
                         {
                             lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * lastVertices[i]) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
                         }
@@ -229,18 +229,22 @@ public class PrefabLineEditor : Editor
 
                             for (int k = 0; k < lastVertexPositions.Count; k++)
                             {
-                                float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * vertices[i]) + prefab.transform.position);
-                                if (calculatedDistance < currentDistance)
+                                float localZ = (Quaternion.Euler(0, -(prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position)).z;
+                                float zDifference = Mathf.Abs(localZ - vertices[i].z);
+                                if (zDifference < 0.001f)
                                 {
-                                    currentDistance = calculatedDistance;
-                                    nearestVertex = lastVertexPositions[k];
+                                    float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * vertices[i]) + prefab.transform.position);
+                                    if (calculatedDistance < currentDistance)
+                                    {
+                                        currentDistance = calculatedDistance;
+                                        nearestVertex = lastVertexPositions[k];
+                                    }
                                 }
                             }
 
-                            vertices[i] = ((Quaternion.Euler(0, 0, 0) * nearestVertex) - prefab.transform.position);
+                            vertices[i] = Quaternion.Euler(0, -(prefab.transform.rotation.eulerAngles.y), 0) * (nearestVertex - prefab.transform.position);
                         }
                     }
-
                     mesh.vertices = vertices;
                     prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
                     prefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
