@@ -97,7 +97,7 @@ public class PrefabLineEditor : Editor
             {
                 prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
 
-                if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left/* && prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right*/)
+                if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left && prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right)
                 {
                     prefabCreator.rotationDirection = PrefabLineCreator.RotationDirection.left;
                 }
@@ -182,14 +182,18 @@ public class PrefabLineEditor : Editor
                     float distanceToChange = Vector3.Distance(center, currentPoints.prefabPoints[j]);
 
                     Vector3 controlPoint;
-                    if (currentPoints.rotateTowardsLeft[j] == true)
+                    float distanceToChangeMultiplied = distanceToChange * prefabCreator.bendMultiplier;
+                    if (currentPoints.rotateTowardsLeft[j] == false)
                     {
-                        controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * prefabCreator.bendMultiplier);
+                        distanceToChangeMultiplied = -distanceToChangeMultiplied;
                     }
-                    else
+
+                    if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
                     {
-                        controlPoint = mesh.bounds.center + new Vector3(0, 0, -(distanceToChange * prefabCreator.bendMultiplier));
+                        distanceToChangeMultiplied = -distanceToChangeMultiplied;
                     }
+
+                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChangeMultiplied);
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
@@ -211,7 +215,7 @@ public class PrefabLineEditor : Editor
                     Vector3[] lastVertices = prefabCreator.transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
                     for (int i = 0; i < lastVertices.Length; i++)
                     {
-                        if (lastVertices[i].x == prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x)
+                        if (lastVertices[i].x == GetMaxX())
                         {
                             lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * lastVertices[i]) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
                         }
@@ -222,7 +226,7 @@ public class PrefabLineEditor : Editor
                     Vector3[] vertices = mesh.vertices;
                     for (int i = 0; i < mesh.vertices.Length; i++)
                     {
-                        if (vertices[i].x == prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x)
+                        if (vertices[i].x == GetMinX())
                         {
                             Vector3 nearestVertex = Vector3.zero;
                             float currentDistance = float.MaxValue;
@@ -258,6 +262,29 @@ public class PrefabLineEditor : Editor
                     }
                 }
             }
+        }
+    }
+
+    private float GetMaxX ()
+    {
+        if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
+        {
+            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x;
+        } else
+        {
+            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x;
+        }
+    }
+
+    private float GetMinX()
+    {
+        if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
+        {
+            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x;
+        }
+        else
+        {
+            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x;
         }
     }
 
