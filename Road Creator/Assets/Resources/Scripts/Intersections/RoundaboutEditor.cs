@@ -50,7 +50,6 @@ public class RoundaboutEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         roundabout.centerMaterial = (Material)EditorGUILayout.ObjectField("Center Material", roundabout.centerMaterial, typeof(Material), false);
-        roundabout.connectionMaterial = (Material)EditorGUILayout.ObjectField("Connection Material", roundabout.connectionMaterial, typeof(Material), false);
         roundabout.diameter = Mathf.Max(1.2f, EditorGUILayout.FloatField("Diameter", roundabout.diameter));
         roundabout.width = Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", roundabout.width));
         roundabout.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roundabout.heightOffset));
@@ -61,11 +60,12 @@ public class RoundaboutEditor : Editor
         for (int i = 0; i < roundabout.connectionVertexIndex.Count; i++)
         {
             roundabout.connectionOpen[i] = EditorGUILayout.Foldout(roundabout.connectionOpen[i], "Connection #" + i);
-            
+
             if (roundabout.connectionOpen[i] == true)
             {
                 roundabout.connectionVertexIndex[i] = Mathf.Clamp(EditorGUILayout.IntField("Connection Vertex Index", roundabout.connectionVertexIndex[i]), 0, roundabout.points.Length);
                 roundabout.connectionWidth[i] = Mathf.Max(0.1f, EditorGUILayout.FloatField("Connection Width", roundabout.connectionWidth[i]));
+                roundabout.connectionMaterial[i] = (Material)EditorGUILayout.ObjectField("Connection Material", roundabout.connectionMaterial[i], typeof(Material), false);
 
                 if (GUILayout.Button("Remove Connection") == true)
                 {
@@ -84,6 +84,7 @@ public class RoundaboutEditor : Editor
             roundabout.connectionOpen.Add(true);
             roundabout.connectionVertexIndex.Add(0);
             roundabout.connectionWidth.Add(2);
+            roundabout.connectionMaterial.Add(Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material);
 
             GameObject connection = new GameObject("Connection " + roundabout.transform.GetChild(0).childCount);
             connection.transform.SetParent(roundabout.transform.GetChild(0));
@@ -124,8 +125,11 @@ public class RoundaboutEditor : Editor
         {
             for (int i = 0; i < roundabout.transform.GetChild(0).childCount; i++)
             {
-                Handles.color = Color.green;
-                Handles.CylinderHandleCap(0, roundabout.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), roundabout.globalSettings.pointSize, EventType.Repaint);
+                if (roundabout.connectionMaterial[i] != null)
+                {
+                    Handles.color = Color.green;
+                    Handles.CylinderHandleCap(0, roundabout.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), roundabout.globalSettings.pointSize, EventType.Repaint);
+                }
             }
         }
 

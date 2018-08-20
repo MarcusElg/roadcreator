@@ -8,25 +8,27 @@ public class DiamondIntersection : MonoBehaviour
     public float width = 3;
     public float height = 3;
     public float heightOffset = 0.02f;
-
     public Material centerMaterial;
-    public Material connectionMaterial;
 
     public bool upperLeftConnection = true;
     public float upperLeftConnectionWidth = 1.5f;
     public float upperLeftConnectionHeight = 1;
+    public Material upperLeftConnectionMaterial;
 
     public bool upperRightConnection = true;
     public float upperRightConnectionWidth = 1.5f;
     public float upperRightConnectionHeight = 1;
+    public Material upperRightConnectionMaterial;
 
     public bool lowerLeftConnection = true;
     public float lowerLeftConnectionWidth = 1.5f;
     public float lowerLeftConnectionHeight = 1;
+    public Material lowerLeftConnectionMaterial;
 
     public bool lowerRightConnection = true;
     public float lowerRightConnectionWidth = 1.5f;
     public float lowerRightConnectionHeight = 1;
+    public Material lowerRightConnectionMaterial;
 
     public GlobalSettings globalSettings;
 
@@ -37,9 +39,24 @@ public class DiamondIntersection : MonoBehaviour
             centerMaterial = Resources.Load("Materials/Intersections/Grid Intersection") as Material;
         }
 
-        if (connectionMaterial == null)
+        if (upperLeftConnectionMaterial == null)
         {
-            connectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+            upperLeftConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (upperRightConnectionMaterial == null)
+        {
+            upperRightConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (lowerLeftConnectionMaterial == null)
+        {
+            lowerLeftConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (lowerRightConnectionMaterial == null)
+        {
+            lowerRightConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
         }
 
         GenerateMesh(transform.GetChild(1), new Vector3(-width, heightOffset, 0), new Vector3(0, heightOffset, -height), new Vector3(0, heightOffset, height), new Vector3(width, heightOffset, 0), centerMaterial);
@@ -50,7 +67,7 @@ public class DiamondIntersection : MonoBehaviour
             transform.GetChild(0).GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.left, new Vector3(-width, heightOffset, 0) - new Vector3(0, heightOffset, height));
             transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, upperLeftConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(-width, heightOffset, 0), new Vector3(0, heightOffset, height)) / 2;
-            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-upperLeftConnectionWidth, heightOffset, upperLeftConnectionHeight), new Vector3(upperLeftConnectionWidth, heightOffset, upperLeftConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-upperLeftConnectionWidth, heightOffset, upperLeftConnectionHeight), new Vector3(upperLeftConnectionWidth, heightOffset, upperLeftConnectionHeight), upperLeftConnectionMaterial);
         }
         else
         {
@@ -64,7 +81,7 @@ public class DiamondIntersection : MonoBehaviour
             transform.GetChild(0).GetChild(1).localRotation = Quaternion.FromToRotation(Vector3.right, new Vector3(width, heightOffset, 0) - new Vector3(0, heightOffset, height));
             transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, upperRightConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(width, heightOffset, 0), new Vector3(0, heightOffset, height)) / 2;
-            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-upperRightConnectionWidth, heightOffset, upperRightConnectionHeight), new Vector3(upperRightConnectionWidth, heightOffset, upperRightConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-upperRightConnectionWidth, heightOffset, upperRightConnectionHeight), new Vector3(upperRightConnectionWidth, heightOffset, upperRightConnectionHeight), upperRightConnectionMaterial);
         }
         else
         {
@@ -78,7 +95,7 @@ public class DiamondIntersection : MonoBehaviour
             transform.GetChild(0).GetChild(2).localRotation = Quaternion.FromToRotation(Vector3.left, new Vector3(0, heightOffset, -height) - new Vector3(-width, heightOffset, 0));
             transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, lowerLeftConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(-width, heightOffset, 0), new Vector3(0, heightOffset, -height)) / 2;
-            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-lowerLeftConnectionWidth, heightOffset, lowerLeftConnectionHeight), new Vector3(lowerLeftConnectionWidth, heightOffset, lowerLeftConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-lowerLeftConnectionWidth, heightOffset, lowerLeftConnectionHeight), new Vector3(lowerLeftConnectionWidth, heightOffset, lowerLeftConnectionHeight), lowerLeftConnectionMaterial);
         }
         else
         {
@@ -92,7 +109,7 @@ public class DiamondIntersection : MonoBehaviour
             transform.GetChild(0).GetChild(3).localRotation = Quaternion.FromToRotation(Vector3.right, new Vector3(0, heightOffset, -height) - new Vector3(width, heightOffset, 0));
             transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, lowerRightConnectionHeight);
             float connectionWidth = Vector3.Distance(new Vector3(width, heightOffset, 0), new Vector3(0, heightOffset, -height)) / 2;
-            GenerateMesh(transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-lowerRightConnectionWidth, heightOffset, lowerRightConnectionHeight), new Vector3(lowerRightConnectionWidth, heightOffset, lowerRightConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-connectionWidth, heightOffset, 0), new Vector3(connectionWidth, heightOffset, 0), new Vector3(-lowerRightConnectionWidth, heightOffset, lowerRightConnectionHeight), new Vector3(lowerRightConnectionWidth, heightOffset, lowerRightConnectionHeight), lowerRightConnectionMaterial);
         }
         else
         {

@@ -78,7 +78,6 @@ public class SquareIntersectionEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         intersection.centerMaterial = (Material)EditorGUILayout.ObjectField("Center Material", intersection.centerMaterial, typeof(Material), false);
-        intersection.connectionMaterial = (Material)EditorGUILayout.ObjectField("Connection Material", intersection.connectionMaterial, typeof(Material), false);
         intersection.width = Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", intersection.width));
         intersection.height = Mathf.Max(0.1f, EditorGUILayout.FloatField("Height", intersection.height));
         intersection.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.heightOffset));
@@ -91,6 +90,7 @@ public class SquareIntersectionEditor : Editor
         intersection.upConnection = EditorGUILayout.Toggle("Up Connection", intersection.upConnection);
         if (intersection.upConnection == true)
         {
+            intersection.upConnectionMaterial = (Material)EditorGUILayout.ObjectField("Up Connection Material", intersection.upConnectionMaterial, typeof(Material), false);
             intersection.upConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Up Connection Height", intersection.upConnectionHeight));
             intersection.upConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Up Connection Width", intersection.upConnectionWidth));
         }
@@ -100,6 +100,7 @@ public class SquareIntersectionEditor : Editor
         intersection.downConnection = EditorGUILayout.Toggle("Down Connection", intersection.downConnection);
         if (intersection.downConnection == true)
         {
+            intersection.downConnectionMaterial = (Material)EditorGUILayout.ObjectField("Down Connection Material", intersection.downConnectionMaterial, typeof(Material), false);
             intersection.downConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Height", intersection.downConnectionHeight));
             intersection.downConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Width", intersection.downConnectionWidth));
         }
@@ -109,6 +110,7 @@ public class SquareIntersectionEditor : Editor
         intersection.leftConnection = EditorGUILayout.Toggle("Left Connection", intersection.leftConnection);
         if (intersection.leftConnection == true)
         {
+            intersection.leftConnectionMaterial = (Material)EditorGUILayout.ObjectField("Left Connection Material", intersection.leftConnectionMaterial, typeof(Material), false);
             intersection.leftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Height", intersection.leftConnectionHeight));
             intersection.leftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Width", intersection.leftConnectionWidth));
         }
@@ -118,6 +120,7 @@ public class SquareIntersectionEditor : Editor
         intersection.rightConnection = EditorGUILayout.Toggle("Right Connection", intersection.rightConnection);
         if (intersection.rightConnection == true)
         {
+            intersection.rightConnectionMaterial = (Material)EditorGUILayout.ObjectField("Right Connection Material", intersection.rightConnectionMaterial, typeof(Material), false);
             intersection.rightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Height", intersection.rightConnectionHeight));
             intersection.rightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Width", intersection.rightConnectionWidth));
         }
@@ -138,12 +141,28 @@ public class SquareIntersectionEditor : Editor
     private void OnSceneGUI()
     {
         // Draw
-        if (intersection.centerMaterial != null && intersection.connectionMaterial != null)
+        if (intersection.centerMaterial != null)
         {
-            for (int i = 0; i < intersection.transform.GetChild(0).childCount; i++)
+            Handles.color = Color.green;
+
+            if (intersection.upConnection == true)
             {
-                Handles.color = Color.green;
-                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(0).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            if (intersection.downConnection == true)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(1).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            if (intersection.leftConnection == true)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(2).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            if (intersection.rightConnection == true)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(3).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
             }
         }
 

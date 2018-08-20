@@ -78,7 +78,6 @@ public class DiamondIntersectionEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         intersection.centerMaterial = (Material)EditorGUILayout.ObjectField("Center Material", intersection.centerMaterial, typeof(Material), false);
-        intersection.connectionMaterial = (Material)EditorGUILayout.ObjectField("Connection Material", intersection.connectionMaterial, typeof(Material), false);
         intersection.width = Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", intersection.width));
         intersection.height = Mathf.Max(0.1f, EditorGUILayout.FloatField("Height", intersection.height));
         intersection.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.heightOffset));
@@ -91,6 +90,7 @@ public class DiamondIntersectionEditor : Editor
         intersection.upperLeftConnection = EditorGUILayout.Toggle("Upper Left Connection", intersection.upperLeftConnection);
         if (intersection.upperLeftConnection == true)
         {
+            intersection.upperLeftConnectionMaterial = (Material)EditorGUILayout.ObjectField("Upper Left Connection Material", intersection.upperLeftConnectionMaterial, typeof(Material), false);
             intersection.upperLeftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Left Connection Height", intersection.upperLeftConnectionHeight));
             intersection.upperLeftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Left Connection Width", intersection.upperLeftConnectionWidth));
         }
@@ -100,6 +100,7 @@ public class DiamondIntersectionEditor : Editor
         intersection.upperRightConnection = EditorGUILayout.Toggle("Upper Right Connection", intersection.upperRightConnection);
         if (intersection.upperRightConnection == true)
         {
+            intersection.upperRightConnectionMaterial = (Material)EditorGUILayout.ObjectField("Upper Right Connection Material", intersection.upperRightConnectionMaterial, typeof(Material), false);
             intersection.upperRightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Right Connection Height", intersection.upperRightConnectionHeight));
             intersection.upperRightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Right Connection Width", intersection.upperRightConnectionWidth));
         }
@@ -109,6 +110,7 @@ public class DiamondIntersectionEditor : Editor
         intersection.lowerLeftConnection = EditorGUILayout.Toggle("Lower Left Connection", intersection.lowerLeftConnection);
         if (intersection.lowerLeftConnection == true)
         {
+            intersection.lowerLeftConnectionMaterial = (Material)EditorGUILayout.ObjectField("Lower Left Connection Material", intersection.lowerLeftConnectionMaterial, typeof(Material), false);
             intersection.lowerLeftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Left Connection Height", intersection.lowerLeftConnectionHeight));
             intersection.lowerLeftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Left Connection Width", intersection.lowerLeftConnectionWidth));
         }
@@ -118,6 +120,7 @@ public class DiamondIntersectionEditor : Editor
         intersection.lowerRightConnection = EditorGUILayout.Toggle("Lower Right Connection", intersection.lowerRightConnection);
         if (intersection.lowerRightConnection == true)
         {
+            intersection.lowerRightConnectionMaterial = (Material)EditorGUILayout.ObjectField("Lower Right Connection Material", intersection.lowerRightConnectionMaterial, typeof(Material), false);
             intersection.lowerRightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Right Connection Height", intersection.lowerRightConnectionHeight));
             intersection.lowerRightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Right Connection Width", intersection.lowerRightConnectionWidth));
         }
@@ -138,12 +141,28 @@ public class DiamondIntersectionEditor : Editor
     private void OnSceneGUI()
     {
         // Draw
-        if (intersection.centerMaterial != null && intersection.connectionMaterial != null)
+        if (intersection.centerMaterial != null)
         {
-            for (int i = 0; i < intersection.transform.GetChild(0).childCount; i++)
+            Handles.color = Color.green;
+
+            if (intersection.upperLeftConnection == true)
             {
-                Handles.color = Color.green;
-                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(i).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(0).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            if (intersection.upperRightConnection == true)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(1).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            if (intersection.lowerLeftConnection == true)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(2).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            if (intersection.lowerRightConnection == true)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(0).GetChild(3).GetChild(1).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
             }
         }
 

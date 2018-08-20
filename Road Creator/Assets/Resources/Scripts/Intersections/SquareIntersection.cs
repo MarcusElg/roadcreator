@@ -7,25 +7,27 @@ public class SquareIntersection : MonoBehaviour {
     public float width = 3;
     public float height = 3;
     public float heightOffset = 0.02f;
-
     public Material centerMaterial;
-    public Material connectionMaterial;
 
     public bool upConnection = true;
     public float upConnectionWidth = 1.5f;
     public float upConnectionHeight = 1;
+    public Material upConnectionMaterial;
 
     public bool downConnection = true;
     public float downConnectionWidth = 1.5f;
     public float downConnectionHeight = 1;
+    public Material downConnectionMaterial;
 
     public bool leftConnection = true;
     public float leftConnectionWidth = 1.5f;
     public float leftConnectionHeight = 1;
+    public Material leftConnectionMaterial;
 
     public bool rightConnection = true;
     public float rightConnectionWidth = 1.5f;
     public float rightConnectionHeight = 1;
+    public Material rightConnectionMaterial;
 
     public GlobalSettings globalSettings;
 
@@ -36,9 +38,24 @@ public class SquareIntersection : MonoBehaviour {
             centerMaterial = Resources.Load("Materials/Intersections/Grid Intersection") as Material;
         }
 
-        if (connectionMaterial == null)
+        if (upConnectionMaterial == null)
         {
-            connectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+            upConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (downConnectionMaterial == null)
+        {
+            downConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (leftConnectionMaterial == null)
+        {
+            leftConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (rightConnectionMaterial == null)
+        {
+            rightConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
         }
 
         GenerateMesh(transform.GetChild(1), new Vector3(-width, heightOffset, -height), new Vector3(width, heightOffset, -height), new Vector3(-width, heightOffset, height), new Vector3(width, heightOffset, height), centerMaterial);
@@ -47,7 +64,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, height);
             transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, upConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-upConnectionWidth, heightOffset, upConnectionHeight), new Vector3(upConnectionWidth, heightOffset, upConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-upConnectionWidth, heightOffset, upConnectionHeight), new Vector3(upConnectionWidth, heightOffset, upConnectionHeight), upConnectionMaterial);
         }
         else
         {
@@ -59,7 +76,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, -height);
             transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, downConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-downConnectionWidth, heightOffset, downConnectionHeight), new Vector3(downConnectionWidth, heightOffset, downConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-downConnectionWidth, heightOffset, downConnectionHeight), new Vector3(downConnectionWidth, heightOffset, downConnectionHeight), downConnectionMaterial);
         }
         else
         {
@@ -71,7 +88,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(2).localPosition = new Vector3(-width, 0, 0);
             transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, leftConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-height, heightOffset, 0), new Vector3(height, heightOffset, 0), new Vector3(-leftConnectionWidth, heightOffset, leftConnectionHeight), new Vector3(leftConnectionWidth, heightOffset, leftConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-height, heightOffset, 0), new Vector3(height, heightOffset, 0), new Vector3(-leftConnectionWidth, heightOffset, leftConnectionHeight), new Vector3(leftConnectionWidth, heightOffset, leftConnectionHeight), leftConnectionMaterial);
         }
         else
         {
@@ -83,7 +100,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(3).localPosition = new Vector3(width, 0, 0);
             transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, rightConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-height, heightOffset, 0), new Vector3(height, heightOffset, 0), new Vector3(-rightConnectionWidth, heightOffset, rightConnectionHeight), new Vector3(rightConnectionWidth, heightOffset, rightConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-height, heightOffset, 0), new Vector3(height, heightOffset, 0), new Vector3(-rightConnectionWidth, heightOffset, rightConnectionHeight), new Vector3(rightConnectionWidth, heightOffset, rightConnectionHeight), rightConnectionMaterial);
         }
         else
         {

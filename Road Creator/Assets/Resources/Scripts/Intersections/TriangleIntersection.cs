@@ -7,21 +7,22 @@ public class TriangleIntersection : MonoBehaviour {
     public float width = 3;
     public float height = 3;
     public float heightOffset = 0.02f;
-
     public Material centerMaterial;
-    public Material connectionMaterial;
 
     public bool downConnection = true;
     public float downConnectionWidth = 1.5f;
     public float downConnectionHeight = 1;
+    public Material downConnectionMaterial;
 
     public bool leftConnection = true;
     public float leftConnectionWidth = 1.5f;
     public float leftConnectionHeight = 1;
+    public Material leftConnectionMaterial;
 
     public bool rightConnection = true;
     public float rightConnectionWidth = 1.5f;
     public float rightConnectionHeight = 1;
+    public Material rightConnectionMaterial;
 
     public GlobalSettings globalSettings;
 
@@ -32,9 +33,19 @@ public class TriangleIntersection : MonoBehaviour {
             centerMaterial = Resources.Load("Materials/Intersections/Grid Intersection") as Material;
         }
 
-        if (connectionMaterial == null)
+        if (downConnectionMaterial == null)
         {
-            connectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+            downConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (leftConnectionMaterial == null)
+        {
+            leftConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
+        }
+
+        if (rightConnectionMaterial == null)
+        {
+            rightConnectionMaterial = Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material;
         }
 
         GenerateCenterMesh();
@@ -43,7 +54,7 @@ public class TriangleIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, -height);
             transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, downConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-downConnectionWidth, heightOffset, downConnectionHeight), new Vector3(downConnectionWidth, heightOffset, downConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-downConnectionWidth, heightOffset, downConnectionHeight), new Vector3(downConnectionWidth, heightOffset, downConnectionHeight), downConnectionMaterial);
         }
         else
         {
@@ -57,7 +68,7 @@ public class TriangleIntersection : MonoBehaviour {
             transform.GetChild(0).GetChild(1).localRotation = Quaternion.FromToRotation(Vector3.right, new Vector3(0, heightOffset, height) - new Vector3(-width, heightOffset, -height));
             transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, leftConnectionHeight);
             float connectionHeight = Vector3.Distance(new Vector3(-width, heightOffset, -height), new Vector3(0, heightOffset, height)) / 2;
-            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-connectionHeight, heightOffset, 0), new Vector3(connectionHeight, heightOffset, 0), new Vector3(-leftConnectionWidth, heightOffset, leftConnectionHeight), new Vector3(leftConnectionWidth, heightOffset, leftConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-connectionHeight, heightOffset, 0), new Vector3(connectionHeight, heightOffset, 0), new Vector3(-leftConnectionWidth, heightOffset, leftConnectionHeight), new Vector3(leftConnectionWidth, heightOffset, leftConnectionHeight), leftConnectionMaterial);
         }
         else
         {
@@ -71,7 +82,7 @@ public class TriangleIntersection : MonoBehaviour {
             transform.GetChild(0).GetChild(2).localRotation = Quaternion.FromToRotation(Vector3.left, new Vector3(0, heightOffset, height) - new Vector3(width, heightOffset, -height));
             transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, rightConnectionHeight);
             float connectionHeight = Vector3.Distance(new Vector3(-width, heightOffset, -height), new Vector3(0, heightOffset, height)) / 2;
-            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-connectionHeight, heightOffset, 0), new Vector3(connectionHeight, heightOffset, 0), new Vector3(-rightConnectionWidth, heightOffset, rightConnectionHeight), new Vector3(rightConnectionWidth, heightOffset, rightConnectionHeight), connectionMaterial);
+            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-connectionHeight, heightOffset, 0), new Vector3(connectionHeight, heightOffset, 0), new Vector3(-rightConnectionWidth, heightOffset, rightConnectionHeight), new Vector3(rightConnectionWidth, heightOffset, rightConnectionHeight), rightConnectionMaterial);
         }
         else
         {
