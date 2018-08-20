@@ -118,9 +118,6 @@ public class RoadCreator : MonoBehaviour
         {
             if (raycastHit2.collider.name.Contains("Connection Point"))
             {
-                gameObject.GetComponent<Point>().intersectionConnection = raycastHit2.collider.gameObject;
-                gameObject.transform.position = raycastHit2.collider.transform.position;
-
                 // Change width/height
                 SquareIntersection squareIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<SquareIntersection>();
                 TriangleIntersection triangleIntersection = raycastHit2.collider.transform.parent.parent.parent.GetComponent<TriangleIntersection>();
@@ -129,89 +126,98 @@ public class RoadCreator : MonoBehaviour
                 RoadSplitter roadSplitter = raycastHit2.collider.transform.parent.parent.GetComponent<RoadSplitter>();
                 string connectionName = raycastHit2.collider.name;
 
-                float roadWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().startRoadWidth;
-                if (gameObject.name == "End Point")
+                if ((roadSplitter != null && raycastHit2.collider.transform.parent.parent.GetChild(1).GetComponent<MeshFilter>().sharedMesh != null) || raycastHit2.collider.transform.parent.GetChild(0).GetComponent<MeshFilter>().sharedMesh != null)
                 {
-                    roadWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth;
-                }
+                    gameObject.GetComponent<Point>().intersectionConnection = raycastHit2.collider.gameObject;
+                    gameObject.transform.position = raycastHit2.collider.transform.position;
 
-                if (squareIntersection != null)
-                {
-                    if (connectionName == "Up Connection Point")
+                    float roadWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().startRoadWidth;
+                    if (gameObject.name == "End Point")
                     {
-                        squareIntersection.upConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Down Connection Point")
-                    {
-                        squareIntersection.downConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Left Connection Point")
-                    {
-                        squareIntersection.leftConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Right Connection Point")
-                    {
-                        squareIntersection.rightConnectionWidth = roadWidth;
+                        roadWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth;
                     }
 
-                    squareIntersection.GenerateMeshes();
-                }
-                else if (triangleIntersection != null)
-                {
-                    if (connectionName == "Down Connection Point")
+                    if (squareIntersection != null)
                     {
-                        triangleIntersection.downConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Left Connection Point")
-                    {
-                        triangleIntersection.leftConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Right Connection Point")
-                    {
-                        triangleIntersection.rightConnectionWidth = roadWidth;
-                    }
+                        if (connectionName == "Up Connection Point")
+                        {
+                            squareIntersection.upConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Down Connection Point")
+                        {
+                            squareIntersection.downConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Left Connection Point")
+                        {
+                            squareIntersection.leftConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Right Connection Point")
+                        {
+                            squareIntersection.rightConnectionWidth = roadWidth;
+                        }
 
-                    triangleIntersection.GenerateMeshes();
-                }
-                else if (diamondIntersection != null)
-                {
-                    if (connectionName == "Upper Left Connection Point")
-                    {
-                        diamondIntersection.upperLeftConnectionWidth = roadWidth;
+                        squareIntersection.GenerateMeshes();
                     }
-                    else if (connectionName == "Upper Right Connection Point")
+                    else if (triangleIntersection != null)
                     {
-                        diamondIntersection.upperRightConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Lower Left Connection Point")
-                    {
-                        diamondIntersection.lowerLeftConnectionWidth = roadWidth;
-                    }
-                    else if (connectionName == "Lower Right Connection Point")
-                    {
-                        diamondIntersection.lowerRightConnectionWidth = roadWidth;
-                    }
+                        if (connectionName == "Down Connection Point")
+                        {
+                            triangleIntersection.downConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Left Connection Point")
+                        {
+                            triangleIntersection.leftConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Right Connection Point")
+                        {
+                            triangleIntersection.rightConnectionWidth = roadWidth;
+                        }
 
-                    diamondIntersection.GenerateMeshes();
-                }
-                else if (roundabout != null)
-                {
-                    roundabout.connectionWidth[raycastHit2.transform.GetSiblingIndex() - 1] = roadWidth;
-
-                    roundabout.GenerateMeshes();
-                } else if (roadSplitter != null)
-                {
-                    if (connectionName == "Left Connection Point")
-                    {
-                        roadSplitter.leftWidth = roadWidth;
-                    } else if (connectionName == "Lower Right Connection Point")
-                    {
-                        roadSplitter.lowerRightXOffset = -roadSplitter.rightWidth + roadWidth;
-                    } else if (connectionName == "Upper Right Connection Point")
-                    {
-                        roadSplitter.upperRightXOffset = roadSplitter.rightWidth - roadWidth;
+                        triangleIntersection.GenerateMeshes();
                     }
-                    roadSplitter.GenerateMesh();
+                    else if (diamondIntersection != null)
+                    {
+                        if (connectionName == "Upper Left Connection Point")
+                        {
+                            diamondIntersection.upperLeftConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Upper Right Connection Point")
+                        {
+                            diamondIntersection.upperRightConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Lower Left Connection Point")
+                        {
+                            diamondIntersection.lowerLeftConnectionWidth = roadWidth;
+                        }
+                        else if (connectionName == "Lower Right Connection Point")
+                        {
+                            diamondIntersection.lowerRightConnectionWidth = roadWidth;
+                        }
+
+                        diamondIntersection.GenerateMeshes();
+                    }
+                    else if (roundabout != null)
+                    {
+                        roundabout.connectionWidth[raycastHit2.transform.GetSiblingIndex() - 1] = roadWidth;
+
+                        roundabout.GenerateMeshes();
+                    }
+                    else if (roadSplitter != null)
+                    {
+                        if (connectionName == "Left Connection Point")
+                        {
+                            roadSplitter.leftWidth = roadWidth;
+                        }
+                        else if (connectionName == "Lower Right Connection Point")
+                        {
+                            roadSplitter.lowerRightXOffset = -roadSplitter.rightWidth + roadWidth;
+                        }
+                        else if (connectionName == "Upper Right Connection Point")
+                        {
+                            roadSplitter.upperRightXOffset = roadSplitter.rightWidth - roadWidth;
+                        }
+                        roadSplitter.GenerateMesh();
+                    }
                 }
             }
             else
@@ -270,17 +276,20 @@ public class RoadCreator : MonoBehaviour
             {
                 return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
             }
-        } else if (roadSplitter != null)
+        }
+        else if (roadSplitter != null)
         {
             if (connectionPointName == "Left Connection Point")
             {
                 return intersection.transform.position + roadSplitter.transform.forward;
-            } else if (connectionPointName == "Upper Right Connection Point")
+            }
+            else if (connectionPointName == "Upper Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
                 return roadSplitter.transform.GetChild(0).GetChild(1).position + left - new Vector3(0, roadSplitter.heightOffset, 0);
-            } else if (connectionPointName == "Lower Right Connection Point")
+            }
+            else if (connectionPointName == "Lower Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
@@ -301,9 +310,12 @@ public class RoadCreator : MonoBehaviour
 
             for (int j = 0; j < 3; j++)
             {
-                Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
-                material.mainTextureScale = new Vector2(1, textureRepeat);
-                transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
+                if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial != null)
+                {
+                    Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
+                    material.mainTextureScale = new Vector2(1, textureRepeat);
+                    transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
+                }
             }
         }
     }
@@ -346,7 +358,8 @@ public class RoadCreator : MonoBehaviour
         if (Vector3.Distance(lastPosition, segment.transform.GetChild(0).GetChild(2).position) > (distancePerDivision * divisions) / 2)
         {
             points.Add(segment.transform.GetChild(0).GetChild(2).position);
-        } else
+        }
+        else
         {
             points[points.Count - 1] = segment.transform.GetChild(0).GetChild(2).position;
         }

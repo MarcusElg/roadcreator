@@ -539,7 +539,10 @@ public class RoadEditor : Editor
             {
                 for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
                 {
-                    Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).GetChild(1).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                    if (objects[i].GetChild(0).GetChild(j).GetChild(0).GetComponent<MeshFilter>().sharedMesh != null)
+                    {
+                        Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).GetChild(1).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                    }
                 }
             }
             else if (objects[i].name == "Road Splitter")
