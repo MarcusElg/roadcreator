@@ -13,6 +13,7 @@ public class RoadSegmentEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         serializedObject.FindProperty("roadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Road Material", serializedObject.FindProperty("roadMaterial").objectReferenceValue, typeof(Material), false);
+        serializedObject.FindProperty("roadPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Road Physic Material", serializedObject.FindProperty("roadPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
         serializedObject.FindProperty("startRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Start Road Width", serializedObject.FindProperty("startRoadWidth").floatValue));
         serializedObject.FindProperty("endRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("End Road Width", serializedObject.FindProperty("endRoadWidth").floatValue));
         serializedObject.FindProperty("flipped").boolValue = EditorGUILayout.Toggle("Road Flipped", serializedObject.FindProperty("flipped").boolValue);
@@ -27,6 +28,7 @@ public class RoadSegmentEditor : Editor
         if (serializedObject.FindProperty("leftShoulder").boolValue == true)
         {
             serializedObject.FindProperty("leftShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Left Shoulder Material", serializedObject.FindProperty("leftShoulderMaterial").objectReferenceValue, typeof(Material), false);
+            serializedObject.FindProperty("leftShoulderPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Left Shoulder Physic Material", serializedObject.FindProperty("leftShoulderPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
             serializedObject.FindProperty("leftShoulderWidth").floatValue = Mathf.Max(0f, EditorGUILayout.FloatField("Left Shoulder Width", serializedObject.FindProperty("leftShoulderWidth").floatValue));
             serializedObject.FindProperty("leftShoulderHeightOffset").floatValue = EditorGUILayout.FloatField("Left Shoulder Y Offset", serializedObject.FindProperty("leftShoulderHeightOffset").floatValue);
         }
@@ -37,6 +39,7 @@ public class RoadSegmentEditor : Editor
         if (serializedObject.FindProperty("rightShoulder").boolValue == true)
         {
             serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Right Shoulder Material", serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue, typeof(Material), false);
+            serializedObject.FindProperty("rightShoulderPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Right Shoulder Physic Material", serializedObject.FindProperty("rightShoulderPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
             serializedObject.FindProperty("rightShoulderWidth").floatValue = Mathf.Max(0f, EditorGUILayout.FloatField("Right Shoulder Width", serializedObject.FindProperty("rightShoulderWidth").floatValue));
             serializedObject.FindProperty("rightShoulderHeightOffset").floatValue = EditorGUILayout.FloatField("Right Shoulder Y Offset", serializedObject.FindProperty("rightShoulderHeightOffset").floatValue);
         }

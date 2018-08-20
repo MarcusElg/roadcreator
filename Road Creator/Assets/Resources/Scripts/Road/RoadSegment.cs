@@ -6,6 +6,7 @@ public class RoadSegment : MonoBehaviour
 {
 
     public Material roadMaterial;
+    public PhysicMaterial roadPhysicsMaterial;
     public float startRoadWidth = 2;
     public float endRoadWidth = 2;
     public bool flipped = false;
@@ -18,11 +19,13 @@ public class RoadSegment : MonoBehaviour
     public float leftShoulderWidth = 1;
     public float leftShoulderHeightOffset = 0;
     public Material leftShoulderMaterial;
+    public PhysicMaterial leftShoulderPhysicsMaterial;
 
     public bool rightShoulder = false;
     public float rightShoulderWidth = 1;
     public float rightShoulderHeightOffset = 0;
     public Material rightShoulderMaterial;
+    public PhysicMaterial rightShoulderPhysicsMaterial;
 
     public Vector3[] startGuidelinePoints;
     public Vector3[] centerGuidelinePoints;
@@ -53,9 +56,9 @@ public class RoadSegment : MonoBehaviour
             SetGuidelines(points, nextSegmentPoints, false);
         }
 
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator);
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, roadCreator, leftShoulder);
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, roadCreator, rightShoulder);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator, roadPhysicsMaterial);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, roadCreator, leftShoulderPhysicsMaterial, leftShoulder);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, roadCreator, rightShoulderPhysicsMaterial, rightShoulder);
     }
 
     private void SetGuidelines(Vector3[] currentPoints, Vector3[] nextPoints, bool first)
@@ -123,7 +126,7 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, bool generate = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, bool generate = true)
     {
         if (generate == true)
         {
@@ -242,14 +245,14 @@ public class RoadSegment : MonoBehaviour
 
             mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
             mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
+            mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+            mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
         }
         else
         {
             mesh.GetComponent<MeshFilter>().sharedMesh = null;
             mesh.GetComponent<MeshCollider>().sharedMesh = null;
         }
-
-        mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
     }
 
     private Vector3[] fixVertices(int offset, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator)
