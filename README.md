@@ -18,6 +18,6 @@ Intersections Etc:
 - Modify variables such as connection height and width per connection
 - Generate customizable roundabouts
 - Includes a bunch of roads and road related assets like turn markings
-- Create timed taphic lights
+- Create timed traphic lights
 
 For info about planned features and bugs see https://github.com/MCrafterzz/roadcreator/issues/1
