@@ -322,10 +322,12 @@ public class RoadCreator : MonoBehaviour
 
     public Vector3[] CalculatePoints(Transform segment)
     {
-        float divisions = Misc.CalculateDistance(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position);
+        float distance = Misc.CalculateDistance(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position);
+        float divisions = globalSettings.resolution * 4 * distance;
         divisions = Mathf.Max(2, divisions);
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;
+        float globalDistancePerDivision = distancePerDivision * distance;
         Vector3 lastPosition = segment.transform.GetChild(0).GetChild(0).position;
         points.Add(lastPosition);
 
@@ -337,8 +339,8 @@ public class RoadCreator : MonoBehaviour
             }
 
             Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
-            float distance = Vector3.Distance(position, lastPosition);
-            if (distance > distancePerDivision * divisions)
+            float calculatedDistance = Vector3.Distance(position, lastPosition);
+            if (calculatedDistance > globalDistancePerDivision)
             {
                 lastPosition = position;
 

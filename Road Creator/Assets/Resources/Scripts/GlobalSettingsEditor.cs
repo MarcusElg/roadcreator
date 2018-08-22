@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(GlobalSettings))]
-public class GlobalSettingsEditor : Editor {
+public class GlobalSettingsEditor : Editor
+{
 
     GlobalSettings settings;
 
@@ -30,7 +31,31 @@ public class GlobalSettingsEditor : Editor {
             }
         }
 
-        settings.resolution = Mathf.Max(0.2f, EditorGUILayout.FloatField("Resolution", settings.resolution));
+        EditorGUI.BeginChangeCheck();
+        settings.resolution = Mathf.Clamp(EditorGUILayout.FloatField("Resolution", settings.resolution), 0.01f, 2f);
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            Transform[] objects = GameObject.FindObjectsOfType<Transform>();
+
+            for (int i = 0; i < objects.Length; i++)
+            {
+                RoadCreator road = objects[i].GetComponent<RoadCreator>();
+                if (road != null)
+                {
+                    road.CreateMesh();
+                }
+                else
+                {
+                    Roundabout roundabout = objects[i].GetComponent<Roundabout>();
+
+                    if (roundabout != null)
+                    {
+                        roundabout.GenerateMeshes();
+                    }
+                }
+            }
+        }
+
         settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
         settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
         settings.intersectionPointsLayer = Mathf.Clamp(EditorGUILayout.IntField("Intersection Points Layer", settings.intersectionPointsLayer), 9, 31);
@@ -43,6 +68,6 @@ public class GlobalSettingsEditor : Editor {
         }
 
         settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
-    }
 
+    }
 }
