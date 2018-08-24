@@ -43,7 +43,7 @@ public class Roundabout : MonoBehaviour
 
     private void GenerateCircle()
     {
-        points = new Vector3[Mathf.RoundToInt(globalSettings.resolution * (diameter + width)) * 8];
+        points = new Vector3[Mathf.RoundToInt(globalSettings.resolution * (diameter + width) * 8)];
         for (int i = 0; i < points.Length; i++)
         {
             points[i] = Misc.FindPointInCircle(diameter / 2, i, 360f / (points.Length - 1));
@@ -90,7 +90,7 @@ public class Roundabout : MonoBehaviour
         transform.GetChild(1).GetComponent<MeshCollider>().sharedMesh = generatedMesh;
         transform.GetChild(1).GetComponent<MeshRenderer>().sharedMaterial = centerMaterial;
 
-        StartCoroutine(FixTextureStretch(points.Length - (4 * width)));
+        StartCoroutine(FixTextureStretch());
     }
 
     private void GenerateConnection(int objectIndex, int i)
@@ -123,11 +123,11 @@ public class Roundabout : MonoBehaviour
         transform.GetChild(0).GetChild(objectIndex).GetChild(0).GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    IEnumerator FixTextureStretch(float length)
+    IEnumerator FixTextureStretch()
     {
         yield return new WaitForSeconds(0.01f);
 
-        float textureRepeat = length * globalSettings.resolution;
+        float textureRepeat = Mathf.RoundToInt((diameter + width) / 3f);
 
         Material material = new Material(transform.GetChild(1).GetComponent<MeshRenderer>().sharedMaterial);
         material.mainTextureScale = new Vector2(1, textureRepeat);

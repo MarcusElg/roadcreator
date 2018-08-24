@@ -306,7 +306,7 @@ public class RoadCreator : MonoBehaviour
 
         if (transform.GetChild(0).childCount > i)
         {
-            float textureRepeat = length * globalSettings.resolution;
+            float textureRepeat = length / 4;
 
             for (int j = 0; j < 3; j++)
             {

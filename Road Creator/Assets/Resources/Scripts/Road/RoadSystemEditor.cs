@@ -23,7 +23,6 @@ public class RoadSystemEditor : Editor
         if (roadSystem.globalSettings == null)
         {
             roadSystem.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
-            Debug.Log(roadSystem.globalSettings);
         }
 
         lastTool = Tools.current;
