@@ -70,7 +70,7 @@ MonoBehaviour:
   m_MinSize: {x: 402, y: 221}
   m_MaxSize: {x: 8002, y: 4021}
   vertical: 0
-  controlID: 11
+  controlID: 28
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -91,10 +91,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 677, y: 492}
-  m_MaxSize: {x: 14002, y: 14042}
+  m_MinSize: {x: 679, y: 492}
+  m_MaxSize: {x: 14004, y: 14042}
   vertical: 0
-  controlID: 9
+  controlID: 26
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -113,8 +113,8 @@ MonoBehaviour:
     y: 0
     width: 493
     height: 947
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 277, y: 71}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -232,7 +232,7 @@ MonoBehaviour:
   m_MinSize: {x: 402, y: 492}
   m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
-  controlID: 10
+  controlID: 27
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -376,7 +376,7 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/Materials/Intersections/Roundabouts
+    - Assets/Resources/Materials
   m_ViewMode: 0
   m_StartGridSize: 64
   m_LastFolders:
@@ -389,7 +389,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 2e0b0000
     m_LastClickedID: 2862
-    m_ExpandedIDs: 0000000098080000e6080000200900009c0900006c0a0000d60a00002c2d0000
+    m_ExpandedIDs: 00000000a0080000a6090000b0090000f80a0000262e0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -414,24 +414,24 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_AssetTreeState:
-    scrollPos: {x: 0, y: 51}
+    scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: ffffffff00000000980800009c090000d60a00006e0b00002c2d0000
+    m_ExpandedIDs: ffffffff00000000a0080000a6090000e20a00006a0b00007a0b0000262e0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: DiamondIntersectionEditor
+      m_OriginalName: DiamondIntersectionEditor
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 1874
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 6}
     m_SearchString: 
@@ -533,9 +533,9 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 88090000
+    m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 126bfeffe6fbffff00000000e40b0000ea0b0000f00b0000
+    m_ExpandedIDs: 2e8dffff3a8dffffdefbffff00000000280c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -585,14 +585,14 @@ MonoBehaviour:
     height: 610
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SceneLighting: 1
-  lastFramingTime: 2094.1094156294093
+  lastFramingTime: 7157.8400560197315
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 455.32758, y: -8.843036, z: 65.99285}
+    m_Target: {x: 471.10626, y: -3.551962, z: 130.99309}
     speed: 2
-    m_Value: {x: 455.32758, y: -8.843036, z: 65.99285}
+    m_Value: {x: 471.10626, y: -3.551962, z: 130.99309}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -620,19 +620,19 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: -0.7067677, y: 0.07616756, z: -0.077004805, w: -0.6991053}
+    m_Target: {x: 0.35324922, y: -0.6175223, z: 0.6022206, w: 0.36223134}
     speed: 2
-    m_Value: {x: -0.7067677, y: 0.07616756, z: -0.077004805, w: -0.6991053}
+    m_Value: {x: 0.35324922, y: -0.6175223, z: 0.6022206, w: 0.36223134}
   m_Size:
-    m_Target: 22.407082
+    m_Target: 23.964397
     speed: 2
-    m_Value: 22.407082
+    m_Value: 23.964397
   m_Ortho:
     m_Target: 0
     speed: 2
     m_Value: 0
   m_ShowGlobalGrid: 1
-  m_LastSceneViewRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_LastSceneViewRotation: {x: 0.6024411, y: 0.396951, z: -0.5067941, w: 0.47186276}
   m_LastSceneViewOrtho: 0
   m_ReplacementShader: {fileID: 0}
   m_ReplacementString: 

@@ -93,6 +93,7 @@ public class DiamondIntersectionEditor : Editor
             intersection.upperLeftConnectionMaterial = (Material)EditorGUILayout.ObjectField("Upper Left Connection Material", intersection.upperLeftConnectionMaterial, typeof(Material), false);
             intersection.upperLeftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Left Connection Height", intersection.upperLeftConnectionHeight));
             intersection.upperLeftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Left Connection Width", intersection.upperLeftConnectionWidth));
+            intersection.upperLeftConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Upper Left Connection Resolution", intersection.upperLeftConnectionResolution), 2, 15);
         }
 
         GUILayout.Label("");
@@ -103,6 +104,7 @@ public class DiamondIntersectionEditor : Editor
             intersection.upperRightConnectionMaterial = (Material)EditorGUILayout.ObjectField("Upper Right Connection Material", intersection.upperRightConnectionMaterial, typeof(Material), false);
             intersection.upperRightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Right Connection Height", intersection.upperRightConnectionHeight));
             intersection.upperRightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Upper Right Connection Width", intersection.upperRightConnectionWidth));
+            intersection.upperRightConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Upper Right Connection Resolution", intersection.upperRightConnectionResolution), 2, 15);
         }
 
         GUILayout.Label("");
@@ -113,6 +115,7 @@ public class DiamondIntersectionEditor : Editor
             intersection.lowerLeftConnectionMaterial = (Material)EditorGUILayout.ObjectField("Lower Left Connection Material", intersection.lowerLeftConnectionMaterial, typeof(Material), false);
             intersection.lowerLeftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Left Connection Height", intersection.lowerLeftConnectionHeight));
             intersection.lowerLeftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Left Connection Width", intersection.lowerLeftConnectionWidth));
+            intersection.lowerLeftConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Lower Left Connection Resolution", intersection.lowerLeftConnectionResolution), 2, 15);
         }
 
         GUILayout.Label("");
@@ -123,6 +126,7 @@ public class DiamondIntersectionEditor : Editor
             intersection.lowerRightConnectionMaterial = (Material)EditorGUILayout.ObjectField("Lower Right Connection Material", intersection.lowerRightConnectionMaterial, typeof(Material), false);
             intersection.lowerRightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Right Connection Height", intersection.lowerRightConnectionHeight));
             intersection.lowerRightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Lower Right Connection Width", intersection.lowerRightConnectionWidth));
+            intersection.lowerRightConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Lower Right Connection Resolution", intersection.lowerRightConnectionResolution), 2, 15);
         }
 
         if (EditorGUI.EndChangeCheck() == true || intersection.transform.hasChanged == true)

@@ -13,21 +13,25 @@ public class SquareIntersection : MonoBehaviour {
     public float upConnectionWidth = 1.5f;
     public float upConnectionHeight = 1;
     public Material upConnectionMaterial;
+    public int upConnectionResolution = 2;
 
     public bool downConnection = true;
     public float downConnectionWidth = 1.5f;
     public float downConnectionHeight = 1;
     public Material downConnectionMaterial;
+    public int downConnectionResolution = 2;
 
     public bool leftConnection = true;
     public float leftConnectionWidth = 1.5f;
     public float leftConnectionHeight = 1;
     public Material leftConnectionMaterial;
+    public int leftConnectionResolution = 2;
 
     public bool rightConnection = true;
     public float rightConnectionWidth = 1.5f;
     public float rightConnectionHeight = 1;
     public Material rightConnectionMaterial;
+    public int rightConnectionResolution = 2;
 
     public GlobalSettings globalSettings;
 
@@ -64,7 +68,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, 0, height);
             transform.GetChild(0).GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, upConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(0).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-upConnectionWidth, heightOffset, upConnectionHeight), new Vector3(upConnectionWidth, heightOffset, upConnectionHeight), upConnectionMaterial);
+            Misc.GenerateIntersectionConnection(width, upConnectionWidth, upConnectionResolution * 2, upConnectionHeight, heightOffset, transform.GetChild(0).GetChild(0).GetChild(0), upConnectionMaterial);
         }
         else
         {
@@ -76,7 +80,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(1).localPosition = new Vector3(0, 0, -height);
             transform.GetChild(0).GetChild(1).GetChild(1).localPosition = new Vector3(0, 0, downConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(1).GetChild(0), new Vector3(-width, heightOffset, 0), new Vector3(width, heightOffset, 0), new Vector3(-downConnectionWidth, heightOffset, downConnectionHeight), new Vector3(downConnectionWidth, heightOffset, downConnectionHeight), downConnectionMaterial);
+            Misc.GenerateIntersectionConnection(width, downConnectionWidth, downConnectionResolution * 2, downConnectionHeight, heightOffset, transform.GetChild(0).GetChild(1).GetChild(0), downConnectionMaterial);
         }
         else
         {
@@ -88,7 +92,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(2).localPosition = new Vector3(-width, 0, 0);
             transform.GetChild(0).GetChild(2).GetChild(1).localPosition = new Vector3(0, 0, leftConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(2).GetChild(0), new Vector3(-height, heightOffset, 0), new Vector3(height, heightOffset, 0), new Vector3(-leftConnectionWidth, heightOffset, leftConnectionHeight), new Vector3(leftConnectionWidth, heightOffset, leftConnectionHeight), leftConnectionMaterial);
+            Misc.GenerateIntersectionConnection(height, leftConnectionWidth, leftConnectionResolution * 2, leftConnectionHeight, heightOffset, transform.GetChild(0).GetChild(2).GetChild(0), leftConnectionMaterial);
         }
         else
         {
@@ -100,7 +104,7 @@ public class SquareIntersection : MonoBehaviour {
         {
             transform.GetChild(0).GetChild(3).localPosition = new Vector3(width, 0, 0);
             transform.GetChild(0).GetChild(3).GetChild(1).localPosition = new Vector3(0, 0, rightConnectionHeight);
-            GenerateMesh(transform.GetChild(0).GetChild(3).GetChild(0), new Vector3(-height, heightOffset, 0), new Vector3(height, heightOffset, 0), new Vector3(-rightConnectionWidth, heightOffset, rightConnectionHeight), new Vector3(rightConnectionWidth, heightOffset, rightConnectionHeight), rightConnectionMaterial);
+            Misc.GenerateIntersectionConnection(height, rightConnectionWidth, rightConnectionResolution * 2, rightConnectionHeight, heightOffset, transform.GetChild(0).GetChild(3).GetChild(0), rightConnectionMaterial);
         }
         else
         {

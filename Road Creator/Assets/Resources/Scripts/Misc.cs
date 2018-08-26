@@ -142,7 +142,7 @@ public static class Misc
         return nearest;
     }
 
-    public static void DrawRoadGuidelines (Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
+    public static void DrawRoadGuidelines(Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
         RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
         for (int i = 0; i < roadSegments.Length; i++)
@@ -156,7 +156,7 @@ public static class Misc
         }
     }
 
-    private static void DrawRoadGuidelines (Vector3[] guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
+    private static void DrawRoadGuidelines(Vector3[] guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
         if (child == 1)
         {
@@ -180,7 +180,7 @@ public static class Misc
         }
     }
 
-    public static void UpdateAllIntersectionConnections ()
+    public static void UpdateAllIntersectionConnections()
     {
         Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
         for (int i = 0; i < gameObjects.Length; i++)
@@ -197,6 +197,70 @@ public static class Misc
                 gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
             }
         }
+    }
+
+    public static void GenerateIntersectionConnection(float startWidth, float endWidth, int verticeAmount, float height, float yOffset, Transform meshObject, Material material)
+    {
+        Vector3[] vertices = new Vector3[verticeAmount];
+        Vector2[] uvs = new Vector2[verticeAmount];
+        Vector2[] widths = new Vector2[verticeAmount];
+        int numTriangles = 2 * ((verticeAmount / 2) - 1);
+        int[] triangles = new int[numTriangles * 3];
+        int verticeIndex = 0;
+        int triangleIndex = 0;
+
+        float distancePerVertice = 1f / ((verticeAmount - 1) / 2);
+        float currentPercent = 0;
+
+        for (int i = 0; i < vertices.Length; i += 2)
+        {
+            float distance = Mathf.Lerp(startWidth, endWidth, currentPercent);
+            vertices[i] = new Vector3(-distance, yOffset, currentPercent * height);
+            vertices[i + 1] = new Vector3(distance, yOffset, currentPercent * height);
+            uvs[i + 1].x = 1;
+            uvs[i].x = 0;
+
+            if (i < vertices.Length - 2)
+            {
+                triangles[triangleIndex] = verticeIndex;
+                triangles[triangleIndex + 1] = (verticeIndex + 2) % vertices.Length;
+                triangles[triangleIndex + 2] = verticeIndex + 1;
+
+                triangles[triangleIndex + 3] = verticeIndex + 1;
+                triangles[triangleIndex + 4] = (verticeIndex + 2) % vertices.Length;
+                triangles[triangleIndex + 5] = (verticeIndex + 3) % vertices.Length;
+            }
+
+            verticeIndex += 2;
+            triangleIndex += 6;
+            currentPercent += distancePerVertice;
+        }
+
+        float totalWidth = endWidth * 2;
+        if (startWidth > endWidth)
+        {
+            totalWidth = startWidth * 2;
+        }
+
+        for (int i = 0; i < widths.Length; i += 2)
+        {
+            float currentRoadWidth = Vector3.Distance(vertices[i], vertices[i + 1]);
+            float currentLocalDistance = currentRoadWidth / totalWidth;
+            uvs[i].x *= currentLocalDistance;
+            uvs[i + 1].x *= currentLocalDistance;
+            widths[i].x = currentLocalDistance;
+            widths[i + 1].x = currentLocalDistance;
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.uv = uvs;
+        mesh.uv2 = widths;
+
+        meshObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+        meshObject.GetComponent<MeshRenderer>().sharedMaterial = material;
+        meshObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
 }
