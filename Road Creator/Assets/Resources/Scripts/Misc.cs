@@ -212,11 +212,26 @@ public static class Misc
         float distancePerVertice = 1f / ((verticeAmount - 1) / 2);
         float currentPercent = 0;
 
+        // Calculate control point
+        Vector3 firstPoint = new Vector3(-startWidth, 0, 0);
+        Vector3 lastPoint = new Vector3(-endWidth, 0, height);
+        Vector3 controlPoint = Vector3.zero;
+
+        Vector3 centerPoint;
+        centerPoint.x = (firstPoint.x + lastPoint.x) / 2;
+        centerPoint.z = (firstPoint.z + lastPoint.z) / 2;
+
+        Vector3 diagonal;
+        diagonal.x = (firstPoint.x - lastPoint.x) / 2;
+        diagonal.z = (firstPoint.z - lastPoint.z) / 2;
+
+        controlPoint.x = centerPoint.x - diagonal.z;
+        controlPoint.z = centerPoint.z + diagonal.x;
+
         for (int i = 0; i < vertices.Length; i += 2)
         {
-            float distance = Mathf.Lerp(startWidth, endWidth, currentPercent);
-            vertices[i] = new Vector3(-distance, yOffset, currentPercent * height);
-            vertices[i + 1] = new Vector3(distance, yOffset, currentPercent * height);
+            vertices[i] = Lerp3(firstPoint, controlPoint, lastPoint, currentPercent * height) + new Vector3(0, yOffset, 0);
+            vertices[i + 1] = Lerp3(InverseX(firstPoint), InverseX(controlPoint), InverseX(lastPoint), currentPercent * height) + new Vector3(0, yOffset, 0);
             uvs[i + 1].x = 1;
             uvs[i].x = 0;
 
@@ -261,6 +276,11 @@ public static class Misc
         meshObject.GetComponent<MeshFilter>().sharedMesh = mesh;
         meshObject.GetComponent<MeshRenderer>().sharedMaterial = material;
         meshObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
+
+    public static Vector3 InverseX (Vector3 vector)
+    {
+        return new Vector3(-vector.x, vector.y, vector.z);
     }
 
 }
