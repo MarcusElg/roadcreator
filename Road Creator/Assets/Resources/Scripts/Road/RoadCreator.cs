@@ -31,12 +31,8 @@ public class RoadCreator : MonoBehaviour
 
                     if (transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection != null)
                     {
-                        previousPoint = GetIntersectionPoint(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection.transform.parent.parent.gameObject, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection.name);
+                        previousPoint = GetIntersectionPoint(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).transform.position + new Vector3(0, heightOffset, 0), transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection.transform.parent.parent.gameObject, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection.name);
                     }
-                }
-                else
-                {
-                    previousPoint = Misc.MaxVector3;
                 }
 
                 if (i < transform.GetChild(0).childCount - 1 && transform.GetChild(0).GetChild(i + 1).GetChild(0).childCount == 3)
@@ -79,7 +75,7 @@ public class RoadCreator : MonoBehaviour
                     if (transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection != null)
                     {
                         nextPoints = new Vector3[1];
-                        nextPoints[0] = GetIntersectionPoint(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.gameObject, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.name);
+                        nextPoints[0] = GetIntersectionPoint(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).transform.position + new Vector3(0, heightOffset, 0), transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.transform.parent.parent.gameObject, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection.name);
                     }
 
                     transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, heightOffset, transform.GetChild(0).GetChild(i), 0, this);
@@ -227,7 +223,7 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    private Vector3 GetIntersectionPoint(GameObject intersection, string connectionPointName)
+    private Vector3 GetIntersectionPoint(Vector3 position, GameObject intersection, string connectionPointName)
     {
         SquareIntersection squareIntersection = intersection.transform.parent.GetComponent<SquareIntersection>();
         TriangleIntersection triangleIntersection = intersection.transform.parent.GetComponent<TriangleIntersection>();
@@ -237,44 +233,44 @@ public class RoadCreator : MonoBehaviour
 
         if (squareIntersection != null)
         {
-            return intersection.transform.position + new Vector3(0, squareIntersection.heightOffset, 0);
+            return intersection.transform.position + new Vector3(0, squareIntersection.heightOffset - position.y, 0);
         }
         else if (roundabout != null)
         {
-            return roundabout.transform.position + new Vector3(0, roundabout.heightOffset, 0);
+            return roundabout.transform.position + new Vector3(0, roundabout.heightOffset - position.y, 0);
         }
         else if (triangleIntersection != null)
         {
             if (connectionPointName == "Down Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * new Vector3(0, triangleIntersection.heightOffset, -triangleIntersection.height);
+                return intersection.transform.position + intersection.transform.rotation * new Vector3(0, triangleIntersection.heightOffset - position.y, -triangleIntersection.height);
             }
             else if (connectionPointName == "Left Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(-triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(-triangleIntersection.width, triangleIntersection.heightOffset - position.y, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset - position.y, triangleIntersection.height));
             }
             else if (connectionPointName == "Right Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(triangleIntersection.width, triangleIntersection.heightOffset - position.y, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset - position.y, triangleIntersection.height));
             }
         }
         else if (diamondIntersection != null)
         {
             if (connectionPointName == "Upper Left Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
             }
             else if (connectionPointName == "Upper Right Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
             }
             else if (connectionPointName == "Lower Left Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, -diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
             }
             else if (connectionPointName == "Lower Right Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, -diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
             }
         }
         else if (roadSplitter != null)
@@ -287,13 +283,13 @@ public class RoadCreator : MonoBehaviour
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(1).position + left - new Vector3(0, roadSplitter.heightOffset, 0);
+                return roadSplitter.transform.GetChild(0).GetChild(1).position + left - new Vector3(0, roadSplitter.heightOffset - position.y, 0);
             }
             else if (connectionPointName == "Lower Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(2).position + left - new Vector3(0, roadSplitter.heightOffset, 0);
+                return roadSplitter.transform.GetChild(0).GetChild(2).position + left - new Vector3(0, roadSplitter.heightOffset - position.y, 0);
             }
         }
 

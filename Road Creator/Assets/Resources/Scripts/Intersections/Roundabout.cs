@@ -119,7 +119,7 @@ public class Roundabout : MonoBehaviour
         mesh.uv = uvs;
 
         transform.GetChild(0).GetChild(objectIndex).GetChild(0).GetComponent<MeshFilter>().sharedMesh = mesh;
-        transform.GetChild(0).GetChild(objectIndex).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial = connectionMaterial[i];
+        transform.GetChild(0).GetChild(objectIndex).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial = connectionMaterial[objectIndex];
         transform.GetChild(0).GetChild(objectIndex).GetChild(0).GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 

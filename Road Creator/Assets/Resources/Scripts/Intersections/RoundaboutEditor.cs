@@ -72,6 +72,7 @@ public class RoundaboutEditor : Editor
                     roundabout.connectionOpen.RemoveAt(i);
                     roundabout.connectionVertexIndex.RemoveAt(i);
                     roundabout.connectionWidth.RemoveAt(i);
+                    roundabout.connectionMaterial.RemoveAt(i);
                     DestroyImmediate(roundabout.transform.GetChild(0).GetChild(i).gameObject);
                 }
             }

@@ -158,11 +158,11 @@ public class RoadSegment : MonoBehaviour
 
                 if (i == 0 && previousPoint != Misc.MaxVector3)
                 {
-                    correctedHeightOffset = (previousPoint.y - segment.position.y);
+                    correctedHeightOffset = (previousPoint.y + heightOffset);
                 }
                 else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
                 {
-                    correctedHeightOffset = (nextSegmentPoints[0].y - segment.position.y);
+                    correctedHeightOffset = (nextSegmentPoints[0].y + heightOffset);
                 }
 
                 if (name == "Road")
