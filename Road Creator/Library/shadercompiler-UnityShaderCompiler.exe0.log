@@ -6,5 +6,49 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: preprocess
+  insize=1428 outsize=1161 ok=1
+Cmd: preprocess
+  error: 2 plat 4 at (31): invalid subscript 'Uv'
+  insize=876 outsize=1610 ok=0
+Cmd: preprocess
+  error: 2 plat 4 at (31): invalid subscript 'Uv'
+  insize=882 outsize=1616 ok=0
+Cmd: preprocess
+  error: 2 plat 4 at (31): undeclared identifier 'IN'
+  insize=911 outsize=1645 ok=0
+Cmd: preprocess
+  error: 2 plat 21 at (12): Surface shader vertex function 'vert' #0 parameter has wrong modifier; has no modifier but needs 'inout' at 'vertexInput input'
+  insize=1350 outsize=560 ok=0
+Cmd: preprocess
+  error: 2 plat 21 at (12): Surface shader vertex function 'vert' #0 parameter has wrong modifier; has no modifier but needs 'inout' at 'vertexInput input'
+  insize=1350 outsize=560 ok=0
+Cmd: preprocess
+  error: 2 plat 21 at (12): Surface shader vertex function 'vert' #0 parameter has wrong modifier; has no modifier but needs 'inout' at 'vertexInput input'
+  insize=1378 outsize=560 ok=0
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

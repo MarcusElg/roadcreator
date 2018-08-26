@@ -105,8 +105,8 @@ public class Roundabout : MonoBehaviour
 
         vertices[0] = Vector3.left * connectionWidth[objectIndex] + new Vector3(0, heightOffset, 0);
         vertices[1] = -Vector3.left * connectionWidth[objectIndex] + new Vector3(0, heightOffset, 0);
-        vertices[2] = Vector3.left * connectionWidth[objectIndex] + Vector3.forward * (width) + new Vector3(0, heightOffset, 0);
-        vertices[3] = -Vector3.left * connectionWidth[objectIndex] + Vector3.forward * (width) + new Vector3(0, heightOffset, 0);
+        vertices[2] = Vector3.left * connectionWidth[objectIndex] + Vector3.forward * width + new Vector3(0, heightOffset, 0);
+        vertices[3] = -Vector3.left * connectionWidth[objectIndex] + Vector3.forward * width + new Vector3(0, heightOffset, 0);
 
         uvs[0] = new Vector2(0, 0);
         uvs[1] = new Vector2(1, 0);
