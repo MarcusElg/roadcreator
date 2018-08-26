@@ -9,18 +9,20 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1874828136695054}
+  m_RootGameObject: {fileID: 1248168545922950}
   m_IsPrefabAsset: 1
---- !u!1 &1874828136695054
+--- !u!1 &1248168545922950
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4986260419059978}
-  - component: {fileID: 33414957301410092}
-  - component: {fileID: 23091054304359864}
+  - component: {fileID: 4320460336080442}
+  - component: {fileID: 33776346536144090}
+  - component: {fileID: 23571317821170002}
+  - component: {fileID: 65482950208174902}
+  - component: {fileID: 114531955513390686}
   m_Layer: 0
   m_Name: Traffic Light
   m_TagString: Untagged
@@ -28,25 +30,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4986260419059978
+--- !u!4 &4320460336080442
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1874828136695054}
+  m_GameObject: {fileID: 1248168545922950}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 32.367992, y: 0.028959, z: 115.00883}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23091054304359864
+--- !u!23 &23571317821170002
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1874828136695054}
+  m_GameObject: {fileID: 1248168545922950}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -60,7 +62,7 @@ MeshRenderer:
   - {fileID: 2100000, guid: d5f7e04f02831114fb717eb3e1ca6b14, type: 2}
   - {fileID: 2100000, guid: 054f2d6e5cd92c74fa7ff10825693f33, type: 2}
   - {fileID: 2100000, guid: 338e23ed521854743ba11bd146b72119, type: 2}
-  - {fileID: 2100000, guid: 0e8d6d9d7d4e1f048902ac108c4bbf3f, type: 2}
+  - {fileID: 2100000, guid: 4ca656fb0bbae4f4880364bc717e1e46, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -80,10 +82,49 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &33414957301410092
+--- !u!33 &33776346536144090
 MeshFilter:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1874828136695054}
+  m_GameObject: {fileID: 1248168545922950}
   m_Mesh: {fileID: 4300000, guid: da41846b356d2b24d9016f98e876eca1, type: 3}
+--- !u!65 &65482950208174902
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1248168545922950}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.357936, y: 2.951396, z: 0.428948}
+  m_Center: {x: 0, y: 1.446739, z: 0.080125}
+--- !u!114 &114531955513390686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1248168545922950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66611cad691e2d84389c387cdcd0c686, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  greenActive: {fileID: 2100000, guid: 4ca656fb0bbae4f4880364bc717e1e46, type: 2}
+  greenNonActive: {fileID: 2100000, guid: 0e8d6d9d7d4e1f048902ac108c4bbf3f, type: 2}
+  yellowActive: {fileID: 2100000, guid: c3e97bfd02af81f4591622cd58c6e7b8, type: 2}
+  yellowNonActive: {fileID: 2100000, guid: 338e23ed521854743ba11bd146b72119, type: 2}
+  redActive: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
+  redNonActive: {fileID: 2100000, guid: 054f2d6e5cd92c74fa7ff10825693f33, type: 2}
+  greenTime: 30
+  yellowBeforeRedTime: 5
+  redTime: 60
+  yellowBeforeGreenTime: 1
+  startTime: 0
+  timeSinceLast: 0
+  nextChangeTick: 0
+  currentColour: 0
+  startColour: 0
+  paused: 0
