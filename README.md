@@ -17,7 +17,7 @@ Intersections Etc:
 - Generate intersections with 1 - 4 connections (square, triangle and diamond intersections)
 - Modify variables such as connection height and width per connection
 - Generate customizable roundabouts
-- Includes a bunch of roads and road related assets like turn markings
+- Includes a bunch of roads and road related assets like turn markings and signs
 - Create timed traphic lights
 
 For info about planned features and bugs see https://github.com/MCrafterzz/roadcreator/issues/1
