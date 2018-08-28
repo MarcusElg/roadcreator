@@ -41,14 +41,14 @@ public class RoadCreator : MonoBehaviour
                     Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
 
                     int actualSmoothnessAmount = smoothnessAmount;
-                    if ((currentPoints.Length / 2) < actualSmoothnessAmount)
+                    if ((currentPoints.Length / 2) <= actualSmoothnessAmount)
                     {
-                        actualSmoothnessAmount = currentPoints.Length / 2;
+                        actualSmoothnessAmount = currentPoints.Length / 2 - 1;
                     }
 
-                    if ((nextPoints.Length / 2) < actualSmoothnessAmount)
+                    if ((nextPoints.Length / 2) <= actualSmoothnessAmount)
                     {
-                        actualSmoothnessAmount = nextPoints.Length / 2;
+                        actualSmoothnessAmount = nextPoints.Length / 2 - 1;
                     }
 
                     float distanceSection = 1f / ((actualSmoothnessAmount * 2));
