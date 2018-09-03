@@ -76,11 +76,7 @@ public class PrefabLineEditor : Editor
             prefabCreator.bendMultiplier = Mathf.Max(0, EditorGUILayout.FloatField("Bend Multiplier", prefabCreator.bendMultiplier));
         }
 
-        GUIStyle guiStyle = new GUIStyle();
-        guiStyle.fontStyle = FontStyle.Bold;
-        GUILayout.Label("");
-        GUILayout.Label("Prefab Options", guiStyle);
-
+        prefabCreator.modifyY = EditorGUILayout.Toggle("Modify Y For Vertices", prefabCreator.modifyY);
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0, 10);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
@@ -208,6 +204,33 @@ public class PrefabLineEditor : Editor
                     prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
                 }
 
+                if (prefabCreator.modifyY == true)
+                {
+                    Vector3[] vertices = prefab.GetComponent<MeshFilter>().sharedMesh.vertices;
+
+                    for (var i = 0; i < vertices.Length; i++)
+                    {
+                        RaycastHit raycastHit;
+                        if (Physics.Raycast(prefab.transform.position + (prefab.transform.rotation * vertices[i]) + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+                        {
+                            vertices[i].y += raycastHit.point.y - prefab.transform.position.y;
+                        }
+                    }
+
+                    Mesh mesh = Instantiate(prefab.GetComponent<MeshFilter>().sharedMesh);
+                    mesh.vertices = vertices;
+                    prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+                    prefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+
+                    // Change collider to match
+                    System.Type type = prefab.GetComponent<Collider>().GetType();
+                    if (type != null)
+                    {
+                        DestroyImmediate(prefab.GetComponent<Collider>());
+                        prefab.AddComponent(type);
+                    }
+                }
+
                 if (prefabCreator.fillGap == true && j > 0)
                 {
                     // Add last vertices
@@ -265,12 +288,13 @@ public class PrefabLineEditor : Editor
         }
     }
 
-    private float GetMaxX ()
+    private float GetMaxX()
     {
         if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
         {
             return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x;
-        } else
+        }
+        else
         {
             return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x;
         }

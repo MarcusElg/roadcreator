@@ -9,6 +9,7 @@ public class PrefabLineCreator : MonoBehaviour
     public GameObject currentPoint;
 
     public bool bendObjects = true;
+    public bool modifyY = true;
     public float bendMultiplier = 1;
     public bool fillGap = true;
     public float spacing = 1;
