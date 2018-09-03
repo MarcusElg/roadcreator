@@ -228,10 +228,11 @@ public static class Misc
         controlPoint.x = centerPoint.x - diagonal.z;
         controlPoint.z = centerPoint.z + diagonal.x;
 
+
         for (int i = 0; i < vertices.Length; i += 2)
         {
-            vertices[i] = Lerp3(firstPoint, controlPoint, lastPoint, currentPercent * height) + new Vector3(0, yOffset, 0);
-            vertices[i + 1] = Lerp3(InverseX(firstPoint), InverseX(controlPoint), InverseX(lastPoint), currentPercent * height) + new Vector3(0, yOffset, 0);
+            vertices[i] = Lerp3(firstPoint, controlPoint, lastPoint, currentPercent) + new Vector3(0, yOffset, 0);
+            vertices[i + 1] = Lerp3(InverseX(firstPoint), InverseX(controlPoint), InverseX(lastPoint), currentPercent) + new Vector3(0, yOffset, 0);
             uvs[i + 1].x = 1;
             uvs[i].x = 0;
 
