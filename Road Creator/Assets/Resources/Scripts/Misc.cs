@@ -215,19 +215,7 @@ public static class Misc
         // Calculate control point
         Vector3 firstPoint = new Vector3(-startWidth, 0, 0);
         Vector3 lastPoint = new Vector3(-endWidth, 0, height);
-        Vector3 controlPoint = Vector3.zero;
-
-        Vector3 centerPoint;
-        centerPoint.x = (firstPoint.x + lastPoint.x) / 2;
-        centerPoint.z = (firstPoint.z + lastPoint.z) / 2;
-
-        Vector3 diagonal;
-        diagonal.x = (firstPoint.x - lastPoint.x) / 2;
-        diagonal.z = (firstPoint.z - lastPoint.z) / 2;
-
-        controlPoint.x = centerPoint.x - diagonal.z;
-        controlPoint.z = centerPoint.z + diagonal.x;
-
+        Vector3 controlPoint = new Vector3(-endWidth, 0, 0);
 
         for (int i = 0; i < vertices.Length; i += 2)
         {
