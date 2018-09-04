@@ -76,7 +76,13 @@ public class PrefabLineEditor : Editor
             prefabCreator.bendMultiplier = Mathf.Max(0, EditorGUILayout.FloatField("Bend Multiplier", prefabCreator.bendMultiplier));
         }
 
-        prefabCreator.modifyY = EditorGUILayout.Toggle("Modify Y For Vertices", prefabCreator.modifyY);
+        prefabCreator.yModification = (PrefabLineCreator.YModification)EditorGUILayout.EnumPopup("Vertex Y Modification", prefabCreator.yModification);
+
+        if (prefabCreator.yModification == PrefabLineCreator.YModification.matchTerrain)
+        {
+            prefabCreator.terrainCheckHeight = Mathf.Max(0, EditorGUILayout.FloatField("Check Terrain Height", prefabCreator.terrainCheckHeight));
+        }
+
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0, 10);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
@@ -204,16 +210,25 @@ public class PrefabLineEditor : Editor
                     prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
                 }
 
-                if (prefabCreator.modifyY == true)
+                if (prefabCreator.yModification != PrefabLineCreator.YModification.none)
                 {
                     Vector3[] vertices = prefab.GetComponent<MeshFilter>().sharedMesh.vertices;
+                    float startHeight = currentPoints.startPoints[j].y;
+                    float endHeight = currentPoints.endPoints[j].y;
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
-                        RaycastHit raycastHit;
-                        if (Physics.Raycast(prefab.transform.position + (prefab.transform.rotation * vertices[i]) + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+                        if (prefabCreator.yModification == PrefabLineCreator.YModification.matchTerrain)
                         {
-                            vertices[i].y += raycastHit.point.y - prefab.transform.position.y;
+                            RaycastHit raycastHit;
+                            if (Physics.Raycast(prefab.transform.position + (prefab.transform.rotation * vertices[i]) + new Vector3(0, prefabCreator.terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+                            {
+                                vertices[i].y += raycastHit.point.y - prefab.transform.position.y;
+                            }
+                        }
+                        else if (prefabCreator.yModification == PrefabLineCreator.YModification.matchCurve)
+                        {
+                            vertices[i].y += Mathf.Lerp(startHeight, endHeight, Misc.Remap(vertices[i].x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1)) - prefab.transform.position.y;
                         }
                     }
 
@@ -574,12 +589,6 @@ public class PrefabLineEditor : Editor
                 }
 
                 currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
-                RaycastHit raycastHit2;
-                if (Physics.Raycast(currentPoint, Vector3.down, out raycastHit2, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
-                {
-                    currentPoint.y = raycastHit2.point.y;
-                }
-
                 float currentDistance = Vector3.Distance(lastPoint, currentPoint);
 
                 if (currentDistance > prefabCreator.spacing / 2 && endPointAdded == false)
@@ -594,7 +603,7 @@ public class PrefabLineEditor : Editor
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
                     startPoints.Add(lastEndPoint);
-
+                    Debug.Log(currentPoint.y);
                     endPointAdded = false;
 
                     rotateTowardsLeft.Add(isSegmentLeft);
