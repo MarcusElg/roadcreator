@@ -574,6 +574,12 @@ public class PrefabLineEditor : Editor
                 }
 
                 currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
+                RaycastHit raycastHit2;
+                if (Physics.Raycast(currentPoint, Vector3.down, out raycastHit2, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
+                {
+                    currentPoint.y = raycastHit2.point.y;
+                }
+
                 float currentDistance = Vector3.Distance(lastPoint, currentPoint);
 
                 if (currentDistance > prefabCreator.spacing / 2 && endPointAdded == false)
@@ -585,13 +591,6 @@ public class PrefabLineEditor : Editor
 
                 if (currentDistance > prefabCreator.spacing)
                 {
-                    // Add point
-                    RaycastHit raycastHit2;
-                    if (Physics.Raycast(currentPoint, Vector3.down, out raycastHit2, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer)))
-                    {
-                        currentPoint.y = raycastHit2.point.y;
-                    }
-
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
                     startPoints.Add(lastEndPoint);
