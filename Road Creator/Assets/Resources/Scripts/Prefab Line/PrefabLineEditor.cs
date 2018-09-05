@@ -271,15 +271,26 @@ public class PrefabLineEditor : Editor
 
                             for (int k = 0; k < lastVertexPositions.Count; k++)
                             {
+                                float localY = (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position).y;
                                 float localZ = (Quaternion.Euler(0, -(prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position)).z;
                                 float zDifference = Mathf.Abs(localZ - vertices[i].z);
                                 if (zDifference < 0.001f)
                                 {
-                                    float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * vertices[i]) + prefab.transform.position);
-                                    if (calculatedDistance < currentDistance)
+                                    if (prefabCreator.yModification == PrefabLineCreator.YModification.none)
                                     {
-                                        currentDistance = calculatedDistance;
-                                        nearestVertex = lastVertexPositions[k];
+                                        if (Mathf.Abs(localY - vertices[i].y) < 0.001f)
+                                        {
+                                            nearestVertex = lastVertexPositions[k];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * vertices[i]) + prefab.transform.position);
+                                        if (calculatedDistance < currentDistance)
+                                        {
+                                            currentDistance = calculatedDistance;
+                                            nearestVertex = lastVertexPositions[k];
+                                        }
                                     }
                                 }
                             }
