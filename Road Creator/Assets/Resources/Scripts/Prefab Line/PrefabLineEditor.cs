@@ -260,11 +260,11 @@ public class PrefabLineEditor : Editor
                     }
 
                     // Move current vertices to last ones
-                    Mesh mesh = GameObject.Instantiate(prefab.GetComponent<MeshFilter>().sharedMesh);
+                    Mesh mesh = Instantiate(prefab.GetComponent<MeshFilter>().sharedMesh);
                     Vector3[] vertices = mesh.vertices;
-                    for (int i = 0; i < mesh.vertices.Length; i++)
+                    for (int i = 0; i < vertices.Length; i++)
                     {
-                        if (vertices[i].x == GetMinX())
+                        if (Mathf.Abs(vertices[i].x - GetMinX()) < 0.001f)
                         {
                             Vector3 nearestVertex = Vector3.zero;
                             float currentDistance = float.MaxValue;
@@ -284,7 +284,7 @@ public class PrefabLineEditor : Editor
                                 }
                             }
 
-                            vertices[i] = Quaternion.Euler(0, -(prefab.transform.rotation.eulerAngles.y), 0) * (nearestVertex - prefab.transform.position);
+                            vertices[i] = Quaternion.Euler(0, -prefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - prefab.transform.position);
                         }
                     }
                     mesh.vertices = vertices;
@@ -588,12 +588,15 @@ public class PrefabLineEditor : Editor
                     t = 1;
                 }
 
+                float height = Mathf.Lerp(prefabCreator.transform.GetChild(0).GetChild(i).position.y, prefabCreator.transform.GetChild(0).GetChild(i + 2).position.y, t);
                 currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
+                currentPoint.y = height;
                 float currentDistance = Vector3.Distance(lastPoint, currentPoint);
 
                 if (currentDistance > prefabCreator.spacing / 2 && endPointAdded == false)
                 {
                     endPoints.Add(currentPoint);
+                    Debug.Log(startPoints[0] + ", " + endPoints[0]);
                     lastEndPoint = currentPoint;
                     endPointAdded = true;
                 }
@@ -603,7 +606,6 @@ public class PrefabLineEditor : Editor
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
                     startPoints.Add(lastEndPoint);
-                    Debug.Log(currentPoint.y);
                     endPointAdded = false;
 
                     rotateTowardsLeft.Add(isSegmentLeft);
