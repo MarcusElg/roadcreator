@@ -95,7 +95,7 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.fillGap == true || prefabCreator.bendObjects == true)
             {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
 
                 if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left && prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right)
                 {
