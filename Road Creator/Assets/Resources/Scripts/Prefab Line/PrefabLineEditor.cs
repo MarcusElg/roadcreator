@@ -93,6 +93,13 @@ public class PrefabLineEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
+            if (prefabCreator.prefab.GetComponent<MeshFilter>() == null)
+            {
+                prefabCreator.prefab = null;
+                Debug.Log("Selected prefab must have a mesh filter attached");
+                return;
+            }
+
             if (prefabCreator.fillGap == true || prefabCreator.bendObjects == true)
             {
                 prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
