@@ -84,7 +84,7 @@ public class PrefabLineEditor : Editor
         }
 
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
-        prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0, 10);
+        prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0.1f, 10);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
         if (prefabCreator.rotateAlongCurve == true)
         {
@@ -221,7 +221,14 @@ public class PrefabLineEditor : Editor
                         }
                         else if (prefabCreator.yModification == PrefabLineCreator.YModification.matchCurve)
                         {
-                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, Misc.Remap(vertices[i].x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1)) - prefab.transform.position.y) / prefabCreator.scale;
+                            float time = Misc.Remap(vertices[i].x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1);
+
+                            if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
+                            {
+                                time = 1 - time;
+                            }
+
+                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, time) - prefab.transform.position.y) / prefabCreator.scale;
                         }
                     }
 
