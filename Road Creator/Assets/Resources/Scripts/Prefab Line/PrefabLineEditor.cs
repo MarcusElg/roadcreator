@@ -255,7 +255,7 @@ public class PrefabLineEditor : Editor
                     {
                         if (lastVertices[i].x == GetMaxX())
                         {
-                            lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * lastVertices[i]) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
+                            lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * (prefabCreator.scale * lastVertices[i])) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
                         }
                     }
 
@@ -273,19 +273,20 @@ public class PrefabLineEditor : Editor
                             {
                                 float localY = (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position).y;
                                 float localZ = (Quaternion.Euler(0, -(prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position)).z;
-                                float zDifference = Mathf.Abs(localZ - vertices[i].z);
+                                float zDifference = Mathf.Abs(localZ - (vertices[i].z * prefabCreator.scale));
                                 if (zDifference < 0.001f)
                                 {
                                     if (prefabCreator.yModification == PrefabLineCreator.YModification.none)
                                     {
-                                        if (Mathf.Abs(localY - vertices[i].y) < 0.001f)
+                                        if (Mathf.Abs(localY - (vertices[i].y * prefabCreator.scale)) < 0.001f)
                                         {
                                             nearestVertex = lastVertexPositions[k];
                                         }
                                     }
                                     else
                                     {
-                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * vertices[i]) + prefab.transform.position);
+                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * (prefabCreator.scale * vertices[i])) + prefab.transform.position);
+
                                         if (calculatedDistance < currentDistance)
                                         {
                                             currentDistance = calculatedDistance;
@@ -297,7 +298,8 @@ public class PrefabLineEditor : Editor
 
                             if (nearestVertex != Vector3.zero)
                             {
-                                vertices[i] = Quaternion.Euler(0, -prefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - prefab.transform.position);
+                                float scaleModifier = 1 / prefabCreator.scale;
+                                vertices[i] = Quaternion.Euler(0, -prefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - prefab.transform.position) * scaleModifier;
                             }
                         }
                     }
@@ -610,7 +612,6 @@ public class PrefabLineEditor : Editor
                 if (currentDistance > prefabCreator.spacing / 2 && endPointAdded == false)
                 {
                     endPoints.Add(currentPoint);
-                    Debug.Log(startPoints[0] + ", " + endPoints[0]);
                     lastEndPoint = currentPoint;
                     endPointAdded = true;
                 }
