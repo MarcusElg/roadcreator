@@ -188,11 +188,6 @@ public class PrefabLineEditor : Editor
                         distanceToChangeMultiplied = -distanceToChangeMultiplied;
                     }
 
-                    if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
-                    {
-                        distanceToChangeMultiplied = -distanceToChangeMultiplied;
-                    }
-
                     controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChangeMultiplied);
 
                     for (var i = 0; i < vertices.Length; i++)
