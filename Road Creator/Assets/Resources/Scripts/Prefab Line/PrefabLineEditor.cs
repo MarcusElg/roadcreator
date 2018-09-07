@@ -260,7 +260,7 @@ public class PrefabLineEditor : Editor
                     Vector3[] lastVertices = prefabCreator.transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
                     for (int i = 0; i < lastVertices.Length; i++)
                     {
-                        if (lastVertices[i].x == GetMaxX())
+                        if (Mathf.Abs(lastVertices[i].x - GetMaxX()) < 0.001f)
                         {
                             lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * (prefabCreator.scale * lastVertices[i])) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
                         }
