@@ -89,12 +89,6 @@ public static class Misc
         return (one + (difference / 2));
     }
 
-    public static float GetPrefabOffset(GameObject prefab, float scale, float offset)
-    {
-        Mesh mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
-        return ((mesh.bounds.size.x * scale) + (offset / 2)) / 2;
-    }
-
     public static Vector3 FindPointInCircle(float radius, int i, float degreesPerStep)
     {
         return Quaternion.AngleAxis(degreesPerStep * i, Vector3.up) * (Vector3.right * radius);

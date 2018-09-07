@@ -58,7 +58,7 @@ public class PrefabLineEditor : Editor
             {
                 if (prefabCreator.prefab != null)
                 {
-                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2;
+                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
                 }
             }
 
@@ -66,7 +66,7 @@ public class PrefabLineEditor : Editor
             {
                 if (prefabCreator.prefab != null)
                 {
-                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2;
+                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2 * prefabCreator.scale;
                 }
             }
         }
@@ -143,7 +143,7 @@ public class PrefabLineEditor : Editor
 
         if (prefabCreator.transform.GetChild(0).childCount > 2)
         {
-            PointPackage currentPoints = CalculatePoints(Misc.GetPrefabOffset(prefabCreator.prefab, prefabCreator.scale, prefabCreator.globalSettings.pointSize * prefabCreator.scale));
+            PointPackage currentPoints = CalculatePoints();
             for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {
                 GameObject prefab = Instantiate(prefabCreator.prefab);
@@ -570,49 +570,51 @@ public class PrefabLineEditor : Editor
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
     }
 
-    public PointPackage CalculatePoints(float offset)
+    public PointPackage CalculatePoints()
     {
         List<Vector3> prefabPoints = new List<Vector3>();
         List<Vector3> startPoints = new List<Vector3>();
         List<Vector3> endPoints = new List<Vector3>();
         List<bool> rotateTowardsLeft = new List<bool>();
 
-        Vector3 lastEndPoint = Vector3.zero;
-        float distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position);
-        offset /= distance;
+        Vector3 firstPoint = prefabCreator.transform.GetChild(0).GetChild(0).position;
+        Vector3 controlPoint = prefabCreator.transform.GetChild(0).GetChild(1).position;
+        Vector3 endPoint = prefabCreator.transform.GetChild(0).GetChild(2).position;
 
-        prefabPoints.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset));
-        startPoints.Add(prefabCreator.transform.GetChild(0).GetChild(0).position);
-        Vector3 lastPoint = prefabPoints[prefabPoints.Count - 1];
-        bool endPointAdded = false;
+        Vector3 lastEndPoint = firstPoint;
+        float distance = Misc.CalculateDistance(firstPoint, controlPoint, endPoint);
+
+        startPoints.Add(firstPoint);
+        Vector3 lastPoint = firstPoint;
+        bool endPointAdded = true;
 
         Vector3 currentPoint = Vector3.zero;
 
         for (int i = 0; i < prefabCreator.transform.GetChild(0).childCount - 2; i += 2)
         {
-            distance = Misc.CalculateDistance(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position);
+            distance = Misc.CalculateDistance(firstPoint, controlPoint, endPoint);
             float divisions = distance / prefabCreator.spacing;
             divisions = Mathf.Max(2, divisions);
             float distancePerDivision = 1 / divisions;
-            offset /= distance;
             bool isSegmentLeft = IsSegmentLeft(i);
+            firstPoint = prefabCreator.transform.GetChild(0).GetChild(i).position;
+            controlPoint = prefabCreator.transform.GetChild(0).GetChild(i + 1).position;
+            endPoint = prefabCreator.transform.GetChild(0).GetChild(i + 2).position;
 
-            float startOffset = 0;
             if (i == 0)
             {
-                startOffset = offset;
                 rotateTowardsLeft.Add(isSegmentLeft);
             }
 
-            for (float t = startOffset; t < 1; t += distancePerDivision / 10)
+            for (float t = 0; t < 1; t += distancePerDivision / 10)
             {
                 if (t > 1)
                 {
                     t = 1;
                 }
 
-                float height = Mathf.Lerp(prefabCreator.transform.GetChild(0).GetChild(i).position.y, prefabCreator.transform.GetChild(0).GetChild(i + 2).position.y, t);
-                currentPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.transform.GetChild(0).GetChild(i + 1).position, prefabCreator.transform.GetChild(0).GetChild(i + 2).position, t);
+                float height = Mathf.Lerp(firstPoint.y, endPoint.y, t);
+                currentPoint = Misc.Lerp3(firstPoint, controlPoint, endPoint, t);
                 currentPoint.y = height;
                 float currentDistance = Vector3.Distance(lastPoint, currentPoint);
 
@@ -623,7 +625,7 @@ public class PrefabLineEditor : Editor
                     endPointAdded = true;
                 }
 
-                if (currentDistance > prefabCreator.spacing)
+                if (endPointAdded == true && ((currentDistance > prefabCreator.spacing) || (startPoints.Count == 1 && currentDistance > prefabCreator.spacing / 2)))
                 {
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
