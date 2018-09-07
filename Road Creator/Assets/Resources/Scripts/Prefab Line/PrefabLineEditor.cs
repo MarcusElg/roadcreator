@@ -91,8 +91,6 @@ public class PrefabLineEditor : Editor
             prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
         }
 
-        prefabCreator.offsetPrefabWidth = EditorGUILayout.Toggle("Offset Prefab Width", prefabCreator.offsetPrefabWidth);
-
         if (EditorGUI.EndChangeCheck() == true)
         {
             if (prefabCreator.fillGap == true || prefabCreator.bendObjects == true)
@@ -295,7 +293,10 @@ public class PrefabLineEditor : Editor
                                 }
                             }
 
-                            vertices[i] = Quaternion.Euler(0, -prefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - prefab.transform.position);
+                            if (nearestVertex != Vector3.zero)
+                            {
+                                vertices[i] = Quaternion.Euler(0, -prefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - prefab.transform.position);
+                            }
                         }
                     }
                     mesh.vertices = vertices;
@@ -571,7 +572,7 @@ public class PrefabLineEditor : Editor
 
         prefabPoints.Add(Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset));
         startPoints.Add(prefabCreator.transform.GetChild(0).GetChild(0).position);
-        Vector3 lastPoint = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(0).position, prefabCreator.transform.GetChild(0).GetChild(1).position, prefabCreator.transform.GetChild(0).GetChild(2).position, offset);
+        Vector3 lastPoint = prefabPoints[prefabPoints.Count - 1];
         bool endPointAdded = false;
 
         Vector3 currentPoint = Vector3.zero;

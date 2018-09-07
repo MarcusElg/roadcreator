@@ -22,7 +22,6 @@ public class PrefabLineCreator : MonoBehaviour
     public RotationDirection rotationDirection;
 
     public float scale = 1;
-    public bool offsetPrefabWidth = true;
 
     public GlobalSettings globalSettings;
 
