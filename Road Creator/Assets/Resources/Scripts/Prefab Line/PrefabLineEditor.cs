@@ -219,14 +219,14 @@ public class PrefabLineEditor : Editor
                         if (prefabCreator.yModification == PrefabLineCreator.YModification.matchTerrain)
                         {
                             RaycastHit raycastHit;
-                            if (Physics.Raycast(prefab.transform.position + (prefab.transform.rotation * vertices[i]) + new Vector3(0, prefabCreator.terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+                            if (Physics.Raycast(prefab.transform.position + (prefab.transform.rotation * vertices[i] * prefabCreator.scale) + new Vector3(0, prefabCreator.terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
                             {
-                                vertices[i].y += raycastHit.point.y - prefab.transform.position.y;
+                                vertices[i].y += (raycastHit.point.y - prefab.transform.position.y) / prefabCreator.scale;
                             }
                         }
                         else if (prefabCreator.yModification == PrefabLineCreator.YModification.matchCurve)
                         {
-                            vertices[i].y += Mathf.Lerp(startHeight, endHeight, Misc.Remap(vertices[i].x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1)) - prefab.transform.position.y;
+                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, Misc.Remap(vertices[i].x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1)) - prefab.transform.position.y) / prefabCreator.scale;
                         }
                     }
 
