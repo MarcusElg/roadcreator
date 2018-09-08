@@ -83,6 +83,30 @@ public class RoadSplitterEditor : Editor {
         {
             roadSplitter.GenerateMesh();
         }
+
+        if (GUILayout.Button("Convert To Meshes"))
+        {
+            MeshFilter[] meshFilters = roadSplitter.GetComponentsInChildren<MeshFilter>();
+
+            if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
+            {
+                GameObject roadMesh = new GameObject("Road Splitter Mesh");
+                roadMesh.transform.position = roadSplitter.transform.position;
+
+                for (int i = 0; i < meshFilters.Length; i++)
+                {
+                    if (meshFilters[i].sharedMesh != null)
+                    {
+                        meshFilters[i].transform.SetParent(roadMesh.transform);
+                        meshFilters[i].name = "Mesh";
+                        meshFilters[i].transform.localPosition = Vector3.zero;
+                    }
+                }
+
+                DestroyImmediate(roadSplitter.gameObject);
+                Selection.activeObject = roadMesh;
+            }
+        }
     }
 
     private void OnSceneGUI()

@@ -275,7 +275,7 @@ public static class Misc
     {   
         MeshFilter[] meshFilters = intersection.GetComponentsInChildren<MeshFilter>();
 
-        if (meshFilters.Length > 0)
+        if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
         {
             GameObject intersectionMesh = new GameObject(name);
             intersectionMesh.transform.position = intersection.transform.position;

@@ -89,7 +89,7 @@ public class RoadEditor : Editor
         {          
             MeshFilter[] meshFilters = roadCreator.GetComponentsInChildren<MeshFilter>();
 
-            if (meshFilters.Length > 0)
+            if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
             {
                 GameObject roadMesh = new GameObject("Road Mesh");
                 roadMesh.transform.position = meshFilters[0].transform.parent.parent.GetChild(0).GetChild(0).position;
