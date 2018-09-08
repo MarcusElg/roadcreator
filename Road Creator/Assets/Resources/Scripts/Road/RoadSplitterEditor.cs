@@ -90,21 +90,22 @@ public class RoadSplitterEditor : Editor {
 
             if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
             {
-                GameObject roadMesh = new GameObject("Road Splitter Mesh");
-                roadMesh.transform.position = roadSplitter.transform.position;
+                GameObject roadSplitterMesh = new GameObject("Road Splitter Mesh");
+                Undo.RegisterCreatedObjectUndo(roadSplitterMesh, "Created Road Splitter Mesh");
+                roadSplitterMesh.transform.position = roadSplitter.transform.position;
 
                 for (int i = 0; i < meshFilters.Length; i++)
                 {
                     if (meshFilters[i].sharedMesh != null)
                     {
-                        meshFilters[i].transform.SetParent(roadMesh.transform);
+                        Undo.SetTransformParent(meshFilters[i].transform, roadSplitterMesh.transform, "Created Road Splitter Mesh");
                         meshFilters[i].name = "Mesh";
                         meshFilters[i].transform.localPosition = Vector3.zero;
                     }
                 }
 
-                DestroyImmediate(roadSplitter.gameObject);
-                Selection.activeObject = roadMesh;
+                Undo.DestroyObjectImmediate(roadSplitter.gameObject);
+                Selection.activeObject = roadSplitterMesh;
             }
         }
     }

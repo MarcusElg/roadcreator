@@ -278,18 +278,19 @@ public static class Misc
         if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
         {
             GameObject intersectionMesh = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(intersectionMesh, "Created Intersection Mesh");
             intersectionMesh.transform.position = intersection.transform.position;
 
             for (int i = 0; i < meshFilters.Length; i++)
             {
                 if (meshFilters[i].sharedMesh != null)
                 {
-                    meshFilters[i].transform.SetParent(intersectionMesh.transform, true);
+                    Undo.SetTransformParent(meshFilters[i].transform, intersectionMesh.transform, "Created Intersection Mesh");
                     meshFilters[i].name = "Mesh";
                 }
             }
 
-            GameObject.DestroyImmediate(intersection.gameObject);
+            Undo.DestroyObjectImmediate(intersection.gameObject);
             Selection.activeObject = intersectionMesh;
         }
     }
