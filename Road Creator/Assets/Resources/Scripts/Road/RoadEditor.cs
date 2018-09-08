@@ -86,7 +86,7 @@ public class RoadEditor : Editor
         }
 
         if (GUILayout.Button("Convert To Meshes"))
-        {          
+        {
             MeshFilter[] meshFilters = roadCreator.GetComponentsInChildren<MeshFilter>();
 
             if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
@@ -101,7 +101,7 @@ public class RoadEditor : Editor
                     {
                         Undo.SetTransformParent(meshFilters[i].transform, roadMesh.transform, "Created Road Mesh");
                         meshFilters[i].name = "Mesh";
-                        meshFilters[i].transform.localPosition = Vector3.zero;
+                        //meshFilters[i].transform.localPosition = Vector3.zero;
                     }
                 }
 
