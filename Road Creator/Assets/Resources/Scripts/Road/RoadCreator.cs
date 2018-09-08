@@ -110,7 +110,7 @@ public class RoadCreator : MonoBehaviour
     private void DetectIntersectionConnection(GameObject gameObject)
     {
         RaycastHit raycastHit2;
-        if (Physics.Raycast(new Ray(gameObject.transform.position + Vector3.up, Vector3.down), out raycastHit2, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
+        if (Physics.Raycast(gameObject.transform.position + Vector3.up, Vector3.down, out raycastHit2, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
         {
             if (raycastHit2.collider.name.Contains("Connection Point"))
             {
