@@ -140,6 +140,11 @@ public class DiamondIntersectionEditor : Editor
         {
             intersection.GenerateMeshes();
         }
+
+        if (GUILayout.Button("Convert To Meshes"))
+        {
+            Misc.ConvertIntersectionToMesh(intersection.gameObject, "Diamond Intersection Mesh");
+        }
     }
 
     private void OnSceneGUI()

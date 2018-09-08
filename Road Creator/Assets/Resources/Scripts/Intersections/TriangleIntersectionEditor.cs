@@ -128,6 +128,11 @@ public class TriangleIntersectionEditor : Editor
         {
             intersection.GenerateMeshes();
         }
+
+        if (GUILayout.Button("Convert To Meshes"))
+        {
+            Misc.ConvertIntersectionToMesh(intersection.gameObject, "Triangle Intersection Mesh");
+        }
     }
 
     private void OnSceneGUI()

@@ -266,9 +266,28 @@ public static class Misc
         meshObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    public static Vector3 InverseX (Vector3 vector)
+    public static Vector3 InverseX(Vector3 vector)
     {
         return new Vector3(-vector.x, vector.y, vector.z);
+    }
+
+    public static void ConvertIntersectionToMesh(GameObject intersection, string name)
+    {
+        GameObject intersectionMesh = new GameObject(name);
+        MeshFilter[] meshFilters = intersection.GetComponentsInChildren<MeshFilter>();
+        intersectionMesh.transform.position = intersection.transform.position;
+
+        for (int i = 0; i < meshFilters.Length; i++)
+        {
+            if (meshFilters[i].sharedMesh != null)
+            {
+                meshFilters[i].transform.SetParent(intersectionMesh.transform, true);
+                meshFilters[i].name = "Mesh";
+            }
+        }
+
+        GameObject.DestroyImmediate(intersection.gameObject);
+        Selection.activeObject = intersectionMesh;
     }
 
 }

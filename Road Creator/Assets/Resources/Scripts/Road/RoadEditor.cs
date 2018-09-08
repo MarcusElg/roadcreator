@@ -47,7 +47,7 @@ public class RoadEditor : Editor
         EditorGUI.BeginChangeCheck();
         roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadCreator.heightOffset));
         roadCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", roadCreator.smoothnessAmount));
-        roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", serializedObject.FindProperty("segmentPreset").objectReferenceValue, typeof(Preset), false);
+        roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", roadCreator.segmentPreset, typeof(Preset), false);
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
@@ -77,6 +77,26 @@ public class RoadEditor : Editor
         if (GUILayout.Button("Generate Road"))
         {
             roadCreator.CreateMesh();
+        }
+
+        if (GUILayout.Button("Convert To Meshes"))
+        {
+            GameObject roadMesh = new GameObject("Road Mesh");
+            MeshFilter[] meshFilters = roadCreator.GetComponentsInChildren<MeshFilter>();
+            roadMesh.transform.position = meshFilters[0].transform.parent.parent.GetChild(0).GetChild(0).position;
+
+            for (int i = 0; i < meshFilters.Length; i++)
+            {
+                if (meshFilters[i].sharedMesh != null)
+                {
+                    meshFilters[i].transform.SetParent(roadMesh.transform);
+                    meshFilters[i].name = "Mesh";
+                    meshFilters[i].transform.localPosition = Vector3.zero;
+                }
+            }
+
+            DestroyImmediate(roadCreator.gameObject);
+            Selection.activeObject = roadMesh;
         }
     }
 

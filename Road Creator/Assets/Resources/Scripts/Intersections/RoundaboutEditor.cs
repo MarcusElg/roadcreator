@@ -118,6 +118,11 @@ public class RoundaboutEditor : Editor
         {
             roundabout.GenerateMeshes();
         }
+
+        if (GUILayout.Button("Convert To Meshes"))
+        {
+            Misc.ConvertIntersectionToMesh(roundabout.gameObject, "Roundabout Mesh");
+        }
     }
 
     private void OnSceneGUI()
