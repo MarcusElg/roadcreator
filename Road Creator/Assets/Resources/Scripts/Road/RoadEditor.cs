@@ -54,6 +54,12 @@ public class RoadEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
+            if (roadCreator.followObject.GetComponent<RoadCreator>() == null && roadCreator.followObject.GetComponent<PrefabLineCreator>() == null)
+            {
+                roadCreator.followObject = null;
+                Debug.Log("Follow object must either be a road or a prefab line");
+            }
+
             roadCreator.CreateMesh();
         }
 
@@ -80,12 +86,12 @@ public class RoadEditor : Editor
         }
 
         if (GUILayout.Button("Convert To Meshes"))
-        {
-            GameObject roadMesh = new GameObject("Road Mesh");
+        {          
             MeshFilter[] meshFilters = roadCreator.GetComponentsInChildren<MeshFilter>();
 
             if (meshFilters.Length > 0)
             {
+                GameObject roadMesh = new GameObject("Road Mesh");
                 roadMesh.transform.position = meshFilters[0].transform.parent.parent.GetChild(0).GetChild(0).position;
 
                 for (int i = 0; i < meshFilters.Length; i++)

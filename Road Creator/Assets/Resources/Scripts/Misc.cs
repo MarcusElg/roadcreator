@@ -272,12 +272,12 @@ public static class Misc
     }
 
     public static void ConvertIntersectionToMesh(GameObject intersection, string name)
-    {
-        GameObject intersectionMesh = new GameObject(name);
+    {   
         MeshFilter[] meshFilters = intersection.GetComponentsInChildren<MeshFilter>();
 
         if (meshFilters.Length > 0)
         {
+            GameObject intersectionMesh = new GameObject(name);
             intersectionMesh.transform.position = intersection.transform.position;
 
             for (int i = 0; i < meshFilters.Length; i++)
