@@ -49,21 +49,28 @@ public class RoadSegmentEditor : Editor
             serializedObject.ApplyModifiedProperties();
 
             for (int i = 0; i < targets.Length; i++)
-            {
+            { 
                 ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().CreateMesh();
             }
         }
 
         GUILayout.Label("");
-        if (GUILayout.Button("Detach Connections"))
+        if (GUILayout.Button("Detatch Connections"))
         {
             for (int i = 0; i < targets.Length; i++)
             {
-                ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection = null;
-
-                if (((RoadSegment)targets[i]).transform.GetChild(0).childCount == 3)
+                if (((RoadSegment)targets[i]).transform.GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection != null)
                 {
-                    ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection = null;
+                    ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(0).position += new Vector3(0, 0.2f, 0);
+                    ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(0).GetComponent<Point>().intersectionConnection = null;
+                }
+
+                if (((RoadSegment)targets[i]).transform.GetChild(0).childCount == 3 && ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection != null)
+                {
+                    {
+                        ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(2).position += new Vector3(0, 0.2f, 0);
+                        ((RoadSegment)targets[i]).transform.GetChild(0).GetChild(2).GetComponent<Point>().intersectionConnection = null;
+                    }
                 }
             }
         }
