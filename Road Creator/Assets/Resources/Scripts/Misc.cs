@@ -275,19 +275,23 @@ public static class Misc
     {
         GameObject intersectionMesh = new GameObject(name);
         MeshFilter[] meshFilters = intersection.GetComponentsInChildren<MeshFilter>();
-        intersectionMesh.transform.position = intersection.transform.position;
 
-        for (int i = 0; i < meshFilters.Length; i++)
+        if (meshFilters.Length > 0)
         {
-            if (meshFilters[i].sharedMesh != null)
-            {
-                meshFilters[i].transform.SetParent(intersectionMesh.transform, true);
-                meshFilters[i].name = "Mesh";
-            }
-        }
+            intersectionMesh.transform.position = intersection.transform.position;
 
-        GameObject.DestroyImmediate(intersection.gameObject);
-        Selection.activeObject = intersectionMesh;
+            for (int i = 0; i < meshFilters.Length; i++)
+            {
+                if (meshFilters[i].sharedMesh != null)
+                {
+                    meshFilters[i].transform.SetParent(intersectionMesh.transform, true);
+                    meshFilters[i].name = "Mesh";
+                }
+            }
+
+            GameObject.DestroyImmediate(intersection.gameObject);
+            Selection.activeObject = intersectionMesh;
+        }
     }
 
 }

@@ -83,20 +83,24 @@ public class RoadEditor : Editor
         {
             GameObject roadMesh = new GameObject("Road Mesh");
             MeshFilter[] meshFilters = roadCreator.GetComponentsInChildren<MeshFilter>();
-            roadMesh.transform.position = meshFilters[0].transform.parent.parent.GetChild(0).GetChild(0).position;
 
-            for (int i = 0; i < meshFilters.Length; i++)
+            if (meshFilters.Length > 0)
             {
-                if (meshFilters[i].sharedMesh != null)
-                {
-                    meshFilters[i].transform.SetParent(roadMesh.transform);
-                    meshFilters[i].name = "Mesh";
-                    meshFilters[i].transform.localPosition = Vector3.zero;
-                }
-            }
+                roadMesh.transform.position = meshFilters[0].transform.parent.parent.GetChild(0).GetChild(0).position;
 
-            DestroyImmediate(roadCreator.gameObject);
-            Selection.activeObject = roadMesh;
+                for (int i = 0; i < meshFilters.Length; i++)
+                {
+                    if (meshFilters[i].sharedMesh != null)
+                    {
+                        meshFilters[i].transform.SetParent(roadMesh.transform);
+                        meshFilters[i].name = "Mesh";
+                        meshFilters[i].transform.localPosition = Vector3.zero;
+                    }
+                }
+
+                DestroyImmediate(roadCreator.gameObject);
+                Selection.activeObject = roadMesh;
+            }
         }
     }
 
