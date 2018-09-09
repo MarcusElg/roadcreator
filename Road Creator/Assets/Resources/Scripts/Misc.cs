@@ -148,7 +148,11 @@ public static class Misc
         {
             if (roadSegments[i].transform.GetChild(0).childCount == 3)
             {
-                DrawRoadGuidelines(roadSegments[i].startGuidelinePoints, 0, roadSegments[i], mousePosition, objectToMove, extraObjectToMove);
+                if (roadSegments[i].transform.GetSiblingIndex() == 0)
+                {
+                    DrawRoadGuidelines(roadSegments[i].startGuidelinePoints, 0, roadSegments[i], mousePosition, objectToMove, extraObjectToMove);
+                }
+
                 DrawRoadGuidelines(roadSegments[i].centerGuidelinePoints, 1, roadSegments[i], mousePosition, objectToMove, extraObjectToMove);
                 DrawRoadGuidelines(roadSegments[i].endGuidelinePoints, 2, roadSegments[i], mousePosition, objectToMove, extraObjectToMove);
             }
@@ -165,11 +169,12 @@ public static class Misc
         {
             Handles.color = Misc.lightGreen;
         }
+
         if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(mousePosition, roadSegment.transform.GetChild(0).GetChild(child).position) < 10) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
         {
             Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 2]);
             Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 1]);
-            Vector3 left = Misc.CalculateLeft(guidelines[0], guidelines[2]);
+            Vector3 left = Misc.CalculateLeft(guidelines[2], guidelines[0]);
             Handles.DrawLine((left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position, (-left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position);
 
             for (int j = 0; j < guidelines.Length; j++)
@@ -272,7 +277,7 @@ public static class Misc
     }
 
     public static void ConvertIntersectionToMesh(GameObject intersection, string name)
-    {   
+    {
         MeshFilter[] meshFilters = intersection.GetComponentsInChildren<MeshFilter>();
 
         if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
