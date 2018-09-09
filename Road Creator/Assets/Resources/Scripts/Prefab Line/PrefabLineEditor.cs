@@ -10,6 +10,7 @@ public class PrefabLineEditor : Editor
     Vector3[] points = null;
     GameObject objectToMove;
     Tool lastTool;
+    bool mouseDown;
 
     private void OnEnable()
     {
@@ -472,8 +473,30 @@ public class PrefabLineEditor : Editor
 
     private void MovePoints(Event guiEvent, RaycastHit raycastHit, Vector3 hitPosition)
     {
+        if (mouseDown == true && objectToMove != null)
+        {
+            if (guiEvent.keyCode == KeyCode.Plus || guiEvent.keyCode == KeyCode.KeypadPlus)
+            {
+                Undo.RecordObject(objectToMove.transform, "Moved Point");
+                objectToMove.transform.position += new Vector3(0, 0.2f, 0);
+            }
+            else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
+            {
+                Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
+
+                if (position.y < raycastHit.point.y)
+                {
+                    position.y = raycastHit.point.y;
+                }
+
+                Undo.RecordObject(objectToMove.transform, "Moved Point");
+                objectToMove.transform.position = position;
+            }
+        }
+
         if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
         {
+            mouseDown = true;
             if (raycastHit.collider.gameObject.name == "Control Point")
             {
                 objectToMove = raycastHit.collider.gameObject;
@@ -492,6 +515,7 @@ public class PrefabLineEditor : Editor
         }
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
         {
+            mouseDown = false;
             objectToMove.GetComponent<BoxCollider>().enabled = true;
             objectToMove = null;
             PlacePrefabs();

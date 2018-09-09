@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Presets;
+using UnityEditor;
 
 public class RoadCreator : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class RoadCreator : MonoBehaviour
     public GlobalSettings globalSettings;
 
     public Preset segmentPreset;
+
+    public Vector3 lastMoveObjectPosition;
 
     public void CreateMesh()
     {

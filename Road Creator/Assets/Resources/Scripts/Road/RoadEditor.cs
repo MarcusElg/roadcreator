@@ -15,6 +15,7 @@ public class RoadEditor : Editor
     Tool lastTool;
     Event guiEvent;
     Vector3 hitPosition;
+    bool mouseDown;
 
     private void OnEnable()
     {
@@ -347,51 +348,56 @@ public class RoadEditor : Editor
         return segment;
     }
 
-    private void MovePoints(RaycastHit raycastHit)
-    {
-        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
+        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0)
         {
-            if (raycastHit.collider.gameObject.name == "Control Point")
+            mouseDown = true;
+            if (objectToMove == null)
             {
-                objectToMove = raycastHit.collider.gameObject;
-                objectToMove.GetComponent<BoxCollider>().enabled = false;
-            }
-            else if (raycastHit.collider.gameObject.name == "Start Point")
-            {
-                objectToMove = raycastHit.collider.gameObject;
-                objectToMove.GetComponent<BoxCollider>().enabled = false;
-
-                if (objectToMove.transform.parent.parent.GetSiblingIndex() > 0)
+                if (raycastHit.collider.gameObject.name == "Control Point")
                 {
-                    extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).gameObject;
-                    extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
+                    objectToMove = raycastHit.collider.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
                 }
-            }
-            else if (raycastHit.collider.gameObject.name == "End Point")
-            {
-                objectToMove = raycastHit.collider.gameObject;
-                objectToMove.GetComponent<BoxCollider>().enabled = false;
-
-                if (objectToMove.transform.parent.parent.GetSiblingIndex() < objectToMove.transform.parent.parent.parent.childCount - 1 && raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).childCount == 3)
+                else if (raycastHit.collider.gameObject.name == "Start Point")
                 {
-                    extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).gameObject;
-                    extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
+                    objectToMove = raycastHit.collider.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
+
+                    if (objectToMove.transform.parent.parent.GetSiblingIndex() > 0)
+                    {
+                        extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).gameObject;
+                        extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
+                    }
+                }
+                else if (raycastHit.collider.gameObject.name == "End Point")
+                {
+                    objectToMove = raycastHit.collider.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
+
+                    if (objectToMove.transform.parent.parent.GetSiblingIndex() < objectToMove.transform.parent.parent.parent.childCount - 1 && raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).childCount == 3)
+                    {
+                        extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).gameObject;
+                        extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
+                    }
                 }
             }
         }
         else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
         {
-            Undo.RecordObject(objectToMove.transform, "Moved Point");
-            objectToMove.transform.position = hitPosition;
-
-            if (extraObjectToMove != null)
             {
-                Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
-                extraObjectToMove.transform.position = hitPosition;
+                Undo.RecordObject(objectToMove.transform, "Moved Point");
+                objectToMove.transform.position = hitPosition;
+
+                if (extraObjectToMove != null)
+                {
+                    Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
+                    extraObjectToMove.transform.position = hitPosition;
+                }
             }
         }
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
         {
+            mouseDown = false;
             if (objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
             {
                 if (objectToMove.transform.GetSiblingIndex() == 1)
