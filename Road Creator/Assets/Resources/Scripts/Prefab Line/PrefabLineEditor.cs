@@ -211,6 +211,14 @@ public class PrefabLineEditor : Editor
                     mesh.vertices = vertices;
                     mesh.RecalculateBounds();
                     prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+
+                    // Change collider to match
+                    System.Type type = prefab.GetComponent<Collider>().GetType();
+                    if (type != null)
+                    {
+                        DestroyImmediate(prefab.GetComponent<Collider>());
+                        prefab.AddComponent(type);
+                    }
                 }
 
                 if (prefabCreator.yModification != PrefabLineCreator.YModification.none)
@@ -500,15 +508,19 @@ public class PrefabLineEditor : Editor
         if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
         {
             mouseDown = true;
-            if (raycastHit.collider.gameObject.name == "Control Point")
+
+            if (raycastHit.transform.name.Contains("Point") && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() != null && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() == prefabCreator)
             {
-                objectToMove = raycastHit.collider.gameObject;
-                objectToMove.GetComponent<BoxCollider>().enabled = false;
-            }
-            else if (raycastHit.collider.gameObject.name == "Point")
-            {
-                objectToMove = raycastHit.collider.gameObject;
-                objectToMove.GetComponent<BoxCollider>().enabled = false;
+                if (raycastHit.collider.gameObject.name == "Control Point")
+                {
+                    objectToMove = raycastHit.collider.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
+                }
+                else if (raycastHit.collider.gameObject.name == "Point")
+                {
+                    objectToMove = raycastHit.collider.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
+                }
             }
         }
         else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
