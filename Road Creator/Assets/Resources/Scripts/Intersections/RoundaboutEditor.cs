@@ -25,11 +25,13 @@ public class RoundaboutEditor : Editor
             connections.transform.SetParent(roundabout.transform);
             connections.transform.localPosition = Vector3.zero;
             connections.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            connections.hideFlags = HideFlags.NotEditable;
 
             GameObject mainMesh = new GameObject("Main Mesh");
             mainMesh.transform.SetParent(roundabout.transform);
             mainMesh.transform.localPosition = new Vector3(0, 0.001f, 0);
             mainMesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            mainMesh.hideFlags = HideFlags.NotEditable;
             mainMesh.AddComponent<MeshFilter>();
             mainMesh.AddComponent<MeshRenderer>();
             mainMesh.AddComponent<MeshCollider>();
@@ -91,6 +93,7 @@ public class RoundaboutEditor : Editor
             GameObject connection = new GameObject("Connection " + roundabout.transform.GetChild(0).childCount);
             connection.transform.SetParent(roundabout.transform.GetChild(0));
             connection.transform.localPosition = Vector3.zero;
+            connection.hideFlags = HideFlags.NotEditable;
 
             GameObject connectionMesh = new GameObject("Mesh");
             connectionMesh.AddComponent<MeshFilter>();
@@ -98,6 +101,7 @@ public class RoundaboutEditor : Editor
             connectionMesh.AddComponent<MeshCollider>();
             connectionMesh.transform.SetParent(connection.transform);
             connectionMesh.transform.localPosition = Vector3.zero;
+            connectionMesh.hideFlags = HideFlags.NotEditable;
 
             GameObject connectionPoint = new GameObject("Connection Point");
             connectionPoint.AddComponent<BoxCollider>();
@@ -105,6 +109,7 @@ public class RoundaboutEditor : Editor
             connectionPoint.transform.SetParent(connection.transform);
             connectionPoint.transform.localPosition = Vector3.zero;
             connectionPoint.layer = roundabout.globalSettings.intersectionPointsLayer;
+            connectionPoint.hideFlags = HideFlags.NotEditable;
         }
 
         if (EditorGUI.EndChangeCheck() == true || roundabout.transform.hasChanged == true)

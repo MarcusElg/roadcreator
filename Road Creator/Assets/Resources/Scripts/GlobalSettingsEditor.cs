@@ -12,6 +12,7 @@ public class GlobalSettingsEditor : Editor
     private void OnEnable()
     {
         settings = ((GlobalSettings)target);
+        settings.transform.hideFlags = HideFlags.NotEditable;
     }
 
     public override void OnInspectorGUI()

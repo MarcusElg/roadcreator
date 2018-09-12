@@ -427,6 +427,7 @@ public class RoadCreator : MonoBehaviour
 
         point.transform.SetParent(parent);
         point.transform.position = position;
+        point.hideFlags = HideFlags.NotEditable;
         point.layer = globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
         return point;
@@ -437,6 +438,7 @@ public class RoadCreator : MonoBehaviour
         RoadSegment segment = new GameObject("Segment").AddComponent<RoadSegment>();
         segment.transform.SetParent(transform.GetChild(0), false);
         segment.transform.position = position;
+        segment.transform.hideFlags = HideFlags.NotEditable;
 
         if (segmentPreset == null)
         {
@@ -474,14 +476,17 @@ public class RoadCreator : MonoBehaviour
         GameObject points = new GameObject("Points");
         points.transform.SetParent(segment.transform);
         points.transform.localPosition = Vector3.zero;
+        points.hideFlags = HideFlags.NotEditable;
 
         GameObject meshes = new GameObject("Meshes");
         meshes.transform.SetParent(segment.transform);
         meshes.transform.localPosition = Vector3.zero;
+        meshes.hideFlags = HideFlags.NotEditable;
 
         GameObject mainMesh = new GameObject("Main Mesh");
         mainMesh.transform.SetParent(meshes.transform);
         mainMesh.transform.localPosition = Vector3.zero;
+        mainMesh.hideFlags = HideFlags.NotEditable;
         mainMesh.AddComponent<MeshRenderer>();
         mainMesh.AddComponent<MeshFilter>();
         mainMesh.AddComponent<MeshCollider>();
@@ -490,6 +495,7 @@ public class RoadCreator : MonoBehaviour
         GameObject leftShoulderMesh = new GameObject("Left Shoulder Mesh");
         leftShoulderMesh.transform.SetParent(meshes.transform);
         leftShoulderMesh.transform.localPosition = Vector3.zero;
+        leftShoulderMesh.hideFlags = HideFlags.NotEditable;
         leftShoulderMesh.AddComponent<MeshRenderer>();
         leftShoulderMesh.AddComponent<MeshFilter>();
         leftShoulderMesh.AddComponent<MeshCollider>();
@@ -498,6 +504,7 @@ public class RoadCreator : MonoBehaviour
         GameObject rightShoulderMesh = new GameObject("Right Shoulder Mesh");
         rightShoulderMesh.transform.SetParent(meshes.transform);
         rightShoulderMesh.transform.localPosition = Vector3.zero;
+        rightShoulderMesh.hideFlags = HideFlags.NotEditable;
         rightShoulderMesh.AddComponent<MeshRenderer>();
         rightShoulderMesh.AddComponent<MeshFilter>();
         rightShoulderMesh.AddComponent<MeshCollider>();

@@ -22,6 +22,7 @@ public class RoadEditor : Editor
         {
             GameObject segments = new GameObject("Segments");
             segments.transform.SetParent(roadCreator.transform);
+            segments.hideFlags = HideFlags.NotEditable;
         }
 
         if (roadCreator.globalSettings == null)
@@ -134,7 +135,7 @@ public class RoadEditor : Editor
         {
             if (GUILayout.Button("Reset Road"))
             {
-                Reset();
+                ResetObject();
             }
 
             if (GUILayout.Button("Generate Road"))
@@ -159,7 +160,7 @@ public class RoadEditor : Editor
         }
     }
 
-    public void Reset()
+    public void ResetObject()
     {
         if (roadCreator == null)
         {
@@ -170,7 +171,7 @@ public class RoadEditor : Editor
 
         for (int i = roadCreator.transform.GetChild(0).childCount - 1; i >= 0; i--)
         {
-            //Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
+            Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
         }
 
         if (roadCreator.followObject != null && roadCreator.followObject.GetComponent<RoadCreator>() != null)
@@ -178,7 +179,7 @@ public class RoadEditor : Editor
             roadCreator.followObject.GetComponent<RoadCreator>().currentSegment = null;
             for (int i = roadCreator.followObject.transform.GetChild(0).childCount - 1; i >= 0; i--)
             {
-                //Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(0).GetChild(i).gameObject);
+                Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(0).GetChild(i).gameObject);
             }
         }
     }

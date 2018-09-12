@@ -26,12 +26,14 @@ public class PrefabLineEditor : Editor
             GameObject points = new GameObject("Points");
             points.transform.SetParent(prefabCreator.transform);
             points.transform.SetAsFirstSibling();
+            points.hideFlags = HideFlags.NotEditable;
         }
 
         if (prefabCreator.transform.childCount < 2 || prefabCreator.transform.GetChild(1).name != "Objects")
         {
             GameObject objects = new GameObject("Objects");
             objects.transform.SetParent(prefabCreator.transform);
+            objects.hideFlags = HideFlags.NotEditable;
         }
 
         lastTool = Tools.current;
@@ -467,6 +469,7 @@ public class PrefabLineEditor : Editor
         point.GetComponent<BoxCollider>().size = new Vector3(prefabCreator.globalSettings.pointSize, prefabCreator.globalSettings.pointSize, prefabCreator.globalSettings.pointSize);
         point.transform.SetParent(prefabCreator.transform.GetChild(0));
         point.transform.position = raycastHit;
+        point.hideFlags = HideFlags.NotEditable;
         point.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
         return point;
     }

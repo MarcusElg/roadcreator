@@ -25,6 +25,7 @@ public class DiamondIntersectionEditor : Editor
             sides.transform.SetParent(intersection.transform);
             sides.transform.localPosition = Vector3.zero;
             sides.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            sides.hideFlags = HideFlags.NotEditable;
 
             AddSide("Upper Left");
             AddSide("Upper Right");
@@ -35,6 +36,7 @@ public class DiamondIntersectionEditor : Editor
             mainMesh.transform.SetParent(intersection.transform);
             mainMesh.transform.localPosition = Vector3.zero;
             mainMesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            mainMesh.hideFlags = HideFlags.NotEditable;
             mainMesh.AddComponent<MeshFilter>();
             mainMesh.AddComponent<MeshRenderer>();
             mainMesh.AddComponent<MeshCollider>();
@@ -51,6 +53,7 @@ public class DiamondIntersectionEditor : Editor
         GameObject side = new GameObject(name + " Side");
         side.transform.SetParent(intersection.transform.GetChild(0));
         side.transform.localPosition = Vector3.zero;
+        side.hideFlags = HideFlags.NotEditable;
 
         GameObject mesh = new GameObject(name + " Mesh");
         mesh.AddComponent<MeshFilter>();
@@ -58,12 +61,14 @@ public class DiamondIntersectionEditor : Editor
         mesh.AddComponent<MeshCollider>();
         mesh.transform.SetParent(side.transform);
         mesh.transform.localPosition = Vector3.zero;
+        mesh.hideFlags = HideFlags.NotEditable;
 
         GameObject connectionPoint = new GameObject(name + " Connection Point");
         connectionPoint.AddComponent<BoxCollider>();
         connectionPoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
         connectionPoint.transform.SetParent(side.transform);
         connectionPoint.transform.localPosition = Vector3.zero;
+        connectionPoint.hideFlags = HideFlags.NotEditable;
         connectionPoint.layer = intersection.globalSettings.intersectionPointsLayer;
 
         return side;
