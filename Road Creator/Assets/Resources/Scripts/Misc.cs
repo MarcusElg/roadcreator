@@ -161,25 +161,28 @@ public static class Misc
 
     private static void DrawRoadGuidelines(Vector3[] guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
-        if (child == 1)
+        if (roadSegment.transform.parent.parent.GetComponent<RoadCreator>().isFollowObject == false)
         {
-            Handles.color = Misc.darkGreen;
-        }
-        else
-        {
-            Handles.color = Misc.lightGreen;
-        }
-
-        if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(mousePosition, roadSegment.transform.GetChild(0).GetChild(child).position) < 10) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
-        {
-            Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 2]);
-            Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 1]);
-            Vector3 left = Misc.CalculateLeft(guidelines[2], guidelines[0]);
-            Handles.DrawLine((left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position, (-left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position);
-
-            for (int j = 0; j < guidelines.Length; j++)
+            if (child == 1)
             {
-                Handles.DrawSolidDisc(guidelines[j], Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize * 0.75f);
+                Handles.color = Misc.darkGreen;
+            }
+            else
+            {
+                Handles.color = Misc.lightGreen;
+            }
+
+            if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(mousePosition, roadSegment.transform.GetChild(0).GetChild(child).position) < 10) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
+            {
+                Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 2]);
+                Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 1]);
+                Vector3 left = Misc.CalculateLeft(guidelines[2], guidelines[0]);
+                Handles.DrawLine((left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position, (-left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position);
+
+                for (int j = 0; j < guidelines.Length; j++)
+                {
+                    Handles.DrawSolidDisc(guidelines[j], Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize * 0.75f);
+                }
             }
         }
     }

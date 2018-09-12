@@ -15,7 +15,14 @@ public class RoadCreator : MonoBehaviour
 
     public Preset segmentPreset;
 
+    public GameObject followObject;
     public Vector3 lastMoveObjectPosition;
+
+    public bool isFollowObject = false;
+
+    public GameObject objectToMove = null;
+    public GameObject extraObjectToMove = null;
+    private bool mouseDown;
 
     public void CreateMesh()
     {
@@ -316,6 +323,426 @@ public class RoadCreator : MonoBehaviour
                     transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
                 }
             }
+        }
+    }
+
+    public void UndoUpdate()
+    {
+        if (currentSegment != null && currentSegment.transform.GetChild(0).childCount == 3)
+        {
+            currentSegment = null;
+        }
+
+        if (transform.GetChild(0).childCount > 0)
+        {
+            Transform lastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1);
+            if (transform.GetChild(0).childCount > 0 && lastSegment.GetChild(0).childCount < 3)
+            {
+                currentSegment = lastSegment.GetComponent<RoadSegment>();
+            }
+        }
+
+        CreateMesh();
+
+        if (followObject != null && followObject.GetComponent<RoadCreator>() != null)
+        {
+            followObject.GetComponent<RoadCreator>().UndoUpdate();
+        }
+    }
+
+    public void CreatePoints(Vector3 hitPosition)
+    {
+        if (currentSegment != null)
+        {
+            if (currentSegment.transform.GetChild(0).childCount == 1)
+            {
+                if (globalSettings.roadCurved == true)
+                {
+                    // Create control point
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", currentSegment.transform.GetChild(0), hitPosition), "Created point");
+                }
+                else
+                {
+                    // Create control and end points
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", currentSegment.transform.GetChild(0), Misc.GetCenter(currentSegment.transform.GetChild(0).GetChild(0).position, hitPosition)), "Created point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", currentSegment.transform.GetChild(0), hitPosition), "Created point");
+                    currentSegment = null;
+                    CreateMesh();
+                }
+            }
+            else if (currentSegment.transform.GetChild(0).childCount == 2)
+            {
+                // Create end point
+                Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", currentSegment.transform.GetChild(0), hitPosition), "Created Point");
+                currentSegment = null;
+                CreateMesh();
+            }
+        }
+        else
+        {
+            if (transform.GetChild(0).childCount == 0)
+            {
+                // Create first segment
+                RoadSegment segment = CreateSegment(hitPosition);
+                Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), hitPosition), "Created Point");
+
+                if (globalSettings.roadCurved == false)
+                {
+                    segment.curved = false;
+                }
+            }
+            else
+            {
+                RoadSegment segment = CreateSegment(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).position);
+                Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), segment.transform.position), "Created Point");
+
+                if (globalSettings.roadCurved == true)
+                {
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), hitPosition), "Created Point");
+                }
+                else
+                {
+                    segment.curved = false;
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", currentSegment.transform.GetChild(0), Misc.GetCenter(currentSegment.transform.GetChild(0).GetChild(0).position, hitPosition)), "Created point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", currentSegment.transform.GetChild(0), hitPosition), "Created point");
+                    currentSegment = null;
+                    CreateMesh();
+                }
+            }
+        }
+    }
+
+    private GameObject CreatePoint(string name, Transform parent, Vector3 position)
+    {
+        GameObject point = new GameObject(name);
+        point.gameObject.AddComponent<BoxCollider>();
+        point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+
+        if (isFollowObject == true)
+        {
+            point.GetComponent<BoxCollider>().enabled = false;
+        }
+
+        point.transform.SetParent(parent);
+        point.transform.position = position;
+        point.layer = globalSettings.ignoreMouseRayLayer;
+        point.AddComponent<Point>();
+        return point;
+    }
+
+    private RoadSegment CreateSegment(Vector3 position)
+    {
+        RoadSegment segment = new GameObject("Segment").AddComponent<RoadSegment>();
+        segment.transform.SetParent(transform.GetChild(0), false);
+        segment.transform.position = position;
+
+        if (segmentPreset == null)
+        {
+            if (transform.GetChild(0).childCount > 1)
+            {
+                RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
+                segment.roadMaterial = oldLastSegment.roadMaterial;
+                segment.startRoadWidth = oldLastSegment.startRoadWidth;
+                segment.endRoadWidth = oldLastSegment.endRoadWidth;
+                segment.flipped = oldLastSegment.flipped;
+                segment.terrainOption = oldLastSegment.terrainOption;
+
+                segment.leftShoulderMaterial = oldLastSegment.leftShoulderMaterial;
+                segment.leftShoulder = oldLastSegment.leftShoulder;
+                segment.leftShoulderWidth = oldLastSegment.leftShoulderWidth;
+                segment.leftShoulderHeightOffset = oldLastSegment.leftShoulderHeightOffset;
+
+                segment.rightShoulderMaterial = oldLastSegment.rightShoulderMaterial;
+                segment.rightShoulder = oldLastSegment.rightShoulder;
+                segment.rightShoulderWidth = oldLastSegment.rightShoulderWidth;
+                segment.rightShoulderHeightOffset = oldLastSegment.rightShoulderHeightOffset;
+            }
+            else
+            {
+                segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+                segment.leftShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+                segment.rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+            }
+        }
+        else
+        {
+            segmentPreset.ApplyTo(segment);
+        }
+
+        GameObject points = new GameObject("Points");
+        points.transform.SetParent(segment.transform);
+        points.transform.localPosition = Vector3.zero;
+
+        GameObject meshes = new GameObject("Meshes");
+        meshes.transform.SetParent(segment.transform);
+        meshes.transform.localPosition = Vector3.zero;
+
+        GameObject mainMesh = new GameObject("Main Mesh");
+        mainMesh.transform.SetParent(meshes.transform);
+        mainMesh.transform.localPosition = Vector3.zero;
+        mainMesh.AddComponent<MeshRenderer>();
+        mainMesh.AddComponent<MeshFilter>();
+        mainMesh.AddComponent<MeshCollider>();
+        mainMesh.layer = globalSettings.roadLayer;
+
+        GameObject leftShoulderMesh = new GameObject("Left Shoulder Mesh");
+        leftShoulderMesh.transform.SetParent(meshes.transform);
+        leftShoulderMesh.transform.localPosition = Vector3.zero;
+        leftShoulderMesh.AddComponent<MeshRenderer>();
+        leftShoulderMesh.AddComponent<MeshFilter>();
+        leftShoulderMesh.AddComponent<MeshCollider>();
+        leftShoulderMesh.layer = globalSettings.roadLayer;
+
+        GameObject rightShoulderMesh = new GameObject("Right Shoulder Mesh");
+        rightShoulderMesh.transform.SetParent(meshes.transform);
+        rightShoulderMesh.transform.localPosition = Vector3.zero;
+        rightShoulderMesh.AddComponent<MeshRenderer>();
+        rightShoulderMesh.AddComponent<MeshFilter>();
+        rightShoulderMesh.AddComponent<MeshCollider>();
+        rightShoulderMesh.layer = globalSettings.roadLayer;
+
+        currentSegment = segment;
+
+        return segment;
+    }
+
+    public void RemovePoints()
+    {
+        if (transform.GetChild(0).childCount > 0)
+        {
+            if (transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>().curved == true)
+            {
+                if (currentSegment != null)
+                {
+                    if (currentSegment.transform.GetChild(0).childCount == 2)
+                    {
+                        Undo.DestroyObjectImmediate(currentSegment.transform.GetChild(0).GetChild(1).gameObject);
+                    }
+                    else if (currentSegment.transform.GetChild(0).childCount == 1)
+                    {
+                        Undo.DestroyObjectImmediate(currentSegment.gameObject);
+
+                        if (transform.GetChild(0).childCount > 0)
+                        {
+                            if (transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>().curved == false)
+                            {
+                                Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
+                                Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(1).gameObject);
+                                currentSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
+                                CreateMesh();
+                            }
+                            else
+                            {
+                                if (transform.GetChild(0).childCount > 0)
+                                {
+                                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
+                                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
+                                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshFilter>().sharedMesh = null;
+                                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshCollider>().sharedMesh = null;
+                                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshFilter>().sharedMesh = null;
+                                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshCollider>().sharedMesh = null;
+
+                                    Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
+                                    currentSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            currentSegment = null;
+                        }
+                    }
+                }
+                else
+                {
+                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
+                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshCollider>().sharedMesh = null;
+                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshFilter>().sharedMesh = null;
+                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(1).GetComponent<MeshCollider>().sharedMesh = null;
+                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshFilter>().sharedMesh = null;
+                    transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(2).GetComponent<MeshCollider>().sharedMesh = null;
+
+                    Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
+                    currentSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
+                }
+            }
+            else
+            {
+                Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
+                CreateMesh();
+            }
+        }
+    }
+
+    public void MovePoints(Vector3 hitPosition, Event guiEvent, RaycastHit raycastHit)
+    {
+        if (mouseDown == true && objectToMove != null)
+        {
+            if (guiEvent.keyCode == KeyCode.Plus || guiEvent.keyCode == KeyCode.KeypadPlus)
+            {
+                Undo.RecordObject(objectToMove.transform, "Moved Point");
+                objectToMove.transform.position += new Vector3(0, 0.2f, 0);
+
+                if (extraObjectToMove != null)
+                {
+                    Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
+                    extraObjectToMove.transform.position = objectToMove.transform.position;
+                }
+            }
+            else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
+            {
+                Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
+
+                if (position.y < raycastHit.point.y)
+                {
+                    position.y = raycastHit.point.y;
+                }
+
+                Undo.RecordObject(objectToMove.transform, "Moved Point");
+                objectToMove.transform.position = position;
+
+                if (extraObjectToMove != null)
+                {
+                    Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
+                    extraObjectToMove.transform.position = position;
+                }
+            }
+        }
+
+        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0)
+        {
+            mouseDown = true;
+            if (objectToMove == null)
+            {
+                if (raycastHit.transform.name.Contains("Point") && raycastHit.collider.transform.parent.parent.parent.parent.gameObject != null && raycastHit.collider.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() != null && raycastHit.collider.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().isFollowObject == false)
+                {
+                    if (raycastHit.collider.gameObject.name == "Control Point")
+                    {
+                        objectToMove = raycastHit.collider.gameObject;
+                        objectToMove.GetComponent<BoxCollider>().enabled = false;
+
+                        if (followObject != null && followObject.GetComponent<RoadCreator>() != null)
+                        {
+                            followObject.GetComponent<RoadCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).GetChild(0).GetChild(1).gameObject;
+                        }
+                    }
+                    else if (raycastHit.collider.gameObject.name == "Start Point")
+                    {
+                        objectToMove = raycastHit.collider.gameObject;
+                        objectToMove.GetComponent<BoxCollider>().enabled = false;
+
+                        if (objectToMove.transform.parent.parent.GetSiblingIndex() > 0)
+                        {
+                            extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).gameObject;
+                            extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
+                        }
+
+                        if (followObject != null && followObject.GetComponent<RoadCreator>() != null)
+                        {
+                            followObject.GetComponent<RoadCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).GetChild(0).GetChild(0).gameObject;
+
+                            if (extraObjectToMove != null)
+                            { 
+                                followObject.GetComponent<RoadCreator>().extraObjectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).gameObject;
+                            }
+                        }
+                    }
+                    else if (raycastHit.collider.gameObject.name == "End Point")
+                    {
+                        objectToMove = raycastHit.collider.gameObject;
+                        objectToMove.GetComponent<BoxCollider>().enabled = false;
+
+                        if (objectToMove.transform.parent.parent.GetSiblingIndex() < objectToMove.transform.parent.parent.parent.childCount - 1 && raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).childCount == 3)
+                        {
+                            extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).gameObject;
+                            extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
+                        }
+
+                        if (followObject != null && followObject.GetComponent<RoadCreator>() != null)
+                        {
+                            followObject.GetComponent<RoadCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).GetChild(0).GetChild(2).gameObject;
+
+                            if (extraObjectToMove != null)
+                            {
+                                followObject.GetComponent<RoadCreator>().extraObjectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).gameObject;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
+        {
+            {
+                Undo.RecordObject(objectToMove.transform, "Moved Point");
+                objectToMove.transform.position = hitPosition;
+
+                if (extraObjectToMove != null)
+                {
+                    Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
+                    extraObjectToMove.transform.position = hitPosition;
+                }
+
+                if (followObject != null && followObject.GetComponent<RoadCreator>() != null)
+                {
+                    Undo.RecordObject(followObject.GetComponent<RoadCreator>().objectToMove.transform, "Moved Point");
+                    followObject.GetComponent<RoadCreator>().objectToMove.transform.position = hitPosition;
+
+                    if (extraObjectToMove != null)
+                    {
+                        Undo.RecordObject(followObject.GetComponent<RoadCreator>().extraObjectToMove.transform, "Moved Point");
+                        followObject.GetComponent<RoadCreator>().extraObjectToMove.transform.position = hitPosition;
+                    }
+                }
+            }
+        }
+        else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
+        {
+            mouseDown = false;
+            if (objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
+            {
+                if (objectToMove.transform.GetSiblingIndex() == 1)
+                {
+                    objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved = true;
+                }
+                else
+                {
+                    if (objectToMove.transform.parent.childCount == 3)
+                    {
+                        objectToMove.transform.parent.GetChild(1).position = Misc.GetCenter(objectToMove.transform.parent.GetChild(0).position, objectToMove.transform.parent.GetChild(2).position);
+                    }
+                }
+            }
+
+            if (isFollowObject == false)
+            {
+                objectToMove.GetComponent<BoxCollider>().enabled = true;
+            }
+
+            objectToMove = null;
+
+            if (extraObjectToMove != null)
+            {
+                if (extraObjectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
+                {
+                    if (extraObjectToMove.transform.parent.childCount == 3)
+                    {
+                        extraObjectToMove.transform.parent.GetChild(1).position = Misc.GetCenter(extraObjectToMove.transform.parent.GetChild(0).position, extraObjectToMove.transform.parent.GetChild(2).position);
+                    }
+                }
+
+                if (isFollowObject == false)
+                {
+                    extraObjectToMove.GetComponent<BoxCollider>().enabled = true;
+                    extraObjectToMove = null;
+                }
+            }
+
+            CreateMesh();
+            globalSettings.UpdateRoadGuidelines();
         }
     }
 
