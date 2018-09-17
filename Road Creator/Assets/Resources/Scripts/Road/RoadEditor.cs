@@ -359,12 +359,18 @@ public class RoadEditor : Editor
 
     private void RemovePoints()
     {
-        roadCreator.RemovePoints();
-
-        if (roadCreator.followObject != null && roadCreator.followObject.GetComponent<RoadCreator>() != null)
+        if (roadCreator.followObject != null)
         {
-            roadCreator.followObject.GetComponent<RoadCreator>().RemovePoints();
+            if (roadCreator.followObject.GetComponent<RoadCreator>() != null)
+            {
+                roadCreator.followObject.GetComponent<RoadCreator>().RemovePoints();
+            } else
+            {
+                roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints(roadCreator.IsLastSegmentCurved());
+            }
         }
+
+        roadCreator.RemovePoints();
     }
 
     private void Draw(Vector3 mousePosition)

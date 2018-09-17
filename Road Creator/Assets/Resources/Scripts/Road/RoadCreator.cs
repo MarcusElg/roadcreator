@@ -344,9 +344,15 @@ public class RoadCreator : MonoBehaviour
 
         CreateMesh();
 
-        if (followObject != null && followObject.GetComponent<RoadCreator>() != null)
+        if (followObject != null)
         {
-            followObject.GetComponent<RoadCreator>().UndoUpdate();
+            if (followObject.GetComponent<RoadCreator>() != null)
+            {
+                followObject.GetComponent<RoadCreator>().UndoUpdate();
+            } else
+            {
+                followObject.GetComponent<PrefabLineCreator>().UndoUpdate();
+            }
         }
     }
 
@@ -513,6 +519,17 @@ public class RoadCreator : MonoBehaviour
         currentSegment = segment;
 
         return segment;
+    }
+
+    public bool IsLastSegmentCurved ()
+    {
+        if (transform.GetChild(0).childCount > 0)
+        {
+            return transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>().curved;
+        } else
+        {
+            return false;
+        }
     }
 
     public void RemovePoints()

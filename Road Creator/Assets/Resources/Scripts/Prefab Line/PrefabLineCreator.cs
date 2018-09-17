@@ -42,34 +42,27 @@ public class PrefabLineCreator : MonoBehaviour
 
     public void CreatePoints(Vector3 hitPosition)
     {
-        if (prefab == null)
+        if (currentPoint != null && currentPoint.name == "Point")
         {
-            Debug.Log("You must select a prefab to place before creating the line");
-        }
-        else
-        {
-            if (currentPoint != null && currentPoint.name == "Point")
+            if (globalSettings.roadCurved == true)
             {
-                if (globalSettings.roadCurved == true)
-                {
-                    currentPoint = CreatePoint("Control Point", hitPosition);
-                    Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
-                }
-                else
-                {
-                    currentPoint = CreatePoint("Control Point", Misc.GetCenter(currentPoint.transform.position, hitPosition));
-                    Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
-                    currentPoint = CreatePoint("Point", hitPosition);
-                    Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
-                    PlacePrefabs();
-                }
+                currentPoint = CreatePoint("Control Point", hitPosition);
+                Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
             }
             else
             {
-                currentPoint = CreatePoint("Point", hitPosition);
-                PlacePrefabs();
+                currentPoint = CreatePoint("Control Point", Misc.GetCenter(currentPoint.transform.position, hitPosition));
                 Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
+                currentPoint = CreatePoint("Point", hitPosition);
+                Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
+                PlacePrefabs();
             }
+        }
+        else
+        {
+            currentPoint = CreatePoint("Point", hitPosition);
+            PlacePrefabs();
+            Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
         }
     }
 
@@ -140,7 +133,7 @@ public class PrefabLineCreator : MonoBehaviour
         }
     }
 
-    public void RemovePoints()
+    public void RemovePoints(bool removeTwo = false)
     {
         if (transform.GetChild(0).childCount > 0)
         {
@@ -152,8 +145,16 @@ public class PrefabLineCreator : MonoBehaviour
                     currentPoint = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject;
                 }
 
-                PlacePrefabs();
+                if (removeTwo == false)
+                {
+                    PlacePrefabs();
+                }
             }
+        }
+
+        if (removeTwo == true)
+        {
+            RemovePoints();
         }
     }
 
@@ -172,7 +173,7 @@ public class PrefabLineCreator : MonoBehaviour
                 GameObject placedPrefab = Instantiate(prefab);
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.transform.position = currentPoints.prefabPoints[j];
-                placedPrefab.name = "placedPrefab";
+                placedPrefab.name = "Prefab";
                 placedPrefab.layer = globalSettings.roadLayer;
                 placedPrefab.transform.localScale = new Vector3(scale, scale, scale);
                 Vector3 left = Misc.CalculateLeft(currentPoints.startPoints[j], currentPoints.endPoints[j]);
