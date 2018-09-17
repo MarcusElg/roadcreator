@@ -319,7 +319,7 @@ public class RoadCreator : MonoBehaviour
                 if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial != null)
                 {
                     Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
-                    material.mainTextureScale = new Vector2(1, textureRepeat);
+                    material.SetVector("Vector2_79C0D9A3", new Vector2(1, textureRepeat));
                     transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
                 }
             }

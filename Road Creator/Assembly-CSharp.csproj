@@ -87,9 +87,32 @@
     <Compile Include="Assets\Resources\Scripts\Road\RoadSystemEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\TraphicLight.cs" />
     <Compile Include="Assets\Resources\Scripts\TraphicLightEditor.cs" />
-    <None Include="Assets\Resources\Shaders\Uv Fix Shader.shader" />
+    <Reference Include="Unity.RenderPipelines.Core.Editor">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Lightweight.Runtime">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.RenderPipelines.Lightweight.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Lightweight.Editor">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.RenderPipelines.Lightweight.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Postprocessing.Editor">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ShaderGraph.Editor">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.IncludePaths">
+      <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.RenderPipelines.Core.IncludePaths.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.2.2f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

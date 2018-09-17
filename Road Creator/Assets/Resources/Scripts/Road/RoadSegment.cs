@@ -251,12 +251,12 @@ public class RoadSegment : MonoBehaviour
                 TerrainData terrainData = terrain.terrainData;
                 Vector3 localTerrainPoint = raycastHit.point - terrain.transform.position;
 
-                int terrainPointX = (int)((localTerrainPoint.x / terrainData.size.x) * terrainData.alphamapWidth);
-                //int terrainPointY = (int)((vertices[verticeIndex] + segment.position).y * terrainData.size.y);
-                int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.alphamapHeight);
-                float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.alphamapWidth, terrainData.alphamapHeight);
+                int terrainPointX = (int)((localTerrainPoint.x / terrainData.size.x) * terrainData.heightmapWidth);
+                int terrainPointY = (int)position.y;
+                int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.heightmapHeight);
+                float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 
-                modifiedHeights[(int)terrainPointX, (int)terrainPointZ] = 10;
+                modifiedHeights[(int)terrainPointX, (int)terrainPointZ] = terrainPointY;
                 terrainData.SetHeights(0, 0, modifiedHeights);
             }
         }

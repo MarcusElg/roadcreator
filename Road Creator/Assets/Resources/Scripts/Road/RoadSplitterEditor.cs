@@ -24,6 +24,7 @@ public class RoadSplitterEditor : Editor {
             connections.transform.SetParent(roadSplitter.transform);
             connections.transform.localPosition = Vector3.zero;
             connections.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            connections.hideFlags = HideFlags.NotEditable;
 
             AddConnection("Left");
             AddConnection("Upper Right");
@@ -33,6 +34,7 @@ public class RoadSplitterEditor : Editor {
             mesh.transform.SetParent(roadSplitter.transform);
             mesh.transform.localPosition = Vector3.zero;
             mesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            mesh.hideFlags = HideFlags.NotEditable;
             mesh.AddComponent<MeshFilter>();
             mesh.AddComponent<MeshRenderer>();
             mesh.AddComponent<MeshCollider>();
@@ -52,6 +54,7 @@ public class RoadSplitterEditor : Editor {
         connectionPoint.transform.SetParent(roadSplitter.transform.GetChild(0));
         connectionPoint.transform.localPosition = Vector3.zero;
         connectionPoint.layer = roadSplitter.globalSettings.intersectionPointsLayer;
+        connectionPoint.hideFlags = HideFlags.NotEditable;
     }
 
     private void OnDisable()

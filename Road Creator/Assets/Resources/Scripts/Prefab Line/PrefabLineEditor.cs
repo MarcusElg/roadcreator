@@ -8,9 +8,7 @@ public class PrefabLineEditor : Editor
 
     PrefabLineCreator prefabCreator;
     Vector3[] points = null;
-    GameObject objectToMove;
     Tool lastTool;
-    bool mouseDown;
 
     private void OnEnable()
     {
@@ -39,7 +37,7 @@ public class PrefabLineEditor : Editor
         lastTool = Tools.current;
         Tools.current = Tool.None;
 
-        Undo.undoRedoPerformed += UndoUpdate;
+        Undo.undoRedoPerformed += prefabCreator.UndoUpdate;
     }
 
     private void OnDisable()
@@ -113,450 +111,110 @@ public class PrefabLineEditor : Editor
                 }
             }
 
-            PlacePrefabs();
+            prefabCreator.PlacePrefabs();
         }
 
-        GUILayout.Label("");
-
-        if (GUILayout.Button("Reset"))
+        if (prefabCreator.globalSettings.debug == true)
         {
-            prefabCreator.currentPoint = null;
+            EditorGUILayout.Toggle("Is Follow Object", prefabCreator.isFollowObject);
+        }
 
-            for (int i = 1; i >= 0; i--)
+        if (prefabCreator.isFollowObject == false)
+        {
+            GUILayout.Label("");
+
+            if (GUILayout.Button("Reset"))
             {
-                for (int j = prefabCreator.transform.GetChild(i).childCount - 1; j >= 0; j--)
+                prefabCreator.currentPoint = null;
+
+                for (int i = 1; i >= 0; i--)
                 {
-                    Undo.DestroyObjectImmediate(prefabCreator.transform.GetChild(i).GetChild(j).gameObject);
-                }
-            }
-        }
-
-        if (GUILayout.Button("Place Prefabs"))
-        {
-            PlacePrefabs();
-        }
-    }
-
-    public void PlacePrefabs()
-    {
-        for (int i = prefabCreator.transform.GetChild(1).childCount - 1; i >= 0; i--)
-        {
-            DestroyImmediate(prefabCreator.transform.GetChild(1).GetChild(i).gameObject);
-        }
-
-        if (prefabCreator.transform.GetChild(0).childCount > 2)
-        {
-            PointPackage currentPoints = CalculatePoints();
-            for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
-            {
-                GameObject prefab = Instantiate(prefabCreator.prefab);
-                prefab.transform.SetParent(prefabCreator.transform.GetChild(1));
-                prefab.transform.position = currentPoints.prefabPoints[j];
-                prefab.name = "Prefab";
-                prefab.layer = prefabCreator.globalSettings.roadLayer;
-                prefab.transform.localScale = new Vector3(prefabCreator.scale, prefabCreator.scale, prefabCreator.scale);
-                Vector3 left = Misc.CalculateLeft(currentPoints.startPoints[j], currentPoints.endPoints[j]);
-                Vector3 forward = new Vector3(left.z, 0, -left.x);
-
-                if (prefabCreator.rotateAlongCurve == true)
-                {
-                    if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.forward)
+                    for (int j = prefabCreator.transform.GetChild(i).childCount - 1; j >= 0; j--)
                     {
-                        prefab.transform.rotation = Quaternion.LookRotation(forward);
-                    }
-                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.backward)
-                    {
-                        prefab.transform.rotation = Quaternion.LookRotation(-forward);
-                    }
-                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
-                    {
-                        prefab.transform.rotation = Quaternion.LookRotation(left);
-                    }
-                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
-                    {
-                        prefab.transform.rotation = Quaternion.LookRotation(-left);
-                    }
-                    else if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.randomY)
-                    {
-                        prefab.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
-                    }
-                }
-
-                if (prefabCreator.bendObjects == true)
-                {
-                    Mesh mesh = GameObject.Instantiate(prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh);
-                    Vector3[] vertices = mesh.vertices;
-
-                    // Calculate distance to change
-                    Vector3 center = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
-                    float distanceToChange = Vector3.Distance(center, currentPoints.prefabPoints[j]);
-
-                    Vector3 controlPoint;
-                    float distanceToChangeMultiplied = distanceToChange * prefabCreator.bendMultiplier;
-                    if (currentPoints.rotateTowardsLeft[j] == false)
-                    {
-                        distanceToChangeMultiplied = -distanceToChangeMultiplied;
-                    }
-
-                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChangeMultiplied);
-
-                    for (var i = 0; i < vertices.Length; i++)
-                    {
-                        float distance = Mathf.Abs(vertices[i].x - mesh.bounds.min.x);
-                        float distanceCovered = (distance / mesh.bounds.size.x);
-                        Vector3 lerpedPoint = Misc.Lerp3(new Vector3(-mesh.bounds.extents.x, 0, 0), controlPoint, new Vector3(mesh.bounds.extents.x, 0, 0), distanceCovered);
-                        vertices[i].z = vertices[i].z - (lerpedPoint).z;
-                    }
-
-                    mesh.vertices = vertices;
-                    mesh.RecalculateBounds();
-                    prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-
-                    // Change collider to match
-                    System.Type type = prefab.GetComponent<Collider>().GetType();
-                    if (type != null)
-                    {
-                        DestroyImmediate(prefab.GetComponent<Collider>());
-                        prefab.AddComponent(type);
-                    }
-                }
-
-                if (prefabCreator.yModification != PrefabLineCreator.YModification.none)
-                {
-                    Vector3[] vertices = prefab.GetComponent<MeshFilter>().sharedMesh.vertices;
-                    float startHeight = currentPoints.startPoints[j].y;
-                    float endHeight = currentPoints.endPoints[j].y;
-
-                    for (var i = 0; i < vertices.Length; i++)
-                    {
-                        if (prefabCreator.yModification == PrefabLineCreator.YModification.matchTerrain)
-                        {
-                            RaycastHit raycastHit;
-                            if (Physics.Raycast(prefab.transform.position + (prefab.transform.rotation * vertices[i] * prefabCreator.scale) + new Vector3(0, prefabCreator.terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
-                            {
-                                vertices[i].y += (raycastHit.point.y - prefab.transform.position.y) / prefabCreator.scale;
-                            }
-                        }
-                        else if (prefabCreator.yModification == PrefabLineCreator.YModification.matchCurve)
-                        {
-                            float time = Misc.Remap(vertices[i].x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1);
-
-                            if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
-                            {
-                                time = 1 - time;
-                            }
-
-                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, time) - prefab.transform.position.y) / prefabCreator.scale;
-                        }
-                    }
-
-                    Mesh mesh = Instantiate(prefab.GetComponent<MeshFilter>().sharedMesh);
-                    mesh.vertices = vertices;
-                    prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-                    prefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
-
-                    // Change collider to match
-                    System.Type type = prefab.GetComponent<Collider>().GetType();
-                    if (type != null)
-                    {
-                        DestroyImmediate(prefab.GetComponent<Collider>());
-                        prefab.AddComponent(type);
-                    }
-                }
-
-                if (prefabCreator.fillGap == true && j > 0)
-                {
-                    // Add last vertices
-                    List<Vector3> lastVertexPositions = new List<Vector3>();
-                    Vector3[] lastVertices = prefabCreator.transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
-                    for (int i = 0; i < lastVertices.Length; i++)
-                    {
-                        if (Mathf.Abs(lastVertices[i].x - GetMaxX()) < 0.001f)
-                        {
-                            lastVertexPositions.Add((prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation * (prefabCreator.scale * lastVertices[i])) + prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position);
-                        }
-                    }
-
-                    // Move current vertices to last ones
-                    Mesh mesh = Instantiate(prefab.GetComponent<MeshFilter>().sharedMesh);
-                    Vector3[] vertices = mesh.vertices;
-                    for (int i = 0; i < vertices.Length; i++)
-                    {
-                        if (Mathf.Abs(vertices[i].x - GetMinX()) < 0.001f)
-                        {
-                            Vector3 nearestVertex = Vector3.zero;
-                            float currentDistance = float.MaxValue;
-
-                            for (int k = 0; k < lastVertexPositions.Count; k++)
-                            {
-                                float localY = (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position).y;
-                                float localZ = (Quaternion.Euler(0, -(prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - prefabCreator.transform.GetChild(1).GetChild(j - 1).transform.position)).z;
-                                float zDifference = Mathf.Abs(localZ - (vertices[i].z * prefabCreator.scale));
-                                if (zDifference < 0.001f)
-                                {
-                                    if (prefabCreator.yModification == PrefabLineCreator.YModification.none)
-                                    {
-                                        if (Mathf.Abs(localY - (vertices[i].y * prefabCreator.scale)) < 0.001f)
-                                        {
-                                            nearestVertex = lastVertexPositions[k];
-                                        }
-                                    }
-                                    else
-                                    {
-                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (prefab.transform.rotation * (prefabCreator.scale * vertices[i])) + prefab.transform.position);
-
-                                        if (calculatedDistance < currentDistance)
-                                        {
-                                            currentDistance = calculatedDistance;
-                                            nearestVertex = lastVertexPositions[k];
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (nearestVertex != Vector3.zero)
-                            {
-                                float scaleModifier = 1 / prefabCreator.scale;
-                                vertices[i] = Quaternion.Euler(0, -prefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - prefab.transform.position) * scaleModifier;
-                            }
-                        }
-                    }
-                    mesh.vertices = vertices;
-                    prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-                    prefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
-
-                    // Change collider to match
-                    System.Type type = prefab.GetComponent<Collider>().GetType();
-                    if (type != null)
-                    {
-                        DestroyImmediate(prefab.GetComponent<Collider>());
-                        prefab.AddComponent(type);
+                        Undo.DestroyObjectImmediate(prefabCreator.transform.GetChild(i).GetChild(j).gameObject);
                     }
                 }
             }
-        }
-    }
 
-    private float GetMaxX()
-    {
-        if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
-        {
-            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x;
-        }
-        else
-        {
-            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x;
-        }
-    }
-
-    private float GetMinX()
-    {
-        if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left)
-        {
-            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x;
-        }
-        else
-        {
-            return prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x;
+            if (GUILayout.Button("Place Prefabs"))
+            {
+                prefabCreator.PlacePrefabs();
+            }
         }
     }
 
     public void OnSceneGUI()
     {
-        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        Event guiEvent = Event.current;
-
-        Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
-
-        RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+        if (prefabCreator.isFollowObject == false)
         {
-            Vector3 hitPosition = raycastHit.point;
+            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+            Event guiEvent = Event.current;
 
-            if (guiEvent.control == true)
+            Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
+
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
             {
-                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
-                if (nearestGuideline != Misc.MaxVector3)
+                Vector3 hitPosition = raycastHit.point;
+
+                if (guiEvent.control == true)
                 {
-                    hitPosition = nearestGuideline;
+                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                    if (nearestGuideline != Misc.MaxVector3)
+                    {
+                        hitPosition = nearestGuideline;
+                    }
+                    else
+                    {
+                        hitPosition = Misc.Round(hitPosition);
+                    }
                 }
-                else
+
+                if (guiEvent.type == EventType.MouseDown)
+                {
+                    if (guiEvent.button == 0)
+                    {
+                        if (guiEvent.shift == true)
+                        {
+                            prefabCreator.CreatePoints(hitPosition);
+                        }
+                    }
+                    else if (guiEvent.button == 1 && guiEvent.shift == true)
+                    {
+                        prefabCreator.RemovePoints();
+                    }
+                }
+
+                if (prefabCreator.currentPoint != null && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
+                {
+                    points = CalculatePoints(guiEvent, hitPosition);
+                }
+
+                Draw(guiEvent, hitPosition);
+            }
+
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
+            {
+                Vector3 hitPosition = raycastHit.point;
+
+                if (guiEvent.control == true)
                 {
                     hitPosition = Misc.Round(hitPosition);
                 }
-            }
 
-            if (guiEvent.type == EventType.MouseDown)
-            {
-                if (guiEvent.button == 0)
+                if (guiEvent.shift == false)
                 {
-                    if (guiEvent.shift == true)
-                    {
-                        CreatePoints(hitPosition);
-                    }
-                }
-                else if (guiEvent.button == 1 && guiEvent.shift == true)
-                {
-                    RemovePoints();
+                    prefabCreator.MovePoints(guiEvent, raycastHit, hitPosition);
                 }
             }
 
-            if (prefabCreator.currentPoint != null && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
-            {
-                points = CalculatePoints(guiEvent, hitPosition);
-            }
-
-            Draw(guiEvent, hitPosition);
-        }
-
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
-        {
-            Vector3 hitPosition = raycastHit.point;
-
-            if (guiEvent.control == true)
-            {
-                hitPosition = Misc.Round(hitPosition);
-            }
-
-            if (guiEvent.shift == false)
-            {
-                MovePoints(guiEvent, raycastHit, hitPosition);
-            }
-        }
-
-        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
-    }
-
-    private void UndoUpdate()
-    {
-        if (prefabCreator.currentPoint == null && prefabCreator.transform.GetChild(0).childCount > 0)
-        {
-            prefabCreator.currentPoint = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).gameObject;
-        }
-
-        PlacePrefabs();
-    }
-
-    private void CreatePoints(Vector3 hitPosition)
-    {
-        if (prefabCreator.prefab == null)
-        {
-            Debug.Log("You must select a prefab to place before creating the line");
-        }
-        else
-        {
-            if (prefabCreator.currentPoint != null && prefabCreator.currentPoint.name == "Point")
-            {
-                if (prefabCreator.globalSettings.roadCurved == true)
-                {
-                    prefabCreator.currentPoint = CreatePoint("Control Point", hitPosition);
-                    Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
-                }
-                else
-                {
-                    prefabCreator.currentPoint = CreatePoint("Control Point", Misc.GetCenter(prefabCreator.currentPoint.transform.position, hitPosition));
-                    Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
-                    prefabCreator.currentPoint = CreatePoint("Point", hitPosition);
-                    Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
-                    PlacePrefabs();
-                }
-            }
-            else
-            {
-                prefabCreator.currentPoint = CreatePoint("Point", hitPosition);
-                PlacePrefabs();
-                Undo.RegisterCreatedObjectUndo(prefabCreator.currentPoint, "Create Point");
-            }
-        }
-    }
-
-    private GameObject CreatePoint(string name, Vector3 raycastHit)
-    {
-        GameObject point = new GameObject(name);
-        point.AddComponent<BoxCollider>();
-        point.GetComponent<BoxCollider>().size = new Vector3(prefabCreator.globalSettings.pointSize, prefabCreator.globalSettings.pointSize, prefabCreator.globalSettings.pointSize);
-        point.transform.SetParent(prefabCreator.transform.GetChild(0));
-        point.transform.position = raycastHit;
-        point.hideFlags = HideFlags.NotEditable;
-        point.layer = prefabCreator.globalSettings.ignoreMouseRayLayer;
-        return point;
-    }
-
-    private void MovePoints(Event guiEvent, RaycastHit raycastHit, Vector3 hitPosition)
-    {
-        if (mouseDown == true && objectToMove != null)
-        {
-            if (guiEvent.keyCode == KeyCode.Plus || guiEvent.keyCode == KeyCode.KeypadPlus)
-            {
-                Undo.RecordObject(objectToMove.transform, "Moved Point");
-                objectToMove.transform.position += new Vector3(0, 0.2f, 0);
-            }
-            else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
-            {
-                Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
-
-                if (position.y < raycastHit.point.y)
-                {
-                    position.y = raycastHit.point.y;
-                }
-
-                Undo.RecordObject(objectToMove.transform, "Moved Point");
-                objectToMove.transform.position = position;
-            }
-        }
-
-        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
-        {
-            mouseDown = true;
-
-            if (raycastHit.transform.name.Contains("Point") && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() != null && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() == prefabCreator)
-            {
-                if (raycastHit.collider.gameObject.name == "Control Point")
-                {
-                    objectToMove = raycastHit.collider.gameObject;
-                    objectToMove.GetComponent<BoxCollider>().enabled = false;
-                }
-                else if (raycastHit.collider.gameObject.name == "Point")
-                {
-                    objectToMove = raycastHit.collider.gameObject;
-                    objectToMove.GetComponent<BoxCollider>().enabled = false;
-                }
-            }
-        }
-        else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
-        {
-            Undo.RecordObject(objectToMove.transform, "Moved Point");
-            objectToMove.transform.position = hitPosition;
-        }
-        else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
-        {
-            mouseDown = false;
-            objectToMove.GetComponent<BoxCollider>().enabled = true;
-            objectToMove = null;
-            PlacePrefabs();
-        }
-    }
-
-    private void RemovePoints()
-    {
-        if (prefabCreator.transform.GetChild(0).childCount > 0)
-        {
-            if (prefabCreator.currentPoint != null)
-            {
-                Undo.DestroyObjectImmediate(prefabCreator.currentPoint.gameObject);
-                if (prefabCreator.transform.GetChild(0).childCount > 0)
-                {
-                    prefabCreator.currentPoint = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).gameObject;
-                }
-
-                PlacePrefabs();
-            }
+            GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
         }
     }
 
     private void Draw(Event guiEvent, Vector3 hitPosition)
     {
-        Misc.DrawRoadGuidelines(hitPosition, objectToMove, null);
+        Misc.DrawRoadGuidelines(hitPosition, prefabCreator.objectToMove, null);
 
         for (int i = 0; i < prefabCreator.transform.GetChild(0).childCount; i++)
         {
@@ -607,98 +265,6 @@ public class PrefabLineEditor : Editor
         // Mouse position
         Handles.color = Color.blue;
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
-    }
-
-    public PointPackage CalculatePoints()
-    {
-        List<Vector3> prefabPoints = new List<Vector3>();
-        List<Vector3> startPoints = new List<Vector3>();
-        List<Vector3> endPoints = new List<Vector3>();
-        List<bool> rotateTowardsLeft = new List<bool>();
-
-        Vector3 firstPoint = prefabCreator.transform.GetChild(0).GetChild(0).position;
-        Vector3 controlPoint = prefabCreator.transform.GetChild(0).GetChild(1).position;
-        Vector3 endPoint = prefabCreator.transform.GetChild(0).GetChild(2).position;
-
-        Vector3 lastEndPoint = firstPoint;
-        float distance = Misc.CalculateDistance(firstPoint, controlPoint, endPoint);
-
-        startPoints.Add(firstPoint);
-        Vector3 lastPoint = firstPoint;
-        bool endPointAdded = true;
-
-        Vector3 currentPoint = Vector3.zero;
-
-        for (int i = 0; i < prefabCreator.transform.GetChild(0).childCount - 2; i += 2)
-        {
-            distance = Misc.CalculateDistance(firstPoint, controlPoint, endPoint);
-            float divisions = distance / prefabCreator.spacing;
-            divisions = Mathf.Max(2, divisions);
-            float distancePerDivision = 1 / divisions;
-            bool isSegmentLeft = IsSegmentLeft(i);
-            firstPoint = prefabCreator.transform.GetChild(0).GetChild(i).position;
-            controlPoint = prefabCreator.transform.GetChild(0).GetChild(i + 1).position;
-            endPoint = prefabCreator.transform.GetChild(0).GetChild(i + 2).position;
-
-            if (i == 0)
-            {
-                rotateTowardsLeft.Add(isSegmentLeft);
-            }
-
-            for (float t = 0; t < 1; t += distancePerDivision / 10)
-            {
-                if (t > 1)
-                {
-                    t = 1;
-                }
-
-                float height = Mathf.Lerp(firstPoint.y, endPoint.y, t);
-                currentPoint = Misc.Lerp3(firstPoint, controlPoint, endPoint, t);
-                currentPoint.y = height;
-                float currentDistance = Vector3.Distance(lastPoint, currentPoint);
-
-                if (currentDistance > prefabCreator.spacing / 2 && endPointAdded == false)
-                {
-                    endPoints.Add(currentPoint);
-                    lastEndPoint = currentPoint;
-                    endPointAdded = true;
-                }
-
-                if (endPointAdded == true && ((currentDistance > prefabCreator.spacing) || (startPoints.Count == 1 && currentDistance > prefabCreator.spacing / 2)))
-                {
-                    prefabPoints.Add(currentPoint);
-                    lastPoint = currentPoint;
-                    startPoints.Add(lastEndPoint);
-                    endPointAdded = false;
-
-                    rotateTowardsLeft.Add(isSegmentLeft);
-                }
-            }
-
-            if (endPoints.Count < prefabPoints.Count && (i + 2) >= prefabCreator.transform.GetChild(0).childCount - 2)
-            {
-                endPoints.Add(currentPoint);
-            }
-        }
-
-        return new PointPackage(prefabPoints.ToArray(), startPoints.ToArray(), endPoints.ToArray(), rotateTowardsLeft.ToArray());
-    }
-
-    private bool IsSegmentLeft(int startIndex)
-    {
-        Vector3 forward = (prefabCreator.transform.GetChild(0).GetChild(startIndex).position - prefabCreator.transform.GetChild(0).GetChild(startIndex + 2).position).normalized;
-        Vector3 center = Misc.GetCenter(prefabCreator.transform.GetChild(0).GetChild(startIndex).position, prefabCreator.transform.GetChild(0).GetChild(startIndex + 2).position);
-        Vector3 right = Vector3.Cross(forward, (prefabCreator.transform.GetChild(0).GetChild(startIndex + 1).position - center).normalized);
-        float direction = Vector3.Dot(right, Vector3.up);
-
-        if (direction > 0.0f)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
     }
 
     private Vector3[] CalculatePoints(Event guiEvent, Vector3 hitPosition)

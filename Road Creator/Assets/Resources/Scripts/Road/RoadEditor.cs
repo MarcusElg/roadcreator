@@ -80,41 +80,60 @@ public class RoadEditor : Editor
                     Debug.Log("Follow object can not be itself");
                 }
 
-                if (roadCreator.followObject != null && roadCreator.followObject.GetComponent<RoadCreator>() != null)
+                if (roadCreator.followObject != null)
                 {
-                    roadCreator.followObject.GetComponent<RoadCreator>().isFollowObject = true;
-
-                    for (int i = 0; i < roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>().Length; i++)
+                    if (roadCreator.followObject.GetComponent<RoadCreator>() != null)
                     {
-                        roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].enabled = false;
+                        roadCreator.followObject.GetComponent<RoadCreator>().isFollowObject = true;
 
-                        if (i == roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>().Length - 1)
+                        for (int i = 0; i < roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>().Length; i++)
                         {
-                            int roadCreatorChildCount = 0;
+                            roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].enabled = false;
 
-                            if (roadCreator.transform.GetChild(0).childCount > 0)
+                            if (i == roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>().Length - 1)
                             {
-                                roadCreatorChildCount = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount - 1;
-                            }
+                                int roadCreatorChildCount = 0;
 
-                            int followObjectChildCount = roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].transform.parent.childCount;
+                                if (roadCreator.transform.GetChild(0).childCount > 0)
+                                {
+                                    roadCreatorChildCount = roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount - 1;
+                                }
 
-                            if (roadCreatorChildCount > 0 && roadCreatorChildCount < 3)
-                            {
-                                DestroyImmediate(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).gameObject);
-                            }
+                                int followObjectChildCount = roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].transform.parent.childCount;
 
-                            if (followObjectChildCount > 0 && followObjectChildCount < 3)
-                            {
-                                DestroyImmediate(roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].transform.parent.parent.gameObject);
+                                if (roadCreatorChildCount > 0 && roadCreatorChildCount < 3)
+                                {
+                                    DestroyImmediate(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).gameObject);
+                                }
+
+                                if (followObjectChildCount > 0 && followObjectChildCount < 3)
+                                {
+                                    DestroyImmediate(roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].transform.parent.parent.gameObject);
+                                }
                             }
+                        }
+                    }
+                    else
+                    {
+                        roadCreator.followObject.GetComponent<PrefabLineCreator>().isFollowObject = true;
+
+                        for (int i = 0; i < roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>().Length; i++)
+                        {
+                            roadCreator.followObject.transform.GetComponentsInChildren<BoxCollider>()[i].enabled = false;
                         }
                     }
                 }
             }
             else
             {
-                lastFollowObject.GetComponent<RoadCreator>().isFollowObject = false;
+                if (lastFollowObject.GetComponent<RoadCreator>() != null)
+                {
+                    lastFollowObject.GetComponent<RoadCreator>().isFollowObject = false;
+                }
+                else
+                {
+                    lastFollowObject.GetComponent<PrefabLineCreator>().isFollowObject = false;
+                }
 
                 for (int i = 0; i < lastFollowObject.transform.GetComponentsInChildren<BoxCollider>().Length; i++)
                 {
@@ -142,9 +161,16 @@ public class RoadEditor : Editor
             {
                 roadCreator.CreateMesh();
 
-                if (roadCreator.followObject != null && roadCreator.followObject.GetComponent<RoadCreator>() != null)
+                if (roadCreator.followObject != null)
                 {
-                    roadCreator.followObject.GetComponent<RoadCreator>().CreateMesh();
+                    if (roadCreator.followObject.GetComponent<RoadCreator>() != null)
+                    {
+                        roadCreator.followObject.GetComponent<RoadCreator>().CreateMesh();
+                    }
+                    else
+                    {
+                        roadCreator.followObject.GetComponent<PrefabLineCreator>().PlacePrefabs();
+                    }
                 }
             }
 
@@ -174,9 +200,21 @@ public class RoadEditor : Editor
             Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
         }
 
-        if (roadCreator.followObject != null && roadCreator.followObject.GetComponent<RoadCreator>() != null)
+        if (roadCreator.followObject != null)
         {
-            roadCreator.followObject.GetComponent<RoadCreator>().currentSegment = null;
+            if (roadCreator.followObject.GetComponent<RoadCreator>() != null)
+            {
+                roadCreator.followObject.GetComponent<RoadCreator>().currentSegment = null;
+            }
+            else
+            {
+                roadCreator.followObject.GetComponent<PrefabLineCreator>().currentPoint = null;
+                for (int i = roadCreator.followObject.transform.GetChild(1).childCount - 1; i >= 0; i--)
+                {
+                    Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(1).GetChild(i).gameObject);
+                }
+            }
+
             for (int i = roadCreator.followObject.transform.GetChild(0).childCount - 1; i >= 0; i--)
             {
                 Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(0).GetChild(i).gameObject);
@@ -296,9 +334,16 @@ public class RoadEditor : Editor
     {
         roadCreator.CreatePoints(hitPosition);
 
-        if (roadCreator.followObject != null && roadCreator.followObject.GetComponent<RoadCreator>() != null)
+        if (roadCreator.followObject != null)
         {
-            roadCreator.followObject.GetComponent<RoadCreator>().CreatePoints(hitPosition);
+            if (roadCreator.followObject.GetComponent<RoadCreator>() != null)
+            {
+                roadCreator.followObject.GetComponent<RoadCreator>().CreatePoints(hitPosition);
+            }
+            else
+            {
+                roadCreator.followObject.GetComponent<PrefabLineCreator>().CreatePoints(hitPosition);
+            }
         }
     }
 
