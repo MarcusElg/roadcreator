@@ -366,7 +366,12 @@ public class RoadEditor : Editor
                 roadCreator.followObject.GetComponent<RoadCreator>().RemovePoints();
             } else
             {
-                roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints(roadCreator.IsLastSegmentCurved());
+                roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints(!roadCreator.IsLastSegmentCurved());
+
+                if (roadCreator.followObject.transform.GetChild(0).childCount == 1 || roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 1)
+                {
+                    roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints();
+                }
             }
         }
 

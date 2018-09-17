@@ -140,26 +140,28 @@ public class PrefabLineCreator : MonoBehaviour
             if (currentPoint != null)
             {
                 Undo.DestroyObjectImmediate(currentPoint.gameObject);
+
+                if (removeTwo == true)
+                {
+                    Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
+                }
                 if (transform.GetChild(0).childCount > 0)
                 {
                     currentPoint = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject;
                 }
 
-                if (removeTwo == false)
-                {
-                    PlacePrefabs();
-                }
+                PlacePrefabs();
             }
-        }
-
-        if (removeTwo == true)
-        {
-            RemovePoints();
         }
     }
 
     public void PlacePrefabs()
     {
+        if (prefab == null)
+        {
+            prefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
+        }
+
         for (int i = transform.GetChild(1).childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(transform.GetChild(1).GetChild(i).gameObject);
@@ -219,7 +221,7 @@ public class PrefabLineCreator : MonoBehaviour
                         distanceToChangeMultiplied = -distanceToChangeMultiplied;
                     }
 
-                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChangeMultiplied);
+                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChangeMultiplied * 0.25f);
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
