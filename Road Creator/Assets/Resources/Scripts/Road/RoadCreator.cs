@@ -779,7 +779,7 @@ public class RoadCreator : MonoBehaviour
         float distancePerDivision = 1 / divisions;
         float globalDistancePerDivision = distancePerDivision * distance;
         Vector3 lastPosition = segment.transform.GetChild(0).GetChild(0).position;
-        points.Add(lastPosition);
+        points.Add(RaycastedPosition(lastPosition, segment.GetComponent<RoadSegment>()));
 
         for (float t = 0; t <= 1; t += distancePerDivision / 10)
         {
@@ -794,29 +794,34 @@ public class RoadCreator : MonoBehaviour
             {
                 lastPosition = position;
 
-                if (segment.GetComponent<RoadSegment>().terrainOption == RoadSegment.TerrainOption.adapt)
-                {
-                    RaycastHit raycastHit;
-                    if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer) | (1 << globalSettings.intersectionPointsLayer))))
-                    {
-                        position.y = raycastHit.point.y;
-                    }
-                }
-
-                points.Add(position);
+                points.Add(RaycastedPosition(position, segment.GetComponent<RoadSegment>()));
             }
         }
 
         if (Vector3.Distance(lastPosition, segment.transform.GetChild(0).GetChild(2).position) > (distancePerDivision * divisions) / 2)
         {
-            points.Add(segment.transform.GetChild(0).GetChild(2).position);
+            points.Add(RaycastedPosition(segment.transform.GetChild(0).GetChild(2).position, segment.GetComponent<RoadSegment>()));
         }
         else
         {
-            points[points.Count - 1] = segment.transform.GetChild(0).GetChild(2).position;
+            points[points.Count - 1] = RaycastedPosition(segment.transform.GetChild(0).GetChild(2).position, segment.GetComponent<RoadSegment>());
         }
 
         return points.ToArray();
+    }
+
+    public Vector3 RaycastedPosition(Vector3 originalPosition, RoadSegment segment)
+    {
+        if (segment.terrainOption == RoadSegment.TerrainOption.adapt)
+        {
+            RaycastHit raycastHit;
+            if (Physics.Raycast(originalPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer) | (1 << globalSettings.intersectionPointsLayer))))
+            {
+                return raycastHit.point;
+            }
+        }
+
+        return originalPosition;
     }
 
 }
