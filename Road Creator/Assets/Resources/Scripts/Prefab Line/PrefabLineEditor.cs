@@ -48,6 +48,7 @@ public class PrefabLineEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
+        prefabCreator.pointCalculationDivisions = Mathf.Clamp(EditorGUILayout.FloatField("Point Calculation Divisions", prefabCreator.pointCalculationDivisions), 1, 1000);
         prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
         prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
 
@@ -108,11 +109,6 @@ public class PrefabLineEditor : Editor
             if (prefabCreator.fillGap == true || prefabCreator.bendObjects == true)
             {
                 prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
-
-                if (prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.left && prefabCreator.rotationDirection != PrefabLineCreator.RotationDirection.right)
-                {
-                    prefabCreator.rotationDirection = PrefabLineCreator.RotationDirection.left;
-                }
             }
 
             prefabCreator.PlacePrefabs();
@@ -129,8 +125,6 @@ public class PrefabLineEditor : Editor
 
             if (GUILayout.Button("Reset"))
             {
-                prefabCreator.currentPoint = null;
-
                 for (int i = 1; i >= 0; i--)
                 {
                     for (int j = prefabCreator.transform.GetChild(i).childCount - 1; j >= 0; j--)
@@ -189,7 +183,7 @@ public class PrefabLineEditor : Editor
                     }
                 }
 
-                if (prefabCreator.currentPoint != null && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
+                if (prefabCreator.transform.childCount > 0 && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
                 {
                     points = CalculatePoints(guiEvent, hitPosition);
                 }
@@ -208,7 +202,7 @@ public class PrefabLineEditor : Editor
 
                 if (guiEvent.shift == false)
                 {
-                    prefabCreator.MovePoints(guiEvent, raycastHit, hitPosition);
+                    prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
                 }
             }
 
@@ -249,19 +243,19 @@ public class PrefabLineEditor : Editor
             }
         }
 
-        if (prefabCreator.currentPoint != null)
+        if (prefabCreator.transform.childCount > 0)
         {
             if (guiEvent.shift == true)
             {
-                if (prefabCreator.transform.GetChild(0).childCount > 1 && prefabCreator.currentPoint.name == "Control Point")
+                if (prefabCreator.transform.GetChild(0).childCount > 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Control Point")
                 {
                     Handles.color = Color.black;
                     Handles.DrawPolyLine(points);
                 }
-                else
+                else if (prefabCreator.transform.GetChild(0).childCount > 1)
                 {
                     Handles.color = Color.black;
-                    Handles.DrawLine(prefabCreator.currentPoint.transform.position, hitPosition);
+                    Handles.DrawLine(prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).position, hitPosition);
                 }
             }
         }
@@ -274,7 +268,7 @@ public class PrefabLineEditor : Editor
     private Vector3[] CalculatePoints(Event guiEvent, Vector3 hitPosition)
     {
         float divisions;
-        int lastIndex = prefabCreator.currentPoint.transform.GetSiblingIndex();
+        int lastIndex = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).GetSiblingIndex();
         if (prefabCreator.transform.GetChild(0).GetChild(lastIndex).name == "Point")
         {
             lastIndex -= 1;
@@ -286,9 +280,9 @@ public class PrefabLineEditor : Editor
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;
 
-        for (float t = 0; t <= 1; t += distancePerDivision)
+        for (float t = 0; t <= 1; t += distancePerDivision / prefabCreator.pointCalculationDivisions)
         {
-            if (t > 1 - distancePerDivision)
+            if (t > 1 - distancePerDivision / prefabCreator.pointCalculationDivisions)
             {
                 t = 1;
             }

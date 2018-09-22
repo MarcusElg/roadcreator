@@ -7,7 +7,6 @@ public class PrefabLineCreator : MonoBehaviour
 {
 
     public GameObject prefab;
-    public GameObject currentPoint;
 
     public enum YModification { none, matchTerrain, matchCurve };
     public YModification yModification;
@@ -23,6 +22,7 @@ public class PrefabLineCreator : MonoBehaviour
     public RotationDirection rotationDirection;
 
     public float scale = 1;
+    public float pointCalculationDivisions = 10;
 
     public GameObject objectToMove;
     private bool mouseDown;
@@ -32,37 +32,28 @@ public class PrefabLineCreator : MonoBehaviour
 
     public void UndoUpdate()
     {
-        if (currentPoint == null && transform.GetChild(0).childCount > 0)
-        {
-            currentPoint = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject;
-        }
-
         PlacePrefabs();
     }
 
     public void CreatePoints(Vector3 hitPosition)
     {
-        if (currentPoint != null && currentPoint.name == "Point")
+        if (transform.GetChild(0).childCount > 0 && transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).name == "Point")
         {
             if (globalSettings.roadCurved == true)
             {
-                currentPoint = CreatePoint("Control Point", hitPosition);
-                Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", hitPosition), "Create Point");
             }
             else
             {
-                currentPoint = CreatePoint("Control Point", Misc.GetCenter(currentPoint.transform.position, hitPosition));
-                Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
-                currentPoint = CreatePoint("Point", hitPosition);
-                Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", Misc.GetCenter(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position, hitPosition)), "Create Point");
+                Undo.RegisterCreatedObjectUndo(CreatePoint("Point", hitPosition), "Create Point");
                 PlacePrefabs();
             }
         }
         else
         {
-            currentPoint = CreatePoint("Point", hitPosition);
+            Undo.RegisterCreatedObjectUndo(CreatePoint("Point", hitPosition), "Create Point");
             PlacePrefabs();
-            Undo.RegisterCreatedObjectUndo(currentPoint, "Create Point");
         }
     }
 
@@ -78,7 +69,7 @@ public class PrefabLineCreator : MonoBehaviour
         return point;
     }
 
-    public void MovePoints(Event guiEvent, RaycastHit raycastHit, Vector3 hitPosition)
+    public void MovePoints(Vector3 hitPosition, Event guiEvent, RaycastHit raycastHit)
     {
         if (mouseDown == true && objectToMove != null)
         {
@@ -127,7 +118,12 @@ public class PrefabLineCreator : MonoBehaviour
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
         {
             mouseDown = false;
-            objectToMove.GetComponent<BoxCollider>().enabled = true;
+
+            if (isFollowObject == false)
+            {
+                objectToMove.GetComponent<BoxCollider>().enabled = true;
+            }
+
             objectToMove = null;
             PlacePrefabs();
         }
@@ -137,17 +133,13 @@ public class PrefabLineCreator : MonoBehaviour
     {
         if (transform.GetChild(0).childCount > 0)
         {
-            if (currentPoint != null)
+            if (transform.GetChild(0).childCount > 0)
             {
-                Undo.DestroyObjectImmediate(currentPoint.gameObject);
+                Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
 
                 if (removeTwo == true)
                 {
                     Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
-                }
-                if (transform.GetChild(0).childCount > 0)
-                {
-                    currentPoint = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject;
                 }
 
                 PlacePrefabs();
@@ -165,6 +157,11 @@ public class PrefabLineCreator : MonoBehaviour
         for (int i = transform.GetChild(1).childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(transform.GetChild(1).GetChild(i).gameObject);
+        }
+
+        if (fillGap == true && rotationDirection != PrefabLineCreator.RotationDirection.left && rotationDirection != PrefabLineCreator.RotationDirection.right)
+        {
+            rotationDirection = PrefabLineCreator.RotationDirection.left;
         }
 
         if (transform.GetChild(0).childCount > 2)
@@ -420,7 +417,7 @@ public class PrefabLineCreator : MonoBehaviour
                 rotateTowardsLeft.Add(isSegmentLeft);
             }
 
-            for (float t = 0; t < 1; t += distancePerDivision / 10)
+            for (float t = 0; t < 1; t += distancePerDivision / pointCalculationDivisions)
             {
                 if (t > 1)
                 {

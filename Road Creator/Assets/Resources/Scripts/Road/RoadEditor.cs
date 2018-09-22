@@ -208,7 +208,6 @@ public class RoadEditor : Editor
             }
             else
             {
-                roadCreator.followObject.GetComponent<PrefabLineCreator>().currentPoint = null;
                 for (int i = roadCreator.followObject.transform.GetChild(1).childCount - 1; i >= 0; i--)
                 {
                     Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(1).GetChild(i).gameObject);
