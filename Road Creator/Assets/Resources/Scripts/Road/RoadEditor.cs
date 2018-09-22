@@ -238,6 +238,7 @@ public class RoadEditor : Editor
                 {
                     Undo.SetTransformParent(meshFilters[i].transform, roadMesh.transform, "Created Road Mesh");
                     meshFilters[i].name = "Mesh";
+                    meshFilters[i].gameObject.hideFlags = HideFlags.None;
                 }
             }
 

@@ -65,7 +65,7 @@ public static class Misc
                 {
                     if (nextSegmentPoints.Length > 1)
                     {
-                        forward = nextSegmentPoints[1] - points[points.Length - 1];
+                        forward = nextSegmentPoints[1] - nextSegmentPoints[0];
                     }
                     else
                     {
@@ -295,6 +295,7 @@ public static class Misc
                 {
                     Undo.SetTransformParent(meshFilters[i].transform, intersectionMesh.transform, "Created Intersection Mesh");
                     meshFilters[i].name = "Mesh";
+                    meshFilters[i].gameObject.hideFlags = HideFlags.None;
                 }
             }
 

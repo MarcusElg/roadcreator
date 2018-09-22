@@ -104,6 +104,7 @@ public class RoadSplitterEditor : Editor {
                         Undo.SetTransformParent(meshFilters[i].transform, roadSplitterMesh.transform, "Created Road Splitter Mesh");
                         meshFilters[i].name = "Mesh";
                         meshFilters[i].transform.localPosition = Vector3.zero;
+                        meshFilters[i].gameObject.hideFlags = HideFlags.None;
                     }
                 }
 
