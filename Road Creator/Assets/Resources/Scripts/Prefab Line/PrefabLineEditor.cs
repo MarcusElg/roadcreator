@@ -73,11 +73,6 @@ public class PrefabLineEditor : Editor
             }
         }
 
-        if (prefabCreator.bendObjects == true)
-        {
-            prefabCreator.bendMultiplier = Mathf.Max(0, EditorGUILayout.FloatField("Bend Multiplier", prefabCreator.bendMultiplier));
-        }
-
         prefabCreator.yModification = (PrefabLineCreator.YModification)EditorGUILayout.EnumPopup("Vertex Y Modification", prefabCreator.yModification);
 
         if (prefabCreator.yModification == PrefabLineCreator.YModification.matchTerrain)

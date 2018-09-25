@@ -171,7 +171,7 @@ public class PrefabLineCreator : MonoBehaviour
             {
                 GameObject placedPrefab = Instantiate(prefab);
                 placedPrefab.transform.SetParent(transform.GetChild(1));
-                placedPrefab.transform.position = currentPoints.prefabPoints[j];
+                placedPrefab.transform.position = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]); /*currentPoints.prefabPoints[j]*/;
                 placedPrefab.name = "Prefab";
                 placedPrefab.layer = globalSettings.roadLayer;
                 placedPrefab.transform.localScale = new Vector3(scale, scale, scale);
@@ -206,19 +206,15 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     Mesh mesh = GameObject.Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
                     Vector3[] vertices = mesh.vertices;
-
-                    // Calculate distance to change
-                    Vector3 center = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
-                    float distanceToChange = Vector3.Distance(center, currentPoints.prefabPoints[j]);
+                    float distanceToChange = Vector3.Distance(placedPrefab.transform.position, currentPoints.prefabPoints[j]);
 
                     Vector3 controlPoint;
-                    float distanceToChangeMultiplied = distanceToChange * bendMultiplier;
                     if (currentPoints.rotateTowardsLeft[j] == false)
                     {
-                        distanceToChangeMultiplied = -distanceToChangeMultiplied;
+                        distanceToChange = -distanceToChange;
                     }
 
-                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChangeMultiplied * 0.25f);
+                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * 4);
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
@@ -391,10 +387,7 @@ public class PrefabLineCreator : MonoBehaviour
         Vector3 firstPoint = transform.GetChild(0).GetChild(0).position;
         Vector3 controlPoint = transform.GetChild(0).GetChild(1).position;
         Vector3 endPoint = transform.GetChild(0).GetChild(2).position;
-
-        Vector3 lastEndPoint = firstPoint;
         float distance = Misc.CalculateDistance(firstPoint, controlPoint, endPoint);
-
         startPoints.Add(firstPoint);
         Vector3 lastPoint = firstPoint;
         bool endPointAdded = true;
@@ -432,7 +425,7 @@ public class PrefabLineCreator : MonoBehaviour
                 if (currentDistance > spacing / 2 && endPointAdded == false)
                 {
                     endPoints.Add(currentPoint);
-                    lastEndPoint = currentPoint;
+                    startPoints.Add(currentPoint);
                     endPointAdded = true;
                 }
 
@@ -440,7 +433,6 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
-                    startPoints.Add(lastEndPoint);
                     endPointAdded = false;
 
                     rotateTowardsLeft.Add(isSegmentLeft);
