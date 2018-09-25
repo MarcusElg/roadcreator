@@ -206,7 +206,7 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     Mesh mesh = GameObject.Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
                     Vector3[] vertices = mesh.vertices;
-                    float distanceToChange = Vector3.Distance(placedPrefab.transform.position, currentPoints.prefabPoints[j]);
+                    float distanceToChange = Mathf.Abs((Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * placedPrefab.transform.position).z - (Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * currentPoints.prefabPoints[j]).z);
 
                     Vector3 controlPoint;
                     if (currentPoints.rotateTowardsLeft[j] == false)
