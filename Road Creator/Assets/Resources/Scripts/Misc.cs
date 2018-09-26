@@ -271,6 +271,57 @@ public static class Misc
         meshObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
+    public static GameObject AddIntersectionSide (Transform parent, GlobalSettings globalSettings, string name)
+    {
+        GameObject side = new GameObject(name + " Side");
+        side.transform.SetParent(parent);
+        side.transform.localPosition = Vector3.zero;
+        side.hideFlags = HideFlags.NotEditable;
+
+        GameObject mesh = new GameObject(name + " Mesh");
+        mesh.AddComponent<MeshFilter>();
+        mesh.AddComponent<MeshRenderer>();
+        mesh.AddComponent<MeshCollider>();
+        mesh.transform.SetParent(side.transform);
+        mesh.transform.localPosition = Vector3.zero;
+        mesh.hideFlags = HideFlags.NotEditable;
+
+        GameObject connectionPoint = new GameObject(name + " Connection Point");
+        connectionPoint.AddComponent<BoxCollider>();
+        connectionPoint.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+        connectionPoint.transform.SetParent(side.transform);
+        connectionPoint.transform.localPosition = Vector3.zero;
+        connectionPoint.layer = globalSettings.intersectionPointsLayer;
+        connectionPoint.hideFlags = HideFlags.NotEditable;
+
+        return side;
+    }
+
+    public static void GenerateSquareMesh (Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour, Material material)
+    {
+        Vector3[] vertices = new Vector3[4];
+        Vector2[] uvs = new Vector2[4];
+
+        vertices[0] = pointOne;
+        vertices[1] = pointTwo;
+        vertices[2] = pointThree;
+        vertices[3] = pointFour;
+
+        uvs[0] = new Vector2(0, 0);
+        uvs[1] = new Vector2(1, 0);
+        uvs[2] = new Vector2(0, 1);
+        uvs[3] = new Vector2(1, 1);
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices;
+        mesh.triangles = new int[] { 2, 1, 0, 1, 2, 3 };
+        mesh.uv = uvs;
+
+        meshOwner.GetComponent<MeshFilter>().sharedMesh = mesh;
+        meshOwner.GetComponent<MeshRenderer>().sharedMaterial = material;
+        meshOwner.GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
+
     public static Vector3 InverseX(Vector3 vector)
     {
         return new Vector3(-vector.x, vector.y, vector.z);

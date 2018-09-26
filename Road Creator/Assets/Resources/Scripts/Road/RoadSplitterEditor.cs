@@ -87,30 +87,15 @@ public class RoadSplitterEditor : Editor {
             roadSplitter.GenerateMesh();
         }
 
-        if (GUILayout.Button("Convert To Meshes"))
+        if (GUILayout.Button("Convert To Mesh"))
         {
-            MeshFilter[] meshFilters = roadSplitter.GetComponentsInChildren<MeshFilter>();
+            GameObject mesh = roadSplitter.transform.GetChild(1).gameObject;
+            Undo.SetTransformParent(mesh.transform, null, "Created Road Splitter Mesh");
+            mesh.hideFlags = HideFlags.None;
+            mesh.name = "Road Splitter Mesh";
+            Selection.activeGameObject = mesh;
 
-            if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
-            {
-                GameObject roadSplitterMesh = new GameObject("Road Splitter Mesh");
-                Undo.RegisterCreatedObjectUndo(roadSplitterMesh, "Created Road Splitter Mesh");
-                roadSplitterMesh.transform.position = roadSplitter.transform.position;
-
-                for (int i = 0; i < meshFilters.Length; i++)
-                {
-                    if (meshFilters[i].sharedMesh != null)
-                    {
-                        Undo.SetTransformParent(meshFilters[i].transform, roadSplitterMesh.transform, "Created Road Splitter Mesh");
-                        meshFilters[i].name = "Mesh";
-                        meshFilters[i].transform.localPosition = Vector3.zero;
-                        meshFilters[i].gameObject.hideFlags = HideFlags.None;
-                    }
-                }
-
-                Undo.DestroyObjectImmediate(roadSplitter.gameObject);
-                Selection.activeObject = roadSplitterMesh;
-            }
+            Undo.DestroyObjectImmediate(roadSplitter.gameObject);
         }
     }
 

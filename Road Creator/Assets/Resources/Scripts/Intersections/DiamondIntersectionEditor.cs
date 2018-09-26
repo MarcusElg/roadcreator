@@ -27,10 +27,10 @@ public class DiamondIntersectionEditor : Editor
             sides.transform.localRotation = Quaternion.Euler(Vector3.zero);
             sides.hideFlags = HideFlags.NotEditable;
 
-            AddSide("Upper Left");
-            AddSide("Upper Right");
-            AddSide("Lower Left");
-            AddSide("Lower Right");
+            Misc.AddIntersectionSide(intersection.transform.GetChild(0), intersection.globalSettings, "Upper Left");
+            Misc.AddIntersectionSide(intersection.transform.GetChild(0), intersection.globalSettings, "Upper Right");
+            Misc.AddIntersectionSide(intersection.transform.GetChild(0), intersection.globalSettings, "Lower Left");
+            Misc.AddIntersectionSide(intersection.transform.GetChild(0), intersection.globalSettings, "Lower Right");
 
             GameObject mainMesh = new GameObject("Main Mesh");
             mainMesh.transform.SetParent(intersection.transform);
@@ -46,32 +46,6 @@ public class DiamondIntersectionEditor : Editor
         Tools.current = Tool.None;
 
         intersection.GenerateMeshes();
-    }
-
-    private GameObject AddSide(string name)
-    {
-        GameObject side = new GameObject(name + " Side");
-        side.transform.SetParent(intersection.transform.GetChild(0));
-        side.transform.localPosition = Vector3.zero;
-        side.hideFlags = HideFlags.NotEditable;
-
-        GameObject mesh = new GameObject(name + " Mesh");
-        mesh.AddComponent<MeshFilter>();
-        mesh.AddComponent<MeshRenderer>();
-        mesh.AddComponent<MeshCollider>();
-        mesh.transform.SetParent(side.transform);
-        mesh.transform.localPosition = Vector3.zero;
-        mesh.hideFlags = HideFlags.NotEditable;
-
-        GameObject connectionPoint = new GameObject(name + " Connection Point");
-        connectionPoint.AddComponent<BoxCollider>();
-        connectionPoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
-        connectionPoint.transform.SetParent(side.transform);
-        connectionPoint.transform.localPosition = Vector3.zero;
-        connectionPoint.hideFlags = HideFlags.NotEditable;
-        connectionPoint.layer = intersection.globalSettings.intersectionPointsLayer;
-
-        return side;
     }
 
     private void OnDisable()
