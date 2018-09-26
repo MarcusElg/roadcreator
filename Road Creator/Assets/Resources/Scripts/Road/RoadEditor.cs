@@ -163,7 +163,7 @@ public class RoadEditor : Editor
         {
             for (int i = 0; i < 2; i++)
             {
-                for (int j = roadCreator.followObject.transform.GetChild(1).childCount - 1; j >= 0; j -= 1)
+                for (int j = roadCreator.followObject.transform.GetChild(i).childCount - 1; j >= 0; j -= 1)
                 {
                     Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(i).GetChild(j).gameObject);
                 }
