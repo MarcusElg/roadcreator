@@ -147,6 +147,11 @@ public class RoadSegment : MonoBehaviour
 
             for (int i = 0; i < points.Length; i++)
             {
+                /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                g.transform.position = points[i];
+                g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                g.transform.GetComponent<Collider>().enabled = false;
+                g.name = i + "";*/
                 Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
                 float correctedHeightOffset = heightOffset;
 
@@ -203,24 +208,28 @@ public class RoadSegment : MonoBehaviour
                 triangleIndex += 6;
             }
 
-            // Fix texture overlapping with intersections
+            // Last
             if (nextSegmentPoints != null && nextSegmentPoints.Length == 1)
             {
-                vertices = fixVertices(0, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator);
-                vertices = fixVertices(-1, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator);
+                // Intersection
+                //vertices = fixVertices(0, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
+                //vertices = fixVertices(-1, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
             }
 
-            if (previousPoint != Misc.MaxVector3)
+            if (nextSegmentPoints != null && smoothnessAmount > 0)
             {
-                vertices = fixVerticesBeggining(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
-                vertices = fixVerticesBeggining(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator);
+                // Smoothness at end of segment
+                //vertices = fixVertices(vertices.Length - 1 - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
+                vertices = fixVertices(vertices.Length - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
             }
 
-            if (smoothnessAmount > 0)
+            // First
+            /*if (previousPoint != Misc.MaxVector3)
             {
-                vertices = fixVerticesBeggining(vertices.Length - 3 - (2 * smoothnessAmount), vertices, (points[points.Length - smoothnessAmount] - points[points.Length - smoothnessAmount - 2]).normalized, segment, roadCreator);
-                vertices = fixVerticesBeggining(vertices.Length - 4 - (2 * smoothnessAmount), vertices, (points[points.Length - smoothnessAmount] - points[points.Length - smoothnessAmount - 2]).normalized, segment, roadCreator);
-            }
+                // Intersection
+                vertices = fixVertices(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
+                vertices = fixVertices(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
+            }*/
 
             Mesh generatedMesh = new Mesh();
             generatedMesh.vertices = vertices;
@@ -240,6 +249,43 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
+    private Vector3[] fixVertices(int position, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator, int change)
+    {
+        int startVertex = 0;
+        for (int i = position; startVertex == 0; i -= change)
+        {
+            if (i < 1)
+            {
+                return vertices;
+            }
+
+            float direction = Vector3.Dot(forward.normalized, (vertices[position] - vertices[i]).normalized);
+            if (direction > 0.0f)
+            {
+                startVertex = i += change;
+            }
+
+        }
+        int amount = Mathf.Abs(startVertex - position);
+        float part = 1f / amount;
+        float index = 0;
+
+        for (int i = startVertex; i < amount * 2; i += change)
+        {
+            GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            g.transform.position = vertices[startVertex] + segment.position;
+            g.name = "Start Vertex";
+            g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            g.transform.position = vertices[position] + segment.position;
+            g.name = "Start Position";
+
+            vertices[i] = Vector3.Lerp(vertices[startVertex], vertices[position], part * index);
+            index += 1;
+        }
+
+        return vertices;
+    }
+
     private void DeformTerrain(Vector3 position, int roadLayer)
     {
         // Change y position
@@ -253,7 +299,8 @@ public class RoadSegment : MonoBehaviour
                 Vector3 localTerrainPoint = raycastHit.point - terrain.transform.position;
 
                 int terrainPointX = (int)((localTerrainPoint.x / terrainData.size.x) * terrainData.heightmapWidth);
-                int terrainPointY = (int)(position.y);
+                Debug.Log(terrain.SampleHeight(position));
+                int terrainPointY = (int)terrain.SampleHeight(position);
                 int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.heightmapHeight);
                 float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 
@@ -261,67 +308,6 @@ public class RoadSegment : MonoBehaviour
                 terrainData.SetHeights(0, 0, modifiedHeights);
             }
         }
-    }
-
-    private Vector3[] fixVertices(int offset, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator)
-    {
-        int startVertex = 0;
-        for (int i = vertices.Length - 1 + offset; startVertex == 0; i -= 2)
-        {
-            if (i < 1)
-            {
-                return vertices;
-            }
-
-            float direction = Vector3.Dot(forward.normalized, (vertices[vertices.Length - 1 + offset] - vertices[i]).normalized);
-            if (direction > 0.0f)
-            {
-                startVertex = i += 2;
-            }
-
-        }
-        int amount = vertices.Length - 1 - startVertex + offset;
-        float part = 1f / amount;
-        float index = 0;
-
-        for (int i = startVertex; i < vertices.Length - 1 + offset; i += 2)
-        {
-            vertices[i] = Vector3.Lerp(vertices[startVertex - 2], vertices[vertices.Length - 1 + offset], part * index);
-            index += 1;
-        }
-
-        return vertices;
-    }
-
-    private Vector3[] fixVerticesBeggining(int offset, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator)
-    {
-        int startVertex = 0;
-        int t = 0;
-        for (int i = offset; startVertex == 0 && t < 10; i += 2)
-        {
-            if (i > vertices.Length - 1)
-            {
-                return vertices;
-            }
-
-            float direction = Vector3.Dot(forward.normalized, (vertices[i] - vertices[offset]).normalized);
-            if (direction > 0.0f)
-            {
-                startVertex = i -= 2;
-            }
-            t += 1;
-        }
-        int amount = startVertex - offset;
-        float part = 1f / amount;
-        float index = 0;
-
-        for (int i = startVertex; i > offset; i -= 2)
-        {
-            vertices[i] = Vector3.Lerp(vertices[startVertex + 2], vertices[offset], part * index);
-            index += 1;
-        }
-
-        return vertices;
     }
 
     private Mesh GenerateUvs(Mesh mesh)

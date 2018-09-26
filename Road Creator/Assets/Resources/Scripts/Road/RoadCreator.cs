@@ -113,17 +113,17 @@ public class RoadCreator : MonoBehaviour
     {
         if (transform.GetChild(0).childCount > 0)
         {
-            DetectIntersectionConnection(transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject);
+            DetectIntersectionConnection(transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject, 0);
 
             Transform lastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1);
             if (lastSegment.GetChild(0).childCount == 3)
             {
-                DetectIntersectionConnection(lastSegment.transform.GetChild(0).GetChild(2).gameObject);
+                DetectIntersectionConnection(lastSegment.transform.GetChild(0).GetChild(2).gameObject, lastSegment.GetSiblingIndex() * 2 + 2);
             }
         }
     }
 
-    private void DetectIntersectionConnection(GameObject gameObject)
+    private void DetectIntersectionConnection(GameObject gameObject, int followIndex)
     {
         RaycastHit raycastHit2;
         if (Physics.Raycast(gameObject.transform.position + Vector3.up, Vector3.down, out raycastHit2, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
@@ -142,6 +142,12 @@ public class RoadCreator : MonoBehaviour
                 {
                     gameObject.GetComponent<Point>().intersectionConnection = raycastHit2.collider.gameObject;
                     gameObject.transform.position = raycastHit2.collider.transform.position;
+
+                    if (followObject != null)
+                    {
+                        followObject.transform.GetChild(0).GetChild(followIndex).position = raycastHit2.collider.transform.position;
+                        followObject.GetComponent<PrefabLineCreator>().PlacePrefabs();
+                    }
 
                     float roadWidth = gameObject.transform.parent.parent.GetComponent<RoadSegment>().startRoadWidth;
                     if (gameObject.name == "End Point")
@@ -773,6 +779,8 @@ public class RoadCreator : MonoBehaviour
             }
 
             Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
+            position.y = Mathf.Lerp(segment.GetChild(0).GetChild(0).position.y, segment.GetChild(0).GetChild(2).position.y, t);
+
             float calculatedDistance = Vector3.Distance(position, lastPosition);
             if (calculatedDistance > globalDistancePerDivision)
             {

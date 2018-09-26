@@ -34,8 +34,8 @@ public static class Misc
 
     public static Vector3 CalculateLeft(Vector3 point, Vector3 nextPoint)
     {
-        Vector3 forward = (nextPoint - point).normalized;
-        return new Vector3(-forward.z, 0, forward.x);
+        Vector3 forward = (nextPoint - point);
+        return new Vector3(-forward.z, 0, forward.x).normalized;
     }
 
     public static Vector3 CalculateLeft(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index, bool circle = false)

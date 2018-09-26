@@ -174,7 +174,7 @@ public class PrefabLineCreator : MonoBehaviour
             {
                 GameObject placedPrefab = Instantiate(prefab);
                 placedPrefab.transform.SetParent(transform.GetChild(1));
-                placedPrefab.transform.position = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]); /*currentPoints.prefabPoints[j]*/;
+                placedPrefab.transform.position = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
                 placedPrefab.name = "Prefab";
                 placedPrefab.layer = globalSettings.roadLayer;
                 placedPrefab.transform.localScale = new Vector3(scale, scale, scale);
