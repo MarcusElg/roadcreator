@@ -10,6 +10,7 @@ public class RoadSegment : MonoBehaviour
     public float startRoadWidth = 2;
     public float endRoadWidth = 2;
     public bool flipped = false;
+    public float textureTilingY = 1;
     public bool curved = true;
 
     public enum TerrainOption { adapt, deform, ignore };
