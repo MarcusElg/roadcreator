@@ -121,7 +121,6 @@ public class RoadEditor : Editor
         {
             GUILayout.Label("");
             GUILayout.Label("Debug", guiStyle);
-            EditorGUILayout.ObjectField(roadCreator.currentSegment, typeof(RoadSegment), true);
         }
 
         if (GUILayout.Button("Reset Road"))
@@ -151,8 +150,6 @@ public class RoadEditor : Editor
         {
             roadCreator = (RoadCreator)target;
         }
-
-        roadCreator.currentSegment = null;
 
         for (int i = roadCreator.transform.GetChild(0).childCount - 1; i >= 0; i--)
         {
@@ -248,7 +245,7 @@ public class RoadEditor : Editor
                 }
             }
 
-            if (roadCreator.currentSegment != null && roadCreator.currentSegment.transform.GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
+            if (roadCreator.transform.GetChild(0).childCount > 0 && roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
             {
                 points = CalculateTemporaryPoints(hitPosition);
             }
@@ -302,11 +299,6 @@ public class RoadEditor : Editor
         if (roadCreator.followObject != null)
         {
             roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints(!roadCreator.IsLastSegmentCurved());
-
-            if (roadCreator.followObject.transform.GetChild(0).childCount == 1 || roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 1)
-            {
-                roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints();
-            }
         }
 
         roadCreator.RemovePoints();
@@ -367,7 +359,7 @@ public class RoadEditor : Editor
             }
         }
 
-        if (roadCreator.currentSegment == null && roadCreator.transform.GetChild(0).childCount > 0 && roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 3)
+        if (roadCreator.transform.GetChild(0).childCount > 0 && roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 3)
         {
             if (guiEvent.shift == true)
             {
@@ -407,7 +399,7 @@ public class RoadEditor : Editor
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)
     {
-        float divisions = Misc.CalculateDistance(roadCreator.currentSegment.transform.GetChild(0).GetChild(0).position, roadCreator.currentSegment.transform.GetChild(0).GetChild(1).position, hitPosition);
+        float divisions = Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition);
         divisions = Mathf.Max(2, divisions);
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;
@@ -419,7 +411,7 @@ public class RoadEditor : Editor
                 t = 1;
             }
 
-            Vector3 position = Misc.Lerp3(roadCreator.currentSegment.transform.GetChild(0).GetChild(0).position, roadCreator.currentSegment.transform.GetChild(0).GetChild(1).position, hitPosition, t);
+            Vector3 position = Misc.Lerp3(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition, t);
 
             RaycastHit raycastHit;
             if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))

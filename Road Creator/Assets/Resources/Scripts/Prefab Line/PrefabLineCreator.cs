@@ -133,17 +133,14 @@ public class PrefabLineCreator : MonoBehaviour
     {
         if (transform.GetChild(0).childCount > 0)
         {
-            if (transform.GetChild(0).childCount > 0)
+            Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
+
+            if (removeTwo == true && transform.GetChild(0).childCount > 0)
             {
                 Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
-
-                if (removeTwo == true)
-                {
-                    Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).gameObject);
-                }
-
-                PlacePrefabs();
             }
+
+            PlacePrefabs();
         }
     }
 
