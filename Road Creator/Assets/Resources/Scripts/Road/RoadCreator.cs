@@ -557,7 +557,8 @@ public class RoadCreator : MonoBehaviour
                             }
                         }
                     }
-                } else
+                }
+                else
                 {
                     Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
                     transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh = null;
@@ -591,6 +592,12 @@ public class RoadCreator : MonoBehaviour
                     Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                     extraObjectToMove.transform.position = objectToMove.transform.position;
                 }
+
+                if (followObject != null)
+                {
+                    Undo.RecordObject(followObject.GetComponent<PrefabLineCreator>().objectToMove.transform, "Moved Point");
+                    followObject.GetComponent<PrefabLineCreator>().objectToMove.transform.position = objectToMove.transform.position;
+                }
             }
             else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
             {
@@ -608,6 +615,12 @@ public class RoadCreator : MonoBehaviour
                 {
                     Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                     extraObjectToMove.transform.position = position;
+                }
+
+                if (followObject != null)
+                {
+                    Undo.RecordObject(followObject.GetComponent<PrefabLineCreator>().objectToMove.transform, "Moved Point");
+                    followObject.GetComponent<PrefabLineCreator>().objectToMove.transform.position = objectToMove.transform.position;
                 }
             }
         }
@@ -631,15 +644,7 @@ public class RoadCreator : MonoBehaviour
 
                         if (followObject != null)
                         {
-                            if (followObject.GetComponent<RoadCreator>() != null)
-                            {
-                                followObject.GetComponent<RoadCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).GetChild(0).GetChild(1).gameObject;
-                            }
-                            else
-                            {
-                                int childIndex = objectToMove.transform.parent.parent.GetSiblingIndex() * 2 - 1;
-                                followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(childIndex).gameObject;
-                            }
+                            followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() * 2 + 1).gameObject;
                         }
                     }
                     else if (raycastHit.collider.gameObject.name == "Start Point")
@@ -655,19 +660,7 @@ public class RoadCreator : MonoBehaviour
 
                         if (followObject != null)
                         {
-                            if (followObject.GetComponent<RoadCreator>() != null)
-                            {
-                                followObject.GetComponent<RoadCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).GetChild(0).GetChild(0).gameObject;
-
-                                if (extraObjectToMove != null)
-                                {
-                                    followObject.GetComponent<RoadCreator>().extraObjectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).gameObject;
-                                }
-                            }
-                            else
-                            {
-                                followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).gameObject;
-                            }
+                            followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() * 2).gameObject;
                         }
                     }
                     else if (raycastHit.collider.gameObject.name == "End Point")
@@ -683,15 +676,7 @@ public class RoadCreator : MonoBehaviour
 
                         if (followObject != null)
                         {
-                            if (followObject.GetComponent<RoadCreator>() != null)
-                            {
-                                followObject.GetComponent<RoadCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex()).GetChild(0).GetChild(2).gameObject;
-
-                                if (extraObjectToMove != null)
-                                {
-                                    followObject.GetComponent<RoadCreator>().extraObjectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).gameObject;
-                                }
-                            }
+                            followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() * 2 + 2).gameObject;
                         }
                     }
 
