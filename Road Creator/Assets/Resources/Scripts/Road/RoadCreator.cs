@@ -305,13 +305,13 @@ public class RoadCreator : MonoBehaviour
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(1).position + left - new Vector3(0, roadSplitter.heightOffset - position.y, 0);
+                return roadSplitter.transform.GetChild(0).GetChild(1).position + left + new Vector3(0, roadSplitter.heightOffset - position.y, 0);
             }
             else if (connectionPointName == "Lower Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(2).position + left - new Vector3(0, roadSplitter.heightOffset - position.y, 0);
+                return roadSplitter.transform.GetChild(0).GetChild(2).position + left + new Vector3(0, roadSplitter.heightOffset - position.y, 0);
             }
         }
 
