@@ -302,6 +302,7 @@ public class RoadSegment : MonoBehaviour
                 float terrainPointY = position.y / terrainData.size.y;
                 int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.heightmapHeight);
                 float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+                modifiedHeights[terrainPointZ, terrainPointX] = terrainPointY;
 
                 terrainData.SetHeights(0, 0, modifiedHeights);
             }
