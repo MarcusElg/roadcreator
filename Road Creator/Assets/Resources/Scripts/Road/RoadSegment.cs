@@ -290,7 +290,7 @@ public class RoadSegment : MonoBehaviour
     {
         // Change y position
         RaycastHit raycastHit;
-        if (Physics.Raycast(position + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~(1 << roadLayer)))
+        if (Physics.Raycast(position + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadLayer | 1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
         {
             Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
             if (terrain != null)
@@ -302,7 +302,7 @@ public class RoadSegment : MonoBehaviour
                 float terrainPointY = position.y / terrainData.size.y;
                 int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.heightmapHeight);
                 float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
-                modifiedHeights[terrainPointZ, terrainPointX] = terrainPointY;
+                modifiedHeights[terrainPointZ, terrainPointX] = Mathf.Clamp01(terrainPointY);
 
                 terrainData.SetHeights(0, 0, modifiedHeights);
             }
