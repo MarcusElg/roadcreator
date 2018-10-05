@@ -326,7 +326,7 @@ public class RoadCreator : MonoBehaviour
         {
             float textureRepeat = length / 4;
 
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
             {
                 if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial != null)
                 {
@@ -437,21 +437,20 @@ public class RoadCreator : MonoBehaviour
                 segment.flipped = oldLastSegment.flipped;
                 segment.terrainOption = oldLastSegment.terrainOption;
 
-                segment.leftShoulderMaterial = oldLastSegment.leftShoulderMaterial;
-                segment.leftShoulder = oldLastSegment.leftShoulder;
-                segment.leftShoulderWidth = oldLastSegment.leftShoulderWidth;
-                segment.leftShoulderHeightOffset = oldLastSegment.leftShoulderHeightOffset;
-
-                segment.rightShoulderMaterial = oldLastSegment.rightShoulderMaterial;
-                segment.rightShoulder = oldLastSegment.rightShoulder;
-                segment.rightShoulderWidth = oldLastSegment.rightShoulderWidth;
-                segment.rightShoulderHeightOffset = oldLastSegment.rightShoulderHeightOffset;
+                for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
+                {
+                    segment.extraMeshOpen.Add(oldLastSegment.extraMeshOpen[i]);
+                    segment.extraMeshLeft.Add(oldLastSegment.extraMeshLeft[i]);
+                    segment.extraMeshMaterial.Add(oldLastSegment.extraMeshMaterial[i]);
+                    segment.extraMeshPhysicMaterial.Add(oldLastSegment.extraMeshPhysicMaterial[i]);
+                    segment.extraMeshXOffset.Add(oldLastSegment.extraMeshXOffset[i]);
+                    segment.extraMeshYOffset.Add(oldLastSegment.extraMeshYOffset[i]);
+                    segment.extraMeshWidth.Add(oldLastSegment.extraMeshWidth[i]);
+                }
             }
             else
             {
                 segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
-                segment.leftShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
-                segment.rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
             }
         }
         else
@@ -477,24 +476,6 @@ public class RoadCreator : MonoBehaviour
         mainMesh.AddComponent<MeshFilter>();
         mainMesh.AddComponent<MeshCollider>();
         mainMesh.layer = globalSettings.roadLayer;
-
-        GameObject leftShoulderMesh = new GameObject("Left Shoulder Mesh");
-        leftShoulderMesh.transform.SetParent(meshes.transform);
-        leftShoulderMesh.transform.localPosition = Vector3.zero;
-        leftShoulderMesh.hideFlags = HideFlags.NotEditable;
-        leftShoulderMesh.AddComponent<MeshRenderer>();
-        leftShoulderMesh.AddComponent<MeshFilter>();
-        leftShoulderMesh.AddComponent<MeshCollider>();
-        leftShoulderMesh.layer = globalSettings.roadLayer;
-
-        GameObject rightShoulderMesh = new GameObject("Right Shoulder Mesh");
-        rightShoulderMesh.transform.SetParent(meshes.transform);
-        rightShoulderMesh.transform.localPosition = Vector3.zero;
-        rightShoulderMesh.hideFlags = HideFlags.NotEditable;
-        rightShoulderMesh.AddComponent<MeshRenderer>();
-        rightShoulderMesh.AddComponent<MeshFilter>();
-        rightShoulderMesh.AddComponent<MeshCollider>();
-        rightShoulderMesh.layer = globalSettings.roadLayer;
 
         return segment;
     }

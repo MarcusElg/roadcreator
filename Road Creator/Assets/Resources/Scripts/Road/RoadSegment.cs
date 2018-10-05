@@ -16,17 +16,13 @@ public class RoadSegment : MonoBehaviour
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
 
-    public bool leftShoulder = false;
-    public float leftShoulderWidth = 1;
-    public float leftShoulderHeightOffset = 0;
-    public Material leftShoulderMaterial;
-    public PhysicMaterial leftShoulderPhysicsMaterial;
-
-    public bool rightShoulder = false;
-    public float rightShoulderWidth = 1;
-    public float rightShoulderHeightOffset = 0;
-    public Material rightShoulderMaterial;
-    public PhysicMaterial rightShoulderPhysicsMaterial;
+    public List<bool> extraMeshOpen = new List<bool>();
+    public List<bool> extraMeshLeft = new List<bool>();
+    public List<Material> extraMeshMaterial = new List<Material>();
+    public List<PhysicMaterial> extraMeshPhysicMaterial = new List<PhysicMaterial>();
+    public List<float> extraMeshXOffset = new List<float>();
+    public List<float> extraMeshWidth = new List<float>();
+    public List<float> extraMeshYOffset = new List<float>();
 
     public Vector3[] startGuidelinePoints;
     public Vector3[] centerGuidelinePoints;
@@ -39,15 +35,14 @@ public class RoadSegment : MonoBehaviour
             roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
         }
 
-        if (leftShoulderMaterial == null)
+        for (int i = 0; i < extraMeshOpen.Count; i++)
         {
-            leftShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
+            if (extraMeshMaterial[i] == null)
+            {
+                extraMeshMaterial[i] = Resources.Load("Materials/Asphalt") as Material;
+            }
         }
 
-        if (rightShoulderMaterial == null)
-        {
-            rightShoulderMaterial = Resources.Load("Materials/Asphalt") as Material;
-        }
         if (segment.GetSiblingIndex() == 0)
         {
             SetGuidelines(points, nextSegmentPoints, true);
@@ -58,8 +53,11 @@ public class RoadSegment : MonoBehaviour
         }
 
         GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator, roadPhysicsMaterial);
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(1), "Left Shoulder", leftShoulderMaterial, smoothnessAmount, roadCreator, leftShoulderPhysicsMaterial, leftShoulder);
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(2), "Right Shoulder", rightShoulderMaterial, smoothnessAmount, roadCreator, rightShoulderPhysicsMaterial, rightShoulder);
+
+        for (int i = 0; i < extraMeshOpen.Count; i++)
+        {
+            GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], extraMeshXOffset[i], extraMeshWidth[i], extraMeshYOffset[i], extraMeshLeft[i]);
+        }
     }
 
     private void SetGuidelines(Vector3[] currentPoints, Vector3[] nextPoints, bool first)
@@ -127,126 +125,121 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, bool generate = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, bool extraMeshLeft = true)
     {
-        if (generate == true)
+        Vector3[] vertices = new Vector3[points.Length * 2];
+        Vector2[] uvs = new Vector2[vertices.Length];
+        int numTriangles = 2 * (points.Length - 1);
+        int[] triangles = new int[numTriangles * 3];
+        int verticeIndex = 0;
+        int triangleIndex = 0;
+        float totalDistance = 0;
+        float currentDistance = 0;
+
+        for (int i = 1; i < points.Length; i++)
         {
-            Vector3[] vertices = new Vector3[points.Length * 2];
-            Vector2[] uvs = new Vector2[vertices.Length];
-            int numTriangles = 2 * (points.Length - 1);
-            int[] triangles = new int[numTriangles * 3];
-            int verticeIndex = 0;
-            int triangleIndex = 0;
-            float totalDistance = 0;
-            float currentDistance = 0;
-
-            for (int i = 1; i < points.Length; i++)
-            {
-                totalDistance += Vector3.Distance(points[i - 1], points[i]);
-            }
-
-            for (int i = 0; i < points.Length; i++)
-            {
-                /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                g.transform.position = points[i];
-                g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                g.transform.GetComponent<Collider>().enabled = false;
-                g.name = i + "";*/
-                Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
-                float correctedHeightOffset = heightOffset;
-
-                if (i > 0)
-                {
-                    currentDistance += Vector3.Distance(points[i - 1], points[i]);
-                }
-
-                float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
-
-                if (i == 0 && previousPoint != Misc.MaxVector3)
-                {
-                    correctedHeightOffset = (previousPoint.y + heightOffset);
-                }
-                else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
-                {
-                    correctedHeightOffset = (nextSegmentPoints[0].y + heightOffset);
-                }
-
-                if (name == "Road")
-                {
-                    vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
-                }
-                else if (name == "Left Shoulder")
-                {
-                    vertices[verticeIndex] = (points[i] + left * roadWidth + left * leftShoulderWidth + new Vector3(0, correctedHeightOffset + leftShoulderHeightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
-                }
-                else if (name == "Right Shoulder")
-                {
-                    vertices[verticeIndex] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] - left * roadWidth - left * rightShoulderWidth + new Vector3(0, correctedHeightOffset + rightShoulderHeightOffset, 0)) - segment.position;
-                }
-
-                if (terrainOption == TerrainOption.deform)
-                {
-                    DeformTerrain(vertices[verticeIndex] + segment.transform.position, roadCreator.globalSettings.roadLayer);
-                    DeformTerrain(vertices[verticeIndex + 1] + segment.transform.position, roadCreator.globalSettings.roadLayer);
-                }
-
-                if (i < points.Length - 1)
-                {
-                    triangles[triangleIndex] = verticeIndex;
-                    triangles[triangleIndex + 1] = (verticeIndex + 2) % vertices.Length;
-                    triangles[triangleIndex + 2] = verticeIndex + 1;
-
-                    triangles[triangleIndex + 3] = verticeIndex + 1;
-                    triangles[triangleIndex + 4] = (verticeIndex + 2) % vertices.Length;
-                    triangles[triangleIndex + 5] = (verticeIndex + 3) % vertices.Length;
-                }
-
-                verticeIndex += 2;
-                triangleIndex += 6;
-            }
-
-            // Last
-            if (nextSegmentPoints != null && nextSegmentPoints.Length == 1)
-            {
-                // Intersection
-                //vertices = fixVertices(0, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
-                //vertices = fixVertices(-1, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
-            }
-
-            if (nextSegmentPoints != null && smoothnessAmount > 0)
-            {
-                // Smoothness at end of segment
-                //vertices = fixVertices(vertices.Length - 1 - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
-                vertices = fixVertices(vertices.Length - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
-            }
-
-            // First
-            /*if (previousPoint != Misc.MaxVector3)
-            {
-                // Intersection
-                vertices = fixVertices(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
-                vertices = fixVertices(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
-            }*/
-
-            Mesh generatedMesh = new Mesh();
-            generatedMesh.vertices = vertices;
-            generatedMesh.triangles = triangles;
-            generatedMesh.uv = uvs;
-            generatedMesh = GenerateUvs(generatedMesh);
-
-            mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
-            mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
-            mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-            mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
+            totalDistance += Vector3.Distance(points[i - 1], points[i]);
         }
-        else
+
+        for (int i = 0; i < points.Length; i++)
         {
-            mesh.GetComponent<MeshFilter>().sharedMesh = null;
-            mesh.GetComponent<MeshCollider>().sharedMesh = null;
+            /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            g.transform.position = points[i];
+            g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            g.transform.GetComponent<Collider>().enabled = false;
+            g.name = i + "";*/
+            Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
+            float correctedHeightOffset = heightOffset;
+
+            if (i > 0)
+            {
+                currentDistance += Vector3.Distance(points[i - 1], points[i]);
+            }
+
+            float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
+
+            if (i == 0 && previousPoint != Misc.MaxVector3)
+            {
+                correctedHeightOffset = (previousPoint.y + heightOffset);
+            }
+            else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
+            {
+                correctedHeightOffset = (nextSegmentPoints[0].y + heightOffset);
+            }
+
+            if (name == "Road")
+            {
+                vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+            }
+            else
+            {
+                if (extraMeshLeft == true)
+                {
+                    vertices[verticeIndex] = (points[i] + left * -xOffset + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] + left * (-xOffset - width) + new Vector3(0, correctedHeightOffset + yOffset, 0)) - segment.position;
+                }
+                else
+                {
+                    vertices[verticeIndex] = (points[i] + left * (xOffset + width) + new Vector3(0, correctedHeightOffset + yOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] + left * xOffset + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                }
+            }
+
+            if (terrainOption == TerrainOption.deform)
+            {
+                DeformTerrain(vertices[verticeIndex] + segment.transform.position, roadCreator.globalSettings.roadLayer, roadCreator);
+                DeformTerrain(vertices[verticeIndex + 1] + segment.transform.position, roadCreator.globalSettings.roadLayer, roadCreator);
+            }
+
+            if (i < points.Length - 1)
+            {
+                triangles[triangleIndex] = verticeIndex;
+                triangles[triangleIndex + 1] = (verticeIndex + 2) % vertices.Length;
+                triangles[triangleIndex + 2] = verticeIndex + 1;
+
+                triangles[triangleIndex + 3] = verticeIndex + 1;
+                triangles[triangleIndex + 4] = (verticeIndex + 2) % vertices.Length;
+                triangles[triangleIndex + 5] = (verticeIndex + 3) % vertices.Length;
+            }
+
+            verticeIndex += 2;
+            triangleIndex += 6;
         }
+
+        // Last
+        if (nextSegmentPoints != null && nextSegmentPoints.Length == 1)
+        {
+            // Intersection
+            vertices = fixVertices(0, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
+            vertices = fixVertices(-1, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
+        }
+
+        if (nextSegmentPoints != null && smoothnessAmount > 0)
+        {
+            // Smoothness at end of segment
+            //vertices = fixVertices(vertices.Length - 1 - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
+            vertices = fixVertices(vertices.Length - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
+        }
+
+        // First
+        /*if (previousPoint != Misc.MaxVector3)
+        {
+            // Intersection
+            vertices = fixVertices(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
+            vertices = fixVertices(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
+        }*/
+
+        Mesh generatedMesh = new Mesh();
+        generatedMesh.vertices = vertices;
+        generatedMesh.triangles = triangles;
+        generatedMesh.uv = uvs;
+        generatedMesh = GenerateUvs(generatedMesh);
+
+        mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
+        mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
+        mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+        mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
     }
 
     private Vector3[] fixVertices(int position, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator, int change)
@@ -286,7 +279,7 @@ public class RoadSegment : MonoBehaviour
         return vertices;
     }
 
-    private void DeformTerrain(Vector3 position, int roadLayer)
+    private void DeformTerrain(Vector3 position, int roadLayer, RoadCreator roadCreator)
     {
         // Change y position
         RaycastHit raycastHit;

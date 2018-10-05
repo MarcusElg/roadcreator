@@ -23,26 +23,64 @@ public class RoadSegmentEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
 
-        GUILayout.Label("");
-        GUILayout.Label("Left Shoulder", guiStyle);
-        serializedObject.FindProperty("leftShoulder").boolValue = EditorGUILayout.Toggle("Left Shoulder", serializedObject.FindProperty("leftShoulder").boolValue);
-        if (serializedObject.FindProperty("leftShoulder").boolValue == true)
+        if (targets.Length == 1)
         {
-            serializedObject.FindProperty("leftShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Left Shoulder Material", serializedObject.FindProperty("leftShoulderMaterial").objectReferenceValue, typeof(Material), false);
-            serializedObject.FindProperty("leftShoulderPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Left Shoulder Physic Material", serializedObject.FindProperty("leftShoulderPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
-            serializedObject.FindProperty("leftShoulderWidth").floatValue = Mathf.Max(0f, EditorGUILayout.FloatField("Left Shoulder Width", serializedObject.FindProperty("leftShoulderWidth").floatValue));
-            serializedObject.FindProperty("leftShoulderHeightOffset").floatValue = EditorGUILayout.FloatField("Left Shoulder Y Offset", serializedObject.FindProperty("leftShoulderHeightOffset").floatValue);
-        }
+            GUILayout.Label("");
+            for (int i = 0; i < serializedObject.FindProperty("extraMeshOpen").arraySize; i++)
+            {
+                serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue = EditorGUILayout.Foldout(serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue, "Extra Mesh " + i);
+                if (serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue == true)
+                {
+                    serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(i).boolValue = EditorGUILayout.Toggle("Left", serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(i).boolValue);
+                    serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(i).objectReferenceValue = (Material)EditorGUILayout.ObjectField("Material", serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(i).objectReferenceValue, typeof(Material), false);
+                    serializedObject.FindProperty("extraMeshPhysicMaterial").GetArrayElementAtIndex(i).objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", serializedObject.FindProperty("extraMeshPhysicMaterial").GetArrayElementAtIndex(i).objectReferenceValue, typeof(PhysicMaterial), false);
+                    serializedObject.FindProperty("extraMeshXOffset").GetArrayElementAtIndex(i).floatValue = Mathf.Max(0, EditorGUILayout.FloatField("X Offset", serializedObject.FindProperty("extraMeshXOffset").GetArrayElementAtIndex(i).floatValue));
+                    serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(i).floatValue = Mathf.Max(EditorGUILayout.FloatField("Width", serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(i).floatValue), 0);
+                    serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(i).floatValue = EditorGUILayout.FloatField("Y Offset", serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(i).floatValue);
 
-        GUILayout.Label("");
-        GUILayout.Label("Right Shoulder", guiStyle);
-        serializedObject.FindProperty("rightShoulder").boolValue = EditorGUILayout.Toggle("Right Shoulder", serializedObject.FindProperty("rightShoulder").boolValue);
-        if (serializedObject.FindProperty("rightShoulder").boolValue == true)
-        {
-            serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Right Shoulder Material", serializedObject.FindProperty("rightShoulderMaterial").objectReferenceValue, typeof(Material), false);
-            serializedObject.FindProperty("rightShoulderPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Right Shoulder Physic Material", serializedObject.FindProperty("rightShoulderPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
-            serializedObject.FindProperty("rightShoulderWidth").floatValue = Mathf.Max(0f, EditorGUILayout.FloatField("Right Shoulder Width", serializedObject.FindProperty("rightShoulderWidth").floatValue));
-            serializedObject.FindProperty("rightShoulderHeightOffset").floatValue = EditorGUILayout.FloatField("Right Shoulder Y Offset", serializedObject.FindProperty("rightShoulderHeightOffset").floatValue);
+                    if (GUILayout.Button("Remove Extra Mesh") == true && ((RoadSegment)target).transform.GetChild(1).childCount > 1)
+                    {
+                        serializedObject.FindProperty("extraMeshOpen").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshLeft").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshMaterial").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshPhysicMaterial").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshXOffset").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshWidth").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshYOffset").DeleteArrayElementAtIndex(i);
+
+                        for (int j = 0; j < targets.Length; j++)
+                        {
+                            DestroyImmediate(((RoadSegment)targets[j]).transform.GetChild(1).GetChild(i + 1).gameObject);
+                        }
+                    }
+                }
+            }
+
+            if (GUILayout.Button("Add Extra Mesh"))
+            {
+                serializedObject.FindProperty("extraMeshOpen").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshOpen").arraySize);
+                serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshOpen").arraySize - 1).boolValue = true;
+                serializedObject.FindProperty("extraMeshLeft").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshLeft").arraySize);
+                serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshLeft").arraySize - 1).boolValue = true;
+                serializedObject.FindProperty("extraMeshMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize);
+                serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize - 1).objectReferenceValue = Resources.Load("Materials/Asphalt") as Material;
+                serializedObject.FindProperty("extraMeshPhysicMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshPhysicMaterial").arraySize);
+                serializedObject.FindProperty("extraMeshXOffset").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshXOffset").arraySize);
+                serializedObject.FindProperty("extraMeshXOffset").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshXOffset").arraySize - 1).floatValue = serializedObject.FindProperty("startRoadWidth").floatValue;
+                serializedObject.FindProperty("extraMeshWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshWidth").arraySize);
+                serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshWidth").arraySize - 1).floatValue = 1;
+                serializedObject.FindProperty("extraMeshYOffset").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshYOffset").arraySize);
+                serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshYOffset").arraySize - 1).floatValue = 0;
+
+                GameObject extraMesh = new GameObject("Extra Mesh");
+                extraMesh.AddComponent<MeshFilter>();
+                extraMesh.AddComponent<MeshRenderer>();
+                extraMesh.AddComponent<MeshCollider>();
+                extraMesh.transform.SetParent(((RoadSegment)target).transform.GetChild(1));
+                extraMesh.transform.localPosition = Vector3.zero;
+                extraMesh.layer = ((RoadSegment)target).transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
+                extraMesh.hideFlags = HideFlags.NotEditable;
+            }
         }
 
         if (EditorGUI.EndChangeCheck())

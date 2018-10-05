@@ -65,9 +65,9 @@ public class RoundaboutEditor : Editor
 
             if (roundabout.connectionOpen[i] == true)
             {
-                roundabout.connectionVertexIndex[i] = Mathf.Clamp(EditorGUILayout.IntField("Connection Vertex Index", roundabout.connectionVertexIndex[i]), 0, roundabout.points.Length);
-                roundabout.connectionWidth[i] = Mathf.Max(0.1f, EditorGUILayout.FloatField("Connection Width", roundabout.connectionWidth[i]));
-                roundabout.connectionMaterial[i] = (Material)EditorGUILayout.ObjectField("Connection Material", roundabout.connectionMaterial[i], typeof(Material), false);
+                roundabout.connectionVertexIndex[i] = Mathf.Clamp(EditorGUILayout.IntField("Vertex Index", roundabout.connectionVertexIndex[i]), 0, roundabout.points.Length);
+                roundabout.connectionWidth[i] = Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", roundabout.connectionWidth[i]));
+                roundabout.connectionMaterial[i] = (Material)EditorGUILayout.ObjectField("Material", roundabout.connectionMaterial[i], typeof(Material), false);
 
                 if (GUILayout.Button("Remove Connection") == true)
                 {
