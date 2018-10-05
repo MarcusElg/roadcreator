@@ -426,38 +426,6 @@ public class RoadCreator : MonoBehaviour
         segment.transform.position = position;
         segment.transform.hideFlags = HideFlags.NotEditable;
 
-        if (segmentPreset == null)
-        {
-            if (transform.GetChild(0).childCount > 1)
-            {
-                RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
-                segment.roadMaterial = oldLastSegment.roadMaterial;
-                segment.startRoadWidth = oldLastSegment.startRoadWidth;
-                segment.endRoadWidth = oldLastSegment.endRoadWidth;
-                segment.flipped = oldLastSegment.flipped;
-                segment.terrainOption = oldLastSegment.terrainOption;
-
-                for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
-                {
-                    segment.extraMeshOpen.Add(oldLastSegment.extraMeshOpen[i]);
-                    segment.extraMeshLeft.Add(oldLastSegment.extraMeshLeft[i]);
-                    segment.extraMeshMaterial.Add(oldLastSegment.extraMeshMaterial[i]);
-                    segment.extraMeshPhysicMaterial.Add(oldLastSegment.extraMeshPhysicMaterial[i]);
-                    segment.extraMeshXOffset.Add(oldLastSegment.extraMeshXOffset[i]);
-                    segment.extraMeshYOffset.Add(oldLastSegment.extraMeshYOffset[i]);
-                    segment.extraMeshWidth.Add(oldLastSegment.extraMeshWidth[i]);
-                }
-            }
-            else
-            {
-                segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
-            }
-        }
-        else
-        {
-            segmentPreset.ApplyTo(segment);
-        }
-
         GameObject points = new GameObject("Points");
         points.transform.SetParent(segment.transform);
         points.transform.localPosition = Vector3.zero;
@@ -476,6 +444,47 @@ public class RoadCreator : MonoBehaviour
         mainMesh.AddComponent<MeshFilter>();
         mainMesh.AddComponent<MeshCollider>();
         mainMesh.layer = globalSettings.roadLayer;
+
+        if (segmentPreset == null)
+        {
+            if (transform.GetChild(0).childCount > 1)
+            {
+                RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
+                segment.roadMaterial = oldLastSegment.roadMaterial;
+                segment.startRoadWidth = oldLastSegment.startRoadWidth;
+                segment.endRoadWidth = oldLastSegment.endRoadWidth;
+                segment.flipped = oldLastSegment.flipped;
+                segment.terrainOption = oldLastSegment.terrainOption;
+
+                for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
+                {
+                    GameObject extraMesh = new GameObject("Extra Mesh");
+                    extraMesh.AddComponent<MeshFilter>();
+                    extraMesh.AddComponent<MeshRenderer>();
+                    extraMesh.AddComponent<MeshCollider>();
+                    extraMesh.transform.SetParent(segment.transform.GetChild(1));
+                    extraMesh.transform.localPosition = Vector3.zero;
+                    extraMesh.layer = globalSettings.roadLayer;
+                    extraMesh.hideFlags = HideFlags.NotEditable;
+
+                    segment.extraMeshOpen.Add(oldLastSegment.extraMeshOpen[i]);
+                    segment.extraMeshLeft.Add(oldLastSegment.extraMeshLeft[i]);
+                    segment.extraMeshMaterial.Add(oldLastSegment.extraMeshMaterial[i]);
+                    segment.extraMeshPhysicMaterial.Add(oldLastSegment.extraMeshPhysicMaterial[i]);
+                    segment.extraMeshXOffset.Add(oldLastSegment.extraMeshXOffset[i]);
+                    segment.extraMeshYOffset.Add(oldLastSegment.extraMeshYOffset[i]);
+                    segment.extraMeshWidth.Add(oldLastSegment.extraMeshWidth[i]);
+                }
+            }
+            else
+            {
+                segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+            }
+        }
+        else
+        {
+            segmentPreset.ApplyTo(segment);
+        }
 
         return segment;
     }
