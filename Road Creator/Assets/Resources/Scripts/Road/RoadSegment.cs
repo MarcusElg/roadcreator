@@ -208,8 +208,14 @@ public class RoadSegment : MonoBehaviour
 
             if (terrainOption == TerrainOption.deform)
             {
-                DeformTerrain(vertices[verticeIndex] + segment.transform.position, roadCreator.globalSettings.roadLayer, roadCreator);
-                DeformTerrain(vertices[verticeIndex + 1] + segment.transform.position, roadCreator.globalSettings.roadLayer, roadCreator);
+                float divisions = Mathf.Max(2f, roadWidth * 3f);
+                for (float t = 0; t <= 1; t += 1f / divisions)
+                {
+                    Vector3 forward = (vertices[verticeIndex + 1] - vertices[verticeIndex]).normalized;
+
+                    Vector3 position = Vector3.Lerp(vertices[verticeIndex] - forward * 0.3f - new Vector3(0, heightOffset, 0), vertices[verticeIndex + 1] + forward * 0.6f - new Vector3(0, heightOffset, 0), t);
+                    DeformTerrain(position + segment.transform.position, roadCreator);
+                }
             }
 
             if (i < points.Length - 1)
@@ -299,11 +305,11 @@ public class RoadSegment : MonoBehaviour
         return vertices;
     }
 
-    private void DeformTerrain(Vector3 position, int roadLayer, RoadCreator roadCreator)
+    private void DeformTerrain(Vector3 position, RoadCreator roadCreator)
     {
         // Change y position
         RaycastHit raycastHit;
-        if (Physics.Raycast(position + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadLayer | 1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
+        if (Physics.Raycast(position + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadCreator.globalSettings.roadLayer | 1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
         {
             Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
             if (terrain != null)
