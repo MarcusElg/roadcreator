@@ -348,21 +348,24 @@ public class RoadEditor : Editor
         Handles.color = Color.green;
         for (int i = 0; i < objects.Length; i++)
         {
-            if (objects[i].name.Contains("Intersection") || objects[i].name == "Roundabout")
+            if (!objects[i].name.Contains("Mesh"))
             {
-                for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
+                if (objects[i].name.Contains("Intersection") || objects[i].name == "Roundabout")
                 {
-                    if (objects[i].GetChild(0).GetChild(j).GetChild(0).GetComponent<MeshFilter>().sharedMesh != null)
+                    for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
                     {
-                        Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).GetChild(1).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                        if (objects[i].GetChild(0).GetChild(j).GetChild(0).GetComponent<MeshFilter>().sharedMesh != null)
+                        {
+                            Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).GetChild(1).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                        }
                     }
                 }
-            }
-            else if (objects[i].name == "Road Splitter")
-            {
-                for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
+                else if (objects[i].name == "Road Splitter")
                 {
-                    Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                    for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
+                    {
+                        Handles.CylinderHandleCap(0, objects[i].GetChild(0).GetChild(j).position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                    }
                 }
             }
         }
