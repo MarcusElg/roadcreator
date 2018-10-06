@@ -110,7 +110,7 @@ public class TriangleIntersectionEditor : Editor
 
         if (GUILayout.Button("Convert To Meshes"))
         {
-            Misc.ConvertIntersectionToMesh(intersection.gameObject, "Triangle Intersection Mesh");
+            Misc.ConvertToMesh(intersection.gameObject, "Triangle Intersection Mesh");
         }
     }
 

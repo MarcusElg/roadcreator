@@ -271,7 +271,7 @@ public static class Misc
         meshObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    public static GameObject AddIntersectionSide (Transform parent, GlobalSettings globalSettings, string name)
+    public static GameObject AddIntersectionSide(Transform parent, GlobalSettings globalSettings, string name)
     {
         GameObject side = new GameObject(name + " Side");
         side.transform.SetParent(parent);
@@ -297,7 +297,7 @@ public static class Misc
         return side;
     }
 
-    public static void GenerateSquareMesh (Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour, Material material)
+    public static void GenerateSquareMesh(Transform meshOwner, Vector3 pointOne, Vector3 pointTwo, Vector3 pointThree, Vector3 pointFour, Material material)
     {
         Vector3[] vertices = new Vector3[4];
         Vector2[] uvs = new Vector2[4];
@@ -327,28 +327,71 @@ public static class Misc
         return new Vector3(-vector.x, vector.y, vector.z);
     }
 
-    public static void ConvertIntersectionToMesh(GameObject intersection, string name)
+    public static void ConvertToMesh(GameObject gameObject, string name)
     {
-        MeshFilter[] meshFilters = intersection.GetComponentsInChildren<MeshFilter>();
+        MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
+        List<Material> materials = new List<Material>();
 
         if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
         {
-            GameObject intersectionMesh = new GameObject(name);
-            Undo.RegisterCreatedObjectUndo(intersectionMesh, "Created Intersection Mesh");
-            intersectionMesh.transform.position = intersection.transform.position;
-
             for (int i = 0; i < meshFilters.Length; i++)
             {
-                if (meshFilters[i].sharedMesh != null)
+                if (!materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial))
                 {
-                    Undo.SetTransformParent(meshFilters[i].transform, intersectionMesh.transform, "Created Intersection Mesh");
-                    meshFilters[i].name = "Mesh";
-                    meshFilters[i].gameObject.hideFlags = HideFlags.None;
+                    materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial);
                 }
             }
 
-            Undo.DestroyObjectImmediate(intersection.gameObject);
-            Selection.activeObject = intersectionMesh;
+            List<Mesh> subMeshes = new List<Mesh>();
+            foreach (Material material in materials)
+            {
+                List<CombineInstance> combinerInstances = new List<CombineInstance>();
+                for (int i = 0; i < meshFilters.Length; i++)
+                {
+                    Material localMaterial = meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial;
+                    if (localMaterial != material)
+                    {
+                        continue;
+                    }
+
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = meshFilters[i].sharedMesh;
+                    Matrix4x4 matrix = Matrix4x4.identity;
+                    matrix.SetTRS(meshFilters[i].transform.position, meshFilters[i].transform.rotation, Vector3.one);
+                    combineInstance.transform = matrix;
+                    combinerInstances.Add(combineInstance);
+                }
+
+                Mesh mesh = new Mesh();
+                mesh.CombineMeshes(combinerInstances.ToArray(), true);
+                subMeshes.Add(mesh);
+            }
+
+            List<CombineInstance> finalCombineInstances = new List<CombineInstance>();
+            for (int i = 0; i < subMeshes.Count; i++)
+            {
+                CombineInstance combineInstance = new CombineInstance();
+                combineInstance.mesh = subMeshes[i];
+                combineInstance.transform = Matrix4x4.identity;
+                finalCombineInstances.Add(combineInstance);
+            }
+            Mesh finalMesh = new Mesh();
+            finalMesh.CombineMeshes(finalCombineInstances.ToArray(), false);
+
+            GameObject newMesh = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(newMesh, "Create Combined Mesh");
+            newMesh.AddComponent<MeshFilter>();
+            newMesh.AddComponent<MeshRenderer>();
+            newMesh.AddComponent<MeshCollider>();
+            newMesh.GetComponent<MeshFilter>().sharedMesh = finalMesh;
+            newMesh.GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
+            newMesh.GetComponent<MeshCollider>().sharedMesh = finalMesh;
+            Selection.activeGameObject = newMesh;
+            Undo.DestroyObjectImmediate(gameObject.gameObject);
+        }
+        else
+        {
+            Debug.Log("There are no meshes to combine");
         }
     }
 

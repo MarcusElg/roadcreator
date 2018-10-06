@@ -53,7 +53,7 @@ public class RoundaboutEditor : Editor
         EditorGUI.BeginChangeCheck();
         roundabout.centerMaterial = (Material)EditorGUILayout.ObjectField("Center Material", roundabout.centerMaterial, typeof(Material), false);
         roundabout.diameter = Mathf.Max(1.2f, EditorGUILayout.FloatField("Diameter", roundabout.diameter));
-        roundabout.width = Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", roundabout.width));
+        roundabout.width = Mathf.Min(roundabout.diameter / 2, Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", roundabout.width)));
         roundabout.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roundabout.heightOffset));
 
         GUIStyle guiStyle = new GUIStyle();
@@ -115,7 +115,7 @@ public class RoundaboutEditor : Editor
         if (EditorGUI.EndChangeCheck() == true || roundabout.transform.hasChanged == true)
         {
             Misc.UpdateAllIntersectionConnections();
-            roundabout.GenerateMeshes();
+            //roundabout.GenerateMeshes();
             roundabout.transform.hasChanged = false;
         }
 
@@ -126,7 +126,7 @@ public class RoundaboutEditor : Editor
 
         if (GUILayout.Button("Convert To Meshes"))
         {
-            Misc.ConvertIntersectionToMesh(roundabout.gameObject, "Roundabout Mesh");
+            Misc.ConvertToMesh(roundabout.gameObject, "Roundabout Mesh");
         }
     }
 

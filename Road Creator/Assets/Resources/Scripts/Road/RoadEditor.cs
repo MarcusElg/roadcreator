@@ -140,7 +140,7 @@ public class RoadEditor : Editor
 
         if (GUILayout.Button("Convert To Meshes"))
         {
-            ConvertToMesh(roadCreator);
+            Misc.ConvertToMesh(roadCreator.gameObject, "Road Mesh");
         }
     }
 
@@ -165,31 +165,6 @@ public class RoadEditor : Editor
                     Undo.DestroyObjectImmediate(roadCreator.followObject.transform.GetChild(i).GetChild(j).gameObject);
                 }
             }
-        }
-    }
-
-    public void ConvertToMesh(RoadCreator roadCreator)
-    {
-        MeshFilter[] meshFilters = roadCreator.GetComponentsInChildren<MeshFilter>();
-
-        if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
-        {
-            GameObject roadMesh = new GameObject("Road Mesh");
-            Undo.RegisterCreatedObjectUndo(roadMesh, "Created Road Mesh");
-            roadMesh.transform.position = meshFilters[0].transform.parent.parent.GetChild(0).GetChild(0).position;
-
-            for (int i = 0; i < meshFilters.Length; i++)
-            {
-                if (meshFilters[i].sharedMesh != null)
-                {
-                    Undo.SetTransformParent(meshFilters[i].transform, roadMesh.transform, "Created Road Mesh");
-                    meshFilters[i].name = "Mesh";
-                    meshFilters[i].gameObject.hideFlags = HideFlags.None;
-                }
-            }
-
-            Undo.DestroyObjectImmediate(roadCreator.gameObject);
-            Selection.activeObject = roadMesh;
         }
     }
 
