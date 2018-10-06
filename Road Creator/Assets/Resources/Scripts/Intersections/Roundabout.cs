@@ -125,7 +125,7 @@ public class Roundabout : MonoBehaviour
 
     IEnumerator FixTextureStretch()
     {
-        yield return new WaitForSeconds(0.01f);
+        yield return new WaitForSeconds(0.03f);
 
         float textureRepeat = Mathf.RoundToInt((diameter + width) / 3f);
 

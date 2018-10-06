@@ -115,7 +115,7 @@ public class RoundaboutEditor : Editor
         if (EditorGUI.EndChangeCheck() == true || roundabout.transform.hasChanged == true)
         {
             Misc.UpdateAllIntersectionConnections();
-            //roundabout.GenerateMeshes();
+            roundabout.GenerateMeshes();
             roundabout.transform.hasChanged = false;
         }
 
