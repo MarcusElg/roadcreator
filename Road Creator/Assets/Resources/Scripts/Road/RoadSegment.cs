@@ -20,7 +20,6 @@ public class RoadSegment : MonoBehaviour
     public List<bool> extraMeshLeft = new List<bool>();
     public List<Material> extraMeshMaterial = new List<Material>();
     public List<PhysicMaterial> extraMeshPhysicMaterial = new List<PhysicMaterial>();
-    public List<float> extraMeshXOffset = new List<float>();
     public List<float> extraMeshWidth = new List<float>();
     public List<float> extraMeshYOffset = new List<float>();
 
@@ -56,7 +55,26 @@ public class RoadSegment : MonoBehaviour
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
         {
-            GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], extraMeshXOffset[i], extraMeshWidth[i], extraMeshYOffset[i], extraMeshLeft[i]);
+            float leftYOffset = 0;
+            float xOffset = 0;
+            if (i > 0)
+            {
+                bool foundLast = false;
+                for (int j = i - 1; j > -1; j -= 1)
+                {
+                    if (extraMeshLeft[j] == extraMeshLeft[i] && j != i)
+                    {
+                        if (foundLast == false)
+                        {
+                            leftYOffset = extraMeshYOffset[j];
+                            foundLast = true;
+                        }
+
+                        xOffset += extraMeshWidth[j];
+                    }
+                }
+            }
+            GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], xOffset, extraMeshWidth[i], extraMeshYOffset[i], leftYOffset, extraMeshLeft[i]);
         }
     }
 
@@ -125,7 +143,7 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, bool extraMeshLeft = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
         Vector3[] vertices = new Vector3[points.Length * 2];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -174,15 +192,17 @@ public class RoadSegment : MonoBehaviour
             }
             else
             {
+                float modifiedXOffset = xOffset + roadWidth;
+
                 if (extraMeshLeft == true)
                 {
-                    vertices[verticeIndex] = (points[i] + left * -xOffset + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] + left * (-xOffset - width) + new Vector3(0, correctedHeightOffset + yOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] + left * -modifiedXOffset + new Vector3(0, correctedHeightOffset + leftYOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] + left * (-modifiedXOffset - width) + new Vector3(0, correctedHeightOffset + yOffset, 0)) - segment.position;
                 }
                 else
                 {
-                    vertices[verticeIndex] = (points[i] + left * (xOffset + width) + new Vector3(0, correctedHeightOffset + yOffset, 0)) - segment.position;
-                    vertices[verticeIndex + 1] = (points[i] + left * xOffset + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                    vertices[verticeIndex] = (points[i] + left * (modifiedXOffset + width) + new Vector3(0, correctedHeightOffset + yOffset, 0)) - segment.position;
+                    vertices[verticeIndex + 1] = (points[i] + left * modifiedXOffset + new Vector3(0, correctedHeightOffset + leftYOffset, 0)) - segment.position;
                 }
             }
 

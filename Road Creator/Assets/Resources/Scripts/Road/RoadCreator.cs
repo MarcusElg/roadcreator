@@ -471,7 +471,6 @@ public class RoadCreator : MonoBehaviour
                     segment.extraMeshLeft.Add(oldLastSegment.extraMeshLeft[i]);
                     segment.extraMeshMaterial.Add(oldLastSegment.extraMeshMaterial[i]);
                     segment.extraMeshPhysicMaterial.Add(oldLastSegment.extraMeshPhysicMaterial[i]);
-                    segment.extraMeshXOffset.Add(oldLastSegment.extraMeshXOffset[i]);
                     segment.extraMeshYOffset.Add(oldLastSegment.extraMeshYOffset[i]);
                     segment.extraMeshWidth.Add(oldLastSegment.extraMeshWidth[i]);
                 }
