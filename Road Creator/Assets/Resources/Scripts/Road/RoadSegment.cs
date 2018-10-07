@@ -234,7 +234,7 @@ public class RoadSegment : MonoBehaviour
                     TerrainData terrainData = terrain.terrainData;
                     modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
                     float zDivisions = Vector3.Distance(points[0], points[1]);
-                    Debug.Log(zDivisions);
+
                     for (int i = 0; i < points.Length; i++)
                     {                
                         Vector3 forward = (vertices[i * 2 + 1] - vertices[i * 2]).normalized;
