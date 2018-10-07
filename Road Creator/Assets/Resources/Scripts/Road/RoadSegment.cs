@@ -206,18 +206,6 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            if (terrainOption == TerrainOption.deform)
-            {
-                float divisions = Mathf.Max(2f, roadWidth * 3f);
-                for (float t = 0; t <= 1; t += 1f / divisions)
-                {
-                    Vector3 forward = (vertices[verticeIndex + 1] - vertices[verticeIndex]).normalized;
-
-                    Vector3 position = Vector3.Lerp(vertices[verticeIndex] - forward * 0.3f - new Vector3(0, heightOffset, 0), vertices[verticeIndex + 1] + forward * 0.6f - new Vector3(0, heightOffset, 0), t);
-                    DeformTerrain(position + segment.transform.position, roadCreator);
-                }
-            }
-
             if (i < points.Length - 1)
             {
                 triangles[triangleIndex] = verticeIndex;
@@ -231,6 +219,61 @@ public class RoadSegment : MonoBehaviour
 
             verticeIndex += 2;
             triangleIndex += 6;
+        }
+
+        // Terrain deformation
+        if (terrainOption == TerrainOption.deform)
+        {
+            float[,] modifiedHeights;
+            RaycastHit raycastHit;
+            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadCreator.globalSettings.roadLayer | 1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
+            {
+                Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
+                if (terrain != null)
+                {
+                    TerrainData terrainData = terrain.terrainData;
+                    modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+                    float zDivisions = Vector3.Distance(points[0], points[1]);
+                    Debug.Log(zDivisions);
+                    for (int i = 0; i < points.Length; i++)
+                    {                
+                        Vector3 forward = (vertices[i * 2 + 1] - vertices[i * 2]).normalized;
+
+                        for (float offset = 0; offset < 1; offset += 1 / zDivisions)
+                        {
+                            Vector3 leftVertex = vertices[i * 2];
+                            Vector3 rightVertex = vertices[i * 2 + 1];
+                            if (i > 0)
+                            {
+                                leftVertex = Vector3.Lerp(vertices[(i - 1) * 2], vertices[i * 2], offset);
+                                rightVertex = Vector3.Lerp(vertices[(i - 1) * 2 + 1], vertices[i * 2 + 1], offset);
+                            }
+
+                            float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, (i / points.Length));
+                            float divisions = Mathf.Max(2f, roadWidth * 10);
+
+                            for (float t = 0; t <= 1; t += 1f / divisions)
+                            {
+                                Vector3 position = Vector3.Lerp(rightVertex + forward * 2f - new Vector3(0, heightOffset, 0) + segment.transform.position, leftVertex - forward * 2f - new Vector3(0, heightOffset, 0) + segment.transform.position, t);
+                                Vector3 localTerrainPoint = position - terrain.transform.position;
+
+                                int terrainPointX = (int)((localTerrainPoint.x / terrainData.size.x) * terrainData.heightmapWidth);
+                                float terrainPointY = position.y / terrainData.size.y;
+                                int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.heightmapHeight);
+
+                                if (terrainPointX > terrainData.heightmapWidth || terrainPointZ > terrainData.heightmapHeight)
+                                {
+                                    continue;
+                                }
+
+                                modifiedHeights[terrainPointZ, terrainPointX] = Mathf.Clamp01(terrainPointY);
+                            }
+                        }
+                    }
+
+                    terrainData.SetHeights(0, 0, modifiedHeights);
+                }
+            }
         }
 
         // Last
@@ -303,29 +346,6 @@ public class RoadSegment : MonoBehaviour
         }
 
         return vertices;
-    }
-
-    private void DeformTerrain(Vector3 position, RoadCreator roadCreator)
-    {
-        // Change y position
-        RaycastHit raycastHit;
-        if (Physics.Raycast(position + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadCreator.globalSettings.roadLayer | 1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
-        {
-            Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
-            if (terrain != null)
-            {
-                TerrainData terrainData = terrain.terrainData;
-                Vector3 localTerrainPoint = raycastHit.point - terrain.transform.position;
-
-                int terrainPointX = (int)((localTerrainPoint.x / terrainData.size.x) * terrainData.heightmapWidth);
-                float terrainPointY = position.y / terrainData.size.y;
-                int terrainPointZ = (int)((localTerrainPoint.z / terrainData.size.z) * terrainData.heightmapHeight);
-                float[,] modifiedHeights = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
-                modifiedHeights[terrainPointZ, terrainPointX] = Mathf.Clamp01(terrainPointY);
-
-                terrainData.SetHeights(0, 0, modifiedHeights);
-            }
-        }
     }
 
     private Mesh GenerateUvs(Mesh mesh)
