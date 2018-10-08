@@ -63,18 +63,18 @@ public class RoadCreator : MonoBehaviour
 
                         if (actualSmoothnessAmount > 0)
                         {
-                            float distanceSection = 1f / ((actualSmoothnessAmount * 2));
+                            float distanceSection = 1f / (actualSmoothnessAmount * 2);
                             int currentPoint = 0;
-                            for (float t = 0; t < 0.5 + distanceSection; t += distanceSection)
+                            for (float t = 0; t < 0.4999 + distanceSection; t += distanceSection)
                             {
                                 if (t > 0.5f)
                                 {
                                     t = 0.5f;
                                 }
-
+                                Debug.Log(actualSmoothnessAmount + ", " + currentPoint);
                                 // First section
                                 currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount + currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], t);
-                                Debug.Log(t);
+
                                 // Second section
                                 nextPoints[actualSmoothnessAmount - currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], 1f - t);
 

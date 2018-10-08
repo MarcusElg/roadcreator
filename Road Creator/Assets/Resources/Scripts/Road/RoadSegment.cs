@@ -182,7 +182,6 @@ public class RoadSegment : MonoBehaviour
             if (name == "Road")
             {
                 vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
-                //Debug.Log(i + ", " + points[i]);
                 vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
             }
             else
@@ -231,7 +230,7 @@ public class RoadSegment : MonoBehaviour
                     float zDivisions = Vector3.Distance(points[0], points[1]);
 
                     for (int i = 0; i < points.Length; i++)
-                    {                
+                    {
                         Vector3 forward = (vertices[i * 2 + 1] - vertices[i * 2]).normalized;
 
                         for (float offset = 0; offset < 1; offset += 1 / zDivisions)
@@ -272,27 +271,28 @@ public class RoadSegment : MonoBehaviour
         }
 
         // Last
-        if (nextSegmentPoints != null && nextSegmentPoints.Length == 1)
+        if (nextSegmentPoints != null)
         {
-            // Intersection
-            vertices = fixVertices(0, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
-            vertices = fixVertices(-1, vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
-        }
-
-        if (nextSegmentPoints != null && smoothnessAmount > 0)
-        {
-            // Smoothness at end of segment
-            //vertices = fixVertices(vertices.Length - 1 - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
-            vertices = fixVertices(vertices.Length - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
+            if (nextSegmentPoints.Length == 1)
+            {
+                // Intersection
+                vertices = fixVertices(vertices.Length - 1 - (2 * smoothnessAmount), vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
+                vertices = fixVertices(vertices.Length - 2 - (2 * smoothnessAmount), vertices, (nextSegmentPoints[0] - points[points.Length - 1]).normalized, segment, roadCreator, 2);
+            } else if (smoothnessAmount > 0)
+            {
+                // Smoothness at end of segment
+                vertices = fixVertices(vertices.Length - 1 - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
+                vertices = fixVertices(vertices.Length - (2 * smoothnessAmount), vertices, (points[points.Length - 1 - smoothnessAmount] - points[points.Length - 2 - smoothnessAmount]).normalized, segment, roadCreator, 2);
+            }
         }
 
         // First
-        /*if (previousPoint != Misc.MaxVector3)
+        if (previousPoint != Misc.MaxVector3)
         {
             // Intersection
-            vertices = fixVertices(0, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
-            vertices = fixVertices(1, vertices, (points[0] - previousPoint).normalized, segment, roadCreator, -2);
-        }*/
+            vertices = fixVertices(0, vertices, (previousPoint - points[0]).normalized, segment, roadCreator, -2);
+            vertices = fixVertices(1, vertices, (previousPoint - points[0]).normalized, segment, roadCreator, -2);
+        }
 
         Mesh generatedMesh = new Mesh();
         generatedMesh.vertices = vertices;
@@ -311,33 +311,27 @@ public class RoadSegment : MonoBehaviour
         int startVertex = 0;
         for (int i = position; startVertex == 0; i -= change)
         {
-            if (i < 1)
+            if ((i < 1 && change == 2) || (i > vertices.Length - 1 && change == -2))
             {
                 return vertices;
             }
 
             float direction = Vector3.Dot(forward.normalized, (vertices[position] - vertices[i]).normalized);
+            
             if (direction > 0.0f)
             {
-                startVertex = i += change;
+                startVertex = i;
             }
-
         }
-        int amount = Mathf.Abs(startVertex - position);
+
+        int amount = Mathf.Abs(startVertex - position) / 2;
         float part = 1f / amount;
         float index = 0;
 
-        for (int i = startVertex; i < amount * 2; i += change)
+        for (int i = startVertex; index < amount * 2; i += change)
         {
-            GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            g.transform.position = vertices[startVertex] + segment.position;
-            g.name = "Start Vertex";
-            g = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            g.transform.position = vertices[position] + segment.position;
-            g.name = "Start Position";
-
             vertices[i] = Vector3.Lerp(vertices[startVertex], vertices[position], part * index);
-            index += 1;
+            index += 2;
         }
 
         return vertices;
