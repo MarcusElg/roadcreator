@@ -71,7 +71,7 @@ public class RoadCreator : MonoBehaviour
                                 {
                                     t = 0.5f;
                                 }
-                                Debug.Log(actualSmoothnessAmount + ", " + currentPoint);
+
                                 // First section
                                 currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount + currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], t);
 
