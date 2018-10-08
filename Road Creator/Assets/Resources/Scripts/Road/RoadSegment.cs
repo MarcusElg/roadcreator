@@ -161,11 +161,6 @@ public class RoadSegment : MonoBehaviour
 
         for (int i = 0; i < points.Length; i++)
         {
-            /*GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            g.transform.position = points[i];
-            g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            g.transform.GetComponent<Collider>().enabled = false;
-            g.name = i + "";*/
             Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
             float correctedHeightOffset = heightOffset;
 
@@ -175,7 +170,6 @@ public class RoadSegment : MonoBehaviour
             }
 
             float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
-
             if (i == 0 && previousPoint != Misc.MaxVector3)
             {
                 correctedHeightOffset = (previousPoint.y + heightOffset);
@@ -188,6 +182,7 @@ public class RoadSegment : MonoBehaviour
             if (name == "Road")
             {
                 vertices[verticeIndex] = (points[i] + left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
+                //Debug.Log(i + ", " + points[i]);
                 vertices[verticeIndex + 1] = (points[i] - left * roadWidth + new Vector3(0, correctedHeightOffset, 0)) - segment.position;
             }
             else
