@@ -1,5 +1,5 @@
 # Roadcreator
-A free road creation tool for unity. It's currently in alpha
+A free road creation tool for unity. It's currently in beta so it's pretty stable but still containes some bugs
 
 ## Features:
 ### Road Creation:
@@ -8,8 +8,8 @@ A free road creation tool for unity. It's currently in alpha
 - Support for shoulders
 - Options are changed per-segment which allows for more control like the road having a extra lane before a intersection
 - Curve smoothing to avoid sharp turns between curves
-- Option to make a prefab line follow for easy bridge creation etc
-- Terrain deformation to mak the terrain adjust to the road
+- Option to make a prefab line follow it for easy bridge creation etc
+- Terrain deformation to make the terrain adjust to the road
 
 ### Prefab Line Tool:
 - Includes a prefab line tool to place prefabs along a series of curves (can also curve the mesh to get a smoother curve)
