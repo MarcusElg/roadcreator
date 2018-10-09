@@ -773,9 +773,9 @@ public class RoadCreator : MonoBehaviour
             position.y = Mathf.Lerp(segment.GetChild(0).GetChild(0).position.y, segment.GetChild(0).GetChild(2).position.y, t);
             
             float calculatedDistance = Vector3.Distance(position, lastPosition);
-            if (t > 1 - distancePerDivision)
+            if (t + distancePerDivision / 10 >= 1)
             {
-                points[points.Count - 1] = RaycastedPosition(position, segment.GetComponent<RoadSegment>());
+                points[points.Count - 1] = RaycastedPosition(segment.GetChild(0).GetChild(2).position, segment.GetComponent<RoadSegment>());
             } else if (calculatedDistance > globalDistancePerDivision)
             {
                 lastPosition = position;

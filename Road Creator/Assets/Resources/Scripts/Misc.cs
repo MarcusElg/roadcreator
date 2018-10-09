@@ -78,9 +78,8 @@ public static class Misc
                 }
             }
         }
-        forward.Normalize();
 
-        return new Vector3(-forward.z, 0, forward.x);
+        return new Vector3(-forward.z, 0, forward.x).normalized;
     }
 
     public static Vector3 GetCenter(Vector3 one, Vector3 two)
