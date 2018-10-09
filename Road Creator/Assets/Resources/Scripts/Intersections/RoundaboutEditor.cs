@@ -87,7 +87,6 @@ public class RoundaboutEditor : Editor
             roundabout.connectionOpen.Add(true);
             roundabout.connectionVertexIndex.Add(0);
             roundabout.connectionWidth.Add(2);
-
             roundabout.connectionMaterial.Add(Resources.Load("Materials/Intersections/Intersection Connections/2L Connection") as Material);
 
             GameObject connection = new GameObject("Connection " + roundabout.transform.GetChild(0).childCount);

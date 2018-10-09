@@ -192,7 +192,7 @@ public static class Misc
             {
                 gameObjects[i].transform.position = gameObjects[i].intersectionConnection.transform.position;
 
-                if (gameObjects[i].transform.parent.childCount == 3)
+                if (gameObjects[i].transform.parent.childCount == 3 && gameObjects[i].transform.parent.parent.GetComponent<RoadSegment>().curved == false)
                 {
                     gameObjects[i].transform.parent.GetChild(1).position = Misc.GetCenter(gameObjects[i].transform.parent.GetChild(0).position, gameObjects[i].transform.parent.GetChild(2).position);
                 }
