@@ -308,16 +308,16 @@ public class PrefabLineCreator : MonoBehaviour
 
                             for (int k = 0; k < lastVertexPositions.Count; k++)
                             {
-                                float localY = (lastVertexPositions[k] - transform.GetChild(1).GetChild(j - 1).transform.position).y;
                                 float localZ = (Quaternion.Euler(0, -(transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - transform.GetChild(1).GetChild(j - 1).transform.position)).z;
                                 float zDifference = Mathf.Abs(localZ - (vertices[i].z * scale));
                                 if (zDifference < 0.001f)
                                 {
                                     if (yModification == PrefabLineCreator.YModification.none)
                                     {
-                                        if (Mathf.Abs(localY - (vertices[i].y * scale)) < 0.001f)
+                                        if (Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * scale) + placedPrefab.transform.position.y)) < currentDistance)
                                         {
                                             nearestVertex = lastVertexPositions[k];
+                                            currentDistance = Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * scale) + placedPrefab.transform.position.y));
                                         }
                                     }
                                     else
