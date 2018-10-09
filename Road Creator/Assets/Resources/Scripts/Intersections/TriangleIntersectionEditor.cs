@@ -69,7 +69,7 @@ public class TriangleIntersectionEditor : Editor
         if (intersection.downConnection == true)
         {
             intersection.downConnectionMaterial = (Material)EditorGUILayout.ObjectField("Down Connection Material", intersection.downConnectionMaterial, typeof(Material), false);
-            intersection.downConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Height", intersection.downConnectionHeight));
+            intersection.downConnectionHeight = Mathf.Max(0, EditorGUILayout.FloatField("Down Connection Height", intersection.downConnectionHeight));
             intersection.downConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Down Connection Width", intersection.downConnectionWidth));
             intersection.downConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Down Connection Resolution", intersection.downConnectionResolution), 2, 15);
         }
@@ -80,7 +80,7 @@ public class TriangleIntersectionEditor : Editor
         if (intersection.leftConnection == true)
         {
             intersection.leftConnectionMaterial = (Material)EditorGUILayout.ObjectField("Left Connection Material", intersection.leftConnectionMaterial, typeof(Material), false);
-            intersection.leftConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Height", intersection.leftConnectionHeight));
+            intersection.leftConnectionHeight = Mathf.Max(0, EditorGUILayout.FloatField("Left Connection Height", intersection.leftConnectionHeight));
             intersection.leftConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Left Connection Width", intersection.leftConnectionWidth));
             intersection.leftConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Left Connection Resolution", intersection.leftConnectionResolution), 2, 15);
         }
@@ -91,7 +91,7 @@ public class TriangleIntersectionEditor : Editor
         if (intersection.rightConnection == true)
         {
             intersection.rightConnectionMaterial = (Material)EditorGUILayout.ObjectField("Right Connection Material", intersection.rightConnectionMaterial, typeof(Material), false);
-            intersection.rightConnectionHeight = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Height", intersection.rightConnectionHeight));
+            intersection.rightConnectionHeight = Mathf.Max(0, EditorGUILayout.FloatField("Right Connection Height", intersection.rightConnectionHeight));
             intersection.rightConnectionWidth = Mathf.Max(0.1f, EditorGUILayout.FloatField("Right Connection Width", intersection.rightConnectionWidth));
             intersection.rightConnectionResolution = Mathf.Clamp(EditorGUILayout.IntField("Right Connection Resolution", intersection.rightConnectionResolution), 2, 15);
         }
