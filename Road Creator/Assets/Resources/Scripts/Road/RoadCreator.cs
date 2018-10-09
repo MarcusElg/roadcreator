@@ -490,6 +490,18 @@ public class RoadCreator : MonoBehaviour
         else
         {
             segmentPreset.ApplyTo(segment);
+
+            for (int i = 0; i < segment.extraMeshOpen.Count; i++)
+            {
+                GameObject extraMesh = new GameObject("Extra Mesh");
+                extraMesh.AddComponent<MeshFilter>();
+                extraMesh.AddComponent<MeshRenderer>();
+                extraMesh.AddComponent<MeshCollider>();
+                extraMesh.transform.SetParent(segment.transform.GetChild(1));
+                extraMesh.transform.localPosition = Vector3.zero;
+                extraMesh.layer = globalSettings.roadLayer;
+                extraMesh.hideFlags = HideFlags.NotEditable;
+            }
         }
 
         return segment;
@@ -771,12 +783,13 @@ public class RoadCreator : MonoBehaviour
         {
             Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
             position.y = Mathf.Lerp(segment.GetChild(0).GetChild(0).position.y, segment.GetChild(0).GetChild(2).position.y, t);
-            
+
             float calculatedDistance = Vector3.Distance(position, lastPosition);
             if (t + distancePerDivision / 10 >= 1)
             {
                 points[points.Count - 1] = RaycastedPosition(segment.GetChild(0).GetChild(2).position, segment.GetComponent<RoadSegment>());
-            } else if (calculatedDistance > globalDistancePerDivision)
+            }
+            else if (calculatedDistance > globalDistancePerDivision)
             {
                 lastPosition = position;
                 points.Add(RaycastedPosition(position, segment.GetComponent<RoadSegment>()));

@@ -298,7 +298,15 @@ public class RoadSegment : MonoBehaviour
         generatedMesh.vertices = vertices;
         generatedMesh.triangles = triangles;
         generatedMesh.uv = uvs;
-        generatedMesh = GenerateUvs(generatedMesh);
+
+        if (name == "Road")
+        {
+            generatedMesh = GenerateUvs(generatedMesh, flipped);
+        }
+        else
+        {
+            generatedMesh = GenerateUvs(generatedMesh, extraMeshLeft);
+        }
 
         mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
@@ -337,7 +345,7 @@ public class RoadSegment : MonoBehaviour
         return vertices;
     }
 
-    private Mesh GenerateUvs(Mesh mesh)
+    private Mesh GenerateUvs(Mesh mesh, bool left)
     {
         Vector2[] uvs = mesh.uv;
         Vector2[] widths = new Vector2[uvs.Length];
@@ -366,7 +374,7 @@ public class RoadSegment : MonoBehaviour
                 currentDistance += Vector3.Distance(vertices[i - 2], vertices[i]);
             }
 
-            if (flipped == false)
+            if (left == false)
             {
                 uvs[i] = new Vector2(0, currentDistance / totalDistanceLeft);
             }
@@ -388,7 +396,7 @@ public class RoadSegment : MonoBehaviour
                 currentDistance = 0;
             }
 
-            if (flipped == false)
+            if (left == false)
             {
                 uvs[i] = new Vector2(1, currentDistance / totalDistanceRight);
             }
