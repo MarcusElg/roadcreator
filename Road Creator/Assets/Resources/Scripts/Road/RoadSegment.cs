@@ -172,11 +172,11 @@ public class RoadSegment : MonoBehaviour
             float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
             if (i == 0 && previousPoint != Misc.MaxVector3)
             {
-                correctedHeightOffset = (previousPoint.y + heightOffset);
+                correctedHeightOffset = previousPoint.y;
             }
             else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
             {
-                correctedHeightOffset = (nextSegmentPoints[0].y + heightOffset);
+                correctedHeightOffset = nextSegmentPoints[0].y + heightOffset;
             }
 
             if (name == "Road")

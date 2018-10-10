@@ -51,6 +51,7 @@ public class Roundabout : MonoBehaviour
 
         Vector3[] vertices = new Vector3[points.Length * 2];
         Vector2[] uvs = new Vector2[vertices.Length];
+        Vector2[] uvs2 = new Vector2[uvs.Length];
         int numTriangles = 2 * (points.Length - 1);
         int[] triangles = new int[numTriangles * 3];
         int verticeIndex = 0;
@@ -65,6 +66,8 @@ public class Roundabout : MonoBehaviour
             float v = 1 - Mathf.Abs(2 * completionPercent - 1);
             uvs[verticeIndex] = new Vector2(0, v);
             uvs[verticeIndex + 1] = new Vector2(1, v);
+            uvs2[verticeIndex] = new Vector2(1, 1);
+            uvs2[verticeIndex + 1] = new Vector2(1, 1);
 
             if (i < points.Length - 1)
             {
@@ -85,6 +88,7 @@ public class Roundabout : MonoBehaviour
         generatedMesh.vertices = vertices;
         generatedMesh.triangles = triangles;
         generatedMesh.uv = uvs;
+        generatedMesh.uv2 = uvs2;
 
         transform.GetChild(1).GetComponent<MeshFilter>().sharedMesh = generatedMesh;
         transform.GetChild(1).GetComponent<MeshCollider>().sharedMesh = generatedMesh;
@@ -130,7 +134,7 @@ public class Roundabout : MonoBehaviour
         float textureRepeat = Mathf.RoundToInt((diameter + width) / 3f);
 
         Material material = new Material(transform.GetChild(1).GetComponent<MeshRenderer>().sharedMaterial);
-        material.mainTextureScale = new Vector2(1, textureRepeat);
+        material.SetVector("Vector2_79C0D9A3", new Vector2(1, textureRepeat));
         transform.GetChild(1).GetComponent<MeshRenderer>().sharedMaterial = material;
     }
 }
