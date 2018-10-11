@@ -120,7 +120,7 @@ public static class Misc
                 {
                     for (int j = 0; j < guidelines.Length; j++)
                     {
-                        float distance = Vector3.Distance(hitPosition, guidelines[j]);
+                        float distance = Vector3.Distance(new Vector3(hitPosition.x, 0, hitPosition.z), new Vector3(guidelines[j].x, 0, guidelines[j].z));
                         if (distance < 1f && distance < nearestDistanceInSegment)
                         {
                             nearestVector = guidelines[j];
@@ -169,7 +169,7 @@ public static class Misc
             Handles.color = Misc.lightGreen;
         }
 
-        if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(mousePosition, roadSegment.transform.GetChild(0).GetChild(child).position) < 10) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
+        if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(new Vector3(mousePosition.x, 0, mousePosition.z), new Vector3(roadSegment.transform.GetChild(0).GetChild(child).position.x, 0, roadSegment.transform.GetChild(0).GetChild(child).position.z)) < guidelines.Length + 1) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
         {
             Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 2]);
             Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 1]);

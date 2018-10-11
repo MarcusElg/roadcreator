@@ -81,7 +81,6 @@ public class RoadSegment : MonoBehaviour
     private void SetGuidelines(Vector3[] currentPoints, Vector3[] nextPoints, bool first)
     {
         // Start Guidelines
-        Vector3 forward;
         Vector3 left;
         int guidelineAmount = transform.parent.parent.GetComponent<RoadCreator>().globalSettings.amountRoadGuidelines;
 
@@ -89,8 +88,7 @@ public class RoadSegment : MonoBehaviour
         {
             if (first == true)
             {
-                forward = currentPoints[1] - currentPoints[0];
-                left = new Vector3(-forward.z, 0, forward.x).normalized;
+                left = Misc.CalculateLeft(currentPoints[0], currentPoints[1]);
 
                 startGuidelinePoints = new Vector3[guidelineAmount * 2];
                 for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
@@ -115,13 +113,11 @@ public class RoadSegment : MonoBehaviour
 
             if (nextPoints == null)
             {
-                forward = currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2];
-                left = new Vector3(-forward.z, 0, forward.x).normalized;
+                left = Misc.CalculateLeft(currentPoints[currentPoints.Length - 2], currentPoints[currentPoints.Length - 1]);
             }
             else if (nextPoints.Length > 1)
             {
-                forward = nextPoints[1] - currentPoints[currentPoints.Length - 1];
-                left = new Vector3(-forward.z, 0, forward.x).normalized;
+                left = Misc.CalculateLeft(currentPoints[currentPoints.Length - 1], nextPoints[1]);
             }
             else
             {
