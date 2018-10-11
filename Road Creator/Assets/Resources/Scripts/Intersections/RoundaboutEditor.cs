@@ -35,6 +35,15 @@ public class RoundaboutEditor : Editor
             mainMesh.AddComponent<MeshFilter>();
             mainMesh.AddComponent<MeshRenderer>();
             mainMesh.AddComponent<MeshCollider>();
+
+            GameObject centerPieceMesh = new GameObject("Center Piece Mesh");
+            centerPieceMesh.transform.SetParent(roundabout.transform);
+            centerPieceMesh.transform.localPosition = new Vector3(0, 0, 0);
+            centerPieceMesh.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            centerPieceMesh.hideFlags = HideFlags.NotEditable;
+            centerPieceMesh.AddComponent<MeshFilter>();
+            centerPieceMesh.AddComponent<MeshRenderer>();
+            centerPieceMesh.AddComponent<MeshCollider>();
         }
 
         lastTool = Tools.current;
@@ -55,6 +64,15 @@ public class RoundaboutEditor : Editor
         roundabout.diameter = Mathf.Max(1.2f, EditorGUILayout.FloatField("Diameter", roundabout.diameter));
         roundabout.width = Mathf.Min(roundabout.diameter / 2, Mathf.Max(0.1f, EditorGUILayout.FloatField("Width", roundabout.width)));
         roundabout.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roundabout.heightOffset));
+
+        GUILayout.Label("");
+
+        roundabout.centerPiece = EditorGUILayout.Toggle("Center Piece", roundabout.centerPiece);
+
+        if (roundabout.centerPiece == true)
+        {
+            roundabout.centerPieceMaterial = (Material)EditorGUILayout.ObjectField("Center Piece Material", roundabout.centerPieceMaterial, typeof(Material), false);
+        }
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
@@ -113,6 +131,16 @@ public class RoundaboutEditor : Editor
 
         GUILayout.Label("");
 
+        if (GUILayout.Button("Generate Roundabout"))
+        {
+            roundabout.transform.hasChanged = true;
+        }
+
+        if (GUILayout.Button("Convert To Meshes"))
+        {
+            Misc.ConvertToMesh(roundabout.gameObject, "Roundabout Mesh");
+        }
+
         if (EditorGUI.EndChangeCheck() == true || roundabout.transform.hasChanged == true)
         {
             Misc.UpdateAllIntersectionConnections();
@@ -120,15 +148,6 @@ public class RoundaboutEditor : Editor
             roundabout.transform.hasChanged = false;
         }
 
-        if (GUILayout.Button("Generate Roundabout"))
-        {
-            roundabout.GenerateMeshes();
-        }
-
-        if (GUILayout.Button("Convert To Meshes"))
-        {
-            Misc.ConvertToMesh(roundabout.gameObject, "Roundabout Mesh");
-        }
     }
 
     private void OnSceneGUI()

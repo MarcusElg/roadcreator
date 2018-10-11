@@ -11,6 +11,9 @@ public class Roundabout : MonoBehaviour
     public Vector3[] points;
     public Material centerMaterial;
 
+    public bool centerPiece = true;
+    public Material centerPieceMaterial;
+
     public List<bool> connectionOpen = new List<bool>();
     public List<int> connectionVertexIndex = new List<int>();
     public List<float> connectionWidth = new List<float>();
@@ -25,6 +28,11 @@ public class Roundabout : MonoBehaviour
             centerMaterial = Resources.Load("Materials/Intersections/Roundabouts/2L Roundabout") as Material;
         }
 
+        if (centerPieceMaterial == null)
+        {
+            centerPieceMaterial = Resources.Load("Materials/Grass") as Material;
+        }
+
         for (int i = 0; i < connectionMaterial.Count; i++)
         {
             if (connectionMaterial[i] == null)
@@ -34,6 +42,17 @@ public class Roundabout : MonoBehaviour
         }
 
         GenerateCircle();
+
+        if (centerPiece == true)
+        {
+            float centerPieceWidth = (diameter - width) / 2;
+            Misc.GenerateSquareMesh(transform.GetChild(2), new Vector3(-centerPieceWidth, heightOffset, -centerPieceWidth), new Vector3(centerPieceWidth, heightOffset, -centerPieceWidth), new Vector3(-centerPieceWidth, heightOffset, centerPieceWidth), new Vector3(centerPieceWidth, heightOffset, centerPieceWidth), centerPieceMaterial);
+        }
+        else
+        {
+            transform.GetChild(2).GetComponent<MeshFilter>().sharedMesh = null;
+            transform.GetChild(2).GetComponent<MeshCollider>().sharedMesh = null;
+        }
 
         for (int i = 0; i < connectionVertexIndex.Count; i++)
         {
