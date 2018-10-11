@@ -26,6 +26,7 @@ public class RoadSegmentEditor : Editor
         if (targets.Length == 1)
         {
             GUILayout.Label("");
+            GUILayout.Label("Extra Meshes", guiStyle);
             for (int i = 0; i < serializedObject.FindProperty("extraMeshOpen").arraySize; i++)
             {
                 serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue = EditorGUILayout.Foldout(serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue, "Extra Mesh " + i);

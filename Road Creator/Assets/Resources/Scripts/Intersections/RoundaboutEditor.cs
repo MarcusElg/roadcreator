@@ -59,6 +59,8 @@ public class RoundaboutEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
 
+        GUILayout.Label("");
+        GUILayout.Label("Connections", guiStyle);
         for (int i = 0; i < roundabout.connectionVertexIndex.Count; i++)
         {
             roundabout.connectionOpen[i] = EditorGUILayout.Foldout(roundabout.connectionOpen[i], "Connection #" + i);
@@ -79,8 +81,6 @@ public class RoundaboutEditor : Editor
                 }
             }
         }
-
-        GUILayout.Label("");
 
         if (GUILayout.Button("Add Connection"))
         {
@@ -110,6 +110,8 @@ public class RoundaboutEditor : Editor
             connectionPoint.layer = roundabout.globalSettings.intersectionPointsLayer;
             connectionPoint.hideFlags = HideFlags.NotEditable;
         }
+
+        GUILayout.Label("");
 
         if (EditorGUI.EndChangeCheck() == true || roundabout.transform.hasChanged == true)
         {
