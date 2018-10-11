@@ -223,7 +223,7 @@ public class RoadCreator : MonoBehaviour
                     }
                     else if (roundabout != null)
                     {
-                        roundabout.connectionWidth[raycastHit2.transform.GetSiblingIndex() - 1] = roadWidth;
+                        roundabout.connectionWidth[raycastHit2.transform.parent.GetSiblingIndex()] = roadWidth;
 
                         roundabout.GenerateMeshes();
                     }
@@ -262,63 +262,63 @@ public class RoadCreator : MonoBehaviour
 
         if (squareIntersection != null)
         {
-            return intersection.transform.position + new Vector3(0, squareIntersection.heightOffset - position.y, 0);
+            return intersection.transform.position + new Vector3(0, squareIntersection.heightOffset, 0);
         }
         else if (roundabout != null)
         {
-            return roundabout.transform.position + new Vector3(0, roundabout.heightOffset - position.y, 0);
+            return roundabout.transform.position + new Vector3(0, roundabout.heightOffset, 0);
         }
         else if (triangleIntersection != null)
         {
             if (connectionPointName == "Down Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * new Vector3(0, triangleIntersection.heightOffset - position.y, -triangleIntersection.height);
+                return intersection.transform.position + intersection.transform.rotation * new Vector3(0, triangleIntersection.heightOffset, -triangleIntersection.height);
             }
             else if (connectionPointName == "Left Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(-triangleIntersection.width, triangleIntersection.heightOffset - position.y, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset - position.y, triangleIntersection.height));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(-triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
             }
             else if (connectionPointName == "Right Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(triangleIntersection.width, triangleIntersection.heightOffset - position.y, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset - position.y, triangleIntersection.height));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(triangleIntersection.width, triangleIntersection.heightOffset, -triangleIntersection.height), new Vector3(0, triangleIntersection.heightOffset, triangleIntersection.height));
             }
         }
         else if (diamondIntersection != null)
         {
             if (connectionPointName == "Upper Left Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset, 0));
             }
             else if (connectionPointName == "Upper Right Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
             }
             else if (connectionPointName == "Lower Left Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, -diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(-diamondIntersection.width, diamondIntersection.heightOffset, 0));
             }
             else if (connectionPointName == "Lower Right Connection Point")
             {
-                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset - position.y, -diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset - position.y, 0));
+                return intersection.transform.position + intersection.transform.rotation * Misc.GetCenter(new Vector3(0, diamondIntersection.heightOffset, -diamondIntersection.height), new Vector3(diamondIntersection.width, diamondIntersection.heightOffset, 0));
             }
         }
         else if (roadSplitter != null)
         {
             if (connectionPointName == "Left Connection Point")
             {
-                return intersection.transform.position + roadSplitter.transform.forward;
+                return new Vector3(roadSplitter.transform.position.x, roadSplitter.transform.GetChild(0).GetChild(0).position.y, roadSplitter.transform.position.z) + roadSplitter.transform.forward;
             }
             else if (connectionPointName == "Upper Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(1).position + left + new Vector3(0, roadSplitter.heightOffset - position.y, 0);
+                return roadSplitter.transform.GetChild(0).GetChild(1).position + left;
             }
             else if (connectionPointName == "Lower Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(2).position + left + new Vector3(0, roadSplitter.heightOffset - position.y, 0);
+                return roadSplitter.transform.GetChild(0).GetChild(2).position + left;
             }
         }
 
