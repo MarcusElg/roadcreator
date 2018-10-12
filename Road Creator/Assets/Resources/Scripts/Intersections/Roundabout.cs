@@ -45,7 +45,7 @@ public class Roundabout : MonoBehaviour
 
         if (centerPiece == true)
         {
-            float centerPieceWidth = (diameter - width) / 2;
+            float centerPieceWidth = (diameter - width * 2) / 2;
             Misc.GenerateSquareMesh(transform.GetChild(2), new Vector3(-centerPieceWidth, heightOffset, -centerPieceWidth), new Vector3(centerPieceWidth, heightOffset, -centerPieceWidth), new Vector3(-centerPieceWidth, heightOffset, centerPieceWidth), new Vector3(centerPieceWidth, heightOffset, centerPieceWidth), centerPieceMaterial);
         }
         else
