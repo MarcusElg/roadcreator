@@ -43,6 +43,11 @@ public class RoadSystemEditor : Editor
                 Undo.DestroyObjectImmediate(roadSystem.transform.GetChild(i).gameObject);
             }
         }
+
+        if (GUILayout.Button("Convert To Mesh"))
+        {
+            Misc.ConvertToMesh(roadSystem.gameObject, "Road System Mesh");
+        }
     }
 
     private void OnSceneGUI()

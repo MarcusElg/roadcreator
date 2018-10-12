@@ -133,6 +133,11 @@ public class PrefabLineEditor : Editor
             {
                 prefabCreator.PlacePrefabs();
             }
+
+            if (GUILayout.Button("Convert To Mesh"))
+            {
+                Misc.ConvertToMesh(prefabCreator.gameObject, "Prefab Line Mesh");
+            }
         }
     }
 

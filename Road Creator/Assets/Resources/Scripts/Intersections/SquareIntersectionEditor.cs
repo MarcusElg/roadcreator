@@ -120,7 +120,7 @@ public class SquareIntersectionEditor : Editor
             intersection.GenerateMeshes();
         }
 
-        if (GUILayout.Button("Convert To Meshes"))
+        if (GUILayout.Button("Convert To Mesh"))
         {
             Misc.ConvertToMesh(intersection.gameObject, "Square Intersection Mesh");
         }

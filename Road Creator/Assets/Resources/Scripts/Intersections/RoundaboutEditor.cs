@@ -136,7 +136,7 @@ public class RoundaboutEditor : Editor
             roundabout.transform.hasChanged = true;
         }
 
-        if (GUILayout.Button("Convert To Meshes"))
+        if (GUILayout.Button("Convert To Mesh"))
         {
             Misc.ConvertToMesh(roundabout.gameObject, "Roundabout Mesh");
         }

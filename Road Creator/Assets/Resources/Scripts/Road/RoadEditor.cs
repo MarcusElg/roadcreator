@@ -138,7 +138,7 @@ public class RoadEditor : Editor
             }
         }
 
-        if (GUILayout.Button("Convert To Meshes"))
+        if (GUILayout.Button("Convert To Mesh"))
         {
             Misc.ConvertToMesh(roadCreator.gameObject, "Road Mesh");
         }
