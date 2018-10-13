@@ -306,19 +306,19 @@ public class RoadCreator : MonoBehaviour
         {
             if (connectionPointName == "Left Connection Point")
             {
-                return new Vector3(roadSplitter.transform.position.x, roadSplitter.transform.GetChild(0).GetChild(0).position.y, roadSplitter.transform.position.z) + roadSplitter.transform.forward;
+                return new Vector3(roadSplitter.transform.position.x, roadSplitter.transform.GetChild(0).GetChild(0).position.y, roadSplitter.transform.position.z) + roadSplitter.transform.forward + new Vector3(0, roadSplitter.heightOffset, 0);
             }
             else if (connectionPointName == "Upper Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(1).position + left;
+                return roadSplitter.transform.GetChild(0).GetChild(1).position + left + new Vector3(0, roadSplitter.heightOffset, 0);
             }
             else if (connectionPointName == "Lower Right Connection Point")
             {
                 Vector3 up = (roadSplitter.transform.GetChild(0).GetChild(1).position - roadSplitter.transform.GetChild(0).GetChild(2).position).normalized;
                 Vector3 left = new Vector3(-up.z, 0, up.x);
-                return roadSplitter.transform.GetChild(0).GetChild(2).position + left;
+                return roadSplitter.transform.GetChild(0).GetChild(2).position + left + new Vector3(0, roadSplitter.heightOffset, 0);
             }
         }
 

@@ -20,9 +20,9 @@ public class RoadSplitter : MonoBehaviour
 
     public void GenerateMesh()
     {
-        transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, heightOffset, 0);
-        transform.GetChild(0).GetChild(1).transform.localPosition = new Vector3(rightXOffset - upperRightXOffset, heightOffset, height);
-        transform.GetChild(0).GetChild(2).transform.localPosition = new Vector3(rightXOffset - lowerRightXOffset, heightOffset, height);
+        transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
+        transform.GetChild(0).GetChild(1).transform.localPosition = new Vector3(rightXOffset - upperRightXOffset, 0, height);
+        transform.GetChild(0).GetChild(2).transform.localPosition = new Vector3(rightXOffset - lowerRightXOffset, 0, height);
 
         Point[] objects = GameObject.FindObjectsOfType<Point>();
         for (int i = 0; i < objects.Length; i++)
