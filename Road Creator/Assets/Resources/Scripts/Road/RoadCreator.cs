@@ -644,7 +644,7 @@ public class RoadCreator : MonoBehaviour
             mouseDown = true;
             if (objectToMove == null)
             {
-                if (raycastHit.transform.name.Contains("Point"))
+                if (raycastHit.transform.name.Contains("Point") && raycastHit.transform.GetComponent<Point>() != null && raycastHit.transform.parent.parent.parent.parent.gameObject == Selection.activeGameObject)
                 {
                     if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
                     {
