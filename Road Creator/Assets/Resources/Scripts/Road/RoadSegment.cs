@@ -199,12 +199,12 @@ public class RoadSegment : MonoBehaviour
             if (i < points.Length - 1)
             {
                 triangles[triangleIndex] = verticeIndex;
-                triangles[triangleIndex + 1] = (verticeIndex + 2) % vertices.Length;
+                triangles[triangleIndex + 1] = verticeIndex + 2;
                 triangles[triangleIndex + 2] = verticeIndex + 1;
 
                 triangles[triangleIndex + 3] = verticeIndex + 1;
-                triangles[triangleIndex + 4] = (verticeIndex + 2) % vertices.Length;
-                triangles[triangleIndex + 5] = (verticeIndex + 3) % vertices.Length;
+                triangles[triangleIndex + 4] = verticeIndex + 2;
+                triangles[triangleIndex + 5] = verticeIndex + 3;
             }
 
             verticeIndex += 2;
