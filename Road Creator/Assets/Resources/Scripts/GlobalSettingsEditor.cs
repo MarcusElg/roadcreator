@@ -47,12 +47,7 @@ public class GlobalSettingsEditor : Editor
                 }
                 else
                 {
-                    Roundabout roundabout = objects[i].GetComponent<Roundabout>();
-
-                    if (roundabout != null)
-                    {
-                        roundabout.GenerateMeshes();
-                    }
+                    // generate intersection
                 }
             }
         }

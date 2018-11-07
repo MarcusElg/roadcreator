@@ -350,7 +350,7 @@ public class RoadEditor : Editor
         {
             if (!objects[i].name.Contains("Mesh"))
             {
-                if (objects[i].name.Contains("Intersection") || objects[i].name == "Roundabout")
+                if ((objects[i].name.Contains("Intersection") && objects[i].name != "Intersection")|| objects[i].name == "Roundabout")
                 {
                     for (int j = 0; j < objects[i].GetChild(0).childCount; j++)
                     {

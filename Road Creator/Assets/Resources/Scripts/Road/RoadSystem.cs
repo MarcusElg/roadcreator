@@ -103,7 +103,6 @@ public class RoadSystem : MonoBehaviour
         else if (ClickedButton(3) == true)
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<SquareIntersection>();
             gameObject.name = "Square Intersection";
             gameObject.transform.SetParent(transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Square Intersection");
@@ -113,7 +112,6 @@ public class RoadSystem : MonoBehaviour
         else if (ClickedButton(4) == true)
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<TriangleIntersection>();
             gameObject.name = "Triangle Intersection";
             gameObject.transform.SetParent(transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Triangle Intersection");
@@ -123,7 +121,6 @@ public class RoadSystem : MonoBehaviour
         else if (ClickedButton(5) == true)
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<DiamondIntersection>();
             gameObject.name = "Diamond Intersection";
             gameObject.transform.SetParent(transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Diamond Intersection");
@@ -133,7 +130,6 @@ public class RoadSystem : MonoBehaviour
         else if (ClickedButton(6) == true)
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<Roundabout>();
             gameObject.name = "Roundabout";
             gameObject.transform.SetParent(transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Roundabout");

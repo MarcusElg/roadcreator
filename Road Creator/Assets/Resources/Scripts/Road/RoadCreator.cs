@@ -132,7 +132,7 @@ public class RoadCreator : MonoBehaviour
 
     private void DetectIntersectionConnection(GameObject gameObject, int followIndex)
     {
-        RaycastHit raycastHit2;
+        /*RaycastHit raycastHit2;
         if (Physics.Raycast(gameObject.transform.position + Vector3.up, Vector3.down, out raycastHit2, 100f, ~(1 << globalSettings.ignoreMouseRayLayer)))
         {
             if (raycastHit2.collider.name.Contains("Connection Point"))
@@ -249,12 +249,12 @@ public class RoadCreator : MonoBehaviour
             {
                 gameObject.GetComponent<Point>().intersectionConnection = null;
             }
-        }
+        }*/
     }
 
     private Vector3 GetIntersectionPoint(Vector3 position, GameObject intersection, string connectionPointName)
     {
-        SquareIntersection squareIntersection = intersection.transform.parent.GetComponent<SquareIntersection>();
+        /*SquareIntersection squareIntersection = intersection.transform.parent.GetComponent<SquareIntersection>();
         TriangleIntersection triangleIntersection = intersection.transform.parent.GetComponent<TriangleIntersection>();
         DiamondIntersection diamondIntersection = intersection.transform.parent.GetComponent<DiamondIntersection>();
         Roundabout roundabout = intersection.transform.parent.GetComponent<Roundabout>();
@@ -321,7 +321,7 @@ public class RoadCreator : MonoBehaviour
                 return roadSplitter.transform.GetChild(0).GetChild(2).position + left + new Vector3(0, roadSplitter.heightOffset, 0);
             }
         }
-
+        */
         return Misc.MaxVector3;
     }
 
@@ -423,6 +423,9 @@ public class RoadCreator : MonoBehaviour
         point.hideFlags = HideFlags.NotEditable;
         point.layer = globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
+
+        CheckForIntersectionGeneration(point);
+
         return point;
     }
 
@@ -505,6 +508,85 @@ public class RoadCreator : MonoBehaviour
         }
 
         return segment;
+    }
+
+    public void CheckForIntersectionGeneration(GameObject point)
+    {
+        RaycastHit[] raycastHits = Physics.RaycastAll(point.transform.position + new Vector3(0, 1, 0), Vector3.down, 100, 1 << globalSettings.ignoreMouseRayLayer);
+
+        if (raycastHits.Length > 0)
+        {
+            if ((raycastHits[0].collider.gameObject != point && raycastHits[0].transform.GetComponent<Point>() != null) || (raycastHits.Length > 1 && raycastHits[1].collider.GetComponent<Point>() != null && raycastHits[1].transform.gameObject != point))
+            {
+                RaycastHit raycastHit;
+
+                if (raycastHits[0].collider.gameObject != point && raycastHits[0].transform.GetComponent<Point>() != null)
+                {
+                    raycastHit = raycastHits[0];
+                }
+                else
+                {
+                    raycastHit = raycastHits[1];
+                }
+
+                // Create Intersection
+                GameObject intersection = new GameObject("Intersection");
+                Undo.RegisterCreatedObjectUndo(intersection, "Create Intersection");
+                intersection.transform.SetParent(transform.parent);
+                intersection.transform.position = raycastHit.point;
+                intersection.AddComponent<MeshFilter>();
+                intersection.AddComponent<MeshRenderer>();
+                intersection.AddComponent<MeshCollider>();
+                intersection.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
+                intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
+                intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
+                intersection.AddComponent<Intersection>();
+                intersection.GetComponent<Intersection>().yOffset = heightOffset;
+
+                // First connection
+                Vector3 forward = intersection.transform.position - point.transform.parent.GetChild(0).position;
+                point.transform.position += (-forward).normalized * 4;
+                point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+                CreateIntersectionConnection(intersection.GetComponent<Intersection>(), point.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth, point);
+
+                // Second connection
+                forward = raycastHit.transform.position - raycastHit.transform.parent.GetChild(0).position;
+                raycastHit.transform.position += (-forward).normalized * 4;
+                raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+                CreateIntersectionConnection(intersection.GetComponent<Intersection>(), raycastHit.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth, raycastHit.transform.gameObject);
+                intersection.GetComponent<Intersection>().GenerateMesh();
+            }
+            else
+            {
+                RaycastHit raycastHit;
+
+                if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, globalSettings.ignoreMouseRayLayer))
+                {
+                    if (raycastHit.transform.name == "Intersection" && raycastHit.transform.GetComponent<Intersection>() != null)
+                    {
+                        Vector3 forward = raycastHit.transform.position - point.transform.parent.GetChild(0).position;
+                        point.transform.position += (-forward).normalized * 4;
+                        point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+                        CreateIntersectionConnection(raycastHit.transform.GetComponent<Intersection>(), point.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth, point);
+                        raycastHit.transform.GetComponent<Intersection>().connections.Sort();
+                        raycastHit.transform.GetComponent<Intersection>().GenerateMesh();
+                    }
+                }
+            }
+        }
+    }
+
+    public void CreateIntersectionConnection (Intersection intersection, float width, GameObject point)
+    {
+        IntersectionConnection intersectionConnection = new IntersectionConnection();
+        intersection.connections.Add(intersectionConnection);
+
+        intersectionConnection.width = width;
+        intersectionConnection.leftPoint = new SerializedVector3(point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 2] + point.transform.parent.parent.position);
+        intersectionConnection.rightPoint = new SerializedVector3(point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 1] + point.transform.parent.parent.position);
+        intersectionConnection.lastPoint = new SerializedVector3(Misc.GetCenter(intersectionConnection.leftPoint.ToNormalVector3(), intersectionConnection.rightPoint.ToNormalVector3()));
+        intersectionConnection.YRotation = Quaternion.LookRotation((intersection.transform.position - point.transform.parent.GetChild(0).position).normalized).eulerAngles.y;
+        intersectionConnection.length = 10;
     }
 
     public bool IsLastSegmentCurved()

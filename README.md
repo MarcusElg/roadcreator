@@ -17,9 +17,8 @@ A free road creation tool for unity. It's currently in beta so it's pretty stabl
 
 
 ### Intersections Etc:
-- Generate intersections with 1 - 4 connections (square, triangle and diamond intersections)
+- Procedurally generated intersections, connect two road's end/start points, change a few values and it's done!
 - Modify variables such as connection height and width per connection
-- Generate customizable roundabouts
 - Includes a bunch of roads and road related assets like turn markings and road signs
 - Create timed traphic lights
 
