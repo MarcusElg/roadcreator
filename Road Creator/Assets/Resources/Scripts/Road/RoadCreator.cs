@@ -516,11 +516,11 @@ public class RoadCreator : MonoBehaviour
 
         if (raycastHits.Length > 0)
         {
-            if ((raycastHits[0].collider.gameObject != point && raycastHits[0].transform.GetComponent<Point>() != null) || (raycastHits.Length > 1 && raycastHits[1].collider.GetComponent<Point>() != null && raycastHits[1].transform.gameObject != point))
+            if ((raycastHits[0].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject && raycastHits[0].transform.GetComponent<Point>() != null) || (raycastHits.Length > 1 && raycastHits[1].collider.GetComponent<Point>() != null && raycastHits[1].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject))
             {
                 RaycastHit raycastHit;
 
-                if (raycastHits[0].collider.gameObject != point && raycastHits[0].transform.GetComponent<Point>() != null)
+                if (raycastHits[0].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject && raycastHits[0].transform.GetComponent<Point>() != null)
                 {
                     raycastHit = raycastHits[0];
                 }
