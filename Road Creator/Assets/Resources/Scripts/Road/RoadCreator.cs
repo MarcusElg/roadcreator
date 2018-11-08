@@ -544,12 +544,15 @@ public class RoadCreator : MonoBehaviour
                 intersection.GetComponent<Intersection>().yOffset = heightOffset;
 
                 // First connection
-                Vector3 forward = intersection.transform.position - point.transform.parent.GetChild(0).position;
+                point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+                Vector3[] vertices = point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
+                Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
                 point.transform.position += (-forward).normalized * 4;
                 point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
                 CreateIntersectionConnection(intersection.GetComponent<Intersection>(), point.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth, point);
 
                 // Second connection
+                point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
                 forward = raycastHit.transform.position - raycastHit.transform.parent.GetChild(0).position;
                 raycastHit.transform.position += (-forward).normalized * 4;
                 raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
@@ -564,7 +567,8 @@ public class RoadCreator : MonoBehaviour
                 {
                     if (raycastHit.transform.name == "Intersection" && raycastHit.transform.GetComponent<Intersection>() != null)
                     {
-                        Vector3 forward = raycastHit.transform.position - point.transform.parent.GetChild(0).position;
+                        Vector3[] vertices = point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
+                        Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
                         point.transform.position += (-forward).normalized * 4;
                         point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
                         CreateIntersectionConnection(raycastHit.transform.GetComponent<Intersection>(), point.transform.parent.parent.GetComponent<RoadSegment>().endRoadWidth, point);
@@ -576,7 +580,7 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    public void CreateIntersectionConnection (Intersection intersection, float width, GameObject point)
+    public void CreateIntersectionConnection(Intersection intersection, float width, GameObject point)
     {
         IntersectionConnection intersectionConnection = new IntersectionConnection();
         intersection.connections.Add(intersectionConnection);
