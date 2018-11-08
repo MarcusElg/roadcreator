@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class TraphicLight : MonoBehaviour
+public class TrafficLight : MonoBehaviour
 {
 
     public Material greenActive;
@@ -22,9 +22,9 @@ public class TraphicLight : MonoBehaviour
     public float timeSinceLast = 0;
     public float nextChangeTick = 0;
 
-    public enum TraphicColour { Green, YellowBeforeRed, Red, YellowBeforeGreen };
-    public TraphicColour currentColour;
-    public TraphicColour startColour;
+    public enum TrafficColour { Green, YellowBeforeRed, Red, YellowBeforeGreen };
+    public TrafficColour currentColour;
+    public TrafficColour startColour;
 
     public bool paused = false;
 
@@ -41,21 +41,21 @@ public class TraphicLight : MonoBehaviour
 
             if (timeSinceLast >= nextChangeTick)
             {
-                if (currentColour == TraphicColour.Green)
+                if (currentColour == TrafficColour.Green)
                 {
-                    currentColour = TraphicColour.YellowBeforeRed;
+                    currentColour = TrafficColour.YellowBeforeRed;
                 }
-                else if (currentColour == TraphicColour.YellowBeforeRed)
+                else if (currentColour == TrafficColour.YellowBeforeRed)
                 {
-                    currentColour = TraphicColour.Red;
+                    currentColour = TrafficColour.Red;
                 }
-                else if (currentColour == TraphicColour.Red)
+                else if (currentColour == TrafficColour.Red)
                 {
-                    currentColour = TraphicColour.YellowBeforeGreen;
+                    currentColour = TrafficColour.YellowBeforeGreen;
                 }
-                else if (currentColour == TraphicColour.YellowBeforeGreen)
+                else if (currentColour == TrafficColour.YellowBeforeGreen)
                 {
-                    currentColour = TraphicColour.Green;
+                    currentColour = TrafficColour.Green;
                 }
 
                 timeSinceLast = 0;
@@ -67,19 +67,19 @@ public class TraphicLight : MonoBehaviour
 
     public void ModifyChangeTick()
     {
-        if (currentColour == TraphicColour.Green)
+        if (currentColour == TrafficColour.Green)
         {
             nextChangeTick = greenTime;
         }
-        else if (currentColour == TraphicColour.YellowBeforeRed)
+        else if (currentColour == TrafficColour.YellowBeforeRed)
         {
             nextChangeTick = yellowBeforeRedTime;
         }
-        else if (currentColour == TraphicColour.Red)
+        else if (currentColour == TrafficColour.Red)
         {
             nextChangeTick = redTime;
         }
-        else if (currentColour == TraphicColour.YellowBeforeGreen)
+        else if (currentColour == TrafficColour.YellowBeforeGreen)
         {
             nextChangeTick = yellowBeforeGreenTime;
         }
@@ -92,17 +92,17 @@ public class TraphicLight : MonoBehaviour
         materials[3] = yellowNonActive;
         materials[2] = redNonActive;
 
-        if (currentColour == TraphicColour.Green)
+        if (currentColour == TrafficColour.Green)
         {
             materials[4] = greenActive;
         }
         else
-        if (currentColour == TraphicColour.YellowBeforeRed || currentColour == TraphicColour.YellowBeforeGreen)
+        if (currentColour == TrafficColour.YellowBeforeRed || currentColour == TrafficColour.YellowBeforeGreen)
         {
             materials[3] = yellowActive;
         }
         else
-        if (currentColour == TraphicColour.Red)
+        if (currentColour == TrafficColour.Red)
         {
             materials[2] = redActive;
         }

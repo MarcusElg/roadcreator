@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(TraphicLight))]
-public class TraphicLightEditor : Editor
+[CustomEditor(typeof(TrafficLight))]
+public class TrafficLightEditor : Editor
 {
 
     public override void OnInspectorGUI()
@@ -28,7 +28,7 @@ public class TraphicLightEditor : Editor
         serializedObject.FindProperty("yellowBeforeRedTime").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Yellow Before Red Time", serializedObject.FindProperty("yellowBeforeRedTime").floatValue));
         serializedObject.FindProperty("redTime").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Red Time", serializedObject.FindProperty("redTime").floatValue));
         serializedObject.FindProperty("yellowBeforeGreenTime").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Yellow Before Green Time", serializedObject.FindProperty("yellowBeforeGreenTime").floatValue));
-        serializedObject.FindProperty("startColour").enumValueIndex = (int)(TraphicLight.TraphicColour)EditorGUILayout.EnumPopup("Start Colour", (TraphicLight.TraphicColour)System.Enum.GetValues(typeof(TraphicLight.TraphicColour)).GetValue(serializedObject.FindProperty("startColour").enumValueIndex));
+        serializedObject.FindProperty("startColour").enumValueIndex = (int)(TrafficLight.TrafficColour)EditorGUILayout.EnumPopup("Start Colour", (TrafficLight.TrafficColour)System.Enum.GetValues(typeof(TrafficLight.TrafficColour)).GetValue(serializedObject.FindProperty("startColour").enumValueIndex));
 
         if (EditorGUI.EndChangeCheck() == true)
         {
@@ -37,7 +37,7 @@ public class TraphicLightEditor : Editor
             
             for (int i = 0; i < targets.Length; i++)
             {
-                ((TraphicLight)targets[i]).UpdateMaterials();
+                ((TrafficLight)targets[i]).UpdateMaterials();
             }
         }
     }
