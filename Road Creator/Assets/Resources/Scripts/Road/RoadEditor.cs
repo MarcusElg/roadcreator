@@ -251,11 +251,14 @@ public class RoadEditor : Editor
 
     private void CreatePoints()
     {
-        roadCreator.CreatePoints(hitPosition);
-
-        if (roadCreator.followObject != null)
+        if (!roadCreator.endIntersectionConnection.Equals(new IntersectionConnection()))
         {
-            roadCreator.followObject.GetComponent<PrefabLineCreator>().CreatePoints(hitPosition);
+            roadCreator.CreatePoints(hitPosition);
+
+            if (roadCreator.followObject != null)
+            {
+                roadCreator.followObject.GetComponent<PrefabLineCreator>().CreatePoints(hitPosition);
+            }
         }
     }
 
@@ -271,12 +274,15 @@ public class RoadEditor : Editor
 
     private void RemovePoints()
     {
-        if (roadCreator.followObject != null)
+        if (!roadCreator.endIntersectionConnection.Equals(new IntersectionConnection()))
         {
-            roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints(!roadCreator.IsLastSegmentCurved());
-        }
+            if (roadCreator.followObject != null)
+            {
+                roadCreator.followObject.GetComponent<PrefabLineCreator>().RemovePoints(!roadCreator.IsLastSegmentCurved());
+            }
 
-        roadCreator.RemovePoints();
+            roadCreator.RemovePoints();
+        }
     }
 
     private void Draw(Vector3 mousePosition)

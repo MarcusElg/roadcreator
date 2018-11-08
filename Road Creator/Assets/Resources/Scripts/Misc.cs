@@ -185,7 +185,7 @@ public static class Misc
 
     public static void UpdateAllIntersectionConnections()
     {
-        Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
+        /*Point[] gameObjects = GameObject.FindObjectsOfType<Point>();
         for (int i = 0; i < gameObjects.Length; i++)
         {
             if (gameObjects[i].intersectionConnection != null)
@@ -199,7 +199,7 @@ public static class Misc
 
                 gameObjects[i].transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
             }
-        }
+        }*/
     }
 
     public static void GenerateIntersectionConnection(float startWidth, float endWidth, int verticeAmount, float height, float yOffset, Transform meshObject, Material material)

@@ -139,7 +139,6 @@ public class RoadSystem : MonoBehaviour
         else if (ClickedButton(7) == true)
         {
             GameObject gameObject = new GameObject();
-            gameObject.AddComponent<RoadSplitter>();
             gameObject.name = "Road Splitter";
             gameObject.transform.SetParent(transform);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Road Splitter");

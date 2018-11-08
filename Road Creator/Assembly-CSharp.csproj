@@ -75,14 +75,12 @@
     <Compile Include="Assets\Resources\Scripts\Road\RoadEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSegment.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSegmentEditor.cs" />
-    <Compile Include="Assets\Resources\Scripts\Road\RoadSplitter.cs" />
-    <Compile Include="Assets\Resources\Scripts\Road\RoadSplitterEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSystem.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSystemCreatorButton.cs" />
     <Compile Include="Assets\Resources\Scripts\Road\RoadSystemEditor.cs" />
     <Compile Include="Assets\Resources\Scripts\SerializedVector3.cs" />
-    <Compile Include="Assets\Resources\Scripts\TraphicLight.cs" />
-    <Compile Include="Assets\Resources\Scripts\TraphicLightEditor.cs" />
+    <Compile Include="Assets\Resources\Scripts\TrafficLight.cs" />
+    <Compile Include="Assets\Resources\Scripts\TrafficLightEditor.cs" />
     <Reference Include="Unity.RenderPipelines.Core.Editor">
       <HintPath>C:/Users/marcu/Documents/Github/roadcreator/Road Creator/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
     </Reference>
