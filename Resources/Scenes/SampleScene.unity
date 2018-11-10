@@ -209,7 +209,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4630945944706580, guid: 15f8aef4eb755eb49bc9c4cdee4be7be, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 412.8988
+      value: 412.77
       objectReference: {fileID: 0}
     - target: {fileID: 4630945944706580, guid: 15f8aef4eb755eb49bc9c4cdee4be7be, type: 2}
       propertyPath: m_LocalPosition.y
@@ -217,7 +217,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4630945944706580, guid: 15f8aef4eb755eb49bc9c4cdee4be7be, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 212.6333
+      value: 211.45
       objectReference: {fileID: 0}
     - target: {fileID: 4630945944706580, guid: 15f8aef4eb755eb49bc9c4cdee4be7be, type: 2}
       propertyPath: m_LocalRotation.x
@@ -1734,6 +1734,8 @@ MonoBehaviour:
   lastMoveObjectPosition: {x: 0, y: 0, z: 0}
   objectToMove: {fileID: 0}
   extraObjectToMove: {fileID: 0}
+  startIntersection: {fileID: 0}
+  endIntersection: {fileID: 0}
   startIntersectionConnection:
     leftPoint:
       x: 0
@@ -1815,6 +1817,8 @@ MonoBehaviour:
   lastMoveObjectPosition: {x: 0, y: 0, z: 0}
   objectToMove: {fileID: 0}
   extraObjectToMove: {fileID: 0}
+  startIntersection: {fileID: 0}
+  endIntersection: {fileID: 0}
   startIntersectionConnection:
     leftPoint:
       x: 0

@@ -282,7 +282,7 @@ public class RoadCreator : MonoBehaviour
             }
             else
             {
-                segment.roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+                segment.roadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
             }
         }
         else

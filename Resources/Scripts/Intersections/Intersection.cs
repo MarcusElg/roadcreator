@@ -19,7 +19,7 @@ public class Intersection : MonoBehaviour
 
         if (material == null)
         {
-            material = Resources.Load("Materials/asphalt") as Material;
+            material = Resources.Load("Materials/Low Poly/asphalt") as Material;
         }
 
         List<Vector3> vertices = new List<Vector3>();

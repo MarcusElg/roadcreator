@@ -37,23 +37,23 @@ public class RoadSystem : MonoBehaviour
 
         if (createRoad == null)
         {
-            createRoad = Resources.Load("Textures/Ui/createroad") as Texture;
-            createPrefabLine = Resources.Load("Textures/Ui/createprefabline") as Texture;
-            createSquareIntersection = Resources.Load("Textures/Ui/createsquareintersection") as Texture;
-            createTriangleIntersection = Resources.Load("Textures/Ui/createtriangleintersection") as Texture;
-            createDiamondIntersection = Resources.Load("Textures/Ui/creatediamondintersection") as Texture;
-            createRoundabout = Resources.Load("Textures/Ui/createroundabout") as Texture;
-            createRoadSplitter = Resources.Load("Textures/Ui/createroadsplitter") as Texture;
+            createRoad = Resources.Load("Textures/Low Poly/Ui/createroad") as Texture;
+            createPrefabLine = Resources.Load("Textures/Low Poly/Ui/createprefabline") as Texture;
+            createSquareIntersection = Resources.Load("Textures/Low Poly/Ui/createsquareintersection") as Texture;
+            createTriangleIntersection = Resources.Load("Textures/Low Poly/Ui/createtriangleintersection") as Texture;
+            createDiamondIntersection = Resources.Load("Textures/Low Poly/Ui/creatediamondintersection") as Texture;
+            createRoundabout = Resources.Load("Textures/Low Poly/Ui/createroundabout") as Texture;
+            createRoadSplitter = Resources.Load("Textures/Low Poly/Ui/createroadsplitter") as Texture;
 
-            straightRoad = Resources.Load("Textures/Ui/straightroad") as Texture;
-            curvedRoad = Resources.Load("Textures/Ui/curvedroad") as Texture;
+            straightRoad = Resources.Load("Textures/Low Poly/Ui/straightroad") as Texture;
+            curvedRoad = Resources.Load("Textures/Low Poly/Ui/curvedroad") as Texture;
 
-            roadGuidelinesOn = Resources.Load("Textures/Ui/roadguidelineson") as Texture;
-            roadGuidelinesOff = Resources.Load("Textures/Ui/roadguidelinesoff") as Texture;
+            roadGuidelinesOn = Resources.Load("Textures/Low Poly/Ui/roadguidelineson") as Texture;
+            roadGuidelinesOff = Resources.Load("Textures/Low Poly/Ui/roadguidelinesoff") as Texture;
         }
 
         Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 260, SceneView.lastActiveSceneView.position.height - 85, 250, 75);
-        windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Ui/Object Creator Gui Skin") as GUISkin).window);
+        windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Low Poly/Ui/Object Creator Gui Skin") as GUISkin).window);
 
         // Detect click
         if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 175), (int)(SceneView.lastActiveSceneView.position.height - 95)))
