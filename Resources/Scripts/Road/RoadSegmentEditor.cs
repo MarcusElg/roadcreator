@@ -62,7 +62,7 @@ public class RoadSegmentEditor : Editor
                 serializedObject.FindProperty("extraMeshLeft").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshLeft").arraySize);
                 serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshLeft").arraySize - 1).boolValue = true;
                 serializedObject.FindProperty("extraMeshMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize);
-                serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize - 1).objectReferenceValue = Resources.Load("Materials/Asphalt") as Material;
+                serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize - 1).objectReferenceValue = Resources.Load("Materials/Low Poly/Asphalt") as Material;
                 serializedObject.FindProperty("extraMeshPhysicMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshPhysicMaterial").arraySize);
                 serializedObject.FindProperty("extraMeshWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshWidth").arraySize);
                 serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshWidth").arraySize - 1).floatValue = 1;

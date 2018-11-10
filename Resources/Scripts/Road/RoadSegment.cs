@@ -31,14 +31,14 @@ public class RoadSegment : MonoBehaviour
     {
         if (roadMaterial == null)
         {
-            roadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+            roadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
         }
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
         {
             if (extraMeshMaterial[i] == null)
             {
-                extraMeshMaterial[i] = Resources.Load("Materials/Asphalt") as Material;
+                extraMeshMaterial[i] = Resources.Load("Materials/Low Poly/Asphalt") as Material;
             }
         }
 
