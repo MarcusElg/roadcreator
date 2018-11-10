@@ -12,6 +12,11 @@ public class Intersection : MonoBehaviour
 
     public void GenerateMesh()
     {
+        if (connections.Count < 2)
+        {
+            GameObject.DestroyImmediate(gameObject);
+        }
+
         if (material == null)
         {
             material = Resources.Load("Materials/asphalt") as Material;
