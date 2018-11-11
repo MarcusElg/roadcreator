@@ -33,10 +33,8 @@ public class RoadSegmentEditor : Editor
 
                 if (roadSegment.transform.GetSiblingIndex() == roadSegment.transform.parent.childCount - 1)
                 {
-                    Debug.Log("3");
-                    if (roadCreator.endIntersectionConnection != null)
+                    if (roadCreator.endIntersection != null)
                     {
-                        Debug.Log("T");
                         roadCreator.CreateMesh();
                         roadCreator.endIntersectionConnection.leftPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 2] + roadSegment.transform.position);
                         roadCreator.endIntersectionConnection.rightPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 1] + roadSegment.transform.position);
@@ -45,7 +43,7 @@ public class RoadSegmentEditor : Editor
                 }
                 else if (roadSegment.transform.GetSiblingIndex() == 0)
                 {
-                    if (roadCreator.startIntersectionConnection != null)
+                    if (roadCreator.startIntersection != null)
                     {
                         roadCreator.CreateMesh();
                         roadCreator.startIntersectionConnection.leftPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[1] + roadSegment.transform.position);
