@@ -34,27 +34,24 @@ public class GlobalSettingsEditor : Editor
 
         EditorGUI.BeginChangeCheck();
         settings.resolution = Mathf.Clamp(EditorGUILayout.FloatField("Resolution", settings.resolution), 0.01f, 2f);
+
         if (EditorGUI.EndChangeCheck() == true)
         {
-            Transform[] objects = GameObject.FindObjectsOfType<Transform>();
-
-            for (int i = 0; i < objects.Length; i++)
+            RoadCreator[] roads = GameObject.FindObjectsOfType<RoadCreator>();
+            for (int i = 0; i < roads.Length; i++)
             {
-                RoadCreator road = objects[i].GetComponent<RoadCreator>();
-                if (road != null)
-                {
-                    road.CreateMesh();
-                }
-                else
-                {
-                    // generate intersection
-                }
+                roads[i].CreateMesh();
+            }
+
+            Intersection[] intersections = GameObject.FindObjectsOfType<Intersection>();
+            for (int i = 0; i < intersections.Length; i++)
+            {
+                intersections[i].GenerateMesh();
             }
         }
 
         settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
         settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
-        settings.intersectionPointsLayer = Mathf.Clamp(EditorGUILayout.IntField("Intersection Points Layer", settings.intersectionPointsLayer), 9, 31);
 
         EditorGUI.BeginChangeCheck();
         settings.amountRoadGuidelines = Mathf.Clamp(EditorGUILayout.IntField("Amount Of Road Guidelines (each side)", settings.amountRoadGuidelines), 0, 15);

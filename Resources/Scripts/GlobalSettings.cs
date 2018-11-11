@@ -9,7 +9,6 @@ public class GlobalSettings : MonoBehaviour
     public float resolution = 0.25f;
     public int ignoreMouseRayLayer = 9;
     public int roadLayer = 10;
-    public int intersectionPointsLayer = 11;
     public int oldAmountRoadGuidelines = 5;
     public int amountRoadGuidelines = 5;
 
