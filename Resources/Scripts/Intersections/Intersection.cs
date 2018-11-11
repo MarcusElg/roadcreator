@@ -71,18 +71,24 @@ public class Intersection : MonoBehaviour
 
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
                 {
-                    vertices.Add(Vector3.Lerp(firstPoint, nextPoint, t) + new Vector3(0, yOffset, 0) - transform.position);
-                    uvs.Add(new Vector2(0, t));
-
-                    if (t < 0.5f)
+                    float modifiedT = t;
+                    if (Mathf.Abs(0.5f - t) < distancePerSegment - 0.1f)
                     {
-                        vertices.Add(Vector3.Lerp(firstCenterPoint, transform.position, t * 2) + new Vector3(0, yOffset, 0) - transform.position);
+                        modifiedT = 0.5f;
+                    }
+
+                    vertices.Add(Vector3.Lerp(firstPoint, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+                    uvs.Add(new Vector2(0, modifiedT));
+
+                    if (modifiedT < 0.5f)
+                    {
+                        vertices.Add(Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) + new Vector3(0, yOffset, 0) - transform.position);
                     }
                     else
                     {
-                        vertices.Add(Vector3.Lerp(transform.position, nextCenterPoint, 2 * (t - 0.5f)) + new Vector3(0, yOffset, 0) - transform.position);
+                        vertices.Add(Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) + new Vector3(0, yOffset, 0) - transform.position);
                     }
-                    uvs.Add(new Vector2(1, t));
+                    uvs.Add(new Vector2(1, modifiedT));
 
                     if (t < 1)
                     {

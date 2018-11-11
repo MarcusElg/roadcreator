@@ -14,8 +14,49 @@ public class RoadSegmentEditor : Editor
         EditorGUI.BeginChangeCheck();
         serializedObject.FindProperty("roadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Road Material", serializedObject.FindProperty("roadMaterial").objectReferenceValue, typeof(Material), false);
         serializedObject.FindProperty("roadPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Road Physic Material", serializedObject.FindProperty("roadPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
+
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            Change();
+        }
+
+        EditorGUI.BeginChangeCheck();
         serializedObject.FindProperty("startRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Start Road Width", serializedObject.FindProperty("startRoadWidth").floatValue));
         serializedObject.FindProperty("endRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("End Road Width", serializedObject.FindProperty("endRoadWidth").floatValue));
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            Change();
+            for (int i = 0; i < targets.Length; i++)
+            {
+                RoadCreator roadCreator = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>();
+                RoadSegment roadSegment = (RoadSegment)targets[i];
+
+                if (roadSegment.transform.GetSiblingIndex() == roadSegment.transform.parent.childCount - 1)
+                {
+                    Debug.Log("3");
+                    if (roadCreator.endIntersectionConnection != null)
+                    {
+                        Debug.Log("T");
+                        roadCreator.CreateMesh();
+                        roadCreator.endIntersectionConnection.leftPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 2] + roadSegment.transform.position);
+                        roadCreator.endIntersectionConnection.rightPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 1] + roadSegment.transform.position);
+                        roadCreator.endIntersection.GenerateMesh();
+                    }
+                }
+                else if (roadSegment.transform.GetSiblingIndex() == 0)
+                {
+                    if (roadCreator.startIntersectionConnection != null)
+                    {
+                        roadCreator.CreateMesh();
+                        roadCreator.startIntersectionConnection.leftPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[1] + roadSegment.transform.position);
+                        roadCreator.startIntersectionConnection.rightPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[0] + roadSegment.transform.position);
+                        roadCreator.startIntersection.GenerateMesh();
+                    }
+                }
+            }
+        }
+
+        EditorGUI.BeginChangeCheck();
         serializedObject.FindProperty("flipped").boolValue = EditorGUILayout.Toggle("Road Flipped", serializedObject.FindProperty("flipped").boolValue);
         serializedObject.FindProperty("textureTilingY").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Texture Tiling Y Multiplier", serializedObject.FindProperty("textureTilingY").floatValue), 0, 10);
         serializedObject.FindProperty("terrainOption").enumValueIndex = (int)(RoadSegment.TerrainOption)EditorGUILayout.EnumPopup("Terrain Option", (RoadSegment.TerrainOption)Enum.GetValues(typeof(RoadSegment.TerrainOption)).GetValue(serializedObject.FindProperty("terrainOption").enumValueIndex));
@@ -82,12 +123,7 @@ public class RoadSegmentEditor : Editor
 
         if (EditorGUI.EndChangeCheck())
         {
-            serializedObject.ApplyModifiedProperties();
-
-            for (int i = 0; i < targets.Length; i++)
-            {
-                ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().CreateMesh();
-            }
+            Change();
         }
         GUILayout.Label("");
 
@@ -113,6 +149,16 @@ public class RoadSegmentEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("startGuidelinePoints"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("centerGuidelinePoints"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("endGuidelinePoints"), true);
+        }
+    }
+
+    private void Change()
+    {
+        serializedObject.ApplyModifiedProperties();
+
+        for (int i = 0; i < targets.Length; i++)
+        {
+            ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().CreateMesh();
         }
     }
 

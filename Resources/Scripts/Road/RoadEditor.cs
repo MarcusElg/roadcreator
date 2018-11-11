@@ -137,11 +137,6 @@ public class RoadEditor : Editor
                 roadCreator.followObject.GetComponent<PrefabLineCreator>().PlacePrefabs();
             }
         }
-
-        if (GUILayout.Button("Convert To Mesh"))
-        {
-            Misc.ConvertToMesh(roadCreator.gameObject, "Road Mesh");
-        }
     }
 
     public void ResetObject()

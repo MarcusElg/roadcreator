@@ -7,7 +7,6 @@ public class IntersectionConnection  : IComparable<IntersectionConnection> {
     public SerializedVector3 rightPoint;
     public SerializedVector3 lastPoint;
     public float YRotation;
-    public float width;
     public float length;
 
     public int CompareTo (IntersectionConnection intersectionConnection)
