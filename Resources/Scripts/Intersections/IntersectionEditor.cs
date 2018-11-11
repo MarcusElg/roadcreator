@@ -24,11 +24,6 @@ public class IntersectionEditor : Editor
         intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
         intersection.yOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
 
-        for (int i = 0; i < intersection.connections.Count; i++)
-        {
-            intersection.connections[i].length = Mathf.Max(0, EditorGUILayout.FloatField("Connection Length #" + i, intersection.connections[i].length));
-        }
-
         if (EditorGUI.EndChangeCheck() == true)
         {
             intersection.GenerateMesh();
