@@ -393,6 +393,14 @@ public class RoadCreator : MonoBehaviour
                 endIntersectionConnection.rightPoint = new SerializedVector3(point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 1] + point.transform.parent.parent.position);
                 endIntersectionConnection.lastPoint = new SerializedVector3(Misc.GetCenter(endIntersectionConnection.leftPoint.ToNormalVector3(), endIntersectionConnection.rightPoint.ToNormalVector3()));
                 endIntersectionConnection.length = Vector3.Distance(endIntersection.transform.position, point.transform.position);
+
+                Vector3 center = Vector3.zero;
+                for (int i = 0; i < endIntersection.connections.Count; i++)
+                {
+                    center += endIntersection.connections[i].lastPoint.ToNormalVector3();
+                }
+
+                endIntersection.transform.position = center / endIntersection.connections.Count;
                 endIntersection.GenerateMesh();
             }
             else
