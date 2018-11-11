@@ -332,14 +332,14 @@ public class RoadCreator : MonoBehaviour
                     Undo.RegisterCreatedObjectUndo(intersection, "Create Intersection");
                     intersection.transform.SetParent(transform.parent);
                     intersection.transform.position = raycastHit.point;
+                    intersection.AddComponent<Intersection>();
+                    intersection.GetComponent<Intersection>().yOffset = heightOffset;
                     intersection.AddComponent<MeshFilter>();
                     intersection.AddComponent<MeshRenderer>();
                     intersection.AddComponent<MeshCollider>();
                     intersection.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
                     intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
-                    intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
-                    intersection.AddComponent<Intersection>();
-                    intersection.GetComponent<Intersection>().yOffset = heightOffset;
+                    intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable; 
 
                     // First connection
                     point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
