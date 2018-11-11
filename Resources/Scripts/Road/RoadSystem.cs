@@ -8,11 +8,6 @@ public class RoadSystem : MonoBehaviour
 
     Texture createRoad;
     Texture createPrefabLine;
-    Texture createSquareIntersection;
-    Texture createTriangleIntersection;
-    Texture createDiamondIntersection;
-    Texture createRoundabout;
-    Texture createRoadSplitter;
 
     Texture straightRoad;
     Texture curvedRoad;
@@ -39,11 +34,6 @@ public class RoadSystem : MonoBehaviour
         {
             createRoad = Resources.Load("Textures/Low Poly/Ui/createroad") as Texture;
             createPrefabLine = Resources.Load("Textures/Low Poly/Ui/createprefabline") as Texture;
-            createSquareIntersection = Resources.Load("Textures/Low Poly/Ui/createsquareintersection") as Texture;
-            createTriangleIntersection = Resources.Load("Textures/Low Poly/Ui/createtriangleintersection") as Texture;
-            createDiamondIntersection = Resources.Load("Textures/Low Poly/Ui/creatediamondintersection") as Texture;
-            createRoundabout = Resources.Load("Textures/Low Poly/Ui/createroundabout") as Texture;
-            createRoadSplitter = Resources.Load("Textures/Low Poly/Ui/createroadsplitter") as Texture;
 
             straightRoad = Resources.Load("Textures/Low Poly/Ui/straightroad") as Texture;
             curvedRoad = Resources.Load("Textures/Low Poly/Ui/curvedroad") as Texture;
@@ -52,11 +42,11 @@ public class RoadSystem : MonoBehaviour
             roadGuidelinesOff = Resources.Load("Textures/Low Poly/Ui/roadguidelinesoff") as Texture;
         }
 
-        Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 260, SceneView.lastActiveSceneView.position.height - 85, 250, 75);
+        Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 170, SceneView.lastActiveSceneView.position.height - 85, 160, 75);
         windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Low Poly/Ui/Object Creator Gui Skin") as GUISkin).window);
 
         // Detect click
-        if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 175), (int)(SceneView.lastActiveSceneView.position.height - 95)))
+        if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 80), (int)(SceneView.lastActiveSceneView.position.height - 95)))
         {
             if (globalSettings.roadCurved == true)
             {
@@ -67,7 +57,7 @@ public class RoadSystem : MonoBehaviour
             }
         }
 
-        if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 135), (int)(SceneView.lastActiveSceneView.position.height - 95)))
+        if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 45), (int)(SceneView.lastActiveSceneView.position.height - 95)))
         {
             if (globalSettings.amountRoadGuidelines > 0)
             {
@@ -100,51 +90,6 @@ public class RoadSystem : MonoBehaviour
             Selection.activeGameObject = gameObject;
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Prefab Line");
         }
-        else if (ClickedButton(3) == true)
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.name = "Square Intersection";
-            gameObject.transform.SetParent(transform);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create Square Intersection");
-
-            SetPosition(gameObject);
-        }
-        else if (ClickedButton(4) == true)
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.name = "Triangle Intersection";
-            gameObject.transform.SetParent(transform);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create Triangle Intersection");
-
-            SetPosition(gameObject);
-        }
-        else if (ClickedButton(5) == true)
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.name = "Diamond Intersection";
-            gameObject.transform.SetParent(transform);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create Diamond Intersection");
-
-            SetPosition(gameObject);
-        }
-        else if (ClickedButton(6) == true)
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.name = "Roundabout";
-            gameObject.transform.SetParent(transform);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create Roundabout");
-
-            SetPosition(gameObject);
-        }
-        else if (ClickedButton(7) == true)
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.name = "Road Splitter";
-            gameObject.transform.SetParent(transform);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create Road Splitter");
-
-            SetPosition(gameObject);
-        }
     }
 
     void DrawWindow(int id)
@@ -166,21 +111,16 @@ public class RoadSystem : MonoBehaviour
 
             if (globalSettings.amountRoadGuidelines > 0)
             {
-                GUI.DrawTexture(new Rect(130, 5, 30, 30), roadGuidelinesOn);
+                GUI.DrawTexture(new Rect(125, 5, 30, 30), roadGuidelinesOn);
             }
             else
             {
-                GUI.DrawTexture(new Rect(130, 5, 30, 30), roadGuidelinesOff);
+                GUI.DrawTexture(new Rect(125, 5, 30, 30), roadGuidelinesOff);
             }
         }
 
-        GUI.DrawTexture(new Rect(5, 40, 30, 30), createRoad);
-        GUI.DrawTexture(new Rect(40, 40, 30, 30), createPrefabLine);
-        GUI.DrawTexture(new Rect(75, 40, 30, 30), createSquareIntersection);
-        GUI.DrawTexture(new Rect(110, 40, 30, 30), createTriangleIntersection);
-        GUI.DrawTexture(new Rect(145, 40, 30, 30), createDiamondIntersection);
-        GUI.DrawTexture(new Rect(180, 40, 30, 30), createRoundabout);
-        GUI.DrawTexture(new Rect(215, 40, 30, 30), createRoadSplitter);
+        GUI.DrawTexture(new Rect(55, 40, 30, 30), createRoad);
+        GUI.DrawTexture(new Rect(90, 40, 30, 30), createPrefabLine);
 
         GUILayout.EndHorizontal();
     }
@@ -202,7 +142,7 @@ public class RoadSystem : MonoBehaviour
 
     private bool ClickedButton(int i)
     {
-        return ClickedButton((int)(5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 260), (int)(SceneView.lastActiveSceneView.position.height - 50 - 15));
+        return ClickedButton((int)(5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 120), (int)(SceneView.lastActiveSceneView.position.height - 50 - 15));
     }
 
     private void SetPosition(GameObject gameObject)
