@@ -20,6 +20,7 @@ public class RoadCreator : MonoBehaviour
     public GameObject objectToMove = null;
     public GameObject extraObjectToMove = null;
     private bool mouseDown;
+    public bool sDown;
 
     public Intersection startIntersection = null;
     public Intersection endIntersection = null;
@@ -159,13 +160,13 @@ public class RoadCreator : MonoBehaviour
                 if (globalSettings.roadCurved == true)
                 {
                     // Create control point
-                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created Point");
                 }
                 else
                 {
                     // Create control and end points
-                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), Misc.GetCenter(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(0).position, hitPosition)), "Created point");
-                    Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), Misc.GetCenter(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(0).position, hitPosition)), "Created Point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created Point");
                     CreateMesh();
                 }
             }
@@ -188,8 +189,8 @@ public class RoadCreator : MonoBehaviour
                 else
                 {
                     segment.curved = false;
-                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), Misc.GetCenter(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(0).position, hitPosition)), "Created point");
-                    Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), Misc.GetCenter(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(0).position, hitPosition)), "Created Point");
+                    Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created Point");
                     CreateMesh();
                 }
             }
@@ -339,7 +340,7 @@ public class RoadCreator : MonoBehaviour
                     intersection.AddComponent<MeshCollider>();
                     intersection.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
                     intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
-                    intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable; 
+                    intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
 
                     // First connection
                     point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
@@ -368,7 +369,7 @@ public class RoadCreator : MonoBehaviour
         {
             RaycastHit raycastHit;
 
-            if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, globalSettings.ignoreMouseRayLayer) && raycastHit.transform.GetComponent<Intersection>() != null)
+            if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, globalSettings.ignoreMouseRayLayer) && raycastHit.transform.GetComponent<Intersection>() != null && sDown == false)
             {
                 if ((point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null) || (point.transform.GetSiblingIndex() == 0 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null))
                 {
@@ -386,7 +387,7 @@ public class RoadCreator : MonoBehaviour
             }
             else
             {
-                if (Event.current.alt == true && endIntersection != null && point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.GetSiblingIndex() == point.transform.parent.parent.parent.childCount - 1)
+                if (sDown == true && endIntersection != null && point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.GetSiblingIndex() == point.transform.parent.parent.parent.childCount - 1)
                 {
                     CreateMesh();
                     endIntersectionConnection.leftPoint = new SerializedVector3(point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 2] + point.transform.parent.parent.position);
@@ -700,6 +701,16 @@ public class RoadCreator : MonoBehaviour
                 {
                     CheckForIntersectionGeneration(objectToMove);
                 }
+            }
+
+            if (startIntersection != null)
+            {
+                startIntersection.GenerateMesh();
+            }
+
+            if (endIntersection != null)
+            {
+                endIntersection.GenerateMesh();
             }
 
             objectToMove.GetComponent<BoxCollider>().enabled = true;

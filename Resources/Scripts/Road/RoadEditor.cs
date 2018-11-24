@@ -213,6 +213,13 @@ public class RoadEditor : Editor
                 {
                     RemovePoints();
                 }
+            } else if (guiEvent.type == EventType.KeyDown && guiEvent.keyCode == KeyCode.S)
+            { 
+                roadCreator.sDown = true;
+            }
+            else if (guiEvent.type == EventType.KeyUp && guiEvent.keyCode == KeyCode.S)
+            {
+                roadCreator.sDown = false;
             }
 
             if (roadCreator.transform.GetChild(0).childCount > 0 && roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
