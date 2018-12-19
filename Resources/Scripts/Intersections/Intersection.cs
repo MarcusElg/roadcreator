@@ -67,7 +67,7 @@ public class Intersection : MonoBehaviour
                     totalLength += connections[i + 1].length;
                 }
 
-                float segments = totalLength * GameObject.FindObjectOfType<GlobalSettings>().resolution;
+                float segments = totalLength * GameObject.FindObjectOfType<GlobalSettings>().resolution * 5;
                 float distancePerSegment = 1f / segments;
 
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
