@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Intersection : MonoBehaviour
 {
@@ -77,7 +78,7 @@ public class Intersection : MonoBehaviour
                         modifiedT = 0.5f;
                     }
 
-                    vertices.Add(Vector3.Lerp(firstPoint, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+                    vertices.Add(Misc.Lerp3(firstPoint, Misc.GetCenter(firstPoint, nextPoint), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
                     uvs.Add(new Vector2(0, modifiedT));
 
                     if (modifiedT < 0.5f)

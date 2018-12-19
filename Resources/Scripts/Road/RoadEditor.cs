@@ -178,6 +178,12 @@ public class RoadEditor : Editor
             roadCreator = (RoadCreator)target;
         }
 
+        if (roadCreator.transform.hasChanged)
+        {
+            roadCreator.CreateMesh();
+            roadCreator.transform.hasChanged = false;
+        }
+
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
         guiEvent = Event.current;
 
