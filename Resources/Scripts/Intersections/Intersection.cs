@@ -83,11 +83,15 @@ public class Intersection : MonoBehaviour
 
                     if (modifiedT < 0.5f)
                     {
-                        vertices.Add(Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) + new Vector3(0, yOffset, 0) - transform.position);
+                        Vector3 point = Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) + new Vector3(0, yOffset, 0) - transform.position;
+                        point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
+                        vertices.Add(point);
                     }
                     else
                     {
-                        vertices.Add(Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) + new Vector3(0, yOffset, 0) - transform.position);
+                        Vector3 point = Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) + new Vector3(0, yOffset, 0) - transform.position;
+                        point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
+                        vertices.Add(point);
                     }
                     uvs.Add(new Vector2(1, modifiedT));
 
