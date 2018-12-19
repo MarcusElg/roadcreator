@@ -219,8 +219,9 @@ public class RoadEditor : Editor
                 {
                     RemovePoints();
                 }
-            } else if (guiEvent.type == EventType.KeyDown && guiEvent.keyCode == KeyCode.S)
-            { 
+            }
+            else if (guiEvent.type == EventType.KeyDown && guiEvent.keyCode == KeyCode.S)
+            {
                 roadCreator.sDown = true;
             }
             else if (guiEvent.type == EventType.KeyUp && guiEvent.keyCode == KeyCode.S)
