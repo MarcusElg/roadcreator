@@ -382,20 +382,20 @@ public class RoadCreator : MonoBehaviour
                 GameObject intersection = CreateIntersection(raycastHit.point);
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
                 {
-                    CreateIntersectionConnectionForNewIntersectionFirst(point, intersection.GetComponent<Intersection>(), startIntersectionConnectionIndex);
+                    CreateIntersectionConnectionForNewIntersectionFirst(point, intersection.GetComponent<Intersection>());
                 }
                 else if (point.transform.GetSiblingIndex() == 2 && endIntersection == null)
                 {
-                    CreateIntersectionConnectionForNewIntersectionLast(point, intersection.GetComponent<Intersection>(), endIntersectionConnectionIndex);
+                    CreateIntersectionConnectionForNewIntersectionLast(point, intersection.GetComponent<Intersection>());
                 }
 
                 if (raycastHit.transform.GetSiblingIndex() == 0 && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null)
                 {
-                    CreateIntersectionConnectionForNewIntersectionFirst(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>(), raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex);
+                    CreateIntersectionConnectionForNewIntersectionFirst(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>());
                 }
                 else if (raycastHit.transform.GetSiblingIndex() == 2 && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
                 {
-                    CreateIntersectionConnectionForNewIntersectionLast(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>(), raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex);
+                    CreateIntersectionConnectionForNewIntersectionLast(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>());
                 }
 
                 intersection.GetComponent<Intersection>().GenerateMesh();
@@ -454,17 +454,17 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    public void CreateIntersectionConnectionForNewIntersectionFirst(GameObject gameObject, Intersection intersection, int connectionIndex)
+    public void CreateIntersectionConnectionForNewIntersectionFirst(GameObject gameObject, Intersection intersection)
     {
-        CreateIntersectionConnectionForNewIntersection(gameObject, intersection, connectionIndex, intersection.transform.position - gameObject.transform.parent.GetChild(2).position, true);
+        CreateIntersectionConnectionForNewIntersection(gameObject, intersection, intersection.transform.position - gameObject.transform.parent.GetChild(2).position, true);
     }
 
-    public void CreateIntersectionConnectionForNewIntersectionLast(GameObject gameObject, Intersection intersection, int connectionIndex)
+    public void CreateIntersectionConnectionForNewIntersectionLast(GameObject gameObject, Intersection intersection)
     {
-        CreateIntersectionConnectionForNewIntersection(gameObject, intersection, connectionIndex, intersection.transform.position - gameObject.transform.parent.GetChild(0).position, false);
+        CreateIntersectionConnectionForNewIntersection(gameObject, intersection, intersection.transform.position - gameObject.transform.parent.GetChild(0).position, false);
     }
 
-    public void CreateIntersectionConnectionForNewIntersection(GameObject gameObject, Intersection intersection, int connectionIndex, Vector3 forward, bool first)
+    public void CreateIntersectionConnectionForNewIntersection(GameObject gameObject, Intersection intersection, Vector3 forward, bool first)
     {
         gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
         Vector3[] vertices = gameObject.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
@@ -475,14 +475,14 @@ public class RoadCreator : MonoBehaviour
         {
             CreateIntersectionConnectionFirst(intersection.GetComponent<Intersection>(), gameObject);
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection = intersection;
+            gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex = intersection.connections.Count - 1;
         }
         else
         {
             CreateIntersectionConnectionLast(intersection.GetComponent<Intersection>(), gameObject);
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection = intersection;
+            gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex = intersection.connections.Count - 1;
         }
-
-        connectionIndex = intersection.connections.Count - 1;
     }
 
 
