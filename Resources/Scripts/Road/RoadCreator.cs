@@ -369,6 +369,16 @@ public class RoadCreator : MonoBehaviour
                     return;
                 }
 
+                if ((point.transform.name == "Start Point" && point.transform.parent.parent.GetSiblingIndex() != 0) || (point.transform.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() != point.transform.parent.parent.parent.childCount - 1))
+                {
+                    return;
+                }
+
+                if ((raycastHit.transform.name == "Start Point" && raycastHit.transform.parent.parent.GetSiblingIndex() != 0) || (raycastHit.transform.name == "End Point" && raycastHit.transform.parent.parent.GetSiblingIndex() != raycastHit.transform.parent.parent.parent.childCount - 1))
+                {
+                    return;
+                }
+
                 GameObject intersection = CreateIntersection(raycastHit.point);
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
                 {
