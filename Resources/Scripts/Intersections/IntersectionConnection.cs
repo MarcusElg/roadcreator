@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 [System.Serializable]
 public class IntersectionConnection  : IComparable<IntersectionConnection> {
@@ -8,6 +9,7 @@ public class IntersectionConnection  : IComparable<IntersectionConnection> {
     public SerializedVector3 lastPoint;
     public float YRotation;
     public float length;
+    public Point road;
 
     public int CompareTo (IntersectionConnection intersectionConnection)
     {

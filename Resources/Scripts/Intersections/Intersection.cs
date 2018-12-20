@@ -11,7 +11,7 @@ public class Intersection : MonoBehaviour
     public List<IntersectionConnection> connections = new List<IntersectionConnection>();
     public float yOffset;
 
-    public void GenerateMesh()
+    public void GenerateMesh(bool fromRoad = false)
     {
         if (connections.Count < 2)
         {
@@ -112,6 +112,14 @@ public class Intersection : MonoBehaviour
                 GetComponent<MeshRenderer>().sharedMaterial = material;
                 GetComponent<MeshCollider>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+            }
+        }
+
+        if (fromRoad == false)
+        {
+            for (int i = 0; i < connections.Count; i++)
+            {
+                connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh(true);
             }
         }
     }
