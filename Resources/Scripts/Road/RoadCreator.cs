@@ -335,6 +335,14 @@ public class RoadCreator : MonoBehaviour
         startIntersection.connections[startIntersectionConnectionIndex].length = Vector3.Distance(startIntersection.transform.position, startIntersection.connections[startIntersectionConnectionIndex].lastPoint.ToNormalVector3());
 
         // YRotation
+        Vector3 totalPosition = Vector3.zero;
+        for (int i = 0; i < startIntersection.connections.Count; i++)
+        {
+            totalPosition += startIntersection.connections[i].lastPoint.ToNormalVector3();
+        }
+
+        startIntersection.transform.position = totalPosition / startIntersection.connections.Count;
+        startIntersection.GenerateMesh();
     }
 
     public void UpdateEndConnectionData()
@@ -344,6 +352,15 @@ public class RoadCreator : MonoBehaviour
         endIntersection.connections[endIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[vertices.Length - 1] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
         endIntersection.connections[endIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).transform.position);
         endIntersection.connections[endIntersectionConnectionIndex].length = Vector3.Distance(endIntersection.transform.position, endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3());
+
+        Vector3 totalPosition = Vector3.zero;
+        for (int i = 0; i < endIntersection.connections.Count; i++)
+        {
+            totalPosition += endIntersection.connections[i].lastPoint.ToNormalVector3();
+        }
+
+        endIntersection.transform.position = totalPosition / endIntersection.connections.Count;
+        endIntersection.GenerateMesh();
     }
 
     public void CheckForIntersectionGeneration(GameObject point)
