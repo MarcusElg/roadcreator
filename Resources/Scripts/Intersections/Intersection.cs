@@ -13,6 +13,14 @@ public class Intersection : MonoBehaviour
 
     public void GenerateMesh(bool fromRoad = false)
     {
+        for (int i = 0; i < connections.Count; i++)
+        {
+            if (connections[i].road == null)
+            {
+                connections.RemoveAt(i);
+            }
+        }
+
         if (connections.Count < 2)
         {
             RoadCreator[] roads = GameObject.FindObjectsOfType<RoadCreator>();
@@ -38,7 +46,7 @@ public class Intersection : MonoBehaviour
 
             if (material == null)
             {
-                material = Resources.Load("Materials/Low Poly/asphalt") as Material;
+                material = Resources.Load("Materials/Low Poly/Intersections/Intersection Connections/2L Connection") as Material;
             }
 
             List<Vector3> vertices = new List<Vector3>();
