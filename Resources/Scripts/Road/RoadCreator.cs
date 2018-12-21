@@ -336,8 +336,24 @@ public class RoadCreator : MonoBehaviour
         startIntersection.connections[startIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[0], vertices[1]) + transform.GetChild(0).GetChild(0).transform.position);
         startIntersection.connections[startIntersectionConnectionIndex].lastPoint.y = startIntersection.transform.position.y;
         startIntersection.connections[startIntersectionConnectionIndex].length = Vector3.Distance(startIntersection.transform.position, startIntersection.connections[startIntersectionConnectionIndex].lastPoint.ToNormalVector3());
+        startIntersection.connections[startIntersectionConnectionIndex].YRotation = Quaternion.LookRotation((startIntersection.transform.position - startIntersection.connections[startIntersectionConnectionIndex].road.transform.position).normalized).eulerAngles.y;
 
-        // YRotation
+        // Update connection index
+        RoadCreator[] roads = new RoadCreator[startIntersection.connections.Count];
+        IntersectionConnection[] connections = new IntersectionConnection[startIntersection.connections.Count];
+        for (int i = 0; i < startIntersection.connections.Count; i++)
+        {
+            roads[i] = startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+            connections[i] = startIntersection.connections[i];
+        }
+
+        startIntersection.connections.Sort();
+
+        for (int i = 0; i < roads.Length; i++)
+        {
+            roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
+        }
+
         Vector3 totalPosition = Vector3.zero;
         for (int i = 0; i < startIntersection.connections.Count; i++)
         {
@@ -360,6 +376,22 @@ public class RoadCreator : MonoBehaviour
         endIntersection.connections[endIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).transform.position);
         endIntersection.connections[endIntersectionConnectionIndex].lastPoint.y = endIntersection.transform.position.y;
         endIntersection.connections[endIntersectionConnectionIndex].length = Vector3.Distance(endIntersection.transform.position, endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3());
+
+        // Update connection index
+        RoadCreator[] roads = new RoadCreator[endIntersection.connections.Count];
+        IntersectionConnection[] connections = new IntersectionConnection[endIntersection.connections.Count];
+        for (int i = 0; i < endIntersection.connections.Count; i++)
+        {
+            roads[i] = endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+            connections[i] = endIntersection.connections[i];
+        }
+
+        endIntersection.connections.Sort();
+
+        for (int i = 0; i < roads.Length; i++)
+        {
+            roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
+        }
 
         Vector3 totalPosition = Vector3.zero;
         for (int i = 0; i < endIntersection.connections.Count; i++)
@@ -442,11 +474,11 @@ public class RoadCreator : MonoBehaviour
                     Vector3 forward = Misc.GetCenter(vertices[0], vertices[1]) - Misc.GetCenter(vertices[2], vertices[3]);
                     point.transform.position += (-forward).normalized * 2;
                     CreateMesh();
-                    IntersectionConnection intersectionConnection = CreateIntersectionConnectionFirst(raycastHit.transform.GetComponent<Intersection>(), point);
+                    CreateIntersectionConnectionFirst(raycastHit.transform.GetComponent<Intersection>(), point);
                     startIntersection = raycastHit.transform.GetComponent<Intersection>();
-                    startIntersection.connections[startIntersectionConnectionIndex] = intersectionConnection;
-                    raycastHit.transform.GetComponent<Intersection>().connections.Sort();
-                    raycastHit.transform.GetComponent<Intersection>().GenerateMesh();
+                    startIntersectionConnectionIndex = startIntersection.connections.Count - 1;
+
+                    UpdateStartConnectionData();
                 }
                 else if (point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
                 {
@@ -455,11 +487,11 @@ public class RoadCreator : MonoBehaviour
                     Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
                     point.transform.position += (-forward).normalized * 2;
                     CreateMesh();
-                    IntersectionConnection intersectionConnection = CreateIntersectionConnectionLast(raycastHit.transform.GetComponent<Intersection>(), point);
+                    CreateIntersectionConnectionLast(raycastHit.transform.GetComponent<Intersection>(), point);
                     endIntersection = raycastHit.transform.GetComponent<Intersection>();
-                    endIntersection.connections[endIntersectionConnectionIndex] = intersectionConnection;
-                    raycastHit.transform.GetComponent<Intersection>().connections.Sort();
-                    raycastHit.transform.GetComponent<Intersection>().GenerateMesh();
+                    endIntersectionConnectionIndex = endIntersection.connections.Count - 1;
+
+                    UpdateEndConnectionData();
                 }
             }
             else
