@@ -35,5 +35,13 @@ public class IntersectionEditor : Editor
         {
             intersection.GenerateMesh();
         }
+
+        if (GameObject.FindObjectOfType<GlobalSettings>().debug == true)
+        {
+            for (int i = 0; i < intersection.connections.Count; i++)
+            {
+                GUILayout.Label(intersection.connections[i].ToString());
+            }
+        }
     }
 }

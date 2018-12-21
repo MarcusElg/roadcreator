@@ -122,6 +122,7 @@ public class RoadEditor : Editor
             GUILayout.Label("");
             GUILayout.Label("Debug", guiStyle);
             GUILayout.Label(roadCreator.startIntersectionConnectionIndex.ToString());
+            GUILayout.Label(roadCreator.endIntersectionConnectionIndex.ToString());
         }
 
         if (GUILayout.Button("Reset Road"))
