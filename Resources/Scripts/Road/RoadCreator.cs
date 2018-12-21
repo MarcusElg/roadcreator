@@ -100,9 +100,11 @@ public class RoadCreator : MonoBehaviour
                     {
                         Vector3[] nextPoints = null;
 
+
                         if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == transform.GetChild(0).childCount - 1 && endIntersection != null)
                         {
                             nextPoints = new Vector3[1];
+
                             nextPoints[0] = endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3() + (currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2]).normalized;
                             nextPoints[0].y = endIntersection.yOffset + endIntersection.connections[endIntersectionConnectionIndex].lastPoint.y;
                         }
@@ -126,13 +128,13 @@ public class RoadCreator : MonoBehaviour
         {
             if (startIntersection != null)
             {
-                UpdateStartConnectionData();
+                UpdateStartConnectionData(startIntersection);
                 startIntersection.GenerateMesh(true);
             }
 
             if (endIntersection != null)
             {
-                UpdateEndConnectionData();
+                UpdateEndConnectionData(endIntersection);
                 endIntersection.GenerateMesh(true);
             }
         }
@@ -326,141 +328,154 @@ public class RoadCreator : MonoBehaviour
         return segment;
     }
 
-    public void UpdateStartConnectionData()
+    public void UpdateStartConnectionData(Intersection startIntersection)
     {
-        Vector3[] vertices = transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
-        startIntersection.connections[startIntersectionConnectionIndex].leftPoint = new SerializedVector3(vertices[1] + transform.GetChild(0).GetChild(0).transform.position);
-        startIntersection.connections[startIntersectionConnectionIndex].leftPoint.y = startIntersection.transform.position.y;
-        startIntersection.connections[startIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[0] + transform.GetChild(0).GetChild(0).transform.position);
-        startIntersection.connections[startIntersectionConnectionIndex].rightPoint.y = startIntersection.transform.position.y;
-        startIntersection.connections[startIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[0], vertices[1]) + transform.GetChild(0).GetChild(0).transform.position);
-        startIntersection.connections[startIntersectionConnectionIndex].lastPoint.y = startIntersection.transform.position.y;
-        startIntersection.connections[startIntersectionConnectionIndex].length = Vector3.Distance(startIntersection.transform.position, startIntersection.connections[startIntersectionConnectionIndex].lastPoint.ToNormalVector3());
-        startIntersection.connections[startIntersectionConnectionIndex].YRotation = Quaternion.LookRotation((startIntersection.transform.position - startIntersection.connections[startIntersectionConnectionIndex].road.transform.position).normalized).eulerAngles.y;
-
-        // Update connection index
-        RoadCreator[] roads = new RoadCreator[startIntersection.connections.Count];
-        IntersectionConnection[] connections = new IntersectionConnection[startIntersection.connections.Count];
-        for (int i = 0; i < startIntersection.connections.Count; i++)
+        if (startIntersection.connections[startIntersectionConnectionIndex] != null)
         {
-            roads[i] = startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
-            connections[i] = startIntersection.connections[i];
+            Vector3[] vertices = transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
+            startIntersection.connections[startIntersectionConnectionIndex].leftPoint = new SerializedVector3(vertices[1] + transform.GetChild(0).GetChild(0).transform.position);
+            startIntersection.connections[startIntersectionConnectionIndex].leftPoint.y = startIntersection.transform.position.y;
+            startIntersection.connections[startIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[0] + transform.GetChild(0).GetChild(0).transform.position);
+            startIntersection.connections[startIntersectionConnectionIndex].rightPoint.y = startIntersection.transform.position.y;
+            startIntersection.connections[startIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[0], vertices[1]) + transform.GetChild(0).GetChild(0).transform.position);
+            startIntersection.connections[startIntersectionConnectionIndex].lastPoint.y = startIntersection.transform.position.y;
+            startIntersection.connections[startIntersectionConnectionIndex].length = Vector3.Distance(startIntersection.transform.position, startIntersection.connections[startIntersectionConnectionIndex].lastPoint.ToNormalVector3());
+            startIntersection.connections[startIntersectionConnectionIndex].YRotation = Quaternion.LookRotation((startIntersection.transform.position - startIntersection.connections[startIntersectionConnectionIndex].road.transform.position).normalized).eulerAngles.y;
+
+            // Update connection index
+            RoadCreator[] roads = new RoadCreator[startIntersection.connections.Count];
+            IntersectionConnection[] connections = new IntersectionConnection[startIntersection.connections.Count];
+            for (int i = 0; i < startIntersection.connections.Count; i++)
+            {
+                roads[i] = startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+                connections[i] = startIntersection.connections[i];
+            }
+
+            startIntersection.connections.Sort();
+
+            for (int i = 0; i < roads.Length; i++)
+            {
+                roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
+            }
+
+            for (int i = 0; i < roads.Length; i++)
+            {
+                roads[i].CreateMesh(true);
+            }
+
+            Vector3 totalPosition = Vector3.zero;
+            for (int i = 0; i < startIntersection.connections.Count; i++)
+            {
+                totalPosition += startIntersection.connections[i].lastPoint.ToNormalVector3();
+            }
+
+            Vector3 newPosition = totalPosition / startIntersection.connections.Count;
+            newPosition.y = startIntersection.transform.position.y;
+            startIntersection.transform.position = newPosition;
+            startIntersection.GenerateMesh();
         }
-
-        startIntersection.connections.Sort();
-
-        for (int i = 0; i < roads.Length; i++)
-        {
-            roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
-        }
-
-        Vector3 totalPosition = Vector3.zero;
-        for (int i = 0; i < startIntersection.connections.Count; i++)
-        {
-            totalPosition += startIntersection.connections[i].lastPoint.ToNormalVector3();
-        }
-
-        Vector3 newPosition = totalPosition / startIntersection.connections.Count;
-        newPosition.y = startIntersection.transform.position.y;
-        startIntersection.transform.position = newPosition;
-        startIntersection.GenerateMesh();
     }
 
-    public void UpdateEndConnectionData()
+    public void UpdateEndConnectionData(Intersection endIntersection)
     {
-        Vector3[] vertices = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
-        endIntersection.connections[endIntersectionConnectionIndex].leftPoint = new SerializedVector3(vertices[vertices.Length - 2] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
-        endIntersection.connections[endIntersectionConnectionIndex].leftPoint.y = endIntersection.transform.position.y;
-        endIntersection.connections[endIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[vertices.Length - 1] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
-        endIntersection.connections[endIntersectionConnectionIndex].rightPoint.y = endIntersection.transform.position.y;
-        endIntersection.connections[endIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).transform.position);
-        endIntersection.connections[endIntersectionConnectionIndex].lastPoint.y = endIntersection.transform.position.y;
-        endIntersection.connections[endIntersectionConnectionIndex].length = Vector3.Distance(endIntersection.transform.position, endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3());
-
-        // Update connection index
-        RoadCreator[] roads = new RoadCreator[endIntersection.connections.Count];
-        IntersectionConnection[] connections = new IntersectionConnection[endIntersection.connections.Count];
-        for (int i = 0; i < endIntersection.connections.Count; i++)
+        if (endIntersection.connections[endIntersectionConnectionIndex] != null)
         {
-            roads[i] = endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
-            connections[i] = endIntersection.connections[i];
+            Vector3[] vertices = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
+            endIntersection.connections[endIntersectionConnectionIndex].leftPoint = new SerializedVector3(vertices[vertices.Length - 2] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
+            endIntersection.connections[endIntersectionConnectionIndex].leftPoint.y = endIntersection.transform.position.y;
+            endIntersection.connections[endIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[vertices.Length - 1] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
+            endIntersection.connections[endIntersectionConnectionIndex].rightPoint.y = endIntersection.transform.position.y;
+            endIntersection.connections[endIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).transform.position);
+            endIntersection.connections[endIntersectionConnectionIndex].lastPoint.y = endIntersection.transform.position.y;
+            endIntersection.connections[endIntersectionConnectionIndex].length = Vector3.Distance(endIntersection.transform.position, endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3());
+
+            // Update connection index
+            RoadCreator[] roads = new RoadCreator[endIntersection.connections.Count];
+            IntersectionConnection[] connections = new IntersectionConnection[endIntersection.connections.Count];
+            for (int i = 0; i < endIntersection.connections.Count; i++)
+            {
+                roads[i] = endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+                connections[i] = endIntersection.connections[i];
+            }
+
+            endIntersection.connections.Sort();
+
+            for (int i = 0; i < roads.Length; i++)
+            {
+                roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
+            }
+
+            for (int i = 0; i < roads.Length; i++)
+            {
+                roads[i].CreateMesh(true);
+            }
+
+            Vector3 totalPosition = Vector3.zero;
+            for (int i = 0; i < endIntersection.connections.Count; i++)
+            {
+                totalPosition += endIntersection.connections[i].lastPoint.ToNormalVector3();
+            }
+
+            Vector3 newPosition = totalPosition / endIntersection.connections.Count;
+            newPosition.y = endIntersection.transform.position.y;
+            endIntersection.transform.position = newPosition;
+            endIntersection.GenerateMesh();
         }
-
-        endIntersection.connections.Sort();
-
-        for (int i = 0; i < roads.Length; i++)
-        {
-            roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
-        }
-
-        Vector3 totalPosition = Vector3.zero;
-        for (int i = 0; i < endIntersection.connections.Count; i++)
-        {
-            totalPosition += endIntersection.connections[i].lastPoint.ToNormalVector3();
-        }
-
-        Vector3 newPosition = totalPosition / endIntersection.connections.Count;
-        newPosition.y = endIntersection.transform.position.y;
-        endIntersection.transform.position = newPosition;
-        endIntersection.GenerateMesh();
     }
 
     public void CheckForIntersectionGeneration(GameObject point)
     {
         RaycastHit[] raycastHits = Physics.RaycastAll(point.transform.position + new Vector3(0, 1, 0), Vector3.down, 100, 1 << globalSettings.ignoreMouseRayLayer);
-        if (raycastHits.Length > 0)
+        if (raycastHits.Length > 0 && ((raycastHits[0].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject && raycastHits[0].transform.GetComponent<Point>() != null) || (raycastHits.Length > 1 && raycastHits[1].collider.GetComponent<Point>() != null && raycastHits[1].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)))
         {
-            if ((raycastHits[0].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject && raycastHits[0].transform.GetComponent<Point>() != null) || (raycastHits.Length > 1 && raycastHits[1].collider.GetComponent<Point>() != null && raycastHits[1].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject))
+            RaycastHit raycastHit;
+
+            if (raycastHits[0].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject && raycastHits[0].transform.GetComponent<Point>() != null)
             {
-                RaycastHit raycastHit;
-
-                if (raycastHits[0].transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject && raycastHits[0].transform.GetComponent<Point>() != null)
-                {
-                    raycastHit = raycastHits[0];
-                }
-                else
-                {
-                    raycastHit = raycastHits[1];
-                }
-
-                if (point.transform.GetSiblingIndex() == 1 || raycastHit.transform.GetSiblingIndex() == 1)
-                {
-                    return;
-                }
-
-                if ((point.transform.name == "Start Point" && point.transform.parent.parent.GetSiblingIndex() != 0) || (point.transform.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() != point.transform.parent.parent.parent.childCount - 1))
-                {
-                    return;
-                }
-
-                if ((raycastHit.transform.name == "Start Point" && raycastHit.transform.parent.parent.GetSiblingIndex() != 0) || (raycastHit.transform.name == "End Point" && raycastHit.transform.parent.parent.GetSiblingIndex() != raycastHit.transform.parent.parent.parent.childCount - 1))
-                {
-                    return;
-                }
-
-                Vector3 creationPosition = raycastHit.point;
-                creationPosition.y = point.transform.position.y;
-                GameObject intersection = CreateIntersection(creationPosition);
-                if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
-                {
-                    CreateIntersectionConnectionForNewIntersectionFirst(point, intersection.GetComponent<Intersection>());
-                }
-                else if (point.transform.GetSiblingIndex() == 2 && endIntersection == null)
-                {
-                    CreateIntersectionConnectionForNewIntersectionLast(point, intersection.GetComponent<Intersection>());
-                }
-
-                if (raycastHit.transform.GetSiblingIndex() == 0 && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null)
-                {
-                    CreateIntersectionConnectionForNewIntersectionFirst(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>());
-                }
-                else if (raycastHit.transform.GetSiblingIndex() == 2 && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
-                {
-                    CreateIntersectionConnectionForNewIntersectionLast(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>());
-                }
-
-                intersection.GetComponent<Intersection>().GenerateMesh();
+                raycastHit = raycastHits[0];
             }
+            else
+            {
+                raycastHit = raycastHits[1];
+            }
+
+            if (point.transform.GetSiblingIndex() == 1 || raycastHit.transform.GetSiblingIndex() == 1)
+            {
+                return;
+            }
+
+            if ((point.transform.name == "Start Point" && point.transform.parent.parent.GetSiblingIndex() != 0) || (point.transform.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() != point.transform.parent.parent.parent.childCount - 1))
+            {
+                return;
+            }
+
+            if ((raycastHit.transform.name == "Start Point" && raycastHit.transform.parent.parent.GetSiblingIndex() != 0) || (raycastHit.transform.name == "End Point" && raycastHit.transform.parent.parent.GetSiblingIndex() != raycastHit.transform.parent.parent.parent.childCount - 1))
+            {
+                return;
+            }
+
+            Vector3 creationPosition = raycastHit.point;
+            creationPosition.y = point.transform.position.y;
+            GameObject intersection = CreateIntersection(creationPosition);
+            if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
+            {
+                CreateIntersectionConnectionForNewIntersectionFirst(point, intersection.GetComponent<Intersection>());
+            }
+            else if (point.transform.GetSiblingIndex() == 2 && endIntersection == null)
+            {
+                CreateIntersectionConnectionForNewIntersectionLast(point, intersection.GetComponent<Intersection>());
+            }
+
+            if (raycastHit.transform.GetSiblingIndex() == 0 && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null)
+            {
+                CreateIntersectionConnectionForNewIntersectionFirst(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>());
+            }
+            else if (raycastHit.transform.GetSiblingIndex() == 2 && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
+            {
+                CreateIntersectionConnectionForNewIntersectionLast(raycastHit.transform.gameObject, intersection.GetComponent<Intersection>());
+            }
+
+            intersection.GetComponent<Intersection>().GenerateMesh();
         }
         else
         {
@@ -478,7 +493,7 @@ public class RoadCreator : MonoBehaviour
                     startIntersection = raycastHit.transform.GetComponent<Intersection>();
                     startIntersectionConnectionIndex = startIntersection.connections.Count - 1;
 
-                    UpdateStartConnectionData();
+                    UpdateStartConnectionData(startIntersection);
                 }
                 else if (point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
                 {
@@ -491,7 +506,7 @@ public class RoadCreator : MonoBehaviour
                     endIntersection = raycastHit.transform.GetComponent<Intersection>();
                     endIntersectionConnectionIndex = endIntersection.connections.Count - 1;
 
-                    UpdateEndConnectionData();
+                    UpdateEndConnectionData(endIntersection);
                 }
             }
             else
@@ -504,11 +519,15 @@ public class RoadCreator : MonoBehaviour
                 {
                     if (point.transform.GetSiblingIndex() == 0 && startIntersection != null)
                     {
+                        Intersection intersection = startIntersection;
                         RemoveIntersectionConnection(startIntersection, startIntersectionConnectionIndex);
+                        UpdateStartConnectionData(intersection);
                     }
                     else if (point.transform.GetSiblingIndex() == 2 && endIntersection != null)
                     {
+                        Intersection intersection = endIntersection;
                         RemoveIntersectionConnection(endIntersection, endIntersectionConnectionIndex);
+                        UpdateEndConnectionData(intersection);
                     }
                 }
             }
