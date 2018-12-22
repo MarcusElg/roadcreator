@@ -339,22 +339,47 @@ public class RoadCreator : MonoBehaviour
             // Update connection index
             RoadCreator[] roads = new RoadCreator[startIntersection.connections.Count];
             IntersectionConnection[] connections = new IntersectionConnection[startIntersection.connections.Count];
+            bool[] end = new bool[startIntersection.connections.Count];
+
             for (int i = 0; i < startIntersection.connections.Count; i++)
             {
                 roads[i] = startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
                 connections[i] = startIntersection.connections[i];
+                
+                if (startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex == -1 || startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null || startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection.connections[startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex] != connections[i])
+                {
+                    end[i] = true;
+                }
+                else
+                {
+                    end[i] = false;
+                }
             }
 
             startIntersection.connections.Sort();
 
             for (int i = 0; i < roads.Length; i++)
             {
-                roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
+                if (end[i] == true)
+                {
+                    roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
+                }
+                else
+                {
+                    roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
+                }
             }
 
             for (int i = 0; i < roads.Length; i++)
             {
-                roads[i].UpdateStartConnectionVariables(roads[i].startIntersection);
+                if (end[i] == true)
+                {
+                    roads[i].UpdateEndConnectionVariables(roads[i].endIntersection);
+                }
+                else
+                {
+                    roads[i].UpdateStartConnectionVariables(roads[i].startIntersection);
+                }
             }
 
             Vector3 totalPosition = Vector3.zero;
@@ -379,22 +404,44 @@ public class RoadCreator : MonoBehaviour
             // Update connection index
             RoadCreator[] roads = new RoadCreator[endIntersection.connections.Count];
             IntersectionConnection[] connections = new IntersectionConnection[endIntersection.connections.Count];
+            bool[] end = new bool[endIntersection.connections.Count];
+
             for (int i = 0; i < endIntersection.connections.Count; i++)
             {
                 roads[i] = endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
                 connections[i] = endIntersection.connections[i];
+
+                if (endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex == -1 || endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null || endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection.connections[endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex] != connections[i])
+                {
+                    end[i] = false;
+                } else
+                {
+                    end[i] = true;
+                }
             }
 
             endIntersection.connections.Sort();
 
             for (int i = 0; i < roads.Length; i++)
             {
-                roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
+                if (end[i] == true)
+                {
+                    roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
+                } else
+                {
+                    roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
+                }
             }
 
             for (int i = 0; i < roads.Length; i++)
             {
-                roads[i].UpdateEndConnectionVariables(roads[i].endIntersection);
+                if (end[i] == true)
+                {
+                    roads[i].UpdateEndConnectionVariables(roads[i].endIntersection);
+                } else
+                {
+                    roads[i].UpdateStartConnectionVariables(roads[i].startIntersection);
+                }
             }
 
             Vector3 totalPosition = Vector3.zero;
@@ -541,7 +588,14 @@ public class RoadCreator : MonoBehaviour
                         {
                             if (i > index - 1)
                             {
-                                intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex -= 1;
+                                if (intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex == -1 || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection != intersection)
+                                {
+                                    intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex -= 1;
+                                }
+                                else
+                                {
+                                    intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex -= 1;
+                                }
                             }
                         }
 
@@ -555,7 +609,11 @@ public class RoadCreator : MonoBehaviour
 
                         for (int i = index; i < intersection.connections.Count; i++)
                         {
-                            if (i > index - 1)
+                            if (intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex == -1 || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection != intersection)
+                            {
+                                intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex -= 1;
+                            }
+                            else
                             {
                                 intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex -= 1;
                             }
