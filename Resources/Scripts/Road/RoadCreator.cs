@@ -240,6 +240,10 @@ public class RoadCreator : MonoBehaviour
         if (name == "End Point")
         {
             CheckForIntersectionGeneration(point);
+            if (point.transform.parent.parent.GetSiblingIndex() == 0)
+            {
+                CheckForIntersectionGeneration(point.transform.parent.GetChild(0).gameObject);
+            }
         }
 
         return point;
