@@ -108,7 +108,6 @@ public class Intersection : MonoBehaviour
                         vertices.Add(point);
                     }
                     
-                    Debug.Log(modifiedT);
                     if (t < 1)
                     {
                         triangles = AddTriangles(triangles, vertexIndex);
