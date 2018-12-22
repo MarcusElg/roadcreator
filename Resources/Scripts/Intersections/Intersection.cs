@@ -86,8 +86,14 @@ public class Intersection : MonoBehaviour
                         modifiedT = 0.5f;
                     }
 
+                    if (modifiedT > 1)
+                    {
+                        modifiedT = 1;
+                    }
+
                     vertices.Add(Misc.Lerp3(firstPoint, Misc.GetCenter(firstPoint, nextPoint), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
                     uvs.Add(new Vector2(0, modifiedT));
+                    uvs.Add(new Vector2(1, modifiedT));
 
                     if (modifiedT < 0.5f)
                     {
@@ -101,8 +107,8 @@ public class Intersection : MonoBehaviour
                         point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
                         vertices.Add(point);
                     }
-                    uvs.Add(new Vector2(1, modifiedT));
-
+                    
+                    Debug.Log(modifiedT);
                     if (t < 1)
                     {
                         triangles = AddTriangles(triangles, vertexIndex);
