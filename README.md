@@ -23,3 +23,4 @@ A free road creation tool for unity. It's currently in beta so it's pretty stabl
 - Create timed traffic lights
 
 For info about planned features and bugs see https://trello.com/b/WgYWoShS/road-creator
+Forum post: https://forum.unity.com/threads/beta-want-testers-currently-creating-a-free-road-creator-help-is-welcome.535901/
