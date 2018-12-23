@@ -8,6 +8,7 @@ public class IntersectionEditor : Editor
 {
 
     Intersection intersection;
+    Tool lastTool;
 
     public void OnEnable()
     {
@@ -15,6 +16,42 @@ public class IntersectionEditor : Editor
         {
             intersection = (Intersection)target;
         }
+
+        if (intersection.globalSettings == null)
+        {
+            intersection.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+        }
+
+        lastTool = Tools.current;
+        Tools.current = Tool.None;
+
+        for (int i = 0; i < intersection.connections.Count; i++)
+        {
+            GameObject curvePoint = new GameObject("Connection Point");
+            curvePoint.transform.SetParent(intersection.transform);
+            curvePoint.hideFlags = HideFlags.NotEditable;
+            curvePoint.layer = intersection.globalSettings.ignoreMouseRayLayer;
+            curvePoint.AddComponent<BoxCollider>();
+            curvePoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
+
+            int nextIndex = i + 1;
+            if (nextIndex >= intersection.connections.Count)
+            {
+                nextIndex = 0;
+            }
+
+            curvePoint.transform.position = Misc.GetCenter(intersection.connections[i].leftPoint.ToNormalVector3(), intersection.connections[nextIndex].rightPoint.ToNormalVector3()) - Misc.CalculateLeft(intersection.connections[i].leftPoint.ToNormalVector3(), intersection.connections[nextIndex].rightPoint.ToNormalVector3()) * intersection.connections[i].curviness;
+        }
+    }
+
+    public void OnDisable()
+    {
+        for (int i = intersection.transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(intersection.transform.GetChild(i).gameObject);
+        }
+
+        Tools.current = lastTool;
     }
 
     public override void OnInspectorGUI()
@@ -30,7 +67,7 @@ public class IntersectionEditor : Editor
         }
 
         GUILayout.Label("");
-        
+
         if (GUILayout.Button("Generate Intersection"))
         {
             intersection.GenerateMesh();
@@ -40,8 +77,35 @@ public class IntersectionEditor : Editor
         {
             for (int i = 0; i < intersection.connections.Count; i++)
             {
-                GUILayout.Label(intersection.connections[i].ToString());
+                GUILayout.Label(intersection.connections[i].curviness.ToString());
             }
+        }
+    }
+
+    private void OnSceneGUI()
+    {
+        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+        RaycastHit raycastHit;
+
+        if (Physics.Raycast(ray, out raycastHit, 100f))
+        {
+            Vector3 hitPosition = raycastHit.point;
+            if (Event.current.control == true)
+            {
+                hitPosition = Misc.Round(hitPosition);
+            }
+
+            intersection.MovePoints(raycastHit, hitPosition, Event.current);
+
+            Handles.color = Color.green;
+            for (int i = 0; i < intersection.transform.childCount; i++)
+            {
+                Handles.CylinderHandleCap(0, intersection.transform.GetChild(i).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
+            Handles.color = Color.blue;
+            Handles.CylinderHandleCap(0, raycastHit.point, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
         }
     }
 }

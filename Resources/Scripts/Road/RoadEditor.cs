@@ -163,6 +163,9 @@ public class RoadEditor : Editor
                 }
             }
         }
+
+        roadCreator.startIntersectionConnectionIndex = -1;
+        roadCreator.endIntersectionConnectionIndex = -1;
     }
 
     public void UndoUpdate()

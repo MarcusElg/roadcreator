@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
+using UnityEditor;
 
 public class Intersection : MonoBehaviour
 {
@@ -10,9 +9,65 @@ public class Intersection : MonoBehaviour
     public PhysicMaterial physicMaterial;
     public List<IntersectionConnection> connections = new List<IntersectionConnection>();
     public float yOffset;
+    public GlobalSettings globalSettings;
+    public GameObject objectToMove;
+
+    public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
+    {
+        if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
+        {
+            if (objectToMove == null)
+            {
+                if (raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject)
+                {
+                    if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
+                    {
+                        return;
+                    }
+
+                    objectToMove = raycastHit.transform.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
+                }
+            }
+        }
+        else if (currentEvent.type == EventType.MouseDrag && objectToMove != null)
+        {
+            objectToMove.transform.position = position;
+        }
+        else if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0 && objectToMove != null)
+        {
+            objectToMove.GetComponent<BoxCollider>().enabled = true;
+
+            int nextIndex = objectToMove.transform.GetSiblingIndex() + 1;
+            if (nextIndex >= connections.Count)
+            {
+                nextIndex = 0;
+            }
+
+            connections[objectToMove.transform.GetSiblingIndex()].curviness = Vector3.Distance(Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex()].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()), objectToMove.transform.position);
+            objectToMove = null;
+            GenerateMesh(false);
+
+            for (int i = 0; i < connections.Count; i++)
+            {
+                nextIndex = i + 1;
+                if (nextIndex >= connections.Count)
+                {
+                    nextIndex = 0;
+                }
+
+                transform.GetChild(i).transform.position = Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) - Misc.CalculateLeft(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) * connections[i].curviness;
+            }
+        }
+    }
 
     public void GenerateMesh(bool fromRoad = false)
     {
+        if (globalSettings == null)
+        {
+            globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+        }
+
         for (int i = 0; i < connections.Count; i++)
         {
             if (connections[i].road == null)
@@ -75,7 +130,7 @@ public class Intersection : MonoBehaviour
                     totalLength += connections[i + 1].length;
                 }
 
-                float segments = totalLength * GameObject.FindObjectOfType<GlobalSettings>().resolution * 5;
+                float segments = totalLength * globalSettings.resolution * 5;
                 float distancePerSegment = 1f / segments;
 
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
@@ -91,7 +146,7 @@ public class Intersection : MonoBehaviour
                         modifiedT = 1;
                     }
 
-                    vertices.Add(Misc.Lerp3(firstPoint, Misc.GetCenter(firstPoint, nextPoint), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+                    vertices.Add(Misc.Lerp3(firstPoint, Misc.GetCenter(firstPoint, nextPoint) - Misc.CalculateLeft(firstPoint, nextPoint) * connections[i].curviness, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
                     uvs.Add(new Vector2(0, modifiedT));
                     uvs.Add(new Vector2(1, modifiedT));
 
@@ -107,7 +162,7 @@ public class Intersection : MonoBehaviour
                         point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
                         vertices.Add(point);
                     }
-                    
+
                     if (t < 1)
                     {
                         triangles = AddTriangles(triangles, vertexIndex);
@@ -137,7 +192,7 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    private List<int> AddTriangles (List<int> triangles, int vertexIndex)
+    private List<int> AddTriangles(List<int> triangles, int vertexIndex)
     {
         triangles.Add(vertexIndex);
         triangles.Add(vertexIndex + 2);
