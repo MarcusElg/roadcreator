@@ -5,7 +5,8 @@ using UnityEngine;
 public class RoadSegment : MonoBehaviour
 {
 
-    public Material roadMaterial;
+    public Material baseRoadMaterial;
+    public Material overlayRoadMaterial;
     public PhysicMaterial roadPhysicsMaterial;
     public float startRoadWidth = 2;
     public float endRoadWidth = 2;
@@ -29,9 +30,9 @@ public class RoadSegment : MonoBehaviour
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, int smoothnessAmount, RoadCreator roadCreator)
     {
-        if (roadMaterial == null)
+        if (baseRoadMaterial == null)
         {
-            roadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
+            baseRoadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
         }
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
@@ -51,7 +52,7 @@ public class RoadSegment : MonoBehaviour
             SetGuidelines(points, nextSegmentPoints, false);
         }
 
-        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", roadMaterial, smoothnessAmount, roadCreator, roadPhysicsMaterial);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, smoothnessAmount, roadCreator, roadPhysicsMaterial);
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
         {
@@ -86,7 +87,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], xOffset, extraMeshWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], xOffset, extraMeshWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
         }
     }
 
@@ -151,7 +152,7 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material material, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, float heightOffset, Transform segment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
         Vector3[] vertices = new Vector3[points.Length * 2];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -326,7 +327,12 @@ public class RoadSegment : MonoBehaviour
         mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-        mesh.GetComponent<MeshRenderer>().sharedMaterial = material;
+
+        Material[] materials = new Material[2];
+        materials[0] = baseMaterial;
+        materials[1] = overlayRoadMaterial;
+
+        mesh.GetComponent<MeshRenderer>().sharedMaterials = materials;
     }
 
     private Vector3[] fixVertices(int position, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator, int change)

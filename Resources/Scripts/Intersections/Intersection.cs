@@ -5,7 +5,8 @@ using UnityEditor;
 public class Intersection : MonoBehaviour
 {
 
-    public Material material;
+    public Material baseMaterial;
+    public Material overlayMaterial;
     public PhysicMaterial physicMaterial;
     public List<IntersectionConnection> connections = new List<IntersectionConnection>();
     public float yOffset;
@@ -99,9 +100,9 @@ public class Intersection : MonoBehaviour
         else
         {
 
-            if (material == null)
+            if (baseMaterial == null)
             {
-                material = Resources.Load("Materials/Low Poly/Intersections/Intersection Connections/2L Connection") as Material;
+                baseMaterial = Resources.Load("Materials/Low Poly/Intersections/Intersection Connections/2L Connection") as Material;
             }
 
             List<Vector3> vertices = new List<Vector3>();
@@ -177,9 +178,15 @@ public class Intersection : MonoBehaviour
                 mesh.uv = uvs.ToArray();
 
                 GetComponent<MeshFilter>().sharedMesh = mesh;
-                GetComponent<MeshRenderer>().sharedMaterial = material;
                 GetComponent<MeshCollider>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+
+                Material[] materials = new Material[2];
+                materials[0] = baseMaterial;
+                materials[1] = overlayMaterial;
+
+                GetComponent<MeshRenderer>().sharedMaterials = materials;
+                
             }
         }
 

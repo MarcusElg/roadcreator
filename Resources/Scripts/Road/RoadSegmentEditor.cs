@@ -12,7 +12,8 @@ public class RoadSegmentEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
-        serializedObject.FindProperty("roadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Road Material", serializedObject.FindProperty("roadMaterial").objectReferenceValue, typeof(Material), false);
+        serializedObject.FindProperty("baseRoadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Base Road Material", serializedObject.FindProperty("baseRoadMaterial").objectReferenceValue, typeof(Material), false);
+        serializedObject.FindProperty("overlayRoadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Overlay Road Material", serializedObject.FindProperty("overlayRoadMaterial").objectReferenceValue, typeof(Material), false);
         serializedObject.FindProperty("roadPhysicsMaterial").objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Road Physic Material", serializedObject.FindProperty("roadPhysicsMaterial").objectReferenceValue, typeof(PhysicMaterial), false);
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -21,8 +22,8 @@ public class RoadSegmentEditor : Editor
         }
 
         EditorGUI.BeginChangeCheck();
-        serializedObject.FindProperty("startRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Start Road Width", serializedObject.FindProperty("startRoadWidth").floatValue));
-        serializedObject.FindProperty("endRoadWidth").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("End Road Width", serializedObject.FindProperty("endRoadWidth").floatValue));
+        serializedObject.FindProperty("startRoadWidth").floatValue = Mathf.Max(0.01f, EditorGUILayout.FloatField("Start Road Width", serializedObject.FindProperty("startRoadWidth").floatValue));
+        serializedObject.FindProperty("endRoadWidth").floatValue = Mathf.Max(0.01f, EditorGUILayout.FloatField("End Road Width", serializedObject.FindProperty("endRoadWidth").floatValue));
         if (EditorGUI.EndChangeCheck() == true)
         {
             Change();
@@ -144,6 +145,7 @@ public class RoadSegmentEditor : Editor
         {
             GUILayout.Label("");
             GUILayout.Label("Debug", guiStyle);
+            GUILayout.Label(serializedObject.FindProperty("curved").boolValue.ToString());
             EditorGUILayout.PropertyField(serializedObject.FindProperty("startGuidelinePoints"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("centerGuidelinePoints"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("endGuidelinePoints"), true);

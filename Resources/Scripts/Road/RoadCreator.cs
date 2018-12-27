@@ -201,6 +201,7 @@ public class RoadCreator : MonoBehaviour
 
                 if (globalSettings.roadCurved == true)
                 {
+                    segment.curved = true;
                     Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), hitPosition), "Created Point");
                 }
                 else
@@ -222,6 +223,9 @@ public class RoadCreator : MonoBehaviour
             if (globalSettings.roadCurved == false)
             {
                 segment.curved = false;
+            } else
+            {
+                segment.curved = true;
             }
         }
     }
@@ -280,7 +284,8 @@ public class RoadCreator : MonoBehaviour
             if (transform.GetChild(0).childCount > 1)
             {
                 RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
-                segment.roadMaterial = oldLastSegment.roadMaterial;
+                segment.baseRoadMaterial = oldLastSegment.baseRoadMaterial;
+                segment.overlayRoadMaterial = oldLastSegment.overlayRoadMaterial;
                 segment.startRoadWidth = oldLastSegment.startRoadWidth;
                 segment.endRoadWidth = oldLastSegment.endRoadWidth;
                 segment.flipped = oldLastSegment.flipped;
@@ -304,10 +309,6 @@ public class RoadCreator : MonoBehaviour
                     segment.extraMeshYOffset.Add(oldLastSegment.extraMeshYOffset[i]);
                     segment.extraMeshWidth.Add(oldLastSegment.extraMeshWidth[i]);
                 }
-            }
-            else
-            {
-                segment.roadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
             }
         }
         else
