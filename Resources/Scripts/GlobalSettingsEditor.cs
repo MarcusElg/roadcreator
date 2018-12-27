@@ -18,7 +18,7 @@ public class GlobalSettingsEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
-        settings.pointSize = Mathf.Max(0.2f, EditorGUILayout.FloatField("Point Size", settings.pointSize));
+        settings.pointSize = Mathf.Max(0.1f, EditorGUILayout.FloatField("Point Size", settings.pointSize));
         if (EditorGUI.EndChangeCheck() == true)
         {
             Transform[] objects = GameObject.FindObjectsOfType<Transform>();
