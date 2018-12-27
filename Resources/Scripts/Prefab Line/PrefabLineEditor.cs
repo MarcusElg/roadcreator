@@ -81,6 +81,8 @@ public class PrefabLineEditor : Editor
         }
 
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
+        prefabCreator.startPrefab = (GameObject)EditorGUILayout.ObjectField("Start Prefab", prefabCreator.startPrefab, typeof(GameObject), false);
+        prefabCreator.endPrefab = (GameObject)EditorGUILayout.ObjectField("End Prefab", prefabCreator.endPrefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0.1f, 10);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
         if (prefabCreator.rotateAlongCurve == true)
@@ -206,7 +208,7 @@ public class PrefabLineEditor : Editor
                 }
             }
 
-            GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
+            GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
         }
     }
 
@@ -247,14 +249,13 @@ public class PrefabLineEditor : Editor
         {
             if (guiEvent.shift == true)
             {
+                Handles.color = Color.black;
                 if (prefabCreator.transform.GetChild(0).childCount > 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Control Point")
-                {
-                    Handles.color = Color.black;
+                {  
                     Handles.DrawPolyLine(points);
                 }
-                else if (prefabCreator.transform.GetChild(0).childCount > 1)
+                else if (prefabCreator.transform.GetChild(0).childCount > 0)
                 {
-                    Handles.color = Color.black;
                     Handles.DrawLine(prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).position, hitPosition);
                 }
             }

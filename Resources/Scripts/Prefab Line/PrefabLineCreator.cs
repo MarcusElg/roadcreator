@@ -7,6 +7,8 @@ public class PrefabLineCreator : MonoBehaviour
 {
 
     public GameObject prefab;
+    public GameObject startPrefab;
+    public GameObject endPrefab;
 
     public enum YModification { none, matchTerrain, matchCurve };
     public YModification yModification;
@@ -172,7 +174,21 @@ public class PrefabLineCreator : MonoBehaviour
             PointPackage currentPoints = CalculatePoints();
             for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {
-                GameObject placedPrefab = Instantiate(prefab);
+                GameObject placedPrefab;
+
+                if (j == 0 && startPrefab != null)
+                {
+                    placedPrefab = Instantiate(startPrefab);
+                }
+                else if (j == currentPoints.prefabPoints.Length - 1 && endPrefab != null)
+                {
+                    placedPrefab = Instantiate(endPrefab);
+                }
+                else
+                {
+                    placedPrefab = Instantiate(prefab);
+                }
+
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.transform.position = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
                 placedPrefab.name = "Prefab";

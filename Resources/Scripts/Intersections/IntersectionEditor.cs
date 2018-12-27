@@ -108,5 +108,7 @@ public class IntersectionEditor : Editor
             Handles.color = Color.blue;
             Handles.CylinderHandleCap(0, raycastHit.point, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
         }
+
+        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
     }
 }

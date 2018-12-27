@@ -260,7 +260,7 @@ public class RoadEditor : Editor
             }
         }
 
-        GameObject.Find("Road System").GetComponent<RoadSystem>().ShowCreationButtons();
+        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
     }
 
     private void CreatePoints()
