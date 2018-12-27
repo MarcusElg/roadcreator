@@ -46,9 +46,12 @@ public class IntersectionEditor : Editor
 
     public void OnDisable()
     {
-        for (int i = intersection.transform.childCount - 1; i >= 0; i--)
+        if (intersection != null)
         {
-            DestroyImmediate(intersection.transform.GetChild(i).gameObject);
+            for (int i = intersection.transform.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(intersection.transform.GetChild(i).gameObject);
+            }
         }
 
         Tools.current = lastTool;
