@@ -181,19 +181,19 @@ public class RoadSegment : MonoBehaviour
             float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
             if (i == 0 && previousPoint != Misc.MaxVector3)
             {
-                correctedHeightOffset = previousPoint.y - segment.position.y;
+                correctedHeightOffset = previousPoint.y - segment.position.y - points[i].y;
             }
             else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
             {
-                correctedHeightOffset = nextSegmentPoints[0].y - segment.position.y;
+                correctedHeightOffset = nextSegmentPoints[0].y - segment.position.y - points[i].y;
             }
 
             if (name == "Road")
             {
                 vertices[verticeIndex] = (points[i] + left * roadWidth) - segment.position;
-                vertices[verticeIndex].y = correctedHeightOffset;
+                vertices[verticeIndex].y = correctedHeightOffset + points[i].y;
                 vertices[verticeIndex + 1] = (points[i] - left * roadWidth) - segment.position;
-                vertices[verticeIndex + 1].y = correctedHeightOffset;
+                vertices[verticeIndex + 1].y = correctedHeightOffset + points[i].y;
             }
             else
             {
@@ -202,16 +202,16 @@ public class RoadSegment : MonoBehaviour
                 if (extraMeshLeft == true)
                 {
                     vertices[verticeIndex] = (points[i] + left * -modifiedXOffset) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset;
+                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset + points[i].y;
                     vertices[verticeIndex + 1] = (points[i] + left * (-modifiedXOffset - width)) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset;
+                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset + points[i].y;
                 }
                 else
                 {
                     vertices[verticeIndex] = (points[i] + left * (modifiedXOffset + width)) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + yOffset;
+                    vertices[verticeIndex].y = correctedHeightOffset + yOffset + points[i].y;
                     vertices[verticeIndex + 1] = (points[i] + left * modifiedXOffset) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset;
+                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset + points[i].y;
                 }
             }
 
