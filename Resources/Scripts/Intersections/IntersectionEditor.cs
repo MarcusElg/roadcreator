@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEditor;
 
@@ -68,6 +67,26 @@ public class IntersectionEditor : Editor
         if (EditorGUI.EndChangeCheck() == true)
         {
             intersection.GenerateMesh();
+        }
+
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
+
+        GUILayout.Label("");
+        GUILayout.Label("Bridge Options", guiStyle);
+        serializedObject.FindProperty("bridgeGenerator").enumValueIndex = (int)(RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", (RoadSegment.BridgeGenerator)Enum.GetValues(typeof(RoadSegment.BridgeGenerator)).GetValue(serializedObject.FindProperty("bridgeGenerator").enumValueIndex));
+
+        if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex != 0)
+        {
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeMaterials"), true);
+        }
+
+        if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex == 1)
+        {
+            serializedObject.FindProperty("yOffsetFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", serializedObject.FindProperty("yOffsetFirstStep").floatValue), 0, 2);
+            serializedObject.FindProperty("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", serializedObject.FindProperty("yOffsetSecondStep").floatValue), 0, 2);
+            serializedObject.FindProperty("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", serializedObject.FindProperty("widthPercentageFirstStep").floatValue), 0, 1);
+            serializedObject.FindProperty("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", serializedObject.FindProperty("widthPercentageSecondStep").floatValue), 0, 1);
         }
 
         GUILayout.Label("");

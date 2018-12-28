@@ -13,6 +13,9 @@ public class Intersection : MonoBehaviour
     public GlobalSettings globalSettings;
     public GameObject objectToMove;
 
+    public RoadSegment.BridgeGenerator bridgeGenerator;
+    public Material[] bridgeMaterials;
+
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
         if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
@@ -132,6 +135,7 @@ public class Intersection : MonoBehaviour
                 }
 
                 float segments = totalLength * globalSettings.resolution * 5;
+                segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
 
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
@@ -180,13 +184,12 @@ public class Intersection : MonoBehaviour
                 GetComponent<MeshFilter>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+                GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+            }
 
-                Material[] materials = new Material[2];
-                materials[0] = baseMaterial;
-                materials[1] = overlayMaterial;
-
-                GetComponent<MeshRenderer>().sharedMaterials = materials;
-                
+            if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+            {
+                //BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, heightOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials[0]);
             }
         }
 

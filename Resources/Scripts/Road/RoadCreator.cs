@@ -582,7 +582,7 @@ public class RoadCreator : MonoBehaviour
                     }
                     else
                     {
-                        if (point.transform.GetSiblingIndex() == 0 && startIntersectionConnectionIndex != -1)
+                        if (point.transform.GetSiblingIndex() == 0 && startIntersectionConnectionIndex != -1 && startIntersection != null)
                         {
                             Intersection intersection = startIntersection;
                             int index = startIntersectionConnectionIndex;
@@ -605,7 +605,7 @@ public class RoadCreator : MonoBehaviour
 
                             intersection.GenerateMesh();
                         }
-                        else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnectionIndex != -1)
+                        else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnectionIndex != -1 && endIntersection != null)
                         {
                             Intersection intersection = endIntersection;
                             int index = endIntersectionConnectionIndex;

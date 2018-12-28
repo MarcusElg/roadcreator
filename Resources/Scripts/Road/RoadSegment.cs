@@ -17,6 +17,15 @@ public class RoadSegment : MonoBehaviour
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
 
+    public enum BridgeGenerator { none, simple };
+    public BridgeGenerator bridgeGenerator;
+    public Material[] bridgeMaterials;
+
+    public float yOffsetFirstStep = 0.25f;
+    public float yOffsetSecondStep = 0.5f;
+    public float widthPercentageFirstStep = 0.6f;
+    public float widthPercentageSecondStep = 0.6f;
+
     public List<bool> extraMeshOpen = new List<bool>();
     public List<bool> extraMeshLeft = new List<bool>();
     public List<Material> extraMeshMaterial = new List<Material>();
@@ -33,6 +42,11 @@ public class RoadSegment : MonoBehaviour
         if (baseRoadMaterial == null)
         {
             baseRoadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
+        }
+
+        if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
+        {
+            bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
         }
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
@@ -88,6 +102,31 @@ public class RoadSegment : MonoBehaviour
             }
 
             GenerateMesh(points, nextSegmentPoints, previousPoint, heightOffset, segment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], xOffset, extraMeshWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
+        }
+
+        if (transform.childCount == 3)
+        {
+            DestroyImmediate(transform.GetChild(2).gameObject);
+        }
+
+        if (bridgeGenerator == BridgeGenerator.simple)
+        {
+            float extraWidthLeft = 0;
+            float extraWidthRight = 0;
+
+            for (int i = 0; i < extraMeshLeft.Count; i++)
+            {
+                if (extraMeshLeft[i] == true)
+                {
+                    extraWidthLeft += extraMeshWidth[i];
+                }
+                else
+                {
+                    extraWidthRight += extraMeshWidth[i];
+                }
+            }
+
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, heightOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials[0]);
         }
     }
 
@@ -181,19 +220,19 @@ public class RoadSegment : MonoBehaviour
             float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
             if (i == 0 && previousPoint != Misc.MaxVector3)
             {
-                correctedHeightOffset = previousPoint.y - segment.position.y - points[i].y;
+                correctedHeightOffset = previousPoint.y - points[i].y;
             }
             else if (i == points.Length - 1 && nextSegmentPoints != null && nextSegmentPoints.Length == 1)
             {
-                correctedHeightOffset = nextSegmentPoints[0].y - segment.position.y - points[i].y;
+                correctedHeightOffset = nextSegmentPoints[0].y - points[i].y;
             }
 
             if (name == "Road")
             {
                 vertices[verticeIndex] = (points[i] + left * roadWidth) - segment.position;
-                vertices[verticeIndex].y = correctedHeightOffset + points[i].y;
+                vertices[verticeIndex].y = correctedHeightOffset + points[i].y - segment.position.y;
                 vertices[verticeIndex + 1] = (points[i] - left * roadWidth) - segment.position;
-                vertices[verticeIndex + 1].y = correctedHeightOffset + points[i].y;
+                vertices[verticeIndex + 1].y = correctedHeightOffset + points[i].y - segment.position.y;
             }
             else
             {
@@ -202,16 +241,16 @@ public class RoadSegment : MonoBehaviour
                 if (extraMeshLeft == true)
                 {
                     vertices[verticeIndex] = (points[i] + left * -modifiedXOffset) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset + points[i].y;
+                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y;
                     vertices[verticeIndex + 1] = (points[i] + left * (-modifiedXOffset - width)) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset + points[i].y;
+                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y;
                 }
                 else
                 {
                     vertices[verticeIndex] = (points[i] + left * (modifiedXOffset + width)) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + yOffset + points[i].y;
+                    vertices[verticeIndex].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y;
                     vertices[verticeIndex + 1] = (points[i] + left * modifiedXOffset) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset + points[i].y;
+                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y;
                 }
             }
 
@@ -327,12 +366,7 @@ public class RoadSegment : MonoBehaviour
         mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-
-        Material[] materials = new Material[2];
-        materials[0] = baseMaterial;
-        materials[1] = overlayRoadMaterial;
-
-        mesh.GetComponent<MeshRenderer>().sharedMaterials = materials;
+        mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
     }
 
     private Vector3[] fixVertices(int position, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator, int change)
