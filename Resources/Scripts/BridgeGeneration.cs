@@ -64,6 +64,21 @@ public class BridgeGeneration
             vertices[verticeIndex + 7] = (points[i] + left * roadWidthRight) - parent.position;
             vertices[verticeIndex + 7].y = points[i].y - parent.transform.position.y + heightOffset;
 
+            int uvY = 0;
+            if (i % 2 == 0)
+            {
+                uvY = 1;
+            }
+
+            uvs[verticeIndex] = new Vector2(0, uvY);
+            uvs[verticeIndex + 1] = new Vector2(1, uvY);
+            uvs[verticeIndex + 2] = new Vector2(0, uvY);
+            uvs[verticeIndex + 3] = new Vector2(1, uvY);
+            uvs[verticeIndex + 4] = new Vector2(0, uvY);
+            uvs[verticeIndex + 5] = new Vector2(1, uvY);
+            uvs[verticeIndex + 6] = new Vector2(0, uvY);
+            uvs[verticeIndex + 7] = new Vector2(1, uvY);
+
             if (i < points.Length - 1)
             {
                 for (int j = 0; j < 7; j += 1)
@@ -119,6 +134,19 @@ public class BridgeGeneration
             vertices[verticeIndex + 4].y = inputVertices[i].y - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 5] = inputVertices[i + 1];
             vertices[verticeIndex + 5].y = inputVertices[i].y - inputVertices[i].y;
+
+            int uvY = 0;
+            if (i % 4 == 0)
+            {
+                uvY = 1;
+            }
+
+            uvs[verticeIndex] = new Vector2(0, uvY);
+            uvs[verticeIndex + 1] = new Vector2(1, uvY);
+            uvs[verticeIndex + 2] = new Vector2(0, uvY);
+            uvs[verticeIndex + 3] = new Vector2(1, uvY);
+            uvs[verticeIndex + 4] = new Vector2(0, uvY);
+            uvs[verticeIndex + 5] = new Vector2(1, uvY);
 
             if (i < inputVertices.Length - 2)
             {
