@@ -292,6 +292,13 @@ public class RoadCreator : MonoBehaviour
                 segment.flipped = oldLastSegment.flipped;
                 segment.terrainOption = oldLastSegment.terrainOption;
 
+                segment.bridgeGenerator = oldLastSegment.bridgeGenerator;
+                segment.bridgeMaterials = oldLastSegment.bridgeMaterials;
+                segment.yOffsetFirstStep = oldLastSegment.yOffsetFirstStep;
+                segment.yOffsetSecondStep = oldLastSegment.yOffsetSecondStep;
+                segment.widthPercentageFirstStep = oldLastSegment.widthPercentageFirstStep;
+                segment.widthPercentageSecondStep = oldLastSegment.widthPercentageSecondStep;
+
                 for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
                 {
                     GameObject extraMesh = new GameObject("Extra Mesh");

@@ -16,6 +16,11 @@ public class Intersection : MonoBehaviour
     public RoadSegment.BridgeGenerator bridgeGenerator;
     public Material[] bridgeMaterials;
 
+    public float yOffsetFirstStep = 0.25f;
+    public float yOffsetSecondStep = 0.5f;
+    public float widthPercentageFirstStep = 0.6f;
+    public float widthPercentageSecondStep = 0.6f;
+
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
         if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
@@ -108,6 +113,11 @@ public class Intersection : MonoBehaviour
                 baseMaterial = Resources.Load("Materials/Low Poly/Intersections/Intersection Connections/2L Connection") as Material;
             }
 
+            if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
+            {
+                bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+            }
+
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
@@ -187,9 +197,18 @@ public class Intersection : MonoBehaviour
                 GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
             }
 
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                if (transform.GetChild(i).name == "Bridge")
+                {
+                    DestroyImmediate(transform.GetChild(i).gameObject);
+                    break;
+                }
+            }
+
             if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
             {
-                //BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, heightOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials[0]);
+                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, transform, yOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials[0]);
             }
         }
 

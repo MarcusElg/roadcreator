@@ -49,7 +49,10 @@ public class IntersectionEditor : Editor
         {
             for (int i = intersection.transform.childCount - 1; i >= 0; i--)
             {
-                DestroyImmediate(intersection.transform.GetChild(i).gameObject);
+                if (intersection.transform.GetChild(i).name == "Connection Point")
+                {
+                    DestroyImmediate(intersection.transform.GetChild(i).gameObject);
+                }
             }
         }
 
@@ -74,19 +77,19 @@ public class IntersectionEditor : Editor
 
         GUILayout.Label("");
         GUILayout.Label("Bridge Options", guiStyle);
-        serializedObject.FindProperty("bridgeGenerator").enumValueIndex = (int)(RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", (RoadSegment.BridgeGenerator)Enum.GetValues(typeof(RoadSegment.BridgeGenerator)).GetValue(serializedObject.FindProperty("bridgeGenerator").enumValueIndex));
+        intersection.bridgeGenerator = (RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", intersection.bridgeGenerator);
 
-        if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex != 0)
+        if (intersection.bridgeGenerator != RoadSegment.BridgeGenerator.none)
         {
             EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeMaterials"), true);
         }
 
-        if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex == 1)
+        if (intersection.bridgeGenerator == RoadSegment.BridgeGenerator.simple)
         {
-            serializedObject.FindProperty("yOffsetFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", serializedObject.FindProperty("yOffsetFirstStep").floatValue), 0, 2);
-            serializedObject.FindProperty("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", serializedObject.FindProperty("yOffsetSecondStep").floatValue), 0, 2);
-            serializedObject.FindProperty("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", serializedObject.FindProperty("widthPercentageFirstStep").floatValue), 0, 1);
-            serializedObject.FindProperty("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", serializedObject.FindProperty("widthPercentageSecondStep").floatValue), 0, 1);
+            intersection.yOffsetFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", intersection.yOffsetFirstStep), 0, 2);
+            intersection.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.yOffsetSecondStep), 0, 2);
+            intersection.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.widthPercentageFirstStep), 0, 1);
+            intersection.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.widthPercentageSecondStep), 0, 1);
         }
 
         GUILayout.Label("");
