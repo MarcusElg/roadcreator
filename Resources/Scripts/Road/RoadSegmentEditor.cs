@@ -74,6 +74,7 @@ public class RoadSegmentEditor : Editor
             serializedObject.FindProperty("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", serializedObject.FindProperty("yOffsetSecondStep").floatValue), 0, 2);
             serializedObject.FindProperty("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", serializedObject.FindProperty("widthPercentageFirstStep").floatValue), 0, 1);
             serializedObject.FindProperty("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", serializedObject.FindProperty("widthPercentageSecondStep").floatValue), 0, 1);
+            serializedObject.FindProperty("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", serializedObject.FindProperty("extraWidth").floatValue), 0, 1);
         }
 
         if (targets.Length == 1)

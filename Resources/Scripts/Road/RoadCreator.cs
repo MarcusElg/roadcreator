@@ -299,6 +299,7 @@ public class RoadCreator : MonoBehaviour
                 segment.yOffsetSecondStep = oldLastSegment.yOffsetSecondStep;
                 segment.widthPercentageFirstStep = oldLastSegment.widthPercentageFirstStep;
                 segment.widthPercentageSecondStep = oldLastSegment.widthPercentageSecondStep;
+                segment.extraWidth = oldLastSegment.extraWidth;
 
                 for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
                 {
@@ -697,14 +698,6 @@ public class RoadCreator : MonoBehaviour
         intersection.transform.SetParent(transform.parent);
         intersection.transform.position = position;
 
-        intersection.AddComponent<MeshFilter>();
-        intersection.AddComponent<MeshRenderer>();
-        intersection.AddComponent<MeshCollider>();
-        intersection.GetComponent<Transform>().hideFlags = HideFlags.NotEditable;
-        intersection.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
-        intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
-        intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
-
         intersection.AddComponent<Intersection>();
         intersection.GetComponent<Intersection>().yOffset = heightOffset;
         intersection.GetComponent<Intersection>().bridgeGenerator = segment.bridgeGenerator;
@@ -712,6 +705,15 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<Intersection>().yOffsetSecondStep = segment.yOffsetSecondStep;
         intersection.GetComponent<Intersection>().widthPercentageFirstStep = segment.widthPercentageFirstStep;
         intersection.GetComponent<Intersection>().widthPercentageSecondStep = segment.widthPercentageSecondStep;
+        intersection.GetComponent<Intersection>().extraWidth = segment.extraWidth;
+
+        intersection.AddComponent<MeshFilter>();
+        intersection.AddComponent<MeshRenderer>();
+        intersection.AddComponent<MeshCollider>();
+        intersection.GetComponent<Transform>().hideFlags = HideFlags.NotEditable;
+        intersection.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
+        intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
+        intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
 
         return intersection;
     }

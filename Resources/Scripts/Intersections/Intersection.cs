@@ -20,6 +20,7 @@ public class Intersection : MonoBehaviour
     public float yOffsetSecondStep = 0.5f;
     public float widthPercentageFirstStep = 0.6f;
     public float widthPercentageSecondStep = 0.6f;
+    public float extraWidth = 0.2f;
 
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
@@ -53,7 +54,9 @@ public class Intersection : MonoBehaviour
                 nextIndex = 0;
             }
 
-            connections[objectToMove.transform.GetSiblingIndex()].curviness = Vector3.Distance(Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex()].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()), objectToMove.transform.position);
+            Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex()].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
+            center.y -= yOffset;
+            connections[objectToMove.transform.GetSiblingIndex()].curviness = Vector3.Distance(center, objectToMove.transform.position);
             objectToMove = null;
             GenerateMesh(false);
 
@@ -208,8 +211,10 @@ public class Intersection : MonoBehaviour
 
             if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
             {
-                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, transform, yOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials[0]);
+                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, transform, extraWidth, yOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials);
             }
+
+            CreateCurvePoints();
         }
 
         if (fromRoad == false)
@@ -217,6 +222,46 @@ public class Intersection : MonoBehaviour
             for (int i = 0; i < connections.Count; i++)
             {
                 connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh(true);
+            }
+        }
+    }
+
+    public void CreateCurvePoints()
+    {
+        RemoveCurvePoints();
+
+        for (int i = 0; i < connections.Count; i++)
+        {
+            GameObject curvePoint = new GameObject("Connection Point");
+            curvePoint.transform.SetParent(transform);
+            curvePoint.hideFlags = HideFlags.NotEditable;
+            curvePoint.layer = globalSettings.ignoreMouseRayLayer;
+            curvePoint.AddComponent<BoxCollider>();
+            curvePoint.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+
+            int nextIndex = i + 1;
+            if (nextIndex >= connections.Count)
+            {
+                nextIndex = 0;
+            }
+
+            curvePoint.transform.position = Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) - Misc.CalculateLeft(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) * connections[i].curviness;
+            curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset, curvePoint.transform.position.z);
+        }
+
+        if (transform.Find("Bridge") != null)
+        {
+            transform.Find("Bridge").SetAsLastSibling();
+        }
+    }
+
+    public void RemoveCurvePoints()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            if (transform.GetChild(i).name == "Connection Point")
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
             }
         }
     }

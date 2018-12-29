@@ -5,11 +5,11 @@ using UnityEngine;
 public class BridgeGeneration
 {
 
-    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, Transform parent, float startWidth, float endWidth, float extraWidthLeft, float extraWidthRight, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material[] materials)
+    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, Transform parent, float startWidth, float endWidth, float extraWidthLeft, float extraWidthRight, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, float inputHeightOffset, Material[] materials)
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
-        int numberTriangles = 2 * (points.Length - 1);
+        int numberTriangles = 3 * (points.Length - 1);
         int[] triangles = new int[numberTriangles * 24];
         int verticeIndex = 0;
         int triangleIndex = 0;
@@ -34,37 +34,35 @@ public class BridgeGeneration
             float roadWidthLeft = roadWidth + extraWidthLeft;
             float roadWidthRight = roadWidth + extraWidthRight;
 
-            float correctedHeightOffset = heightOffset;
+            float heightOffset = 0;
             if (i == 0 && previousPoint != Misc.MaxVector3)
             {
-                correctedHeightOffset = previousPoint.y - points[i].y;
+                heightOffset = previousPoint.y - points[i].y;
             }
             else if (i == points.Length - 1 && nextPoints != null && nextPoints.Length == 1)
             {
-                correctedHeightOffset = nextPoints[0].y - points[i].y;
+                heightOffset = nextPoints[0].y - points[i].y;
             }
-
-            correctedHeightOffset -= parent.position.y;
 
             // |_   _|
             //   \_/
             vertices[verticeIndex] = (points[i] - left * roadWidthLeft) - parent.position;
-            vertices[verticeIndex].y = points[i].y + correctedHeightOffset;
+            vertices[verticeIndex].y = points[i].y + heightOffset - parent.transform.position.y;
             vertices[verticeIndex + 1] = (points[i] - left * roadWidthLeft) - parent.position;
-            vertices[verticeIndex + 1].y = points[i].y + correctedHeightOffset - yOffsetFirstStep;
+            vertices[verticeIndex + 1].y = points[i].y - yOffsetFirstStep + heightOffset - parent.transform.position.y;
             vertices[verticeIndex + 2] = (points[i] - left * roadWidthLeft * widthPercentageFirstStep) - parent.position;
-            vertices[verticeIndex + 2].y = points[i].y + correctedHeightOffset - yOffsetFirstStep;
+            vertices[verticeIndex + 2].y = points[i].y - yOffsetFirstStep + heightOffset - parent.transform.position.y;
             vertices[verticeIndex + 3] = (points[i] - left * roadWidthLeft * widthPercentageFirstStep * widthPercentageSecondStep) - parent.position;
-            vertices[verticeIndex + 3].y = points[i].y + correctedHeightOffset - yOffsetFirstStep - yOffsetSecondStep;
+            vertices[verticeIndex + 3].y = points[i].y - yOffsetFirstStep - yOffsetSecondStep + heightOffset - parent.transform.position.y;
 
             vertices[verticeIndex + 4] = (points[i] + left * roadWidthRight * widthPercentageFirstStep * widthPercentageSecondStep) - parent.position;
-            vertices[verticeIndex + 4].y = points[i].y + correctedHeightOffset - yOffsetFirstStep - yOffsetSecondStep;
+            vertices[verticeIndex + 4].y = points[i].y - yOffsetFirstStep - yOffsetSecondStep + heightOffset - parent.transform.position.y;
             vertices[verticeIndex + 5] = (points[i] + left * roadWidthRight * widthPercentageFirstStep) - parent.position;
-            vertices[verticeIndex + 5].y = points[i].y + correctedHeightOffset - yOffsetFirstStep;
+            vertices[verticeIndex + 5].y = points[i].y - yOffsetFirstStep + heightOffset - parent.transform.position.y;
             vertices[verticeIndex + 6] = (points[i] + left * roadWidthRight) - parent.position;
-            vertices[verticeIndex + 6].y = points[i].y + correctedHeightOffset - yOffsetFirstStep;
+            vertices[verticeIndex + 6].y = points[i].y - yOffsetFirstStep + heightOffset - parent.transform.position.y;
             vertices[verticeIndex + 7] = (points[i] + left * roadWidthRight) - parent.position;
-            vertices[verticeIndex + 7].y = points[i].y + correctedHeightOffset;
+            vertices[verticeIndex + 7].y = points[i].y - parent.transform.position.y + heightOffset;
 
             if (i < points.Length - 1)
             {
@@ -72,26 +70,34 @@ public class BridgeGeneration
                 {
                     triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
                     triangles[triangleIndex + 1 + j * 6] = verticeIndex + j;
-                    triangles[triangleIndex + 2 + j * 6] = verticeIndex + 8 + j;
+                    triangles[triangleIndex + 2 + j * 6] = verticeIndex + 9 + j;
 
-                    triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
+                    triangles[triangleIndex + 3 + j * 6] = verticeIndex + 0 + j;
                     triangles[triangleIndex + 4 + j * 6] = verticeIndex + 8 + j;
                     triangles[triangleIndex + 5 + j * 6] = verticeIndex + 9 + j;
                 }
+
+                triangles[triangleIndex + 42] = verticeIndex + 0;
+                triangles[triangleIndex + 43] = verticeIndex + 7;
+                triangles[triangleIndex + 44] = verticeIndex + 8;
+
+                triangles[triangleIndex + 45] = verticeIndex + 8;
+                triangles[triangleIndex + 46] = verticeIndex + 7;
+                triangles[triangleIndex + 47] = verticeIndex + 15;
             }
 
             verticeIndex += 8;
-            triangleIndex += 48;
+            triangleIndex += 54;
         }
 
         BridgeGeneration.CreateBridge(parent, vertices, triangles, uvs, materials);
     }
 
-    public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Transform parent, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material material)
+    public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Transform parent, float extraWidth, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material[] materials)
     {
         Vector3[] vertices = new Vector3[inputVertices.Length * 3];
         Vector2[] uvs = new Vector2[vertices.Length];
-        int[] triangles = new int[inputVertices.Length * 15];
+        int[] triangles = new int[inputVertices.Length * 30];
         int verticeIndex = 0;
         int triangleIndex = 0;
 
@@ -101,13 +107,13 @@ public class BridgeGeneration
 
             // |_   _|
             //   \_/
-            vertices[verticeIndex] = inputVertices[i];
+            vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * extraWidth;
             vertices[verticeIndex].y = inputVertices[i].y + heightOffset - inputVertices[i].y;
-            vertices[verticeIndex + 1] = inputVertices[i];
+            vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * extraWidth;
             vertices[verticeIndex + 1].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 2] = (inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep);
+            vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep - verticeDifference.normalized * extraWidth;
             vertices[verticeIndex + 2].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep * widthPercentageSecondStep;
+            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * extraWidth - verticeDifference * widthPercentageFirstStep * widthPercentageSecondStep;
             vertices[verticeIndex + 3].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 4] = inputVertices[i + 1];
             vertices[verticeIndex + 4].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
@@ -124,19 +130,28 @@ public class BridgeGeneration
                     triangles[triangleIndex + 4 + j * 6] = verticeIndex + 6 + j;
                     triangles[triangleIndex + 5 + j * 6] = verticeIndex + 5 + j;
                 }
+
+                triangles[triangleIndex + 24] = verticeIndex + 0;
+                triangles[triangleIndex + 25] = verticeIndex + 4;
+                triangles[triangleIndex + 26] = verticeIndex + 5;
+
+                triangles[triangleIndex + 27] = verticeIndex + 5;
+                triangles[triangleIndex + 28] = verticeIndex + 4;
+                triangles[triangleIndex + 29] = verticeIndex + 9;
             }
 
             verticeIndex += 5;
-            triangleIndex += 30;
+            triangleIndex += 60;
         }
 
-        BridgeGeneration.CreateBridge(parent, vertices, triangles, uvs, new Material[] { material });
+        BridgeGeneration.CreateBridge(parent, vertices, triangles, uvs, materials);
     }
 
     public static void CreateBridge(Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Material[] materials)
     {
         GameObject bridge = new GameObject("Bridge");
         bridge.transform.SetParent(parent);
+        bridge.transform.SetAsLastSibling();
         bridge.transform.localPosition = Vector3.zero;
         bridge.hideFlags = HideFlags.NotEditable;
         bridge.AddComponent<MeshFilter>();

@@ -24,37 +24,12 @@ public class IntersectionEditor : Editor
         lastTool = Tools.current;
         Tools.current = Tool.None;
 
-        for (int i = 0; i < intersection.connections.Count; i++)
-        {
-            GameObject curvePoint = new GameObject("Connection Point");
-            curvePoint.transform.SetParent(intersection.transform);
-            curvePoint.hideFlags = HideFlags.NotEditable;
-            curvePoint.layer = intersection.globalSettings.ignoreMouseRayLayer;
-            curvePoint.AddComponent<BoxCollider>();
-            curvePoint.GetComponent<BoxCollider>().size = new Vector3(intersection.globalSettings.pointSize, intersection.globalSettings.pointSize, intersection.globalSettings.pointSize);
-
-            int nextIndex = i + 1;
-            if (nextIndex >= intersection.connections.Count)
-            {
-                nextIndex = 0;
-            }
-
-            curvePoint.transform.position = Misc.GetCenter(intersection.connections[i].leftPoint.ToNormalVector3(), intersection.connections[nextIndex].rightPoint.ToNormalVector3()) - Misc.CalculateLeft(intersection.connections[i].leftPoint.ToNormalVector3(), intersection.connections[nextIndex].rightPoint.ToNormalVector3()) * intersection.connections[i].curviness;
-        }
+        intersection.CreateCurvePoints();
     }
 
     public void OnDisable()
     {
-        if (intersection != null)
-        {
-            for (int i = intersection.transform.childCount - 1; i >= 0; i--)
-            {
-                if (intersection.transform.GetChild(i).name == "Connection Point")
-                {
-                    DestroyImmediate(intersection.transform.GetChild(i).gameObject);
-                }
-            }
-        }
+        intersection.RemoveCurvePoints();
 
         Tools.current = lastTool;
     }
@@ -85,6 +60,7 @@ public class IntersectionEditor : Editor
             intersection.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.yOffsetSecondStep), 0, 2);
             intersection.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.widthPercentageFirstStep), 0, 1);
             intersection.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.widthPercentageSecondStep), 0, 1);
+            intersection.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.extraWidth), 0, 1);
         }
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -127,7 +103,10 @@ public class IntersectionEditor : Editor
             Handles.color = Color.green;
             for (int i = 0; i < intersection.transform.childCount; i++)
             {
-                Handles.CylinderHandleCap(0, intersection.transform.GetChild(i).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+                if (intersection.transform.GetChild(i).name != "Bridge")
+                {
+                    Handles.CylinderHandleCap(0, intersection.transform.GetChild(i).position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+                }
             }
 
             Handles.color = Color.blue;

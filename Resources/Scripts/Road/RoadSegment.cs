@@ -25,6 +25,7 @@ public class RoadSegment : MonoBehaviour
     public float yOffsetSecondStep = 0.5f;
     public float widthPercentageFirstStep = 0.6f;
     public float widthPercentageSecondStep = 0.6f;
+    public float extraWidth = 0.2f;
 
     public List<bool> extraMeshOpen = new List<bool>();
     public List<bool> extraMeshLeft = new List<bool>();
@@ -126,7 +127,10 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, heightOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials);
+            extraWidthLeft += extraWidth;
+            extraWidthRight += extraWidth;
+
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, heightOffset, bridgeMaterials);
         }
     }
 
