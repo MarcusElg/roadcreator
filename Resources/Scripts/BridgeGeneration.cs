@@ -9,7 +9,7 @@ public class BridgeGeneration
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
-        int numberTriangles = 3 * (points.Length - 1);
+        int numberTriangles = 4 * (points.Length - 1);
         int[] triangles = new int[numberTriangles * 24];
         int verticeIndex = 0;
         int triangleIndex = 0;
@@ -108,40 +108,42 @@ public class BridgeGeneration
             // |_   _|
             //   \_/
             vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * extraWidth;
-            vertices[verticeIndex].y = inputVertices[i].y + heightOffset - inputVertices[i].y;
+            vertices[verticeIndex].y = inputVertices[i].y - inputVertices[i].y;
             vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * extraWidth;
-            vertices[verticeIndex + 1].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - inputVertices[i].y;
+            vertices[verticeIndex + 1].y = inputVertices[i].y - yOffsetFirstStep - inputVertices[i].y;
             vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep - verticeDifference.normalized * extraWidth;
-            vertices[verticeIndex + 2].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - inputVertices[i].y;
+            vertices[verticeIndex + 2].y = inputVertices[i].y - yOffsetFirstStep - inputVertices[i].y;
             vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * extraWidth - verticeDifference * widthPercentageFirstStep * widthPercentageSecondStep;
-            vertices[verticeIndex + 3].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
+            vertices[verticeIndex + 3].y = inputVertices[i].y - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 4] = inputVertices[i + 1];
-            vertices[verticeIndex + 4].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
+            vertices[verticeIndex + 4].y = inputVertices[i].y - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
+            vertices[verticeIndex + 5] = inputVertices[i + 1];
+            vertices[verticeIndex + 5].y = inputVertices[i].y - inputVertices[i].y;
 
             if (i < inputVertices.Length - 2)
             {
                 for (int j = 0; j < 4; j += 1)
                 {
                     triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
-                    triangles[triangleIndex + 1 + j * 6] = verticeIndex + 5 + j;
+                    triangles[triangleIndex + 1 + j * 6] = verticeIndex + 6 + j;
                     triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
 
                     triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
-                    triangles[triangleIndex + 4 + j * 6] = verticeIndex + 6 + j;
-                    triangles[triangleIndex + 5 + j * 6] = verticeIndex + 5 + j;
+                    triangles[triangleIndex + 4 + j * 6] = verticeIndex + 7 + j;
+                    triangles[triangleIndex + 5 + j * 6] = verticeIndex + 6 + j;
                 }
 
                 triangles[triangleIndex + 24] = verticeIndex + 0;
-                triangles[triangleIndex + 25] = verticeIndex + 4;
+                triangles[triangleIndex + 25] = verticeIndex + 6;
                 triangles[triangleIndex + 26] = verticeIndex + 5;
 
-                triangles[triangleIndex + 27] = verticeIndex + 5;
-                triangles[triangleIndex + 28] = verticeIndex + 4;
-                triangles[triangleIndex + 29] = verticeIndex + 9;
+                triangles[triangleIndex + 27] = verticeIndex + 6;
+                triangles[triangleIndex + 28] = verticeIndex + 11;
+                triangles[triangleIndex + 29] = verticeIndex + 5;
             }
 
-            verticeIndex += 5;
-            triangleIndex += 60;
+            verticeIndex += 6;
+            triangleIndex += 30;
         }
 
         BridgeGeneration.CreateBridge(parent, vertices, triangles, uvs, materials);
