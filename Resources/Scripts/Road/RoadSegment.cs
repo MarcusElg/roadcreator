@@ -126,7 +126,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, heightOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials[0]);
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, heightOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials);
         }
     }
 

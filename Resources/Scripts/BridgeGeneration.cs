@@ -5,7 +5,7 @@ using UnityEngine;
 public class BridgeGeneration
 {
 
-    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, Transform parent, float startWidth, float endWidth, float extraWidthLeft, float extraWidthRight, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material material)
+    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, Transform parent, float startWidth, float endWidth, float extraWidthLeft, float extraWidthRight, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material[] materials)
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -84,7 +84,7 @@ public class BridgeGeneration
             triangleIndex += 48;
         }
 
-        BridgeGeneration.CreateBridge(parent, vertices, triangles, uvs, new Material[] { material });
+        BridgeGeneration.CreateBridge(parent, vertices, triangles, uvs, materials);
     }
 
     public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Transform parent, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material material)

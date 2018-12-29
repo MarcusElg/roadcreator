@@ -64,7 +64,7 @@ public class RoadSegmentEditor : Editor
         guiStyle.fontStyle = FontStyle.Bold;
 
         GUILayout.Label("");
-        GUILayout.Label("Bridge Options", guiStyle);
+        GUILayout.Label("Bridge", guiStyle);
         serializedObject.FindProperty("bridgeGenerator").enumValueIndex = (int)(RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", (RoadSegment.BridgeGenerator)Enum.GetValues(typeof(RoadSegment.BridgeGenerator)).GetValue(serializedObject.FindProperty("bridgeGenerator").enumValueIndex));
 
         if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex > 0)
