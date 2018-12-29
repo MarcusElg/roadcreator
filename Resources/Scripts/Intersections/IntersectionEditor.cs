@@ -67,16 +67,11 @@ public class IntersectionEditor : Editor
         intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
         intersection.yOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
 
-        if (EditorGUI.EndChangeCheck() == true)
-        {
-            intersection.GenerateMesh();
-        }
-
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
 
         GUILayout.Label("");
-        GUILayout.Label("Bridge Options", guiStyle);
+        GUILayout.Label("Bridge", guiStyle);
         intersection.bridgeGenerator = (RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", intersection.bridgeGenerator);
 
         if (intersection.bridgeGenerator != RoadSegment.BridgeGenerator.none)
@@ -90,6 +85,11 @@ public class IntersectionEditor : Editor
             intersection.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.yOffsetSecondStep), 0, 2);
             intersection.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.widthPercentageFirstStep), 0, 1);
             intersection.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.widthPercentageSecondStep), 0, 1);
+        }
+
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            intersection.GenerateMesh();
         }
 
         GUILayout.Label("");

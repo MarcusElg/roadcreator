@@ -91,12 +91,9 @@ public class BridgeGeneration
     {
         Vector3[] vertices = new Vector3[inputVertices.Length * 3];
         Vector2[] uvs = new Vector2[vertices.Length];
-        int numberTriangles = 2 * (inputVertices.Length / 4 - 1);
-        int[] triangles = new int[numberTriangles * 24];
+        int[] triangles = new int[inputVertices.Length * 15];
         int verticeIndex = 0;
         int triangleIndex = 0;
-
-        heightOffset -= parent.position.y;
 
         for (int i = 0; i < inputVertices.Length; i += 2)
         {
@@ -108,36 +105,24 @@ public class BridgeGeneration
             vertices[verticeIndex].y = inputVertices[i].y + heightOffset - inputVertices[i].y;
             vertices[verticeIndex + 1] = inputVertices[i];
             vertices[verticeIndex + 1].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 2] = (inputVertices[i] + verticeDifference * widthPercentageFirstStep);
+            vertices[verticeIndex + 2] = (inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep);
             vertices[verticeIndex + 2].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 3] = inputVertices[i] + verticeDifference * widthPercentageFirstStep * widthPercentageSecondStep;
+            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep * widthPercentageSecondStep;
             vertices[verticeIndex + 3].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
-            vertices[verticeIndex + 4] = Misc.GetCenter(inputVertices[i], inputVertices[i + 1]);
+            vertices[verticeIndex + 4] = inputVertices[i + 1];
             vertices[verticeIndex + 4].y = inputVertices[i].y + heightOffset - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
 
-            if (i == 0)
+            if (i < inputVertices.Length - 2)
             {
-                for (int j = 0; j < 5; j++)
+                for (int j = 0; j < 4; j += 1)
                 {
-                    //GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    //g.transform.position = vertices[j];
-                    //g.transform.name = j + "";
-                    //g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                }
-            }
+                    triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
+                    triangles[triangleIndex + 1 + j * 6] = verticeIndex + 5 + j;
+                    triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
 
-            if (i < inputVertices.Length - 1 && i == 0)
-            {
-                //<5
-                for (int j = 0; j < 2; j += 1)
-                {
-                    triangles[triangleIndex + j * 5] = verticeIndex + 1 + j;
-                    triangles[triangleIndex + 1 + j * 5] = verticeIndex + j;
-                    triangles[triangleIndex + 2 + j * 5] = verticeIndex + 8 + j;
-
-                    //triangles[triangleIndex + 3 + j * 4] = verticeIndex + 1 + j;
-                    //triangles[triangleIndex + 4 + j * 4] = verticeIndex + 8 + j;
-                    //triangles[triangleIndex + 5 + j * 4] = verticeIndex + 9 + j;
+                    triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
+                    triangles[triangleIndex + 4 + j * 6] = verticeIndex + 6 + j;
+                    triangles[triangleIndex + 5 + j * 6] = verticeIndex + 5 + j;
                 }
             }
 
