@@ -126,6 +126,11 @@ public class Intersection : MonoBehaviour
                 bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
             }
 
+            if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
+            {
+                pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Cylinder Bridge Pillar") as GameObject;
+            }
+
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
@@ -216,7 +221,7 @@ public class Intersection : MonoBehaviour
 
             if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
             {
-                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, transform, extraWidth, yOffset, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, bridgeMaterials);
+                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeMaterials);
             }
 
             CreateCurvePoints();

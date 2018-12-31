@@ -149,7 +149,7 @@ public class BridgeGeneration
         }
     }
 
-    public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Transform parent, float extraWidth, float heightOffset, float yOffsetFirstStep, float yOffsetSecondStep, float widthPercentageFirstStep, float widthPercentageSecondStep, Material[] materials)
+    public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Intersection intersection, Material[] materials)
     {
         Vector3[] vertices = new Vector3[inputVertices.Length * 3];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -165,16 +165,16 @@ public class BridgeGeneration
 
             // |_   _|
             //   \_/
-            vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * extraWidth;
+            vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * intersection.extraWidth;
             vertices[verticeIndex].y = inputVertices[i].y - inputVertices[i].y;
-            vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * extraWidth;
-            vertices[verticeIndex + 1].y = inputVertices[i].y - yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * widthPercentageFirstStep - verticeDifference.normalized * extraWidth;
-            vertices[verticeIndex + 2].y = inputVertices[i].y - yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * extraWidth - verticeDifference * widthPercentageFirstStep * widthPercentageSecondStep;
-            vertices[verticeIndex + 3].y = inputVertices[i].y - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
+            vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * intersection.extraWidth;
+            vertices[verticeIndex + 1].y = inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y;
+            vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * intersection.widthPercentageFirstStep - verticeDifference.normalized * intersection.extraWidth;
+            vertices[verticeIndex + 2].y = inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y;
+            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * intersection.extraWidth - verticeDifference * intersection.widthPercentageFirstStep * intersection.widthPercentageSecondStep;
+            vertices[verticeIndex + 3].y = inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 4] = inputVertices[i + 1];
-            vertices[verticeIndex + 4].y = inputVertices[i].y - yOffsetFirstStep - yOffsetSecondStep - inputVertices[i].y;
+            vertices[verticeIndex + 4].y = inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 5] = inputVertices[i + 1];
             vertices[verticeIndex + 5].y = inputVertices[i].y - inputVertices[i].y;
 
@@ -217,7 +217,31 @@ public class BridgeGeneration
             triangleIndex += 30;
         }
 
-        BridgeGeneration.CreateBridge(bridge, parent, vertices, triangles, uvs, materials);
+        CreatePillarIntersection(intersection.transform.GetChild(intersection.transform.childCount - 1), intersection.pillarPrefab, intersection.transform.position, intersection);
+        BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices, triangles, uvs, materials);
+    }
+
+    public static void CreatePillarIntersection(Transform parent, GameObject prefab, Vector3 position, Intersection intersection)
+    {
+        GameObject pillar = GameObject.Instantiate(prefab);
+        pillar.name = "Pillar";
+        pillar.transform.SetParent(parent);
+        pillar.hideFlags = HideFlags.NotEditable;
+
+        RaycastHit raycastHit;
+        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.globalSettings.roadLayer | 1 << intersection.globalSettings.ignoreMouseRayLayer)))
+        {
+            Vector3 groundPosition = raycastHit.point;
+            Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
+            pillar.transform.localPosition = centerPosition;
+
+            float heightDifference = groundPosition.y - centerPosition.y;
+            pillar.transform.localScale = new Vector3(intersection.xzPillarScale, -heightDifference + intersection.extraPillarHeight, intersection.xzPillarScale);
+        }
+        else
+        {
+            GameObject.DestroyImmediate(pillar);
+        }
     }
 
     public static void CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Material[] materials)
