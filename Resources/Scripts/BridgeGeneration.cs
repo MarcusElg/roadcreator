@@ -217,7 +217,7 @@ public class BridgeGeneration
             triangleIndex += 30;
         }
 
-        CreatePillarIntersection(intersection.transform.GetChild(intersection.transform.childCount - 1), intersection.pillarPrefab, intersection.transform.position, intersection);
+        CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.yOffsetFirstStep + intersection.yOffsetSecondStep, 0), intersection);
         BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices, triangles, uvs, materials);
     }
 
@@ -233,7 +233,7 @@ public class BridgeGeneration
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
-            pillar.transform.localPosition = centerPosition;
+            pillar.transform.localPosition = new Vector3(0, centerPosition.y - intersection.transform.position.y, 0);
 
             float heightDifference = groundPosition.y - centerPosition.y;
             pillar.transform.localScale = new Vector3(intersection.xzPillarScale, -heightDifference + intersection.extraPillarHeight, intersection.xzPillarScale);

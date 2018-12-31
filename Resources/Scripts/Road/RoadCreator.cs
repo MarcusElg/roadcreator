@@ -714,7 +714,6 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<Intersection>().widthPercentageSecondStep = segment.widthPercentageSecondStep;
         intersection.GetComponent<Intersection>().extraWidth = segment.extraWidth;
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
-        intersection.GetComponent<Intersection>().pillarPrefab = segment.pillarPrefab;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
         intersection.GetComponent<Intersection>().xzPillarScale = segment.xzPillarScale;
 
