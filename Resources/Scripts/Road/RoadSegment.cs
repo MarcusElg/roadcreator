@@ -29,7 +29,7 @@ public class RoadSegment : MonoBehaviour
 
     public bool placePillars = true;
     public GameObject pillarPrefab;
-    public float pillarGap = 20;
+    public float pillarGap = 5;
     public float pillarPlacementOffset = 5;
     public float extraPillarHeight = 0.2f;
     public float xzPillarScale = 1;
