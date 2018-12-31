@@ -5,7 +5,8 @@ Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Concrete
   m_Shader: {fileID: 4800000, guid: 318feda319b86b144a6e2dea9e1231ad, type: 3}
   m_ShaderKeywords: 
@@ -50,6 +51,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalCreate_26DF4B2A_Texture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -85,7 +90,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_A88FB04B: {r: 0.3137255, g: 0.3019608, b: 0.23137257, a: 0}
+    - Color_A88FB04B: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 0}
     - Vector2_79C0D9A3: {r: 1, g: 1, b: 0, a: 0}
     - _Color: {r: 0.76199996, g: 0.76199996, b: 0.76199996, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

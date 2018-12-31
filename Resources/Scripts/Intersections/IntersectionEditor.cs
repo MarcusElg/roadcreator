@@ -61,6 +61,14 @@ public class IntersectionEditor : Editor
             intersection.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.widthPercentageFirstStep), 0, 1);
             intersection.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.widthPercentageSecondStep), 0, 1);
             intersection.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.extraWidth), 0, 1);
+
+            intersection.placePillars = EditorGUILayout.Toggle("Place Pillars", intersection.placePillars);
+            if (intersection.placePillars == true)
+            {
+                intersection.pillarPrefab = (GameObject)EditorGUILayout.ObjectField("Pillar Prefab", intersection.pillarPrefab, typeof(GameObject), false);
+                intersection.extraPillarHeight = EditorGUILayout.FloatField("Extra Pillar Height", intersection.extraPillarHeight);
+                intersection.xzPillarScale = EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale);
+            }
         }
 
         if (EditorGUI.EndChangeCheck() == true)

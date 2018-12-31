@@ -75,6 +75,18 @@ public class RoadSegmentEditor : Editor
             serializedObject.FindProperty("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", serializedObject.FindProperty("widthPercentageFirstStep").floatValue), 0, 1);
             serializedObject.FindProperty("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", serializedObject.FindProperty("widthPercentageSecondStep").floatValue), 0, 1);
             serializedObject.FindProperty("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", serializedObject.FindProperty("extraWidth").floatValue), 0, 1);
+
+            GUILayout.Label("");
+            GUILayout.Label("Pillar Placement", guiStyle);
+            serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
+            if (serializedObject.FindProperty("placePillars").boolValue == true)
+            {
+                serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
+                serializedObject.FindProperty("pillarGap").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Gap", serializedObject.FindProperty("pillarGap").floatValue));
+                serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
+                serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
+                serializedObject.FindProperty("xzPillarScale").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("XZ Pillar Scale", serializedObject.FindProperty("xzPillarScale").floatValue));
+            }
         }
 
         if (targets.Length == 1)

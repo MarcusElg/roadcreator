@@ -301,6 +301,13 @@ public class RoadCreator : MonoBehaviour
                 segment.widthPercentageSecondStep = oldLastSegment.widthPercentageSecondStep;
                 segment.extraWidth = oldLastSegment.extraWidth;
 
+                segment.placePillars = oldLastSegment.placePillars;
+                segment.pillarPrefab = oldLastSegment.pillarPrefab;
+                segment.pillarGap = oldLastSegment.pillarGap;
+                segment.pillarPlacementOffset = oldLastSegment.pillarPlacementOffset;
+                segment.extraPillarHeight = oldLastSegment.extraPillarHeight;
+                segment.xzPillarScale = oldLastSegment.xzPillarScale;
+
                 for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
                 {
                     GameObject extraMesh = new GameObject("Extra Mesh");
@@ -706,6 +713,10 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<Intersection>().widthPercentageFirstStep = segment.widthPercentageFirstStep;
         intersection.GetComponent<Intersection>().widthPercentageSecondStep = segment.widthPercentageSecondStep;
         intersection.GetComponent<Intersection>().extraWidth = segment.extraWidth;
+        intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
+        intersection.GetComponent<Intersection>().pillarPrefab = segment.pillarPrefab;
+        intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
+        intersection.GetComponent<Intersection>().xzPillarScale = segment.xzPillarScale;
 
         intersection.AddComponent<MeshFilter>();
         intersection.AddComponent<MeshRenderer>();

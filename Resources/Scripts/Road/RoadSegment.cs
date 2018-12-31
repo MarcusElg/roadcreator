@@ -27,6 +27,13 @@ public class RoadSegment : MonoBehaviour
     public float widthPercentageSecondStep = 0.6f;
     public float extraWidth = 0.2f;
 
+    public bool placePillars = true;
+    public GameObject pillarPrefab;
+    public float pillarGap = 20;
+    public float pillarPlacementOffset = 5;
+    public float extraPillarHeight = 0.2f;
+    public float xzPillarScale = 1;
+
     public List<bool> extraMeshOpen = new List<bool>();
     public List<bool> extraMeshLeft = new List<bool>();
     public List<Material> extraMeshMaterial = new List<Material>();
@@ -48,6 +55,11 @@ public class RoadSegment : MonoBehaviour
         if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
         {
             bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+        }
+
+        if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
+        {
+            pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Oval Bridge Pillar") as GameObject;
         }
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
@@ -130,7 +142,7 @@ public class RoadSegment : MonoBehaviour
             extraWidthLeft += extraWidth;
             extraWidthRight += extraWidth;
 
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, transform, startRoadWidth, endRoadWidth, extraWidthLeft, extraWidthRight, yOffsetFirstStep, yOffsetSecondStep, widthPercentageFirstStep, widthPercentageSecondStep, heightOffset, bridgeMaterials);
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, extraWidthLeft, extraWidthRight, bridgeMaterials);
         }
     }
 

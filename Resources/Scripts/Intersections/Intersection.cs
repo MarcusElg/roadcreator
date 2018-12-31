@@ -16,6 +16,11 @@ public class Intersection : MonoBehaviour
     public RoadSegment.BridgeGenerator bridgeGenerator;
     public Material[] bridgeMaterials;
 
+    public bool placePillars = true;
+    public GameObject pillarPrefab;
+    public float extraPillarHeight = 0.2f;
+    public float xzPillarScale = 1;
+
     public float yOffsetFirstStep = 0.25f;
     public float yOffsetSecondStep = 0.5f;
     public float widthPercentageFirstStep = 0.6f;
