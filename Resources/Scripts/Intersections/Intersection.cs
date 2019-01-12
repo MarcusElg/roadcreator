@@ -61,7 +61,7 @@ public class Intersection : MonoBehaviour
 
             Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex()].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
             center.y -= yOffset;
-            connections[objectToMove.transform.GetSiblingIndex()].curviness = Vector3.Distance(center, objectToMove.transform.position);
+            connections[objectToMove.transform.GetSiblingIndex()].curvePoint = new SerializedVector3(objectToMove.transform.position);
             objectToMove = null;
             GenerateMesh(false);
 
@@ -73,7 +73,7 @@ public class Intersection : MonoBehaviour
                     nextIndex = 0;
                 }
 
-                transform.GetChild(i).transform.position = Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) - Misc.CalculateLeft(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) * connections[i].curviness;
+                transform.GetChild(i).transform.position = connections[i].curvePoint.ToNormalVector3();
             }
         }
     }
@@ -157,6 +157,11 @@ public class Intersection : MonoBehaviour
                     totalLength += connections[i + 1].length;
                 }
 
+                if (connections[i].curvePoint == null)
+                {
+                    return;
+                }
+
                 float segments = totalLength * globalSettings.resolution * 5;
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
@@ -174,7 +179,7 @@ public class Intersection : MonoBehaviour
                         modifiedT = 1;
                     }
 
-                    vertices.Add(Misc.Lerp3(firstPoint, Misc.GetCenter(firstPoint, nextPoint) - Misc.CalculateLeft(firstPoint, nextPoint) * connections[i].curviness, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+                    vertices.Add(Misc.Lerp3(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
                     uvs.Add(new Vector2(0, modifiedT));
                     uvs.Add(new Vector2(1, modifiedT));
 
@@ -239,29 +244,55 @@ public class Intersection : MonoBehaviour
     public void CreateCurvePoints()
     {
         RemoveCurvePoints();
+        SetCurvePointPositions();
 
         for (int i = 0; i < connections.Count; i++)
         {
-            GameObject curvePoint = new GameObject("Connection Point");
+            GameObject curvePoint = null;
+            curvePoint = new GameObject("Connection Point");
             curvePoint.transform.SetParent(transform);
             curvePoint.hideFlags = HideFlags.NotEditable;
             curvePoint.layer = globalSettings.ignoreMouseRayLayer;
             curvePoint.AddComponent<BoxCollider>();
             curvePoint.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
-
-            int nextIndex = i + 1;
-            if (nextIndex >= connections.Count)
-            {
-                nextIndex = 0;
-            }
-
-            curvePoint.transform.position = Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) - Misc.CalculateLeft(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()) * connections[i].curviness;
+            curvePoint.transform.position = connections[i].curvePoint.ToNormalVector3();
             curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset, curvePoint.transform.position.z);
         }
 
         if (transform.Find("Bridge") != null)
         {
             transform.Find("Bridge").SetAsLastSibling();
+        }
+    }
+
+    public void SetCurvePointPositions()
+    {
+        for (int i = 0; i < connections.Count; i++)
+        {
+            int nextIndex = i + 1;
+            if (nextIndex >= connections.Count)
+            {
+                nextIndex = 0;
+            }
+
+            if (connections[i].curvePoint.ToNormalVector3() == Misc.MaxVector3)
+            {
+                connections[i].curvePoint = new SerializedVector3(Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()));
+            }
+        }
+    }
+
+    public void ResetCurvePointPositions()
+    {
+        for (int i = 0; i < connections.Count; i++)
+        {
+            int nextIndex = i + 1;
+            if (nextIndex >= connections.Count)
+            {
+                nextIndex = 0;
+            }
+
+            connections[i].curvePoint = new SerializedVector3(Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()));
         }
     }
 
