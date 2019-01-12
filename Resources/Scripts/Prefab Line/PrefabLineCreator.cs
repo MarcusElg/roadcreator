@@ -24,7 +24,7 @@ public class PrefabLineCreator : MonoBehaviour
     public RotationDirection rotationDirection;
 
     public float scale = 1;
-    public float pointCalculationDivisions = 10;
+    public float pointCalculationDivisions = 100;
 
     public GameObject objectToMove;
     private bool mouseDown;
