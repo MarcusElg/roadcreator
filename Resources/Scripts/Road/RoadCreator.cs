@@ -12,12 +12,7 @@ public class RoadCreator : MonoBehaviour
     public bool createIntersections = true;
 
     public GlobalSettings globalSettings;
-
     public Preset segmentPreset;
-
-    public GameObject followObject;
-    public Vector3 lastMoveObjectPosition;
-
     public GameObject objectToMove = null;
     public GameObject extraObjectToMove = null;
     private bool mouseDown;
@@ -162,11 +157,6 @@ public class RoadCreator : MonoBehaviour
     public void UndoUpdate()
     {
         CreateMesh();
-
-        if (followObject != null)
-        {
-            followObject.GetComponent<PrefabLineCreator>().UndoUpdate();
-        }
     }
 
     public void CreatePoints(Vector3 hitPosition)
@@ -851,12 +841,6 @@ public class RoadCreator : MonoBehaviour
                     Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                     extraObjectToMove.transform.position = objectToMove.transform.position;
                 }
-
-                if (followObject != null)
-                {
-                    Undo.RecordObject(followObject.GetComponent<PrefabLineCreator>().objectToMove.transform, "Moved Point");
-                    followObject.GetComponent<PrefabLineCreator>().objectToMove.transform.position = objectToMove.transform.position;
-                }
             }
             else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
             {
@@ -874,12 +858,6 @@ public class RoadCreator : MonoBehaviour
                 {
                     Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                     extraObjectToMove.transform.position = position;
-                }
-
-                if (followObject != null)
-                {
-                    Undo.RecordObject(followObject.GetComponent<PrefabLineCreator>().objectToMove.transform, "Moved Point");
-                    followObject.GetComponent<PrefabLineCreator>().objectToMove.transform.position = objectToMove.transform.position;
                 }
             }
         }
@@ -900,11 +878,6 @@ public class RoadCreator : MonoBehaviour
                     {
                         objectToMove = raycastHit.collider.gameObject;
                         objectToMove.GetComponent<BoxCollider>().enabled = false;
-
-                        if (followObject != null)
-                        {
-                            followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() * 2 + 1).gameObject;
-                        }
                     }
                     else if (raycastHit.collider.gameObject.name == "Start Point")
                     {
@@ -916,11 +889,6 @@ public class RoadCreator : MonoBehaviour
                             extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).gameObject;
                             extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
                         }
-
-                        if (followObject != null)
-                        {
-                            followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() * 2).gameObject;
-                        }
                     }
                     else if (raycastHit.collider.gameObject.name == "End Point")
                     {
@@ -931,11 +899,6 @@ public class RoadCreator : MonoBehaviour
                         {
                             extraObjectToMove = raycastHit.collider.gameObject.transform.parent.parent.parent.GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).gameObject;
                             extraObjectToMove.GetComponent<BoxCollider>().enabled = false;
-                        }
-
-                        if (followObject != null)
-                        {
-                            followObject.GetComponent<PrefabLineCreator>().objectToMove = followObject.transform.GetChild(0).GetChild(objectToMove.transform.parent.parent.GetSiblingIndex() * 2 + 2).gameObject;
                         }
                     }
 
@@ -951,26 +914,6 @@ public class RoadCreator : MonoBehaviour
             {
                 Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                 extraObjectToMove.transform.position = hitPosition;
-            }
-
-            if (followObject != null)
-            {
-                if (followObject.GetComponent<RoadCreator>() != null)
-                {
-                    Undo.RecordObject(followObject.GetComponent<RoadCreator>().objectToMove.transform, "Moved Point");
-                    followObject.GetComponent<RoadCreator>().objectToMove.transform.position = hitPosition;
-
-                    if (extraObjectToMove != null)
-                    {
-                        Undo.RecordObject(followObject.GetComponent<RoadCreator>().extraObjectToMove.transform, "Moved Point");
-                        followObject.GetComponent<RoadCreator>().extraObjectToMove.transform.position = hitPosition;
-                    }
-                }
-                else
-                {
-                    Undo.RecordObject(followObject.GetComponent<PrefabLineCreator>().objectToMove.transform, "Moved Point");
-                    followObject.GetComponent<PrefabLineCreator>().objectToMove.transform.position = hitPosition;
-                }
             }
         }
         else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
