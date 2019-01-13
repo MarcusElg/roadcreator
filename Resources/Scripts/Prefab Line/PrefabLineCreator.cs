@@ -20,8 +20,9 @@ public class PrefabLineCreator : MonoBehaviour
     public float spacing = 1;
     public bool rotateAlongCurve = true;
 
-    public enum RotationDirection { forward, backward, left, right, randomY };
+    public enum RotationDirection { forward, backward, left, right };
     public RotationDirection rotationDirection;
+    public float yRotationRandomization;
 
     public float scale = 1;
     public float pointCalculationDivisions = 100;
@@ -201,23 +202,19 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     if (rotationDirection == PrefabLineCreator.RotationDirection.forward)
                     {
-                        placedPrefab.transform.rotation = Quaternion.LookRotation(forward);
+                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(forward).eulerAngles.x, Quaternion.LookRotation(forward).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(forward).eulerAngles.z);
                     }
                     else if (rotationDirection == PrefabLineCreator.RotationDirection.backward)
                     {
-                        placedPrefab.transform.rotation = Quaternion.LookRotation(-forward);
+                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(-forward).eulerAngles.x, Quaternion.LookRotation(-forward).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(-forward).eulerAngles.z);
                     }
                     else if (rotationDirection == PrefabLineCreator.RotationDirection.left)
                     {
-                        placedPrefab.transform.rotation = Quaternion.LookRotation(left);
+                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(left).eulerAngles.x, Quaternion.LookRotation(left).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(left).eulerAngles.z);
                     }
                     else if (rotationDirection == PrefabLineCreator.RotationDirection.right)
                     {
-                        placedPrefab.transform.rotation = Quaternion.LookRotation(-left);
-                    }
-                    else if (rotationDirection == PrefabLineCreator.RotationDirection.randomY)
-                    {
-                        placedPrefab.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(-left).eulerAngles.x, Quaternion.LookRotation(-left).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(-left).eulerAngles.z);
                     }
                 }
 

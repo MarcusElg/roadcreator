@@ -88,6 +88,14 @@ public class PrefabLineEditor : Editor
         if (prefabCreator.rotateAlongCurve == true)
         {
             prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
+
+            if (prefabCreator.fillGap == false)
+            {
+                prefabCreator.yRotationRandomization = Mathf.Clamp(EditorGUILayout.FloatField("Y Rotation Randomization", prefabCreator.yRotationRandomization), 0, 360);
+            } else
+            {
+                prefabCreator.yRotationRandomization = 0;
+            }
         }
 
         if (EditorGUI.EndChangeCheck() == true)
@@ -251,7 +259,7 @@ public class PrefabLineEditor : Editor
             {
                 Handles.color = Color.black;
                 if (prefabCreator.transform.GetChild(0).childCount > 1 && prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).name == "Control Point")
-                {  
+                {
                     Handles.DrawPolyLine(points);
                 }
                 else if (prefabCreator.transform.GetChild(0).childCount > 0)
