@@ -490,13 +490,11 @@ public class RoadCreator : MonoBehaviour
     {
         if (createIntersections == true)
         {
-            Debug.Log(0);
             RaycastHit raycastHitPoint;
             RaycastHit raycastHitRoad;
 
             if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << globalSettings.ignoreMouseRayLayer) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
             {
-                Debug.Log(1);
                 // Found Point
                 if (point.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().createIntersections == false)
                 {
@@ -512,7 +510,7 @@ public class RoadCreator : MonoBehaviour
                 {
                     return;
                 }
-                Debug.Log(2);
+
                 Vector3 creationPosition = raycastHitPoint.point;
                 creationPosition.y = raycastHitPoint.transform.position.y;
                 GameObject intersection = CreateIntersection(creationPosition, point.transform.parent.parent.GetComponent<RoadSegment>());

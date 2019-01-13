@@ -61,7 +61,7 @@ public class Intersection : MonoBehaviour
 
             Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex()].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
             center.y -= yOffset;
-            connections[objectToMove.transform.GetSiblingIndex()].curvePoint = new SerializedVector3(objectToMove.transform.position);
+            connections[objectToMove.transform.GetSiblingIndex()].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
             objectToMove = null;
             CreateMesh(false);
 
@@ -73,7 +73,7 @@ public class Intersection : MonoBehaviour
                     nextIndex = 0;
                 }
 
-                transform.GetChild(i).transform.position = connections[i].curvePoint.ToNormalVector3();
+                transform.GetChild(i).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
             }
         }
     }
@@ -250,12 +250,11 @@ public class Intersection : MonoBehaviour
             GameObject curvePoint = null;
             curvePoint = new GameObject("Connection Point");
             curvePoint.transform.SetParent(transform);
-            curvePoint.hideFlags = HideFlags.NotEditable;
             curvePoint.layer = globalSettings.ignoreMouseRayLayer;
             curvePoint.AddComponent<BoxCollider>();
             curvePoint.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
             curvePoint.transform.position = connections[i].curvePoint.ToNormalVector3();
-            curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset, curvePoint.transform.position.z);
+            curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset + transform.position.y, curvePoint.transform.position.z);
         }
 
         if (transform.Find("Bridge") != null)
