@@ -46,7 +46,7 @@ public class GlobalSettingsEditor : Editor
             Intersection[] intersections = GameObject.FindObjectsOfType<Intersection>();
             for (int i = 0; i < intersections.Length; i++)
             {
-                intersections[i].GenerateMesh();
+                intersections[i].CreateMesh();
             }
         }
 

@@ -123,13 +123,13 @@ public class RoadCreator : MonoBehaviour
             if (startIntersectionConnectionIndex != -1 && startIntersection != null)
             {
                 UpdateStartConnectionData(startIntersection);
-                startIntersection.GenerateMesh(true);
+                startIntersection.CreateMesh(true);
             }
 
             if (endIntersectionConnectionIndex != -1 && endIntersection != null)
             {
                 UpdateEndConnectionData(endIntersection);
-                endIntersection.GenerateMesh(true);
+                endIntersection.CreateMesh(true);
             }
         }
     }
@@ -232,15 +232,6 @@ public class RoadCreator : MonoBehaviour
         point.hideFlags = HideFlags.NotEditable;
         point.layer = globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
-
-        if (name == "End Point")
-        {
-            CheckForIntersectionGeneration(point);
-            if (point.transform.parent.parent.GetSiblingIndex() == 0)
-            {
-                CheckForIntersectionGeneration(point.transform.parent.GetChild(0).gameObject);
-            }
-        }
 
         return point;
     }
@@ -399,8 +390,7 @@ public class RoadCreator : MonoBehaviour
             Vector3 newPosition = totalPosition / startIntersection.connections.Count;
             newPosition.y = startIntersection.transform.position.y;
             startIntersection.transform.position = newPosition;
-            startIntersection.SetCurvePointPositions();
-            startIntersection.GenerateMesh();
+            startIntersection.CreateMesh();
         }
     }
 
@@ -465,8 +455,7 @@ public class RoadCreator : MonoBehaviour
             Vector3 newPosition = totalPosition / endIntersection.connections.Count;
             newPosition.y = endIntersection.transform.position.y;
             endIntersection.transform.position = newPosition;
-            endIntersection.SetCurvePointPositions();
-            endIntersection.GenerateMesh();
+            endIntersection.CreateMesh();
         }
     }
 
@@ -501,11 +490,13 @@ public class RoadCreator : MonoBehaviour
     {
         if (createIntersections == true)
         {
+            Debug.Log(0);
             RaycastHit raycastHitPoint;
             RaycastHit raycastHitRoad;
 
             if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << globalSettings.ignoreMouseRayLayer) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
             {
+                Debug.Log(1);
                 // Found Point
                 if (point.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().createIntersections == false)
                 {
@@ -521,7 +512,7 @@ public class RoadCreator : MonoBehaviour
                 {
                     return;
                 }
-
+                Debug.Log(2);
                 Vector3 creationPosition = raycastHitPoint.point;
                 creationPosition.y = raycastHitPoint.transform.position.y;
                 GameObject intersection = CreateIntersection(creationPosition, point.transform.parent.parent.GetComponent<RoadSegment>());
@@ -543,7 +534,8 @@ public class RoadCreator : MonoBehaviour
                     CreateIntersectionConnectionForNewIntersectionLast(raycastHitPoint.transform.gameObject, intersection.GetComponent<Intersection>());
                 }
 
-                intersection.GetComponent<Intersection>().GenerateMesh();
+                intersection.GetComponent<Intersection>().ResetCurvePointPositions();
+                intersection.GetComponent<Intersection>().CreateMesh();
             }
             else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, globalSettings.ignoreMouseRayLayer) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
             {
@@ -559,8 +551,8 @@ public class RoadCreator : MonoBehaviour
                     startIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
                     startIntersectionConnectionIndex = startIntersection.connections.Count - 1;
 
-                    UpdateStartConnectionData(startIntersection);
                     startIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
+                    UpdateStartConnectionData(startIntersection);
                 }
                 else if (point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
                 {
@@ -573,8 +565,8 @@ public class RoadCreator : MonoBehaviour
                     endIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
                     endIntersectionConnectionIndex = endIntersection.connections.Count - 1;
 
-                    UpdateEndConnectionData(endIntersection);
                     endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
+                    UpdateEndConnectionData(endIntersection);
                 }
             }
             else
@@ -608,7 +600,7 @@ public class RoadCreator : MonoBehaviour
                         }
 
                         intersection.ResetCurvePointPositions();
-                        intersection.GenerateMesh();
+                        intersection.CreateMesh();
                     }
                     else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnectionIndex != -1 && endIntersection != null)
                     {
@@ -629,7 +621,7 @@ public class RoadCreator : MonoBehaviour
                         }
 
                         intersection.ResetCurvePointPositions();
-                        intersection.GenerateMesh();
+                        intersection.CreateMesh();
                     }
                 }
             }
@@ -957,12 +949,12 @@ public class RoadCreator : MonoBehaviour
 
             if (startIntersectionConnectionIndex != -1)
             {
-                startIntersection.GenerateMesh();
+                startIntersection.CreateMesh();
             }
 
             if (endIntersectionConnectionIndex != -1)
             {
-                endIntersection.GenerateMesh();
+                endIntersection.CreateMesh();
             }
 
             objectToMove.GetComponent<BoxCollider>().enabled = true;

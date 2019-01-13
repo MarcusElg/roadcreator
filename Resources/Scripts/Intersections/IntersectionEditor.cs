@@ -76,14 +76,14 @@ public class IntersectionEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
-            intersection.GenerateMesh();
+            intersection.CreateMesh();
         }
 
         GUILayout.Label("");
 
         if (GUILayout.Button("Generate Intersection"))
         {
-            intersection.GenerateMesh();
+            intersection.CreateMesh();
         }
     }
 

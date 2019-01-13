@@ -39,7 +39,7 @@ public class RoadSegmentEditor : Editor
                         roadCreator.CreateMesh();
                         roadCreator.endIntersection.connections[roadCreator.endIntersectionConnectionIndex].leftPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 2] + roadSegment.transform.position);
                         roadCreator.endIntersection.connections[roadCreator.endIntersectionConnectionIndex].rightPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices.Length - 1] + roadSegment.transform.position);
-                        roadCreator.endIntersection.GenerateMesh();
+                        roadCreator.endIntersection.CreateMesh();
                     }
                 }
                 else if (roadSegment.transform.GetSiblingIndex() == 0)
@@ -49,7 +49,7 @@ public class RoadSegmentEditor : Editor
                         roadCreator.CreateMesh();
                         roadCreator.startIntersection.connections[roadCreator.startIntersectionConnectionIndex].leftPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[1] + roadSegment.transform.position);
                         roadCreator.startIntersection.connections[roadCreator.startIntersectionConnectionIndex].rightPoint = new SerializedVector3(roadSegment.transform.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[0] + roadSegment.transform.position);
-                        roadCreator.startIntersection.GenerateMesh();
+                        roadCreator.startIntersection.CreateMesh();
                     }
                 }
             }

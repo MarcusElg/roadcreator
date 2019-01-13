@@ -63,7 +63,7 @@ public class Intersection : MonoBehaviour
             center.y -= yOffset;
             connections[objectToMove.transform.GetSiblingIndex()].curvePoint = new SerializedVector3(objectToMove.transform.position);
             objectToMove = null;
-            GenerateMesh(false);
+            CreateMesh(false);
 
             for (int i = 0; i < connections.Count; i++)
             {
@@ -78,7 +78,7 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    public void GenerateMesh(bool fromRoad = false)
+    public void CreateMesh(bool fromRoad = false)
     {
         if (globalSettings == null)
         {
@@ -244,7 +244,6 @@ public class Intersection : MonoBehaviour
     public void CreateCurvePoints()
     {
         RemoveCurvePoints();
-        SetCurvePointPositions();
 
         for (int i = 0; i < connections.Count; i++)
         {
@@ -262,23 +261,6 @@ public class Intersection : MonoBehaviour
         if (transform.Find("Bridge") != null)
         {
             transform.Find("Bridge").SetAsLastSibling();
-        }
-    }
-
-    public void SetCurvePointPositions()
-    {
-        for (int i = 0; i < connections.Count; i++)
-        {
-            int nextIndex = i + 1;
-            if (nextIndex >= connections.Count)
-            {
-                nextIndex = 0;
-            }
-
-            if (connections[i].curvePoint.ToNormalVector3() == Misc.MaxVector3)
-            {
-                connections[i].curvePoint = new SerializedVector3(Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()));
-            }
         }
     }
 
