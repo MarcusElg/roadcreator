@@ -51,21 +51,19 @@ public class RoadCreator : MonoBehaviour
                         Vector3[] nextPoints = CalculatePoints(transform.GetChild(0).GetChild(i + 1));
                         Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
 
-                        int actualSmoothnessAmount = smoothnessAmount;
-
-                        if ((currentPoints.Length / 2) <= actualSmoothnessAmount)
+                        if ((currentPoints.Length / 2) <= smoothnessAmount)
                         {
-                            actualSmoothnessAmount = currentPoints.Length / 2 - 2;
+                            smoothnessAmount = currentPoints.Length / 2 - 2;
                         }
 
-                        if ((nextPoints.Length / 2) <= actualSmoothnessAmount)
+                        if ((nextPoints.Length / 2) <= smoothnessAmount)
                         {
-                            actualSmoothnessAmount = nextPoints.Length / 2 - 2;
+                            smoothnessAmount = nextPoints.Length / 2 - 2;
                         }
 
-                        if (actualSmoothnessAmount > 0)
+                        if (smoothnessAmount > 0)
                         {
-                            float distanceSection = 1f / (actualSmoothnessAmount * 2);
+                            float distanceSection = 1f / (smoothnessAmount * 2);
                             int currentPoint = 0;
                             for (float t = 0; t < 0.4999 + distanceSection; t += distanceSection)
                             {
@@ -75,10 +73,10 @@ public class RoadCreator : MonoBehaviour
                                 }
 
                                 // First section
-                                currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount + currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], t);
+                                currentPoints[currentPoints.Length - 1 - smoothnessAmount + currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], t);
 
                                 // Second section
-                                nextPoints[actualSmoothnessAmount - currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - actualSmoothnessAmount], originalControlPoint, nextPoints[actualSmoothnessAmount], 1f - t);
+                                nextPoints[smoothnessAmount - currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 1f - t);
 
                                 currentPoint += 1;
                             }
@@ -88,7 +86,7 @@ public class RoadCreator : MonoBehaviour
                             nextPoints[0] = currentPoints[currentPoints.Length - 1];
                         }
 
-                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, heightOffset, transform.GetChild(0).GetChild(i), actualSmoothnessAmount, this);
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, heightOffset, transform.GetChild(0).GetChild(i), smoothnessAmount, this);
                         StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                         currentPoints = nextPoints;
                     }

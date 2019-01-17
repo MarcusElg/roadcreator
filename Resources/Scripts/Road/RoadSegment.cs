@@ -382,7 +382,15 @@ public class RoadSegment : MonoBehaviour
         mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-        mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+
+        if (overlayMaterial == null)
+        {
+            mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+        }
+        else
+        {
+            mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+        }
     }
 
     private Vector3[] fixVertices(int position, Vector3[] vertices, Vector3 forward, Transform segment, RoadCreator roadCreator, int change)
