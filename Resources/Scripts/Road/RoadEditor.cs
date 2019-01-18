@@ -132,7 +132,7 @@ public class RoadEditor : Editor
                 }
                 else
                 {
-                    hitPosition = Misc.Round(hitPosition);
+                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
                 }
             }
 
