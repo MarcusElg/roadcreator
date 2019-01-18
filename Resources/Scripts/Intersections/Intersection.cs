@@ -12,6 +12,7 @@ public class Intersection : MonoBehaviour
     public float yOffset;
     public GlobalSettings globalSettings;
     public GameObject objectToMove;
+    public bool stretchTexture = false;
 
     public RoadSegment.BridgeGenerator bridgeGenerator;
     public Material[] bridgeMaterials;
@@ -118,7 +119,7 @@ public class Intersection : MonoBehaviour
 
             if (baseMaterial == null)
             {
-                baseMaterial = Resources.Load("Materials/Low Poly/Intersections/Intersection Connections/2L Connection") as Material;
+                baseMaterial = Resources.Load("Materials/Low Poly/Intersections/Asphalt Intersection") as Material;
             }
 
             if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
@@ -180,8 +181,6 @@ public class Intersection : MonoBehaviour
                     }
 
                     vertices.Add(Misc.Lerp3(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
-                    uvs.Add(new Vector2(0, modifiedT));
-                    uvs.Add(new Vector2(1, modifiedT));
 
                     if (modifiedT < 0.5f)
                     {
@@ -194,6 +193,17 @@ public class Intersection : MonoBehaviour
                         Vector3 point = Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) + new Vector3(0, yOffset, 0) - transform.position;
                         point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
                         vertices.Add(point);
+                    }
+
+                    uvs.Add(new Vector2(0, modifiedT));
+
+                    if (stretchTexture == true)
+                    {
+                        uvs.Add(new Vector2(1, modifiedT));
+                    }
+                    else
+                    {
+                        uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 2]), modifiedT));
                     }
 
                     if (t < 1)
@@ -212,7 +222,15 @@ public class Intersection : MonoBehaviour
                 GetComponent<MeshFilter>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-                GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+
+                if (overlayMaterial == null)
+                {
+                    GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+                }
+                else
+                {
+                    GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+                }
             }
 
             for (int i = transform.childCount - 1; i >= 0; i--)
