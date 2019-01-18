@@ -534,6 +534,7 @@ public class RoadCreator : MonoBehaviour
                 Vector3 creationPosition = raycastHitPoint.point;
                 creationPosition.y = raycastHitPoint.transform.position.y;
                 GameObject intersection = CreateIntersection(creationPosition, point.transform.parent.parent.GetComponent<RoadSegment>());
+
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
                 {
                     CreateIntersectionConnectionForNewIntersectionFirst(point, intersection.GetComponent<Intersection>());
