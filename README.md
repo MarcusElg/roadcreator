@@ -9,6 +9,7 @@ A free road creation tool for unity. It's currently in beta so it's pretty stabl
 - Options are changed per-segment which allows for more control like the road having a extra lane before a intersection
 - Curve smoothing to avoid sharp turns between curves
 - Terrain deformation to make the terrain adjust to the road
+- Easly make a road into a bridge with automatic pillar placement
 
 ### Prefab Line Tool:
 - Includes a prefab line tool to place prefabs along a series of curves (can also curve the mesh to get a smoother curve)
