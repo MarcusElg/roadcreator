@@ -128,7 +128,7 @@ public class RoadEditor : Editor
                 Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
                 if (nearestGuideline != Misc.MaxVector3)
                 {
-                    hitPosition = nearestGuideline;
+                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
                 }
                 else
                 {
