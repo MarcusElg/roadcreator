@@ -113,7 +113,8 @@ public class RoadCreator : MonoBehaviour
                         {
                             transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), 0, this);
                             StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
-                        } else
+                        }
+                        else
                         {
                             transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, 0, this);
                         }
@@ -161,6 +162,13 @@ public class RoadCreator : MonoBehaviour
                     Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
                     material.SetVector("Vector2_79C0D9A3", new Vector2(1, textureRepeat * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY));
                     transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
+
+                    if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials.Length > 1)
+                    {
+                        material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[1]);
+                        material.SetVector("Vector2_79C0D9A3", new Vector2(1, textureRepeat * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY));
+                        transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials = new Material[2] { transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[0], material };
+                    }
                 }
             }
         }
