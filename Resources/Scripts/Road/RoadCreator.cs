@@ -571,8 +571,8 @@ public class RoadCreator : MonoBehaviour
                     startIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
                     startIntersectionConnectionIndex = startIntersection.connections.Count - 1;
 
-                    startIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
                     UpdateStartConnectionData(startIntersection);
+                    startIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
                 }
                 else if (point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
                 {
@@ -585,8 +585,8 @@ public class RoadCreator : MonoBehaviour
                     endIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
                     endIntersectionConnectionIndex = endIntersection.connections.Count - 1;
 
-                    endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
                     UpdateEndConnectionData(endIntersection);
+                    endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
                 }
             }
             else
@@ -750,7 +750,7 @@ public class RoadCreator : MonoBehaviour
         intersectionConnection.YRotation = Quaternion.LookRotation((intersection.transform.position - point.transform.parent.GetChild(0).position).normalized).eulerAngles.y;
         intersectionConnection.length = Vector3.Distance(intersection.transform.position, point.transform.position);
         intersectionConnection.road = point.GetComponent<Point>();
-        intersectionConnection.curvePoint = new SerializedVector3(Misc.MaxVector3);
+        intersectionConnection.curvePoint = new SerializedVector3(intersection.transform.position);
 
         return intersectionConnection;
     }
