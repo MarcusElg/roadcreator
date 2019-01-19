@@ -197,9 +197,14 @@ public static class Misc
         {
             for (int i = 0; i < meshFilters.Length; i++)
             {
-                if (!materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial))
+                if (!materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[0]))
                 {
-                    materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial);
+                    materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[0]);
+                }
+
+                if (meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials.Length > 1 && !materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[1]))
+                {
+                    materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[1]);
                 }
             }
 
