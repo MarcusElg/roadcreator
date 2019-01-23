@@ -297,11 +297,14 @@ public class Intersection : MonoBehaviour
 
     public void RemoveCurvePoints()
     {
-        for (int i = transform.childCount - 1; i >= 0; i--)
+        if (gameObject != null)
         {
-            if (transform.GetChild(i).name == "Connection Point")
+            for (int i = transform.childCount - 1; i >= 0; i--)
             {
-                DestroyImmediate(transform.GetChild(i).gameObject);
+                if (transform.GetChild(i).name == "Connection Point")
+                {
+                    DestroyImmediate(transform.GetChild(i).gameObject);
+                }
             }
         }
     }
