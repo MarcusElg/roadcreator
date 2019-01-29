@@ -60,7 +60,7 @@ public class RoadEditor : Editor
 
         if (roadCreator.globalSettings.debug == true)
         {
-            GUILayout.Label("");
+            GUILayout.Space(20);
             GUILayout.Label("Debug", guiStyle);
             GUILayout.Label(roadCreator.startIntersectionConnectionIndex.ToString());
             GUILayout.Label(roadCreator.endIntersectionConnectionIndex.ToString());
@@ -219,11 +219,11 @@ public class RoadEditor : Editor
             {
                 if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).name != "Control Point")
                 {
-                    Handles.color = Color.red;
+                    Handles.color = roadCreator.globalSettings.pointColour;
                 }
                 else
                 {
-                    Handles.color = Color.yellow;
+                    Handles.color = roadCreator.globalSettings.controlPointColour;
                 }
 
                 Handles.CylinderHandleCap(0, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).transform.position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
@@ -274,7 +274,7 @@ public class RoadEditor : Editor
         }
 
         // Mouse position
-        Handles.color = Color.blue;
+        Handles.color = roadCreator.globalSettings.cursorColour;
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
     }
 

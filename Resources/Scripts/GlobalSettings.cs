@@ -11,6 +11,12 @@ public class GlobalSettings : MonoBehaviour
     public int roadLayer = 10;
     public int oldAmountRoadGuidelines = 5;
     public int amountRoadGuidelines = 5;
+    public Color pointColour = Color.red;
+    public Color controlPointColour = Color.yellow;
+    public Color intersectionColour = Color.green;
+    public Color cursorColour = Color.blue;
+    public Color roadGuidelinesColour = Misc.lightGreen;
+    public Color roadControlGuidelinesColour = Misc.darkGreen;
 
     public bool debug = false;
     public bool roadCurved = true;

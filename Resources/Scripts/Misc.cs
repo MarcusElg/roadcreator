@@ -162,11 +162,11 @@ public static class Misc
     {
         if (child == 1)
         {
-            Handles.color = Misc.darkGreen;
+            Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadControlGuidelinesColour;
         }
         else
         {
-            Handles.color = Misc.lightGreen;
+            Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesColour;
         }
 
         if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(new Vector3(mousePosition.x, 0, mousePosition.z), new Vector3(roadSegment.transform.GetChild(0).GetChild(child).position.x, 0, roadSegment.transform.GetChild(0).GetChild(child).position.z)) < guidelines.Length + 1) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)

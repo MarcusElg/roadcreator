@@ -60,7 +60,29 @@ public class GlobalSettingsEditor : Editor
             settings.UpdateRoadGuidelines();
         }
 
-        settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
 
+        GUILayout.Space(20);
+        GUILayout.Label("Colours", guiStyle);
+        settings.pointColour = EditorGUILayout.ColorField("Point Colour", settings.pointColour);
+        settings.controlPointColour = EditorGUILayout.ColorField("Control Point Colour", settings.controlPointColour);
+        settings.intersectionColour = EditorGUILayout.ColorField("Intersection Colour", settings.intersectionColour);
+        settings.cursorColour = EditorGUILayout.ColorField("Cursor Colour", settings.cursorColour);
+        settings.roadGuidelinesColour = EditorGUILayout.ColorField("Road Guidelines Colour", settings.roadGuidelinesColour);
+        settings.roadControlGuidelinesColour = EditorGUILayout.ColorField("Road Control Guidelines Colour", settings.roadControlGuidelinesColour);
+
+        if (GUILayout.Button("Reset Colours"))
+        {
+            settings.pointColour = Color.red;
+            settings.controlPointColour = Color.yellow;
+            settings.intersectionColour = Color.green;
+            settings.cursorColour = Color.blue;
+            settings.roadGuidelinesColour = Misc.lightGreen;
+            settings.roadControlGuidelinesColour = Misc.darkGreen;
+        }
+        GUILayout.Space(20);
+
+        settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
     }
 }

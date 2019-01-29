@@ -126,7 +126,7 @@ public class PrefabLineEditor : Editor
 
         if (prefabCreator.isFollowObject == false)
         {
-            GUILayout.Label("");
+            GUILayout.Space(20);
 
             if (GUILayout.Button("Reset"))
             {
@@ -228,12 +228,12 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.transform.GetChild(0).GetChild(i).name == "Point")
             {
-                Handles.color = Color.red;
+                Handles.color = prefabCreator.globalSettings.pointColour;
                 Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
             }
             else
             {
-                Handles.color = Color.yellow;
+                Handles.color = prefabCreator.globalSettings.controlPointColour;
                 Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
             }
         }
@@ -270,7 +270,7 @@ public class PrefabLineEditor : Editor
         }
 
         // Mouse position
-        Handles.color = Color.blue;
+        Handles.color = prefabCreator.globalSettings.cursorColour;
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
     }
 

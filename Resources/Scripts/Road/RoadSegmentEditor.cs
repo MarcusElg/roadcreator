@@ -63,7 +63,7 @@ public class RoadSegmentEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
 
-        GUILayout.Label("");
+        GUILayout.Space(20);
         GUILayout.Label("Bridge", guiStyle);
         serializedObject.FindProperty("bridgeGenerator").enumValueIndex = (int)(RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", (RoadSegment.BridgeGenerator)Enum.GetValues(typeof(RoadSegment.BridgeGenerator)).GetValue(serializedObject.FindProperty("bridgeGenerator").enumValueIndex));
 
@@ -76,7 +76,7 @@ public class RoadSegmentEditor : Editor
             serializedObject.FindProperty("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", serializedObject.FindProperty("widthPercentageSecondStep").floatValue), 0, 1);
             serializedObject.FindProperty("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", serializedObject.FindProperty("extraWidth").floatValue), 0, 1);
 
-            GUILayout.Label("");
+            GUILayout.Space(20);
             GUILayout.Label("Pillar Placement", guiStyle);
             serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
             if (serializedObject.FindProperty("placePillars").boolValue == true)
@@ -91,7 +91,7 @@ public class RoadSegmentEditor : Editor
 
         if (targets.Length == 1)
         {
-            GUILayout.Label("");
+            GUILayout.Space(20);
             GUILayout.Label("Extra Meshes", guiStyle);
             for (int i = 0; i < serializedObject.FindProperty("extraMeshOpen").arraySize; i++)
             {
@@ -150,7 +150,7 @@ public class RoadSegmentEditor : Editor
         {
             Change();
         }
-        GUILayout.Label("");
+        GUILayout.Space(20);
 
         if (GUILayout.Button("Straighten"))
         {
@@ -169,7 +169,7 @@ public class RoadSegmentEditor : Editor
 
         if (GameObject.FindObjectOfType<GlobalSettings>().debug == true)
         {
-            GUILayout.Label("");
+            GUILayout.Space(20);
             GUILayout.Label("Debug", guiStyle);
             GUILayout.Label(serializedObject.FindProperty("curved").boolValue.ToString());
             EditorGUILayout.PropertyField(serializedObject.FindProperty("startGuidelinePoints"), true);

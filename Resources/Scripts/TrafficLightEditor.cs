@@ -21,7 +21,7 @@ public class TrafficLightEditor : Editor
         serializedObject.FindProperty("redActive").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Red Active Material", serializedObject.FindProperty("redActive").objectReferenceValue, typeof(Material), false);
         serializedObject.FindProperty("redNonActive").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Red Non-active Material", serializedObject.FindProperty("redNonActive").objectReferenceValue, typeof(Material), false);
 
-        GUILayout.Label("");
+        GUILayout.Space(20);
         GUILayout.Label("Timing", guiStyle);
 
         serializedObject.FindProperty("greenTime").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Green Time", serializedObject.FindProperty("greenTime").floatValue));

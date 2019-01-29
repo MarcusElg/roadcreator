@@ -46,7 +46,7 @@ public class IntersectionEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
 
-        GUILayout.Label("");
+        GUILayout.Space(20);
         GUILayout.Label("Bridge", guiStyle);
         intersection.bridgeGenerator = (RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", intersection.bridgeGenerator);
 
@@ -63,7 +63,7 @@ public class IntersectionEditor : Editor
             intersection.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.widthPercentageSecondStep), 0, 1);
             intersection.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.extraWidth), 0, 1);
 
-            GUILayout.Label("");
+            GUILayout.Space(20);
             GUILayout.Label("Pillar Placement", guiStyle);
 
             intersection.placePillars = EditorGUILayout.Toggle("Place Pillar", intersection.placePillars);
@@ -80,7 +80,7 @@ public class IntersectionEditor : Editor
             intersection.CreateMesh();
         }
 
-        GUILayout.Label("");
+        GUILayout.Space(20);
 
         if (GUILayout.Button("Generate Intersection"))
         {
@@ -104,7 +104,7 @@ public class IntersectionEditor : Editor
 
             intersection.MovePoints(raycastHit, hitPosition, Event.current);
 
-            Handles.color = Color.green;
+            Handles.color = intersection.globalSettings.intersectionColour;
             for (int i = 0; i < intersection.transform.childCount; i++)
             {
                 if (intersection.transform.GetChild(i).name != "Bridge")
@@ -113,7 +113,7 @@ public class IntersectionEditor : Editor
                 }
             }
 
-            Handles.color = Color.blue;
+            Handles.color = intersection.globalSettings.cursorColour;
             Handles.CylinderHandleCap(0, raycastHit.point, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
         }
 
