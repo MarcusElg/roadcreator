@@ -210,7 +210,6 @@ public class RoadSegment : MonoBehaviour
     private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
         Vector3[] vertices = new Vector3[points.Length * 2];
-        Vector2[] uvs = new Vector2[vertices.Length];
         int numTriangles = 2 * (points.Length - 1);
         int[] triangles = new int[numTriangles * 3];
         int verticeIndex = 0;
@@ -355,7 +354,6 @@ public class RoadSegment : MonoBehaviour
         Mesh generatedMesh = new Mesh();
         generatedMesh.vertices = vertices;
         generatedMesh.triangles = triangles;
-        generatedMesh.uv = uvs;
 
         if (name == "Road")
         {
@@ -412,7 +410,7 @@ public class RoadSegment : MonoBehaviour
 
     private Mesh GenerateUvs(Mesh mesh, bool left)
     {
-        Vector2[] uvs = mesh.uv;
+        Vector2[] uvs = new Vector2[mesh.vertices.Length];
         Vector2[] widths = new Vector2[uvs.Length];
         Vector3[] vertices = mesh.vertices;
 
@@ -438,7 +436,7 @@ public class RoadSegment : MonoBehaviour
             {
                 currentDistance += Vector3.Distance(vertices[i - 2], vertices[i]);
             }
-
+            
             if (left == false)
             {
                 uvs[i] = new Vector2(0, currentDistance / totalDistanceLeft);

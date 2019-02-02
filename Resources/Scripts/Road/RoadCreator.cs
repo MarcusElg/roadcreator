@@ -154,20 +154,37 @@ public class RoadCreator : MonoBehaviour
 
         if (transform.GetChild(0).childCount > i)
         {
-            float textureRepeat = length / 4;
-
             for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
             {
                 if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial != null)
                 {
+                    float textureRepeat = length / 4 * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY;
+
                     Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
-                    material.SetVector("Vector2_79C0D9A3", new Vector2(1, textureRepeat * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY));
+                    material.SetVector("_Tiling", new Vector2(1, textureRepeat));
+
+                    float lastTextureRepeat = 0;
+                    float lastTextureOffset = 0;
+
+                    if (i > 0)
+                    {
+                        lastTextureRepeat = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Tiling").y;
+                        lastTextureOffset = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Offset").y;
+                        material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                    }
+
                     transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
 
                     if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials.Length > 1)
                     {
                         material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[1]);
-                        material.SetVector("Vector2_79C0D9A3", new Vector2(1, textureRepeat * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY));
+                        material.SetVector("_Tiling", new Vector2(1, textureRepeat));
+
+                        if (i > 0)
+                        {
+                            material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                        }
+
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials = new Material[2] { transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[0], material };
                     }
                 }
