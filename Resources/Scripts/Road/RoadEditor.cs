@@ -49,6 +49,7 @@ public class RoadEditor : Editor
         roadCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", roadCreator.smoothnessAmount));
         roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", roadCreator.segmentPreset, typeof(Preset), false);
         roadCreator.createIntersections = EditorGUILayout.Toggle("Create Intersections", roadCreator.createIntersections);
+        roadCreator.automaticControlPointPlacement = EditorGUILayout.Toggle("Automatic Control Point Placement", roadCreator.automaticControlPointPlacement);
 
         if (EditorGUI.EndChangeCheck() == true)
         {
@@ -114,7 +115,7 @@ public class RoadEditor : Editor
             roadCreator.transform.hasChanged = false;
         }
 
-        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
         guiEvent = Event.current;
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);

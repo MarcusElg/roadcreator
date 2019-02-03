@@ -188,4 +188,9 @@ public class RoadSegmentEditor : Editor
         }
     }
 
+    private void OnSceneGUI()
+    {
+        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
+    }
+
 }

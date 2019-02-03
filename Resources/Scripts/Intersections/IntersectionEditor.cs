@@ -90,7 +90,7 @@ public class IntersectionEditor : Editor
 
     private void OnSceneGUI()
     {
-        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
         Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
         RaycastHit raycastHit;
 
