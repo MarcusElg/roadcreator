@@ -254,10 +254,22 @@ public class BridgeGeneration
         bridge.AddComponent<MeshRenderer>();
         bridge.AddComponent<MeshCollider>();
 
+        // Flat shaded triangles
+        Vector3[] flatShadedVertices = new Vector3[triangles.Length];
+        Vector2[] flatShadedUvs = new Vector2[triangles.Length];
+
+        for (int i = 0; i < triangles.Length; i++)
+        {
+            flatShadedVertices[i] = vertices[triangles[i]];
+            flatShadedUvs[i] = uvs[triangles[i]];
+            triangles[i] = i;
+        }
+
         Mesh mesh = new Mesh();
-        mesh.vertices = vertices;
+        mesh.vertices = flatShadedVertices;
         mesh.triangles = triangles;
-        mesh.uv = uvs;
+        mesh.uv = flatShadedUvs;
+        mesh.RecalculateNormals();
 
         bridge.GetComponent<MeshFilter>().sharedMesh = mesh;
         bridge.GetComponent<MeshRenderer>().sharedMaterials = materials;
