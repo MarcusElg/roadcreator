@@ -342,7 +342,7 @@ public class RoadSegment : MonoBehaviour
         // First
         if (previousVertices != null)
         {
-            if (vertices.Length > 4 && previousVertices.Length > 3)
+            if (vertices.Length > 4 && previousVertices.Length > 3 && name == "Road")
             {
                 vertices[0] = previousVertices[previousVertices.Length - 2] + previousSegment.position - segment.position;
                 vertices[1] = previousVertices[previousVertices.Length - 1] + previousSegment.position - segment.position;
@@ -436,7 +436,7 @@ public class RoadSegment : MonoBehaviour
             {
                 currentDistance += Vector3.Distance(vertices[i - 2], vertices[i]);
             }
-            
+
             if (left == false)
             {
                 uvs[i] = new Vector2(0, currentDistance / totalDistanceLeft);
