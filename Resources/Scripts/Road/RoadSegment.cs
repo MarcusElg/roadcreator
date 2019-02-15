@@ -256,16 +256,16 @@ public class RoadSegment : MonoBehaviour
                 if (extraMeshLeft == true)
                 {
                     vertices[verticeIndex] = (points[i] + left * -modifiedXOffset) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y;
+                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset;
                     vertices[verticeIndex + 1] = (points[i] + left * (-modifiedXOffset - width)) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y;
+                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y - heightOffset;
                 }
                 else
                 {
                     vertices[verticeIndex] = (points[i] + left * (modifiedXOffset + width)) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y;
+                    vertices[verticeIndex].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y - heightOffset;
                     vertices[verticeIndex + 1] = (points[i] + left * modifiedXOffset) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y;
+                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset;
                 }
             }
 
