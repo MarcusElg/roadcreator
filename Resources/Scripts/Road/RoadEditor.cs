@@ -49,7 +49,6 @@ public class RoadEditor : Editor
         roadCreator.smoothnessAmount = Mathf.Max(0, EditorGUILayout.IntField("Smoothness Amount", roadCreator.smoothnessAmount));
         roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", roadCreator.segmentPreset, typeof(Preset), false);
         roadCreator.createIntersections = EditorGUILayout.Toggle("Create Intersections", roadCreator.createIntersections);
-        roadCreator.automaticControlPointPlacement = EditorGUILayout.Toggle("Automatic Control Point Placement", roadCreator.automaticControlPointPlacement);
 
         if (EditorGUI.EndChangeCheck() == true)
         {
