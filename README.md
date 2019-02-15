@@ -1,5 +1,5 @@
 # Roadcreator
-A free road creation tool for unity. It's currently in beta so it's pretty stable but still containes some bugs
+A free road creation tool for unity.
 
 ## Features:
 ### Road Creation:
@@ -24,4 +24,4 @@ A free road creation tool for unity. It's currently in beta so it's pretty stabl
 
 For info about planned features and bugs see https://trello.com/b/WgYWoShS/road-creator
 
-Forum post: https://forum.unity.com/threads/beta-want-testers-currently-creating-a-free-road-creator-help-is-welcome.535901/
+Forum post: https://forum.unity.com/threads/1-0-free-road-creator.629983/
