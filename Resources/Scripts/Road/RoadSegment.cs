@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Segments")]
 public class RoadSegment : MonoBehaviour
 {
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor.Presets;
 using UnityEditor;
 
+[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Roads")]
 public class RoadCreator : MonoBehaviour
 {
 

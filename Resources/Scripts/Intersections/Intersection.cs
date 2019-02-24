@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 
+[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Intersections")]
 public class Intersection : MonoBehaviour
 {
 

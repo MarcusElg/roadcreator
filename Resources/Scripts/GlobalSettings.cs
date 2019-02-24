@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Global-Settings")]
 public class GlobalSettings : MonoBehaviour
 {
 

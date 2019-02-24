@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Road-Systems")]
 public class RoadSystem : MonoBehaviour
 {
 

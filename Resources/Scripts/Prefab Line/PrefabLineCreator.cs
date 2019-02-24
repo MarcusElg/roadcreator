@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Prefab-Lines")]
 public class PrefabLineCreator : MonoBehaviour
 {
 
