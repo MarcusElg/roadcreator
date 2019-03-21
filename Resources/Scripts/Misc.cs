@@ -88,6 +88,12 @@ public static class Misc
         return (one + (difference / 2));
     }
 
+    public static float GetCenter(float one, float two)
+    {
+        float difference = two - one;
+        return (one + (difference / 2));
+    }
+
     public static Vector3 FindPointInCircle(float radius, int i, float degreesPerStep)
     {
         return Quaternion.AngleAxis(degreesPerStep * i, Vector3.up) * (Vector3.right * radius);

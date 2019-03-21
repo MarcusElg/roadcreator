@@ -39,7 +39,8 @@ public class RoadSegment : MonoBehaviour
     public List<bool> extraMeshLeft = new List<bool>();
     public List<Material> extraMeshMaterial = new List<Material>();
     public List<PhysicMaterial> extraMeshPhysicMaterial = new List<PhysicMaterial>();
-    public List<float> extraMeshWidth = new List<float>();
+    public List<float> extraMeshStartWidth = new List<float>();
+    public List<float> extraMeshEndWidth = new List<float>();
     public List<float> extraMeshYOffset = new List<float>();
 
     public Vector3[] startGuidelinePoints;
@@ -85,8 +86,10 @@ public class RoadSegment : MonoBehaviour
         for (int i = 0; i < extraMeshOpen.Count; i++)
         {
             float leftYOffset = extraMeshYOffset[i];
-            float xOffset = 0;
+            float startXOffset = 0;
+            float endXOffset = 0;
             float yOffset = heightOffset;
+
             if (i > 0)
             {
                 bool foundLast = false;
@@ -100,7 +103,8 @@ public class RoadSegment : MonoBehaviour
                             foundLast = true;
                         }
 
-                        xOffset += extraMeshWidth[j];
+                        startXOffset += extraMeshStartWidth[j];
+                        endXOffset += extraMeshEndWidth[j];
                         yOffset += extraMeshYOffset[j];
                     }
                 }
@@ -115,7 +119,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], xOffset, extraMeshWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], startXOffset, endXOffset, extraMeshStartWidth[i], extraMeshEndWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
         }
 
         if (transform.childCount == 3)
@@ -125,25 +129,26 @@ public class RoadSegment : MonoBehaviour
 
         if (bridgeGenerator == BridgeGenerator.simple)
         {
-            float extraWidthLeft = 0;
-            float extraWidthRight = 0;
+            float startExtraWidthLeft = extraWidth;
+            float endExtraWidthLeft = extraWidth;
+            float startExtraWidthRight = extraWidth;
+            float endExtraWidthRight = extraWidth;
 
             for (int i = 0; i < extraMeshLeft.Count; i++)
             {
                 if (extraMeshLeft[i] == true)
                 {
-                    extraWidthLeft += extraMeshWidth[i];
+                    startExtraWidthLeft += extraMeshStartWidth[i];
+                    endExtraWidthLeft += extraMeshEndWidth[i];
                 }
                 else
                 {
-                    extraWidthRight += extraMeshWidth[i];
+                    startExtraWidthRight += extraMeshStartWidth[i];
+                    endExtraWidthRight += extraMeshEndWidth[i];
                 }
             }
 
-            extraWidthLeft += extraWidth;
-            extraWidthRight += extraWidth;
-
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, extraWidthLeft, extraWidthRight, bridgeMaterials);
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment.GetComponent<RoadSegment>(), startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeMaterials);
         }
     }
 
@@ -208,7 +213,7 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float xOffset = 0, float width = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
         Vector3[] vertices = new Vector3[points.Length * 2];
         int numTriangles = 2 * (points.Length - 1);
@@ -234,6 +239,11 @@ public class RoadSegment : MonoBehaviour
             }
 
             float roadWidth = Mathf.Lerp(startRoadWidth, endRoadWidth, currentDistance / totalDistance);
+            if (i == 0 && previousSegment != null)
+            {
+                roadWidth = previousSegment.GetComponent<RoadSegment>().endRoadWidth;
+            }
+
             if (i == 0 && previousPoint != Misc.MaxVector3)
             {
                 correctedHeightOffset = previousPoint.y - points[i].y;
@@ -252,7 +262,8 @@ public class RoadSegment : MonoBehaviour
             }
             else
             {
-                float modifiedXOffset = xOffset + roadWidth;
+                float modifiedXOffset = Mathf.Lerp(startXOffset, endXOffset, currentDistance / totalDistance) + roadWidth;
+                float width = Mathf.Lerp(startWidth, endWidth, currentDistance / totalDistance);
 
                 if (extraMeshLeft == true)
                 {

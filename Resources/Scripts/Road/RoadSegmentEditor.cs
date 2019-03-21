@@ -101,7 +101,8 @@ public class RoadSegmentEditor : Editor
                     serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(i).boolValue = EditorGUILayout.Toggle("Left", serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(i).boolValue);
                     serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(i).objectReferenceValue = (Material)EditorGUILayout.ObjectField("Material", serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(i).objectReferenceValue, typeof(Material), false);
                     serializedObject.FindProperty("extraMeshPhysicMaterial").GetArrayElementAtIndex(i).objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", serializedObject.FindProperty("extraMeshPhysicMaterial").GetArrayElementAtIndex(i).objectReferenceValue, typeof(PhysicMaterial), false);
-                    serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(i).floatValue = Mathf.Max(EditorGUILayout.FloatField("Width", serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(i).floatValue), 0);
+                    serializedObject.FindProperty("extraMeshStartWidth").GetArrayElementAtIndex(i).floatValue = Mathf.Max(EditorGUILayout.FloatField("Start Width", serializedObject.FindProperty("extraMeshStartWidth").GetArrayElementAtIndex(i).floatValue), 0);
+                    serializedObject.FindProperty("extraMeshEndWidth").GetArrayElementAtIndex(i).floatValue = Mathf.Max(EditorGUILayout.FloatField("End Width", serializedObject.FindProperty("extraMeshEndWidth").GetArrayElementAtIndex(i).floatValue), 0);
                     serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(i).floatValue = EditorGUILayout.FloatField("Y Offset", serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(i).floatValue);
 
                     if (GUILayout.Button("Remove Extra Mesh") == true && ((RoadSegment)target).transform.GetChild(1).childCount > 1)
@@ -110,7 +111,8 @@ public class RoadSegmentEditor : Editor
                         serializedObject.FindProperty("extraMeshLeft").DeleteArrayElementAtIndex(i);
                         serializedObject.FindProperty("extraMeshMaterial").DeleteArrayElementAtIndex(i);
                         serializedObject.FindProperty("extraMeshPhysicMaterial").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshWidth").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshStartWidth").DeleteArrayElementAtIndex(i);
+                        serializedObject.FindProperty("extraMeshEndWidth").DeleteArrayElementAtIndex(i);
                         serializedObject.FindProperty("extraMeshYOffset").DeleteArrayElementAtIndex(i);
 
                         for (int j = 0; j < targets.Length; j++)
@@ -130,8 +132,10 @@ public class RoadSegmentEditor : Editor
                 serializedObject.FindProperty("extraMeshMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize);
                 serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize - 1).objectReferenceValue = Resources.Load("Materials/Low Poly/Asphalt") as Material;
                 serializedObject.FindProperty("extraMeshPhysicMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshPhysicMaterial").arraySize);
-                serializedObject.FindProperty("extraMeshWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshWidth").arraySize);
-                serializedObject.FindProperty("extraMeshWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshWidth").arraySize - 1).floatValue = 1;
+                serializedObject.FindProperty("extraMeshStartWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshStartWidth").arraySize);
+                serializedObject.FindProperty("extraMeshStartWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshStartWidth").arraySize - 1).floatValue = 1;
+                serializedObject.FindProperty("extraMeshEndWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshEndWidth").arraySize);
+                serializedObject.FindProperty("extraMeshEndWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshEndWidth").arraySize - 1).floatValue = 1;
                 serializedObject.FindProperty("extraMeshYOffset").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshYOffset").arraySize);
                 serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshYOffset").arraySize - 1).floatValue = 0;
 

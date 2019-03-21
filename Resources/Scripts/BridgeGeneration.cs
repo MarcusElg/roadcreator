@@ -5,7 +5,7 @@ using UnityEngine;
 public class BridgeGeneration
 {
 
-    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, float extraWidthLeft, float extraWidthRight, Material[] materials)
+    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, RoadSegment previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials)
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -35,8 +35,14 @@ public class BridgeGeneration
             }
 
             float roadWidth = Mathf.Lerp(segment.startRoadWidth, segment.endRoadWidth, currentDistance / totalDistance);
-            float roadWidthLeft = roadWidth + extraWidthLeft;
-            float roadWidthRight = roadWidth + extraWidthRight;
+
+            if (i == 0 && previousSegment != null)
+            {
+                roadWidth = previousSegment.endRoadWidth;
+            }
+
+            float roadWidthLeft = roadWidth + Mathf.Lerp(startExtraWidthLeft, endExtraWidthLeft, currentDistance / totalDistance);
+            float roadWidthRight = roadWidth + Mathf.Lerp(startExtraWidthRight, endExtraWidthRight, currentDistance / totalDistance);
 
             float heightOffset = 0;
             if (i == 0 && previousPoint != Misc.MaxVector3)
