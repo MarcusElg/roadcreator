@@ -155,7 +155,6 @@ public class PrefabLineEditor : Editor
     {
         if (prefabCreator.isFollowObject == false)
         {
-            HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
             Event guiEvent = Event.current;
 
             Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);

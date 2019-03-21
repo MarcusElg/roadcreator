@@ -85,4 +85,9 @@ public class GlobalSettingsEditor : Editor
 
         settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
     }
+
+    private void OnSceneGUI()
+    {
+        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+    }
 }

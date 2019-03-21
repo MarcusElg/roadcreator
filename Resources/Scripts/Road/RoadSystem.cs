@@ -21,7 +21,6 @@ public class RoadSystem : MonoBehaviour
 
     public void ShowCreationButtons()
     {
-        SceneView.lastActiveSceneView.Focus();
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
 
         if (largeBoldText == null)

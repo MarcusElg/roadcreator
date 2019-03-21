@@ -114,7 +114,6 @@ public class RoadEditor : Editor
             roadCreator.transform.hasChanged = false;
         }
 
-        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
         guiEvent = Event.current;
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
