@@ -876,15 +876,30 @@ public class RoadCreator : MonoBehaviour
                     Undo.RecordObject(objectToMove.transform, "Moved Point");
                     objectToMove.transform.position += new Vector3(0, 0.2f, 0);
 
+                    if (guiEvent.control == true)
+                    {
+                        objectToMove.transform.position = new Vector3(objectToMove.transform.position.x, Mathf.Ceil(objectToMove.transform.position.y), objectToMove.transform.position.z);
+                    }
+
                     if (extraObjectToMove != null)
                     {
                         Undo.RecordObject(extraObjectToMove.transform, "Moved Point");
                         extraObjectToMove.transform.position = objectToMove.transform.position;
+
+                        if (guiEvent.control == true)
+                        {
+                            extraObjectToMove.transform.position = new Vector3(extraObjectToMove.transform.position.x, Mathf.Ceil(extraObjectToMove.transform.position.y), extraObjectToMove.transform.position.z);
+                        }
                     }
                 }
                 else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
                 {
                     Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
+
+                    if (guiEvent.control == true)
+                    {
+                        position = new Vector3(position.x, Mathf.Floor(position.y), position.z);
+                    }
 
                     if (position.y < raycastHit.point.y)
                     {
@@ -963,7 +978,7 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    public void dropMovingPoint ()
+    public void dropMovingPoint()
     {
         mouseDown = false;
         if (objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)

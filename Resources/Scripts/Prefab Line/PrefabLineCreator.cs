@@ -65,7 +65,6 @@ public class PrefabLineCreator : MonoBehaviour
         GameObject point = new GameObject(name);
         point.AddComponent<BoxCollider>();
         point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
-        point.GetComponent<BoxCollider>().enabled = false;
         point.transform.SetParent(transform.GetChild(0));
         point.transform.position = raycastHit;
         point.hideFlags = HideFlags.NotEditable;
@@ -93,10 +92,20 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     Undo.RecordObject(objectToMove.transform, "Moved Point");
                     objectToMove.transform.position += new Vector3(0, 0.2f, 0);
+
+                    if (guiEvent.control == true)
+                    {
+                        objectToMove.transform.position = new Vector3(objectToMove.transform.position.x, Mathf.Ceil(objectToMove.transform.position.y), objectToMove.transform.position.z);
+                    }
                 }
                 else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
                 {
                     Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
+
+                    if (guiEvent.control == true)
+                    {
+                        position = new Vector3(position.x, Mathf.Floor(position.y), position.z);
+                    }
 
                     if (position.y < raycastHit.point.y)
                     {
@@ -114,16 +123,8 @@ public class PrefabLineCreator : MonoBehaviour
 
                 if (raycastHit.transform.name.Contains("Point") && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() != null && raycastHit.collider.transform.parent.parent.gameObject == gameObject)
                 {
-                    if (raycastHit.collider.gameObject.name == "Control Point")
-                    {
-                        objectToMove = raycastHit.collider.gameObject;
-                        objectToMove.GetComponent<BoxCollider>().enabled = false;
-                    }
-                    else if (raycastHit.collider.gameObject.name == "Point")
-                    {
-                        objectToMove = raycastHit.collider.gameObject;
-                        objectToMove.GetComponent<BoxCollider>().enabled = false;
-                    }
+                    objectToMove = raycastHit.collider.gameObject;
+                    objectToMove.GetComponent<BoxCollider>().enabled = false;
                 }
             }
             else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
