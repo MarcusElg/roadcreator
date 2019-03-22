@@ -98,6 +98,7 @@ public class RoadSystem : MonoBehaviour
             gameObject.name = "Traffic Light";
             gameObject.transform.SetParent(transform);
             Selection.activeGameObject = gameObject;
+            SetPosition(gameObject);
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Traffic Light");
         }
     }
@@ -164,7 +165,7 @@ public class RoadSystem : MonoBehaviour
         if (Physics.Raycast(ray, out raycastHit, 100))
         {
             gameObject.transform.position = raycastHit.point;
-            gameObject.transform.rotation = Quaternion.Euler(0, Camera.current.transform.rotation.eulerAngles.y, 0);
+            gameObject.transform.rotation = Quaternion.Euler(0, Camera.current.transform.rotation.eulerAngles.y + 180, 0);
             Selection.activeGameObject = gameObject;
         }
     }

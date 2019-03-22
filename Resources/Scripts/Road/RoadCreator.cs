@@ -574,6 +574,7 @@ public class RoadCreator : MonoBehaviour
                 }
 
                 intersection.GetComponent<Intersection>().ResetCurvePointPositions();
+                intersection.GetComponent<Intersection>().ResetExtraMeshes();
                 intersection.GetComponent<Intersection>().CreateMesh();
             }
             else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, globalSettings.ignoreMouseRayLayer) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
@@ -592,6 +593,7 @@ public class RoadCreator : MonoBehaviour
 
                     UpdateStartConnectionData(startIntersection);
                     startIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
+                    startIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                 }
                 else if (point.transform.GetSiblingIndex() == 2 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null)
                 {
@@ -606,6 +608,7 @@ public class RoadCreator : MonoBehaviour
 
                     UpdateEndConnectionData(endIntersection);
                     endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
+                   endIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                 }
             }
             else
@@ -639,6 +642,7 @@ public class RoadCreator : MonoBehaviour
                         }
 
                         intersection.ResetCurvePointPositions();
+                        intersection.ResetExtraMeshes();
                         intersection.CreateMesh();
                     }
                     else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnectionIndex != -1 && endIntersection != null)
@@ -660,6 +664,7 @@ public class RoadCreator : MonoBehaviour
                         }
 
                         intersection.ResetCurvePointPositions();
+                        intersection.ResetExtraMeshes();
                         intersection.CreateMesh();
                     }
                 }
@@ -709,6 +714,9 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
         intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
         intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
+
+        GameObject gameObject = new GameObject("Extra Meshes");
+        gameObject.transform.SetParent(intersection.transform, false);
 
         return intersection;
     }

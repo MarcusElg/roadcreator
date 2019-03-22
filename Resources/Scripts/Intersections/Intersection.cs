@@ -29,6 +29,14 @@ public class Intersection : MonoBehaviour
     public float widthPercentageSecondStep = 0.6f;
     public float extraWidth = 0.2f;
 
+    public List<bool> extraMeshOpen = new List<bool>();
+    public List<int> extraMeshIndex = new List<int>();
+    public List<Material> extraMeshMaterial = new List<Material>();
+    public List<PhysicMaterial> extraMeshPhysicMaterial = new List<PhysicMaterial>();
+    public List<float> extraMeshStartWidth = new List<float>();
+    public List<float> extraMeshEndWidth = new List<float>();
+    public List<float> extraMeshYOffset = new List<float>();
+
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
         if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
@@ -55,27 +63,27 @@ public class Intersection : MonoBehaviour
         {
             objectToMove.GetComponent<BoxCollider>().enabled = true;
 
-            int nextIndex = objectToMove.transform.GetSiblingIndex() + 1;
+            int nextIndex = objectToMove.transform.GetSiblingIndex();
             if (nextIndex >= connections.Count)
             {
                 nextIndex = 0;
             }
 
-            Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex()].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
+            Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex() - 1].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
             center.y -= yOffset;
-            connections[objectToMove.transform.GetSiblingIndex()].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
+            connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
             objectToMove = null;
             CreateMesh(false);
 
             for (int i = 0; i < connections.Count; i++)
             {
-                nextIndex = i + 1;
+                nextIndex = i + 2;
                 if (nextIndex >= connections.Count)
                 {
                     nextIndex = 0;
                 }
 
-                transform.GetChild(i).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
+                transform.GetChild(i + 1).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
             }
         }
     }
@@ -136,6 +144,7 @@ public class Intersection : MonoBehaviour
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
+            List<int> firstVertexIndexes = new List<int>();
             int vertexIndex = 0;
 
             for (int i = 0; i < connections.Count; i++)
@@ -145,6 +154,7 @@ public class Intersection : MonoBehaviour
                 Vector3 nextPoint;
                 Vector3 nextCenterPoint;
                 float totalLength = connections[i].length;
+                firstVertexIndexes.Add(vertexIndex);
 
                 if (i == connections.Count - 1)
                 {
@@ -249,6 +259,60 @@ public class Intersection : MonoBehaviour
             }
 
             CreateCurvePoints();
+
+            // Extra meshes
+            float[] startWidths = new float[firstVertexIndexes.Count];
+            float[] endWidths = new float[firstVertexIndexes.Count];
+            float[] heights = new float[firstVertexIndexes.Count];
+
+            for (int i = 0; i < extraMeshOpen.Count; i++)
+            {
+                int endVertexIndex;
+                if (extraMeshIndex[i] < firstVertexIndexes.Count - 1)
+                {
+                    endVertexIndex = firstVertexIndexes[extraMeshIndex[i] + 1];
+                }
+                else
+                {
+                    endVertexIndex = vertices.Count;
+                }
+
+                List<Vector3> extraMeshVertices = new List<Vector3>();
+                triangles.Clear();
+                uvs.Clear();
+                vertexIndex = 0;
+
+                for (int j = firstVertexIndexes[extraMeshIndex[i]]; j < endVertexIndex; j += 2)
+                {
+                    float progress = (j - firstVertexIndexes[extraMeshIndex[i]]) / (float)endVertexIndex;
+                    Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
+                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshStartWidth[i], extraMeshEndWidth[i], progress) + Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], progress)));
+                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshYOffset[i] + heights[extraMeshIndex[i]], 0);
+                    extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], progress));
+                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshIndex[i]], 0);
+
+                    if (j < endVertexIndex - 2)
+                    {
+                        triangles = AddTriangles(triangles, vertexIndex);
+                        vertexIndex += 2;
+                    }
+                }
+
+                Mesh mesh = new Mesh();
+                mesh.vertices = extraMeshVertices.ToArray();
+                mesh.triangles = triangles.ToArray();
+                mesh.uv = uvs.ToArray();
+                vertexIndex = 0;
+
+                transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = mesh;
+                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = mesh;
+                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMaterial = extraMeshPhysicMaterial[i];
+                transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { extraMeshMaterial[i] };
+
+                startWidths[extraMeshIndex[i]] += extraMeshStartWidth[i];
+                endWidths[extraMeshIndex[i]] += extraMeshEndWidth[i];
+                heights[extraMeshIndex[i]] += extraMeshYOffset[i];
+            }
         }
 
         if (fromRoad == false)
@@ -293,6 +357,22 @@ public class Intersection : MonoBehaviour
             }
 
             connections[i].curvePoint = new SerializedVector3(Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()));
+        }
+    }
+
+    public void ResetExtraMeshes()
+    {
+        for (int i = transform.GetChild(0).childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(0).GetChild(i).gameObject);
+
+            extraMeshOpen.Clear();
+            extraMeshMaterial.Clear();
+            extraMeshIndex.Clear();
+            extraMeshPhysicMaterial.Clear();
+            extraMeshStartWidth.Clear();
+            extraMeshEndWidth.Clear();
+            extraMeshYOffset.Clear();
         }
     }
 

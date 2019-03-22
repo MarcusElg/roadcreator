@@ -19,6 +19,7 @@ public class IntersectionEditor : Editor
         if (GameObject.FindObjectOfType<GlobalSettings>() == null)
         {
             intersection.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
+            ((Intersection)target).transform.parent.parent.GetComponent<RoadCreator>().globalSettings = intersection.globalSettings;
         }
         else if (intersection.globalSettings == null)
         {
@@ -78,6 +79,57 @@ public class IntersectionEditor : Editor
                 intersection.xzPillarScale = EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale);
             }
         }
+        GUILayout.Space(20);
+        GUILayout.Label("Extra Meshes", guiStyle);
+        for (int i = 0; i < intersection.extraMeshOpen.Count; i++)
+        {
+            intersection.extraMeshOpen[i] = EditorGUILayout.Foldout(intersection.extraMeshOpen[i], "Extra Mesh " + i);
+            if (intersection.extraMeshOpen[i] == true)
+            {
+                intersection.extraMeshIndex[i] = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshIndex[i]), 0, intersection.connections.Count - 1);
+                intersection.extraMeshMaterial[i] = (Material)EditorGUILayout.ObjectField("Material", intersection.extraMeshMaterial[i], typeof(Material), false);
+                intersection.extraMeshPhysicMaterial[i] = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", intersection.extraMeshPhysicMaterial[i], typeof(PhysicMaterial), false);
+                intersection.extraMeshStartWidth[i] = Mathf.Max(EditorGUILayout.FloatField("Start Width", intersection.extraMeshStartWidth[i]), 0);
+                intersection.extraMeshEndWidth[i] = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshEndWidth[i]), 0);
+                intersection.extraMeshYOffset[i] = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshYOffset[i]);
+
+                if (GUILayout.Button("Remove Extra Mesh") == true && intersection.transform.GetChild(0).childCount > 0)
+                {
+                    intersection.extraMeshOpen.RemoveAt(i);
+                    intersection.extraMeshIndex.RemoveAt(i);
+                    intersection.extraMeshMaterial.RemoveAt(i);
+                    intersection.extraMeshPhysicMaterial.RemoveAt(i);
+                    intersection.extraMeshStartWidth.RemoveAt(i);
+                    intersection.extraMeshEndWidth.RemoveAt(i);
+                    intersection.extraMeshYOffset.RemoveAt(i);
+
+                    for (int j = 0; j < targets.Length; j++)
+                    {
+                        DestroyImmediate(intersection.transform.GetChild(0).GetChild(i).gameObject);
+                    }
+                }
+            }
+        }
+
+        if (GUILayout.Button("Add Extra Mesh"))
+        {
+            intersection.extraMeshOpen.Add(true);
+            intersection.extraMeshIndex.Add(0);
+            intersection.extraMeshMaterial.Add(Resources.Load("Materials/Low Poly/Asphalt") as Material);
+            intersection.extraMeshPhysicMaterial.Add(null);
+            intersection.extraMeshStartWidth.Add(1);
+            intersection.extraMeshEndWidth.Add(1);
+            intersection.extraMeshYOffset.Add(0);
+
+            GameObject extraMesh = new GameObject("Extra Mesh");
+            extraMesh.AddComponent<MeshFilter>();
+            extraMesh.AddComponent<MeshRenderer>();
+            extraMesh.AddComponent<MeshCollider>();
+            extraMesh.transform.SetParent(intersection.transform.GetChild(0));
+            extraMesh.transform.localPosition = Vector3.zero;
+            extraMesh.layer = intersection.globalSettings.roadLayer;
+            extraMesh.hideFlags = HideFlags.NotEditable;
+        }
 
         if (EditorGUI.EndChangeCheck() == true)
         {
@@ -108,7 +160,7 @@ public class IntersectionEditor : Editor
             intersection.MovePoints(raycastHit, hitPosition, Event.current);
 
             Handles.color = intersection.globalSettings.intersectionColour;
-            for (int i = 0; i < intersection.transform.childCount; i++)
+            for (int i = 1; i < intersection.transform.childCount; i++)
             {
                 if (intersection.transform.GetChild(i).name != "Bridge")
                 {
