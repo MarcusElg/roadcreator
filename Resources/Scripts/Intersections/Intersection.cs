@@ -181,7 +181,7 @@ public class Intersection : MonoBehaviour
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
                 {
                     float modifiedT = t;
-                    if (Mathf.Abs(0.5f - t) < distancePerSegment)
+                    if (Mathf.Abs(0.5f - t) < distancePerSegment && t > 0.5f)
                     {
                         modifiedT = 0.5f;
                     }
