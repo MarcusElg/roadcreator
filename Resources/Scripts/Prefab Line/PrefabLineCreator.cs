@@ -30,7 +30,6 @@ public class PrefabLineCreator : MonoBehaviour
 
     public GameObject objectToMove;
     private bool mouseDown;
-    public bool isFollowObject = false;
 
     public GlobalSettings globalSettings;
 
@@ -66,12 +65,7 @@ public class PrefabLineCreator : MonoBehaviour
         GameObject point = new GameObject(name);
         point.AddComponent<BoxCollider>();
         point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
-
-        if (isFollowObject == true)
-        {
-            point.GetComponent<BoxCollider>().enabled = false;
-        }
-
+        point.GetComponent<BoxCollider>().enabled = false;
         point.transform.SetParent(transform.GetChild(0));
         point.transform.position = raycastHit;
         point.hideFlags = HideFlags.NotEditable;
@@ -86,12 +80,7 @@ public class PrefabLineCreator : MonoBehaviour
             if (objectToMove != null)
             {
                 mouseDown = false;
-
-                if (isFollowObject == false)
-                {
-                    objectToMove.GetComponent<BoxCollider>().enabled = true;
-                }
-
+                objectToMove.GetComponent<BoxCollider>().enabled = true;
                 objectToMove = null;
                 PlacePrefabs();
             }
@@ -145,12 +134,7 @@ public class PrefabLineCreator : MonoBehaviour
             else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
             {
                 mouseDown = false;
-
-                if (isFollowObject == false)
-                {
-                    objectToMove.GetComponent<BoxCollider>().enabled = true;
-                }
-
+                objectToMove.GetComponent<BoxCollider>().enabled = true;
                 objectToMove = null;
                 PlacePrefabs();
             }
