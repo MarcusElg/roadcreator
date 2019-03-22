@@ -38,6 +38,11 @@ public static class Misc
         return new Vector3(-forward.z, 0, forward.x).normalized;
     }
 
+    public static Vector3 CalculateLeft (Vector3 forward)
+    {
+        return new Vector3(-forward.z, 0, forward.x).normalized;
+    }
+
     public static Vector3 CalculateLeft(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index, bool circle = false)
     {
         Vector3 forward;
@@ -184,7 +189,7 @@ public static class Misc
         {
             Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 2]);
             Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 1]);
-            Vector3 left = Misc.CalculateLeft(guidelines[2], guidelines[0]);
+            Vector3 left = CalculateLeft(guidelines[2], guidelines[0]);
             Handles.DrawLine((left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position, (-left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position);
 
             for (int j = 0; j < guidelines.Length; j++)

@@ -5,7 +5,7 @@ using UnityEngine;
 public class BridgeGeneration
 {
 
-    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, RoadSegment previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials)
+    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, Transform previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials)
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -38,7 +38,7 @@ public class BridgeGeneration
 
             if (i == 0 && previousSegment != null)
             {
-                roadWidth = previousSegment.endRoadWidth;
+                roadWidth = previousSegment.GetComponent<RoadSegment>().endRoadWidth;
             }
 
             float roadWidthLeft = roadWidth + Mathf.Lerp(startExtraWidthLeft, endExtraWidthLeft, currentDistance / totalDistance);
@@ -144,7 +144,24 @@ public class BridgeGeneration
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
             pillar.transform.localPosition = centerPosition - segment.transform.position;
-            pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(forward, Vector3.up).eulerAngles.y, 0);
+
+            if (segment.rotationDirection == PrefabLineCreator.RotationDirection.forward)
+            {
+                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(forward, Vector3.up).eulerAngles.y, 0);
+            }
+            else if (segment.rotationDirection == PrefabLineCreator.RotationDirection.backward)
+            {
+                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-forward, Vector3.up).eulerAngles.y, 0);
+            }
+            else if (segment.rotationDirection == PrefabLineCreator.RotationDirection.left)
+            {
+                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
+            }
+            else if (segment.rotationDirection == PrefabLineCreator.RotationDirection.right)
+            {
+                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
+            }
+
 
             float heightDifference = groundPosition.y - centerPosition.y;
             pillar.transform.localScale = new Vector3(segment.xzPillarScale, -heightDifference + segment.extraPillarHeight, segment.xzPillarScale);

@@ -94,6 +94,7 @@ public class RoadSegmentEditor : Editor
                 serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
                 serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
                 serializedObject.FindProperty("xzPillarScale").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("XZ Pillar Scale", serializedObject.FindProperty("xzPillarScale").floatValue));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
             }
         }
 

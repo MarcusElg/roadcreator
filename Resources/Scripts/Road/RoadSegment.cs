@@ -34,6 +34,7 @@ public class RoadSegment : MonoBehaviour
     public float pillarPlacementOffset = 5;
     public float extraPillarHeight = 0.2f;
     public float xzPillarScale = 1;
+    public PrefabLineCreator.RotationDirection rotationDirection;
 
     public List<bool> extraMeshOpen = new List<bool>();
     public List<bool> extraMeshLeft = new List<bool>();
@@ -148,7 +149,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment.GetComponent<RoadSegment>(), startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeMaterials);
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeMaterials);
         }
     }
 
