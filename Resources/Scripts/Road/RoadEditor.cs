@@ -25,7 +25,11 @@ public class RoadEditor : Editor
             segments.hideFlags = HideFlags.NotEditable;
         }
 
-        if (roadCreator.globalSettings == null)
+        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        {
+            roadCreator.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
+        }
+        else if (roadCreator.globalSettings == null)
         {
             roadCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
         }
@@ -169,19 +173,32 @@ public class RoadEditor : Editor
             }
         }
 
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.roadLayer)))
+        if (EditorWindow.mouseOverWindow == SceneView.currentDrawingSceneView)
         {
-            Vector3 hitPosition = raycastHit.point;
-
-            if (guiEvent.control == true)
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.roadLayer)))
             {
-                hitPosition = Misc.Round(hitPosition);
-            }
+                hitPosition = raycastHit.point;
 
-            if (guiEvent.shift == false)
-            {
-                MovePoints(raycastHit);
+                if (guiEvent.control == true)
+                {
+                    hitPosition = Misc.Round(hitPosition);
+                }
+
+                if (guiEvent.shift == false)
+                {
+                    MovePoints(raycastHit);
+                }
+                else
+                {
+                    hitPosition = Misc.MaxVector3;
+                    MovePoints(raycastHit);
+                }
             }
+        }
+        else
+        {
+            hitPosition = Misc.MaxVector3;
+            MovePoints(raycastHit);
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();

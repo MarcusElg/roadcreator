@@ -13,6 +13,11 @@ public class GlobalSettingsEditor : Editor
     {
         settings = ((GlobalSettings)target);
         settings.transform.hideFlags = HideFlags.NotEditable;
+
+        if (GameObject.FindObjectOfType<GlobalSettings>() != settings)
+        {
+            DestroyImmediate(settings.GetComponent<GlobalSettings>());
+        }
     }
 
     public override void OnInspectorGUI()

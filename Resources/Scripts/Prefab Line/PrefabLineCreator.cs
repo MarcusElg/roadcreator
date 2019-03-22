@@ -81,61 +81,79 @@ public class PrefabLineCreator : MonoBehaviour
 
     public void MovePoints(Vector3 hitPosition, Event guiEvent, RaycastHit raycastHit)
     {
-        if (mouseDown == true && objectToMove != null)
+        if (hitPosition == Misc.MaxVector3)
         {
-            if (guiEvent.keyCode == KeyCode.Plus || guiEvent.keyCode == KeyCode.KeypadPlus)
+            if (objectToMove != null)
+            {
+                mouseDown = false;
+
+                if (isFollowObject == false)
+                {
+                    objectToMove.GetComponent<BoxCollider>().enabled = true;
+                }
+
+                objectToMove = null;
+                PlacePrefabs();
+            }
+        }
+        else
+        {
+            if (mouseDown == true && objectToMove != null)
+            {
+                if (guiEvent.keyCode == KeyCode.Plus || guiEvent.keyCode == KeyCode.KeypadPlus)
+                {
+                    Undo.RecordObject(objectToMove.transform, "Moved Point");
+                    objectToMove.transform.position += new Vector3(0, 0.2f, 0);
+                }
+                else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
+                {
+                    Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
+
+                    if (position.y < raycastHit.point.y)
+                    {
+                        position.y = raycastHit.point.y;
+                    }
+
+                    Undo.RecordObject(objectToMove.transform, "Moved Point");
+                    objectToMove.transform.position = position;
+                }
+            }
+
+            if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
+            {
+                mouseDown = true;
+
+                if (raycastHit.transform.name.Contains("Point") && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() != null && raycastHit.collider.transform.parent.parent.gameObject == gameObject)
+                {
+                    if (raycastHit.collider.gameObject.name == "Control Point")
+                    {
+                        objectToMove = raycastHit.collider.gameObject;
+                        objectToMove.GetComponent<BoxCollider>().enabled = false;
+                    }
+                    else if (raycastHit.collider.gameObject.name == "Point")
+                    {
+                        objectToMove = raycastHit.collider.gameObject;
+                        objectToMove.GetComponent<BoxCollider>().enabled = false;
+                    }
+                }
+            }
+            else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
             {
                 Undo.RecordObject(objectToMove.transform, "Moved Point");
-                objectToMove.transform.position += new Vector3(0, 0.2f, 0);
+                objectToMove.transform.position = hitPosition;
             }
-            else if (guiEvent.keyCode == KeyCode.Minus || guiEvent.keyCode == KeyCode.KeypadMinus)
+            else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
             {
-                Vector3 position = objectToMove.transform.position - new Vector3(0, 0.2f, 0);
+                mouseDown = false;
 
-                if (position.y < raycastHit.point.y)
+                if (isFollowObject == false)
                 {
-                    position.y = raycastHit.point.y;
+                    objectToMove.GetComponent<BoxCollider>().enabled = true;
                 }
 
-                Undo.RecordObject(objectToMove.transform, "Moved Point");
-                objectToMove.transform.position = position;
+                objectToMove = null;
+                PlacePrefabs();
             }
-        }
-
-        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && objectToMove == null)
-        {
-            mouseDown = true;
-
-            if (raycastHit.transform.name.Contains("Point") && raycastHit.collider.transform.parent.parent.GetComponent<PrefabLineCreator>() != null && raycastHit.collider.transform.parent.parent.gameObject == gameObject)
-            {
-                if (raycastHit.collider.gameObject.name == "Control Point")
-                {
-                    objectToMove = raycastHit.collider.gameObject;
-                    objectToMove.GetComponent<BoxCollider>().enabled = false;
-                }
-                else if (raycastHit.collider.gameObject.name == "Point")
-                {
-                    objectToMove = raycastHit.collider.gameObject;
-                    objectToMove.GetComponent<BoxCollider>().enabled = false;
-                }
-            }
-        }
-        else if (guiEvent.type == EventType.MouseDrag && objectToMove != null)
-        {
-            Undo.RecordObject(objectToMove.transform, "Moved Point");
-            objectToMove.transform.position = hitPosition;
-        }
-        else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
-        {
-            mouseDown = false;
-
-            if (isFollowObject == false)
-            {
-                objectToMove.GetComponent<BoxCollider>().enabled = true;
-            }
-
-            objectToMove = null;
-            PlacePrefabs();
         }
     }
 

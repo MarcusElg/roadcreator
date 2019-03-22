@@ -16,7 +16,11 @@ public class IntersectionEditor : Editor
             intersection = (Intersection)target;
         }
 
-        if (intersection.globalSettings == null)
+        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        {
+            intersection.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
+        }
+        else if (intersection.globalSettings == null)
         {
             intersection.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
         }

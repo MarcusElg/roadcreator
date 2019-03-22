@@ -14,7 +14,11 @@ public class PrefabLineEditor : Editor
     {
         prefabCreator = (PrefabLineCreator)target;
 
-        if (prefabCreator.globalSettings == null)
+        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        {
+            prefabCreator.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
+        }
+        else if (prefabCreator.globalSettings == null)
         {
             prefabCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
         }
@@ -92,7 +96,8 @@ public class PrefabLineEditor : Editor
             if (prefabCreator.fillGap == false)
             {
                 prefabCreator.yRotationRandomization = Mathf.Clamp(EditorGUILayout.FloatField("Y Rotation Randomization", prefabCreator.yRotationRandomization), 0, 360);
-            } else
+            }
+            else
             {
                 prefabCreator.yRotationRandomization = 0;
             }
@@ -200,23 +205,33 @@ public class PrefabLineEditor : Editor
                 Draw(guiEvent, hitPosition);
             }
 
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
+            if (EditorWindow.mouseOverWindow == SceneView.currentDrawingSceneView)
             {
-                Vector3 hitPosition = raycastHit.point;
-
-                if (guiEvent.control == true)
+                if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
                 {
-                    hitPosition = Misc.Round(hitPosition);
-                }
+                    Vector3 hitPosition = raycastHit.point;
 
-                if (guiEvent.shift == false)
-                {
-                    prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
+                    if (guiEvent.control == true)
+                    {
+                        hitPosition = Misc.Round(hitPosition);
+                    }
+
+                    if (guiEvent.shift == false)
+                    {
+                        prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
+                    } else
+                    {
+                        prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
+                    }
                 }
+            } else
+            {
+                prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
             }
-
-            GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
         }
+
+        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+
     }
 
     private void Draw(Event guiEvent, Vector3 hitPosition)

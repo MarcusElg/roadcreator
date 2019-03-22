@@ -9,6 +9,14 @@ using UnityEditor;
 public class RoadSegmentEditor : Editor
 {
 
+    private void OnEnable()
+    {
+        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        {
+            ((RoadSegment)target).transform.parent.parent.GetComponent<RoadCreator>().globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
+        }
+    }
+
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();

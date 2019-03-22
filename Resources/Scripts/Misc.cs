@@ -166,6 +166,11 @@ public static class Misc
 
     private static void DrawRoadGuidelines(Vector3[] guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
+        if (roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings == null)
+        {
+            roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+        }
+
         if (child == 1)
         {
             Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadControlGuidelinesColour;
