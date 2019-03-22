@@ -9,6 +9,7 @@ public class RoadSystem : MonoBehaviour
 
     Texture createRoad;
     Texture createPrefabLine;
+    Texture createTrafficLight;
 
     Texture straightRoad;
     Texture curvedRoad;
@@ -21,7 +22,7 @@ public class RoadSystem : MonoBehaviour
 
     public void ShowCreationButtons()
     {
-        HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
 
         if (largeBoldText == null)
         {
@@ -34,6 +35,7 @@ public class RoadSystem : MonoBehaviour
         {
             createRoad = Resources.Load("Textures/Low Poly/Ui/createroad") as Texture;
             createPrefabLine = Resources.Load("Textures/Low Poly/Ui/createprefabline") as Texture;
+            createTrafficLight = Resources.Load("Textures/Low Poly/Ui/createtrafficlight") as Texture;
 
             straightRoad = Resources.Load("Textures/Low Poly/Ui/straightroad") as Texture;
             curvedRoad = Resources.Load("Textures/Low Poly/Ui/curvedroad") as Texture;
@@ -90,6 +92,14 @@ public class RoadSystem : MonoBehaviour
             Selection.activeGameObject = gameObject;
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Prefab Line");
         }
+        else if (ClickedButton(3) == true)
+        {
+            GameObject gameObject = Instantiate(Resources.Load("Prefabs/Low Poly/Traffic Light") as GameObject);
+            gameObject.name = "Traffic Light";
+            gameObject.transform.SetParent(transform);
+            Selection.activeGameObject = gameObject;
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create Traffic Light");
+        }
     }
 
     void DrawWindow(int id)
@@ -119,8 +129,9 @@ public class RoadSystem : MonoBehaviour
             }
         }
 
-        GUI.DrawTexture(new Rect(55, 40, 30, 30), createRoad);
-        GUI.DrawTexture(new Rect(90, 40, 30, 30), createPrefabLine);
+        GUI.DrawTexture(new Rect(30, 40, 30, 30), createRoad);
+        GUI.DrawTexture(new Rect(65, 40, 30, 30), createPrefabLine);
+        GUI.DrawTexture(new Rect(100, 40, 30, 30), createTrafficLight);
 
         GUILayout.EndHorizontal();
     }
@@ -142,7 +153,7 @@ public class RoadSystem : MonoBehaviour
 
     private bool ClickedButton(int i)
     {
-        return ClickedButton((int)(5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 120), (int)(SceneView.lastActiveSceneView.position.height - 50 - 15));
+        return ClickedButton((int)(5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 145), (int)(SceneView.lastActiveSceneView.position.height - 50 - 15));
     }
 
     private void SetPosition(GameObject gameObject)

@@ -34,7 +34,7 @@ public class TrafficLightEditor : Editor
         {
             serializedObject.FindProperty("currentColour").enumValueIndex = serializedObject.FindProperty("startColour").enumValueIndex;
             serializedObject.ApplyModifiedProperties();
-            
+
             for (int i = 0; i < targets.Length; i++)
             {
                 ((TrafficLight)targets[i]).UpdateMaterials();
@@ -42,4 +42,8 @@ public class TrafficLightEditor : Editor
         }
     }
 
+    public void OnSceneGUI()
+    {
+        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+    }
 }
