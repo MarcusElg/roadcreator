@@ -22,7 +22,7 @@ public class PrefabLineCreator : MonoBehaviour
     public bool rotateAlongCurve = true;
 
     public enum RotationDirection { forward, backward, left, right };
-    public RotationDirection rotationDirection;
+    public RotationDirection rotationDirection = RotationDirection.left;
     public float yRotationRandomization;
 
     public float scale = 1;
