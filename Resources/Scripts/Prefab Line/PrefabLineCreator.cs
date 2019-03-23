@@ -176,6 +176,12 @@ public class PrefabLineCreator : MonoBehaviour
 
         if (transform.GetChild(0).childCount > 2)
         {
+            if (rotateAlongCurve == false && fillGap == true)
+            {
+                fillGap = false;
+                Debug.Log("Rotate alongst curve has to be false to be able to use fill gap");
+            }
+
             PointPackage currentPoints = CalculatePoints();
             for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {
@@ -440,7 +446,7 @@ public class PrefabLineCreator : MonoBehaviour
                 currentPoint = Misc.Lerp3(firstPoint, controlPoint, endPoint, t);
                 currentPoint.y = Mathf.Lerp(Mathf.Lerp(firstPoint.y, Misc.GetCenter(firstPoint.y, endPoint.y), t), endPoint.y, t);
 
-                float currentDistance = Vector3.Distance(lastPoint, currentPoint);
+                float currentDistance = Vector3.Distance(new Vector3(lastPoint.x, 0, lastPoint.z), new Vector3(currentPoint.x, 0, currentPoint.z));
 
                 if (currentDistance > spacing / 2 && endPointAdded == false)
                 {

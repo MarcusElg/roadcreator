@@ -9,7 +9,7 @@ public class BridgeGeneration
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
-        int numberTriangles = 4 * (points.Length - 1);
+        int numberTriangles = 4 * (points.Length - 1) + 1;
         int[] triangles = new int[numberTriangles * 24];
         int verticeIndex = 0;
         int triangleIndex = 0;
@@ -75,11 +75,11 @@ public class BridgeGeneration
             uvs[verticeIndex] = new Vector2(0, currentDistance / totalDistance);
             uvs[verticeIndex + 1] = new Vector2(1, currentDistance / totalDistance);
             uvs[verticeIndex + 2] = new Vector2(0, currentDistance / totalDistance);
-            uvs[verticeIndex + 3] = new Vector2(0.75f, currentDistance / totalDistance);
-            uvs[verticeIndex + 4] = new Vector2(0.25f, currentDistance / totalDistance);
-            uvs[verticeIndex + 5] = new Vector2(0, currentDistance / totalDistance);
-            uvs[verticeIndex + 6] = new Vector2(1, currentDistance / totalDistance);
-            uvs[verticeIndex + 7] = new Vector2(0, currentDistance / totalDistance);
+            uvs[verticeIndex + 3] = new Vector2(1, currentDistance / totalDistance);
+            uvs[verticeIndex + 4] = new Vector2(0, currentDistance / totalDistance);
+            uvs[verticeIndex + 5] = new Vector2(1, currentDistance / totalDistance);
+            uvs[verticeIndex + 6] = new Vector2(0, currentDistance / totalDistance);
+            uvs[verticeIndex + 7] = new Vector2(1, currentDistance / totalDistance);
 
             if (i < points.Length - 1)
             {
@@ -101,6 +101,43 @@ public class BridgeGeneration
                 triangles[triangleIndex + 45] = verticeIndex + 8;
                 triangles[triangleIndex + 46] = verticeIndex + 7;
                 triangles[triangleIndex + 47] = verticeIndex + 15;
+
+                if (i == points.Length - 2)
+                {
+                    // Start cap
+                    triangles[triangleIndex + 48] = 0;
+                    triangles[triangleIndex + 49] = 1;
+                    triangles[triangleIndex + 50] = 7;
+
+                    triangles[triangleIndex + 51] = 1;
+                    triangles[triangleIndex + 52] = 6;
+                    triangles[triangleIndex + 53] = 7;
+
+                    triangles[triangleIndex + 54] = 2;
+                    triangles[triangleIndex + 55] = 3;
+                    triangles[triangleIndex + 56] = 5;
+
+                    triangles[triangleIndex + 57] = 3;
+                    triangles[triangleIndex + 58] = 4;
+                    triangles[triangleIndex + 59] = 5;
+
+                    // End cap
+                    triangles[triangleIndex + 60] = verticeIndex + 15;
+                    triangles[triangleIndex + 61] = verticeIndex + 9;
+                    triangles[triangleIndex + 62] = verticeIndex + 8;
+
+                    triangles[triangleIndex + 63] = verticeIndex + 15;
+                    triangles[triangleIndex + 64] = verticeIndex + 14;
+                    triangles[triangleIndex + 65] = verticeIndex + 9;
+
+                    triangles[triangleIndex + 66] = verticeIndex + 13;
+                    triangles[triangleIndex + 67] = verticeIndex + 11;
+                    triangles[triangleIndex + 68] = verticeIndex + 10;
+
+                    triangles[triangleIndex + 69] = verticeIndex + 11;
+                    triangles[triangleIndex + 70] = verticeIndex + 13;
+                    triangles[triangleIndex + 71] = verticeIndex + 12;
+                }
 
                 GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
             }
