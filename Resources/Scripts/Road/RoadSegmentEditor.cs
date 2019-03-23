@@ -193,7 +193,7 @@ public class RoadSegmentEditor : Editor
 
     private void Change()
     {
-        serializedObject.ApplyModifiedProperties();
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
         for (int i = 0; i < targets.Length; i++)
         {

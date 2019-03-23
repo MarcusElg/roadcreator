@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(TrafficLight))]
+[CanEditMultipleObjects]
 public class TrafficLightEditor : Editor
 {
 
@@ -33,7 +34,7 @@ public class TrafficLightEditor : Editor
         if (EditorGUI.EndChangeCheck() == true)
         {
             serializedObject.FindProperty("currentColour").enumValueIndex = serializedObject.FindProperty("startColour").enumValueIndex;
-            serializedObject.ApplyModifiedProperties();
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
             for (int i = 0; i < targets.Length; i++)
             {

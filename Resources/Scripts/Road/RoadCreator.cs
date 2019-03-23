@@ -190,6 +190,17 @@ public class RoadCreator : MonoBehaviour
                     }
                 }
             }
+
+            if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+            {
+                if (transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial != null)
+                {
+                    Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial);
+                    float textureRepeat = length / 4 * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY;
+                    material.SetVector("_Tiling", new Vector2(1, textureRepeat));
+                    transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial = material;
+                }
+            }
         }
     }
 
@@ -608,7 +619,7 @@ public class RoadCreator : MonoBehaviour
 
                     UpdateEndConnectionData(endIntersection);
                     endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
-                   endIntersection.GetComponent<Intersection>().ResetExtraMeshes();
+                    endIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                 }
             }
             else

@@ -133,6 +133,7 @@ public class IntersectionEditor : Editor
 
         if (EditorGUI.EndChangeCheck() == true)
         {
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
             intersection.CreateMesh();
         }
 

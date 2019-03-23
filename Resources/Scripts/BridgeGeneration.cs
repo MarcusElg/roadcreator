@@ -5,7 +5,7 @@ using UnityEngine;
 public class BridgeGeneration
 {
 
-    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, Transform previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials)
+    public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, Transform previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint)
     {
         Vector3[] vertices = new Vector3[points.Length * 8];
         Vector2[] uvs = new Vector2[vertices.Length];
@@ -15,8 +15,6 @@ public class BridgeGeneration
         int triangleIndex = 0;
         float totalDistance = 0;
         float currentDistance = 0;
-        bool placedFirstPillar = false;
-        float lastDistance = 0;
 
         GameObject bridge = new GameObject("Bridge");
 
@@ -74,20 +72,14 @@ public class BridgeGeneration
             vertices[verticeIndex + 7] = (points[i] + left * roadWidthRight) - segment.transform.position;
             vertices[verticeIndex + 7].y = points[i].y - segment.transform.position.y + heightOffset;
 
-            int uvY = 0;
-            if (i % 2 == 0)
-            {
-                uvY = 1;
-            }
-
-            uvs[verticeIndex] = new Vector2(0, uvY);
-            uvs[verticeIndex + 1] = new Vector2(1, uvY);
-            uvs[verticeIndex + 2] = new Vector2(0, uvY);
-            uvs[verticeIndex + 3] = new Vector2(1, uvY);
-            uvs[verticeIndex + 4] = new Vector2(0, uvY);
-            uvs[verticeIndex + 5] = new Vector2(1, uvY);
-            uvs[verticeIndex + 6] = new Vector2(0, uvY);
-            uvs[verticeIndex + 7] = new Vector2(1, uvY);
+            uvs[verticeIndex] = new Vector2(0, currentDistance / totalDistance);
+            uvs[verticeIndex + 1] = new Vector2(1, currentDistance / totalDistance);
+            uvs[verticeIndex + 2] = new Vector2(0, currentDistance / totalDistance);
+            uvs[verticeIndex + 3] = new Vector2(0.75f, currentDistance / totalDistance);
+            uvs[verticeIndex + 4] = new Vector2(0.25f, currentDistance / totalDistance);
+            uvs[verticeIndex + 5] = new Vector2(0, currentDistance / totalDistance);
+            uvs[verticeIndex + 6] = new Vector2(1, currentDistance / totalDistance);
+            uvs[verticeIndex + 7] = new Vector2(0, currentDistance / totalDistance);
 
             if (i < points.Length - 1)
             {
@@ -110,18 +102,7 @@ public class BridgeGeneration
                 triangles[triangleIndex + 46] = verticeIndex + 7;
                 triangles[triangleIndex + 47] = verticeIndex + 15;
 
-                // Pillars
-                if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
-                {
-                    CreatePillar(bridge.transform, segment.pillarPrefab, points[i] - new Vector3(0, segment.yOffsetFirstStep + segment.yOffsetSecondStep, 0), segment, points[i + 1] - points[i]);
-                    placedFirstPillar = true;
-                    lastDistance = currentDistance;
-                }
-                else if (placedFirstPillar == true && (currentDistance - lastDistance) > segment.pillarGap)
-                {
-                    CreatePillar(bridge.transform, segment.pillarPrefab, points[i] - new Vector3(0, segment.yOffsetFirstStep + segment.yOffsetSecondStep, 0), segment, points[i + 1] - points[i]);
-                    lastDistance = currentDistance;
-                }
+                GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
             }
 
             verticeIndex += 8;
@@ -129,6 +110,32 @@ public class BridgeGeneration
         }
 
         BridgeGeneration.CreateBridge(bridge, segment.transform, vertices, triangles, uvs, materials);
+    }
+
+    public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge)
+    {
+        float currentDistance = 0;
+        Vector3 lastPosition = startPoint;
+        bool placedFirstPillar = false;
+
+        for (float t = 0; t <= 1; t += 0.01f)
+        {
+            Vector3 currentPosition = Misc.Lerp3(startPoint, controlPoint, endPoint, t);
+            currentPosition.y = Mathf.Lerp(Mathf.Lerp(startPoint.y, Misc.GetCenter(endPoint.y, startPoint.y), t), endPoint.y, t);
+            currentDistance = Vector3.Distance(lastPosition, currentPosition);
+
+            if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
+            {
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.yOffsetFirstStep + segment.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
+                lastPosition = currentPosition;
+                placedFirstPillar = true;
+            }
+            else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
+            {
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.yOffsetFirstStep + segment.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
+                lastPosition = currentPosition;
+            }
+        }
     }
 
     public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, RoadSegment segment, Vector3 forward)
@@ -172,47 +179,70 @@ public class BridgeGeneration
         }
     }
 
-    public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Intersection intersection, Material[] materials)
+    public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Intersection intersection, Material[] materials, float[] startWidths, float[] endWidths, int[] startVertices)
     {
         Vector3[] vertices = new Vector3[inputVertices.Length * 3];
         Vector2[] uvs = new Vector2[vertices.Length];
         int[] triangles = new int[inputVertices.Length * 30];
         int verticeIndex = 0;
         int triangleIndex = 0;
+        int currentSegment = 0;
+        Vector3 lastVertexPosition = inputVertices[0];
+        float currentDistance = 0f;
+        float[] totalDistances = new float[startWidths.Length];
 
         GameObject bridge = new GameObject("Bridge");
 
         for (int i = 0; i < inputVertices.Length; i += 2)
         {
-            Vector3 verticeDifference = inputVertices[i + 1] - inputVertices[i];
+            if (currentSegment < startVertices.Length - 1 && i > (startVertices[currentSegment + 1] - 2))
+            {
+                currentSegment += 1;
+                currentDistance = 0;
+                lastVertexPosition = inputVertices[i];
+            }
 
-            // |_   _|
-            //   \_/
-            vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * intersection.extraWidth;
+            totalDistances[currentSegment] += Vector3.Distance(lastVertexPosition, inputVertices[i]);
+            lastVertexPosition = inputVertices[i];
+        }
+
+        lastVertexPosition = inputVertices[0];
+        currentSegment = 0;
+
+        for (int i = 0; i < inputVertices.Length; i += 2)
+        {
+            if (currentSegment < startVertices.Length - 1 && i > (startVertices[currentSegment + 1] - 2))
+            {
+                currentSegment += 1;
+                currentDistance = 0;
+                lastVertexPosition = inputVertices[i];
+            }
+
+            Vector3 verticeDifference = inputVertices[i + 1] - inputVertices[i];
+            currentDistance += Vector3.Distance(lastVertexPosition, inputVertices[i]);
+            float currentWidth = Mathf.Lerp(startWidths[currentSegment], endWidths[currentSegment], currentDistance / totalDistances[currentSegment]);
+
+            //   _|
+            // _/
+            vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth);
             vertices[verticeIndex].y = inputVertices[i].y - inputVertices[i].y;
-            vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * intersection.extraWidth;
+            vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth);
             vertices[verticeIndex + 1].y = inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * intersection.widthPercentageFirstStep - verticeDifference.normalized * intersection.extraWidth;
+            vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * intersection.widthPercentageFirstStep - verticeDifference.normalized * (intersection.extraWidth + currentWidth);
             vertices[verticeIndex + 2].y = inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * intersection.extraWidth - verticeDifference * intersection.widthPercentageFirstStep * intersection.widthPercentageSecondStep;
+            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * (intersection.extraWidth + currentWidth) - verticeDifference * intersection.widthPercentageFirstStep * intersection.widthPercentageSecondStep;
             vertices[verticeIndex + 3].y = inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 4] = inputVertices[i + 1];
             vertices[verticeIndex + 4].y = inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y;
             vertices[verticeIndex + 5] = inputVertices[i + 1];
             vertices[verticeIndex + 5].y = inputVertices[i].y - inputVertices[i].y;
 
-            int uvY = 0;
-            if (i % 4 == 0)
-            {
-                uvY = 1;
-            }
-
-            uvs[verticeIndex] = new Vector2(0, uvY);
-            uvs[verticeIndex + 1] = new Vector2(1, uvY);
-            uvs[verticeIndex + 2] = new Vector2(0, uvY);
-            uvs[verticeIndex + 3] = new Vector2(1, uvY);
-            uvs[verticeIndex + 4] = new Vector2(0, uvY);
-            uvs[verticeIndex + 5] = new Vector2(1, uvY);
+            uvs[verticeIndex] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
+            uvs[verticeIndex + 1] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
+            uvs[verticeIndex + 2] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
+            uvs[verticeIndex + 3] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
+            uvs[verticeIndex + 4] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
+            uvs[verticeIndex + 5] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
 
             if (i < inputVertices.Length - 2)
             {
@@ -238,6 +268,8 @@ public class BridgeGeneration
 
             verticeIndex += 6;
             triangleIndex += 30;
+
+            lastVertexPosition = inputVertices[i];
         }
 
         CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.yOffsetFirstStep + intersection.yOffsetSecondStep, 0), intersection);

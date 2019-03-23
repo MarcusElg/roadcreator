@@ -21,7 +21,7 @@ public class Intersection : MonoBehaviour
     public bool placePillars = true;
     public GameObject pillarPrefab;
     public float extraPillarHeight = 0.2f;
-    public float xzPillarScale = 1;
+    public float xzPillarScale = 3;
 
     public float yOffsetFirstStep = 0.25f;
     public float yOffsetSecondStep = 0.5f;
@@ -145,7 +145,10 @@ public class Intersection : MonoBehaviour
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
             List<int> firstVertexIndexes = new List<int>();
+            float[] totalLength = new float[connections.Count];
+            float[] exactLengths = new float[connections.Count];
             int vertexIndex = 0;
+            Vector3 lastVertexPosition = Misc.MaxVector3;
 
             for (int i = 0; i < connections.Count; i++)
             {
@@ -153,20 +156,20 @@ public class Intersection : MonoBehaviour
                 Vector3 firstCenterPoint = connections[i].lastPoint.ToNormalVector3();
                 Vector3 nextPoint;
                 Vector3 nextCenterPoint;
-                float totalLength = connections[i].length;
+                totalLength[i] = connections[i].length;
                 firstVertexIndexes.Add(vertexIndex);
 
                 if (i == connections.Count - 1)
                 {
                     nextPoint = connections[0].rightPoint.ToNormalVector3();
                     nextCenterPoint = connections[0].lastPoint.ToNormalVector3();
-                    totalLength += connections[0].length;
+                    totalLength[i] += connections[0].length;
                 }
                 else
                 {
                     nextPoint = connections[i + 1].rightPoint.ToNormalVector3();
                     nextCenterPoint = connections[i + 1].lastPoint.ToNormalVector3();
-                    totalLength += connections[i + 1].length;
+                    totalLength[i] += connections[i + 1].length;
                 }
 
                 if (connections[i].curvePoint == null)
@@ -174,7 +177,7 @@ public class Intersection : MonoBehaviour
                     return;
                 }
 
-                float segments = totalLength * globalSettings.resolution * 5;
+                float segments = totalLength[i] * globalSettings.resolution * 5;
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
 
@@ -192,6 +195,16 @@ public class Intersection : MonoBehaviour
                     }
 
                     vertices.Add(Misc.Lerp3(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+
+                    if (t > 0)
+                    {
+                        exactLengths[i] += Vector3.Distance(lastVertexPosition, vertices[vertices.Count - 1]);
+                        lastVertexPosition = vertices[vertices.Count - 1];
+                    }
+                    else
+                    {
+                        lastVertexPosition = vertices[vertices.Count - 1];
+                    }
 
                     if (modifiedT < 0.5f)
                     {
@@ -253,13 +266,6 @@ public class Intersection : MonoBehaviour
                 }
             }
 
-            if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
-            {
-                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeMaterials);
-            }
-
-            CreateCurvePoints();
-
             // Extra meshes
             float[] startWidths = new float[firstVertexIndexes.Count];
             float[] endWidths = new float[firstVertexIndexes.Count];
@@ -268,6 +274,9 @@ public class Intersection : MonoBehaviour
             for (int i = 0; i < extraMeshOpen.Count; i++)
             {
                 int endVertexIndex;
+                float currentLength = 0f;
+                Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshIndex[i]]];
+
                 if (extraMeshIndex[i] < firstVertexIndexes.Count - 1)
                 {
                     endVertexIndex = firstVertexIndexes[extraMeshIndex[i] + 1];
@@ -284,18 +293,24 @@ public class Intersection : MonoBehaviour
 
                 for (int j = firstVertexIndexes[extraMeshIndex[i]]; j < endVertexIndex; j += 2)
                 {
-                    float progress = (j - firstVertexIndexes[extraMeshIndex[i]]) / (float)endVertexIndex;
+                    currentLength += Vector3.Distance(lastPosition, vertices[j]);
+
                     Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
-                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshStartWidth[i], extraMeshEndWidth[i], progress) + Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], progress)));
+                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshStartWidth[i], extraMeshEndWidth[i], currentLength / totalLength[extraMeshIndex[i]]) + Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], currentLength / totalLength[extraMeshIndex[i]])));
                     extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshYOffset[i] + heights[extraMeshIndex[i]], 0);
-                    extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], progress));
+                    extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], currentLength / totalLength[extraMeshIndex[i]]));
                     extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshIndex[i]], 0);
+
+                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshIndex[i]])));
+                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshIndex[i]])));
 
                     if (j < endVertexIndex - 2)
                     {
                         triangles = AddTriangles(triangles, vertexIndex);
                         vertexIndex += 2;
                     }
+
+                    lastPosition = vertices[j];
                 }
 
                 Mesh mesh = new Mesh();
@@ -313,6 +328,13 @@ public class Intersection : MonoBehaviour
                 endWidths[extraMeshIndex[i]] += extraMeshEndWidth[i];
                 heights[extraMeshIndex[i]] += extraMeshYOffset[i];
             }
+
+            if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+            {
+                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
+            }
+
+            CreateCurvePoints();
         }
 
         if (fromRoad == false)

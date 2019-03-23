@@ -149,7 +149,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeMaterials);
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeMaterials, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position);
         }
     }
 
