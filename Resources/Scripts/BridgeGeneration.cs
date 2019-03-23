@@ -244,26 +244,43 @@ public class BridgeGeneration
             uvs[verticeIndex + 4] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
             uvs[verticeIndex + 5] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
 
-            if (i < inputVertices.Length - 2)
+            if (i < inputVertices.Length)
             {
-                for (int j = 0; j < 4; j += 1)
+                if (i < inputVertices.Length - 2)
                 {
-                    triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
-                    triangles[triangleIndex + 1 + j * 6] = verticeIndex + 6 + j;
-                    triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
+                    for (int j = 0; j < 4; j += 1)
+                    {
+                        triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
+                        triangles[triangleIndex + 1 + j * 6] = verticeIndex + 6 + j;
+                        triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
 
-                    triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
-                    triangles[triangleIndex + 4 + j * 6] = verticeIndex + 7 + j;
-                    triangles[triangleIndex + 5 + j * 6] = verticeIndex + 6 + j;
+                        triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
+                        triangles[triangleIndex + 4 + j * 6] = verticeIndex + 7 + j;
+                        triangles[triangleIndex + 5 + j * 6] = verticeIndex + 6 + j;
+                    }
+
+                    // Top cover
+                    triangles[triangleIndex + 24] = verticeIndex + 0;
+                    triangles[triangleIndex + 25] = verticeIndex + 6;
+                    triangles[triangleIndex + 26] = verticeIndex + 5;
+
+                    triangles[triangleIndex + 27] = verticeIndex + 6;
+                    triangles[triangleIndex + 28] = verticeIndex + 11;
+                    triangles[triangleIndex + 29] = verticeIndex + 5;
                 }
+                else
+                {
+                    for (int j = 0; j < 4; j += 1)
+                    {
+                        triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
+                        triangles[triangleIndex + 1 + j * 6] = j;
+                        triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
 
-                triangles[triangleIndex + 24] = verticeIndex + 0;
-                triangles[triangleIndex + 25] = verticeIndex + 6;
-                triangles[triangleIndex + 26] = verticeIndex + 5;
-
-                triangles[triangleIndex + 27] = verticeIndex + 6;
-                triangles[triangleIndex + 28] = verticeIndex + 11;
-                triangles[triangleIndex + 29] = verticeIndex + 5;
+                        triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
+                        triangles[triangleIndex + 4 + j * 6] = j + 1;
+                        triangles[triangleIndex + 5 + j * 6] = j;
+                    }
+                }
             }
 
             verticeIndex += 6;
