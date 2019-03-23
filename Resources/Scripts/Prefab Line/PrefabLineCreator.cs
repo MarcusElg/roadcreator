@@ -420,15 +420,10 @@ public class PrefabLineCreator : MonoBehaviour
             float divisions = distance / spacing;
             divisions = Mathf.Max(2, divisions);
             float distancePerDivision = 1 / divisions;
-            bool isSegmentLeft = IsSegmentLeft(i);
+
             firstPoint = transform.GetChild(0).GetChild(i).position;
             controlPoint = transform.GetChild(0).GetChild(i + 1).position;
             endPoint = transform.GetChild(0).GetChild(i + 2).position;
-
-            if (i == 0)
-            {
-                rotateTowardsLeft.Add(isSegmentLeft);
-            }
 
             for (float t = 0; t < 1; t += distancePerDivision / pointCalculationDivisions)
             {
@@ -447,6 +442,7 @@ public class PrefabLineCreator : MonoBehaviour
                     endPoints.Add(currentPoint);
                     startPoints.Add(currentPoint);
                     endPointAdded = true;
+                    rotateTowardsLeft.Add(IsSegmentLeft(startPoints[startPoints.Count - 2], prefabPoints[prefabPoints.Count - 1], endPoints[endPoints.Count - 1]));
                 }
 
                 if (endPointAdded == true && ((currentDistance > spacing) || (startPoints.Count == 1 && currentDistance > spacing / 2)))
@@ -454,34 +450,31 @@ public class PrefabLineCreator : MonoBehaviour
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
                     endPointAdded = false;
-
-                    rotateTowardsLeft.Add(isSegmentLeft);
                 }
             }
 
             if (endPoints.Count < prefabPoints.Count && (i + 2) >= transform.GetChild(0).childCount - 2)
             {
                 endPoints.Add(currentPoint);
+                rotateTowardsLeft.Add(IsSegmentLeft(startPoints[startPoints.Count - 1], prefabPoints[prefabPoints.Count - 1], endPoints[endPoints.Count - 1]));
             }
         }
 
         return new PointPackage(prefabPoints.ToArray(), startPoints.ToArray(), endPoints.ToArray(), rotateTowardsLeft.ToArray());
     }
 
-    private bool IsSegmentLeft(int startIndex)
+    private bool IsSegmentLeft(Vector3 startPosition, Vector3 prefabPosition, Vector3 endPosition)
     {
-        Vector3 forward = (transform.GetChild(0).GetChild(startIndex).position - transform.GetChild(0).GetChild(startIndex + 2).position).normalized;
-        Vector3 center = Misc.GetCenter(transform.GetChild(0).GetChild(startIndex).position, transform.GetChild(0).GetChild(startIndex + 2).position);
-        Vector3 right = Vector3.Cross(forward, (transform.GetChild(0).GetChild(startIndex + 1).position - center).normalized);
-        float direction = Vector3.Dot(right, Vector3.up);
+        //(b.X - a.X)*(c.Y - a.Y) - (b.Y - a.Y)*(c.X - a.X);
+        float direction = ((float)endPosition.x - startPosition.x) * ((float)prefabPosition.z - startPosition.z) - ((float)endPosition.z - startPosition.z) * ((float)prefabPosition.x - startPosition.x);
 
-        if (direction > 0.0f)
+        if (direction < 0.0f)
         {
-            return false;
+            return true;
         }
         else
         {
-            return true;
+            return false;
         }
     }
 

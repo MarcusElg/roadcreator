@@ -73,7 +73,8 @@ public class PrefabLineEditor : Editor
         if (prefabCreator.rotateAlongCurve == true)
         {
             prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
-        } else if (prefabCreator.fillGap == true)
+        }
+        else if (prefabCreator.fillGap == true)
         {
             Debug.Log("Rotate alongst curve has to be true to be able to use fill gap");
             prefabCreator.fillGap = false;
