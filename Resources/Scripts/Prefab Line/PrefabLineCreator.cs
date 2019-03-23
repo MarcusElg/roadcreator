@@ -176,12 +176,6 @@ public class PrefabLineCreator : MonoBehaviour
 
         if (transform.GetChild(0).childCount > 2)
         {
-            if (rotateAlongCurve == false && fillGap == true)
-            {
-                fillGap = false;
-                Debug.Log("Rotate alongst curve has to be false to be able to use fill gap");
-            }
-
             PointPackage currentPoints = CalculatePoints();
             for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {

@@ -53,8 +53,31 @@ public class PrefabLineEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         prefabCreator.pointCalculationDivisions = Mathf.Clamp(EditorGUILayout.FloatField("Point Calculation Divisions", prefabCreator.pointCalculationDivisions), 1, 1000);
+        prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
+        if (prefabCreator.rotateAlongCurve == true)
+        {
+            prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
+
+            if (prefabCreator.fillGap == false)
+            {
+                prefabCreator.yRotationRandomization = Mathf.Clamp(EditorGUILayout.FloatField("Y Rotation Randomization", prefabCreator.yRotationRandomization), 0, 360);
+            }
+            else
+            {
+                prefabCreator.yRotationRandomization = 0;
+            }
+        }
+
         prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
-        prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
+
+        if (prefabCreator.rotateAlongCurve == true)
+        {
+            prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
+        } else if (prefabCreator.fillGap == true)
+        {
+            Debug.Log("Rotate alongst curve has to be true to be able to use fill gap");
+            prefabCreator.fillGap = false;
+        }
 
         if (prefabCreator.fillGap == false && prefabCreator.bendObjects == false)
         {
@@ -88,20 +111,6 @@ public class PrefabLineEditor : Editor
         prefabCreator.startPrefab = (GameObject)EditorGUILayout.ObjectField("Start Prefab", prefabCreator.startPrefab, typeof(GameObject), false);
         prefabCreator.endPrefab = (GameObject)EditorGUILayout.ObjectField("End Prefab", prefabCreator.endPrefab, typeof(GameObject), false);
         prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0.1f, 10);
-        prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
-        if (prefabCreator.rotateAlongCurve == true)
-        {
-            prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
-
-            if (prefabCreator.fillGap == false)
-            {
-                prefabCreator.yRotationRandomization = Mathf.Clamp(EditorGUILayout.FloatField("Y Rotation Randomization", prefabCreator.yRotationRandomization), 0, 360);
-            }
-            else
-            {
-                prefabCreator.yRotationRandomization = 0;
-            }
-        }
 
         if (EditorGUI.EndChangeCheck() == true)
         {
