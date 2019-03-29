@@ -9,7 +9,6 @@ public class RoadCreator : MonoBehaviour
 {
 
     public float heightOffset = 0.02f;
-    public int smoothnessAmount = 3;
     public bool createIntersections = true;
 
     public GlobalSettings globalSettings;
@@ -50,50 +49,15 @@ public class RoadCreator : MonoBehaviour
                     if (i < transform.GetChild(0).childCount - 1 && transform.GetChild(0).GetChild(i + 1).GetChild(0).childCount == 3)
                     {
                         Vector3[] nextPoints = CalculatePoints(transform.GetChild(0).GetChild(i + 1));
-                        Vector3 originalControlPoint = currentPoints[currentPoints.Length - 1];
-
-                        if ((currentPoints.Length / 2) <= smoothnessAmount)
-                        {
-                            smoothnessAmount = currentPoints.Length / 2 - 2;
-                        }
-
-                        if ((nextPoints.Length / 2) <= smoothnessAmount)
-                        {
-                            smoothnessAmount = nextPoints.Length / 2 - 2;
-                        }
-
-                        if (smoothnessAmount > 0)
-                        {
-                            float distanceSection = 1f / (smoothnessAmount * 2);
-                            int currentPoint = 0;
-                            for (float t = 0; t < 0.4999 + distanceSection; t += distanceSection)
-                            {
-                                if (t > 0.5f)
-                                {
-                                    t = 0.5f;
-                                }
-
-                                // First section
-                                currentPoints[currentPoints.Length - 1 - smoothnessAmount + currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], t);
-
-                                // Second section
-                                nextPoints[smoothnessAmount - currentPoint] = Misc.Lerp3(currentPoints[currentPoints.Length - 1 - smoothnessAmount], originalControlPoint, nextPoints[smoothnessAmount], 1f - t);
-
-                                currentPoint += 1;
-                            }
-                        }
-                        else
-                        {
-                            nextPoints[0] = currentPoints[currentPoints.Length - 1];
-                        }
+                        nextPoints[0] = currentPoints[currentPoints.Length - 1];
 
                         if (i == 0)
                         {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, smoothnessAmount, this);
+                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, this);
                         }
                         else
                         {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), smoothnessAmount, this);
+                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), this);
                         }
 
                         StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
@@ -112,12 +76,12 @@ public class RoadCreator : MonoBehaviour
 
                         if (i - 1 >= 0)
                         {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), 0, this);
+                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), this);
                             StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                         }
                         else
                         {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, 0, this);
+                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, this);
                             StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
                         }
                     }

@@ -48,7 +48,7 @@ public class RoadSegment : MonoBehaviour
     public Vector3[] centerGuidelinePoints;
     public Vector3[] endGuidelinePoints;
 
-    public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, int smoothnessAmount, RoadCreator roadCreator)
+    public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {
         if (baseRoadMaterial == null)
         {
@@ -82,7 +82,7 @@ public class RoadSegment : MonoBehaviour
             SetGuidelines(points, nextSegmentPoints, false);
         }
 
-        GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, smoothnessAmount, roadCreator, roadPhysicsMaterial);
+        GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, roadCreator, roadPhysicsMaterial);
 
         for (int i = 0; i < extraMeshOpen.Count; i++)
         {
@@ -120,7 +120,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, smoothnessAmount, roadCreator, extraMeshPhysicMaterial[i], startXOffset, endXOffset, extraMeshStartWidth[i], extraMeshEndWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, roadCreator, extraMeshPhysicMaterial[i], startXOffset, endXOffset, extraMeshStartWidth[i], extraMeshEndWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
         }
 
         if (transform.childCount == 3)
@@ -214,7 +214,7 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, int smoothnessAmount, RoadCreator roadCreator, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, RoadCreator roadCreator, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
         Vector3[] vertices = new Vector3[points.Length * 2];
         int numTriangles = 2 * (points.Length - 1);
@@ -357,8 +357,6 @@ public class RoadSegment : MonoBehaviour
         {
             if (vertices.Length > 4 && previousVertices.Length > 3 && name == "Road")
             {
-                vertices[0] = previousVertices[previousVertices.Length - 2] + previousSegment.position - segment.position;
-                vertices[1] = previousVertices[previousVertices.Length - 1] + previousSegment.position - segment.position;
                 vertices = fixVertices(0, vertices, (vertices[2] - vertices[4]).normalized);
                 vertices = fixVertices(1, vertices, (vertices[3] - vertices[5]).normalized);
             }

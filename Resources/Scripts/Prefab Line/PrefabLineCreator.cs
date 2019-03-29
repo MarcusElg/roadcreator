@@ -357,6 +357,7 @@ public class PrefabLineCreator : MonoBehaviour
                             }
                         }
                     }
+
                     mesh.vertices = vertices;
                     placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
                     placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();

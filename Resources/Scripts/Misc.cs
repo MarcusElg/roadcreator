@@ -38,12 +38,12 @@ public static class Misc
         return new Vector3(-forward.z, 0, forward.x).normalized;
     }
 
-    public static Vector3 CalculateLeft (Vector3 forward)
+    public static Vector3 CalculateLeft(Vector3 forward)
     {
         return new Vector3(-forward.z, 0, forward.x).normalized;
     }
 
-    public static Vector3 CalculateLeft(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index, bool circle = false)
+    public static Vector3 CalculateLeft(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 prevoiusPoint, int index)
     {
         Vector3 forward;
         if (index < points.Length - 1)
@@ -59,28 +59,21 @@ public static class Misc
         }
         else
         {
-            if (circle == true)
+            // Last vertices
+            if (nextSegmentPoints != null)
             {
-                forward = points[1] - points[points.Length - 1];
-            }
-            else
-            {
-                // Last vertices
-                if (nextSegmentPoints != null)
+                if (nextSegmentPoints.Length > 1)
                 {
-                    if (nextSegmentPoints.Length > 1)
-                    {
-                        forward = nextSegmentPoints[1] - nextSegmentPoints[0];
-                    }
-                    else
-                    {
-                        forward = nextSegmentPoints[0] - points[points.Length - 1];
-                    }
+                    forward = nextSegmentPoints[1] - nextSegmentPoints[0];
                 }
                 else
                 {
-                    forward = points[index] - points[index - 1];
+                    forward = nextSegmentPoints[0] - points[points.Length - 1];
                 }
+            }
+            else
+            {
+                forward = points[index] - points[index - 1];
             }
         }
 
