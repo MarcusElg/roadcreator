@@ -127,15 +127,15 @@ public class IntersectionEditor : Editor
 
         GUILayout.Space(20);
 
-        if (GUILayout.Button("Generate Intersection"))
-        {
-            intersection.CreateMesh();
-        }
-
         if (GUILayout.Button("Reset Curve Points"))
         {
             intersection.ResetCurvePointPositions();
             intersection.CreateCurvePoints();
+            intersection.CreateMesh();
+        }
+
+        if (GUILayout.Button("Generate Intersection"))
+        {
             intersection.CreateMesh();
         }
     }
