@@ -81,27 +81,21 @@ public class IntersectionEditor : Editor
         }
         GUILayout.Space(20);
         GUILayout.Label("Extra Meshes", guiStyle);
-        for (int i = 0; i < intersection.extraMeshOpen.Count; i++)
+        for (int i = 0; i < intersection.extraMeshes.Count; i++)
         {
-            intersection.extraMeshOpen[i] = EditorGUILayout.Foldout(intersection.extraMeshOpen[i], "Extra Mesh " + i);
-            if (intersection.extraMeshOpen[i] == true)
+            intersection.extraMeshes[i].open = EditorGUILayout.Foldout(intersection.extraMeshes[i].open, "Extra Mesh " + i);
+            if (intersection.extraMeshes[i].open == true)
             {
-                intersection.extraMeshIndex[i] = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshIndex[i]), 0, intersection.connections.Count - 1);
-                intersection.extraMeshMaterial[i] = (Material)EditorGUILayout.ObjectField("Material", intersection.extraMeshMaterial[i], typeof(Material), false);
-                intersection.extraMeshPhysicMaterial[i] = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", intersection.extraMeshPhysicMaterial[i], typeof(PhysicMaterial), false);
-                intersection.extraMeshStartWidth[i] = Mathf.Max(EditorGUILayout.FloatField("Start Width", intersection.extraMeshStartWidth[i]), 0);
-                intersection.extraMeshEndWidth[i] = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshEndWidth[i]), 0);
-                intersection.extraMeshYOffset[i] = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshYOffset[i]);
+                intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count - 1);
+                intersection.extraMeshes[i].material = (Material)EditorGUILayout.ObjectField("Material", intersection.extraMeshes[i].material, typeof(Material), false);
+                intersection.extraMeshes[i].physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", intersection.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
+                intersection.extraMeshes[i].startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", intersection.extraMeshes[i].startWidth), 0);
+                intersection.extraMeshes[i].endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshes[i].endWidth), 0);
+                intersection.extraMeshes[i].yOffset = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshes[i].yOffset);
 
                 if (GUILayout.Button("Remove Extra Mesh") == true && intersection.transform.GetChild(0).childCount > 0)
                 {
-                    intersection.extraMeshOpen.RemoveAt(i);
-                    intersection.extraMeshIndex.RemoveAt(i);
-                    intersection.extraMeshMaterial.RemoveAt(i);
-                    intersection.extraMeshPhysicMaterial.RemoveAt(i);
-                    intersection.extraMeshStartWidth.RemoveAt(i);
-                    intersection.extraMeshEndWidth.RemoveAt(i);
-                    intersection.extraMeshYOffset.RemoveAt(i);
+                    intersection.extraMeshes.RemoveAt(i);
 
                     for (int j = 0; j < targets.Length; j++)
                     {
@@ -113,13 +107,7 @@ public class IntersectionEditor : Editor
 
         if (GUILayout.Button("Add Extra Mesh"))
         {
-            intersection.extraMeshOpen.Add(true);
-            intersection.extraMeshIndex.Add(0);
-            intersection.extraMeshMaterial.Add(Resources.Load("Materials/Low Poly/Asphalt") as Material);
-            intersection.extraMeshPhysicMaterial.Add(null);
-            intersection.extraMeshStartWidth.Add(1);
-            intersection.extraMeshEndWidth.Add(1);
-            intersection.extraMeshYOffset.Add(0);
+            intersection.extraMeshes.Add(new ExtraMesh(true, 0, Resources.Load("Materials/Low Poly/Asphalt") as Material, null, 1, 1, 0));
 
             GameObject extraMesh = new GameObject("Extra Mesh");
             extraMesh.AddComponent<MeshFilter>();

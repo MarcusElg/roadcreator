@@ -98,63 +98,68 @@ public class RoadSegmentEditor : Editor
             }
         }
 
-        if (targets.Length == 1)
+        GUILayout.Space(20);
+        GUILayout.Label("Extra Meshes", guiStyle);
+        RoadSegment inspectedSegment = (RoadSegment)target;
+        for (int i = 0; i < inspectedSegment.extraMeshes.Count; i++)
         {
-            GUILayout.Space(20);
-            GUILayout.Label("Extra Meshes", guiStyle);
-            for (int i = 0; i < serializedObject.FindProperty("extraMeshOpen").arraySize; i++)
+            bool open = EditorGUILayout.Foldout(inspectedSegment.extraMeshes[i].open, "Extra mesh #" + i);
+            if (open == true)
             {
-                serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue = EditorGUILayout.Foldout(serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue, "Extra Mesh " + i);
-                if (serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(i).boolValue == true)
+                bool left = EditorGUILayout.Toggle("Left", inspectedSegment.extraMeshes[i].left);
+                Material material = (Material)EditorGUILayout.ObjectField("Material", inspectedSegment.extraMeshes[i].material, typeof(Material), false);
+                PhysicMaterial physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", inspectedSegment.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
+                float startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", inspectedSegment.extraMeshes[i].startWidth), 0);
+                float endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", inspectedSegment.extraMeshes[i].endWidth), 0);
+                float yOffset = EditorGUILayout.FloatField("Y Offset", inspectedSegment.extraMeshes[i].yOffset);
+
+                for (int j = 0; j < targets.Length; j++)
                 {
-                    serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(i).boolValue = EditorGUILayout.Toggle("Left", serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(i).boolValue);
-                    serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(i).objectReferenceValue = (Material)EditorGUILayout.ObjectField("Material", serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(i).objectReferenceValue, typeof(Material), false);
-                    serializedObject.FindProperty("extraMeshPhysicMaterial").GetArrayElementAtIndex(i).objectReferenceValue = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", serializedObject.FindProperty("extraMeshPhysicMaterial").GetArrayElementAtIndex(i).objectReferenceValue, typeof(PhysicMaterial), false);
-                    serializedObject.FindProperty("extraMeshStartWidth").GetArrayElementAtIndex(i).floatValue = Mathf.Max(EditorGUILayout.FloatField("Start Width", serializedObject.FindProperty("extraMeshStartWidth").GetArrayElementAtIndex(i).floatValue), 0);
-                    serializedObject.FindProperty("extraMeshEndWidth").GetArrayElementAtIndex(i).floatValue = Mathf.Max(EditorGUILayout.FloatField("End Width", serializedObject.FindProperty("extraMeshEndWidth").GetArrayElementAtIndex(i).floatValue), 0);
-                    serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(i).floatValue = EditorGUILayout.FloatField("Y Offset", serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(i).floatValue);
-
-                    if (GUILayout.Button("Remove Extra Mesh") == true && ((RoadSegment)target).transform.GetChild(1).childCount > 1)
+                    RoadSegment currentSegment = (RoadSegment)targets[j];
+                    if (currentSegment.extraMeshes.Count > i)
                     {
-                        serializedObject.FindProperty("extraMeshOpen").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshLeft").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshMaterial").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshPhysicMaterial").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshStartWidth").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshEndWidth").DeleteArrayElementAtIndex(i);
-                        serializedObject.FindProperty("extraMeshYOffset").DeleteArrayElementAtIndex(i);
+                        currentSegment.extraMeshes[i] = new ExtraMesh(open, left, material, physicMaterial, startWidth, endWidth, yOffset);
+                    }
+                }
 
-                        for (int j = 0; j < targets.Length; j++)
+                if (GUILayout.Button("Remove Extra Mesh") == true)
+                {
+                    for (int j = 0; j < targets.Length; j++)
+                    {
+                        RoadSegment currentSegment = (RoadSegment)targets[j];
+                        if (currentSegment.extraMeshes.Count > i)
                         {
-                            DestroyImmediate(((RoadSegment)targets[j]).transform.GetChild(1).GetChild(i + 1).gameObject);
+                            currentSegment.extraMeshes.RemoveAt(i);
+                            DestroyImmediate(currentSegment.transform.GetChild(1).GetChild(i + 1).gameObject);
                         }
                     }
                 }
-            }
-
-            if (GUILayout.Button("Add Extra Mesh"))
+            } else
             {
-                serializedObject.FindProperty("extraMeshOpen").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshOpen").arraySize);
-                serializedObject.FindProperty("extraMeshOpen").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshOpen").arraySize - 1).boolValue = true;
-                serializedObject.FindProperty("extraMeshLeft").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshLeft").arraySize);
-                serializedObject.FindProperty("extraMeshLeft").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshLeft").arraySize - 1).boolValue = true;
-                serializedObject.FindProperty("extraMeshMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize);
-                serializedObject.FindProperty("extraMeshMaterial").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshMaterial").arraySize - 1).objectReferenceValue = Resources.Load("Materials/Low Poly/Asphalt") as Material;
-                serializedObject.FindProperty("extraMeshPhysicMaterial").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshPhysicMaterial").arraySize);
-                serializedObject.FindProperty("extraMeshStartWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshStartWidth").arraySize);
-                serializedObject.FindProperty("extraMeshStartWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshStartWidth").arraySize - 1).floatValue = 1;
-                serializedObject.FindProperty("extraMeshEndWidth").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshEndWidth").arraySize);
-                serializedObject.FindProperty("extraMeshEndWidth").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshEndWidth").arraySize - 1).floatValue = 1;
-                serializedObject.FindProperty("extraMeshYOffset").InsertArrayElementAtIndex(serializedObject.FindProperty("extraMeshYOffset").arraySize);
-                serializedObject.FindProperty("extraMeshYOffset").GetArrayElementAtIndex(serializedObject.FindProperty("extraMeshYOffset").arraySize - 1).floatValue = 0;
+                for (int j = 0; j < targets.Length; j++)
+                {
+                    RoadSegment currentSegment = (RoadSegment)targets[j];
+                    if (currentSegment.extraMeshes.Count > i)
+                    {
+                        currentSegment.extraMeshes[i] = new ExtraMesh(open, currentSegment.extraMeshes[i].left, currentSegment.extraMeshes[i].material, currentSegment.extraMeshes[i].physicMaterial, currentSegment.extraMeshes[i].startWidth, currentSegment.extraMeshes[i].endWidth, currentSegment.extraMeshes[i].yOffset);
+                    }
+                }
+            }
+        }
+
+        if (GUILayout.Button("Add Extra Mesh"))
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                ((RoadSegment)targets[i]).extraMeshes.Add(new ExtraMesh(true, true, Resources.Load("Materials/Low Poly/Asphalt") as Material, null, 1, 1, 0));
 
                 GameObject extraMesh = new GameObject("Extra Mesh");
                 extraMesh.AddComponent<MeshFilter>();
                 extraMesh.AddComponent<MeshRenderer>();
                 extraMesh.AddComponent<MeshCollider>();
-                extraMesh.transform.SetParent(((RoadSegment)target).transform.GetChild(1));
+                extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
                 extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = ((RoadSegment)target).transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
+                extraMesh.layer = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }
@@ -163,6 +168,7 @@ public class RoadSegmentEditor : Editor
         {
             Change();
         }
+
         GUILayout.Space(20);
 
         if (GUILayout.Button("Straighten"))

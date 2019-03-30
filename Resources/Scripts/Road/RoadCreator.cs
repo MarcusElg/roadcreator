@@ -303,7 +303,7 @@ public class RoadCreator : MonoBehaviour
                 segment.extraPillarHeight = oldLastSegment.extraPillarHeight;
                 segment.xzPillarScale = oldLastSegment.xzPillarScale;
 
-                for (int i = 0; i < oldLastSegment.extraMeshOpen.Count; i++)
+                for (int i = 0; i < oldLastSegment.extraMeshes.Count; i++)
                 {
                     GameObject extraMesh = new GameObject("Extra Mesh");
                     extraMesh.AddComponent<MeshFilter>();
@@ -314,13 +314,7 @@ public class RoadCreator : MonoBehaviour
                     extraMesh.layer = globalSettings.roadLayer;
                     extraMesh.hideFlags = HideFlags.NotEditable;
 
-                    segment.extraMeshOpen.Add(oldLastSegment.extraMeshOpen[i]);
-                    segment.extraMeshLeft.Add(oldLastSegment.extraMeshLeft[i]);
-                    segment.extraMeshMaterial.Add(oldLastSegment.extraMeshMaterial[i]);
-                    segment.extraMeshPhysicMaterial.Add(oldLastSegment.extraMeshPhysicMaterial[i]);
-                    segment.extraMeshYOffset.Add(oldLastSegment.extraMeshYOffset[i]);
-                    segment.extraMeshStartWidth.Add(oldLastSegment.extraMeshStartWidth[i]);
-                    segment.extraMeshEndWidth.Add(oldLastSegment.extraMeshEndWidth[i]);
+                    segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
                 }
             }
         }
@@ -328,7 +322,7 @@ public class RoadCreator : MonoBehaviour
         {
             segmentPreset.ApplyTo(segment);
 
-            for (int i = 0; i < segment.extraMeshOpen.Count; i++)
+            for (int i = 0; i < segment.extraMeshes.Count; i++)
             {
                 GameObject extraMesh = new GameObject("Extra Mesh");
                 extraMesh.AddComponent<MeshFilter>();

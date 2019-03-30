@@ -36,13 +36,7 @@ public class RoadSegment : MonoBehaviour
     public float xzPillarScale = 1;
     public PrefabLineCreator.RotationDirection rotationDirection;
 
-    public List<bool> extraMeshOpen = new List<bool>();
-    public List<bool> extraMeshLeft = new List<bool>();
-    public List<Material> extraMeshMaterial = new List<Material>();
-    public List<PhysicMaterial> extraMeshPhysicMaterial = new List<PhysicMaterial>();
-    public List<float> extraMeshStartWidth = new List<float>();
-    public List<float> extraMeshEndWidth = new List<float>();
-    public List<float> extraMeshYOffset = new List<float>();
+    public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
     public Vector3[] startGuidelinePoints;
     public Vector3[] centerGuidelinePoints;
@@ -65,11 +59,11 @@ public class RoadSegment : MonoBehaviour
             pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Oval Bridge Pillar") as GameObject;
         }
 
-        for (int i = 0; i < extraMeshOpen.Count; i++)
+        for (int i = 0; i < extraMeshes.Count; i++)
         {
-            if (extraMeshMaterial[i] == null)
+            if (extraMeshes[i].material == null)
             {
-                extraMeshMaterial[i] = Resources.Load("Materials/Low Poly/Asphalt") as Material;
+                extraMeshes[i].material = Resources.Load("Materials/Low Poly/Asphalt") as Material;
             }
         }
 
@@ -84,9 +78,9 @@ public class RoadSegment : MonoBehaviour
 
         GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, roadCreator, roadPhysicsMaterial);
 
-        for (int i = 0; i < extraMeshOpen.Count; i++)
+        for (int i = 0; i < extraMeshes.Count; i++)
         {
-            float leftYOffset = extraMeshYOffset[i];
+            float leftYOffset = extraMeshes[i].yOffset;
             float startXOffset = 0;
             float endXOffset = 0;
             float yOffset = heightOffset;
@@ -96,17 +90,17 @@ public class RoadSegment : MonoBehaviour
                 bool foundLast = false;
                 for (int j = i - 1; j > -1; j -= 1)
                 {
-                    if (extraMeshLeft[j] == extraMeshLeft[i] && j != i)
+                    if (extraMeshes[j].left == extraMeshes[i].left && j != i)
                     {
                         if (foundLast == false)
                         {
-                            leftYOffset = extraMeshYOffset[j];
+                            leftYOffset = extraMeshes[j].yOffset;
                             foundLast = true;
                         }
 
-                        startXOffset += extraMeshStartWidth[j];
-                        endXOffset += extraMeshEndWidth[j];
-                        yOffset += extraMeshYOffset[j];
+                        startXOffset += extraMeshes[j].startWidth;
+                        endXOffset += extraMeshes[j].endWidth;
+                        yOffset += extraMeshes[j].yOffset;
                     }
                 }
             }
@@ -114,13 +108,13 @@ public class RoadSegment : MonoBehaviour
             float currentHeight = heightOffset;
             for (int j = i - 1; j > -1; j -= 1)
             {
-                if (extraMeshLeft[j] == extraMeshLeft[i] && j != i)
+                if (extraMeshes[j].left == extraMeshes[i].left && j != i)
                 {
-                    currentHeight += extraMeshYOffset[j];
+                    currentHeight += extraMeshes[j].yOffset;
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshMaterial[i], null, roadCreator, extraMeshPhysicMaterial[i], startXOffset, endXOffset, extraMeshStartWidth[i], extraMeshEndWidth[i], currentHeight + extraMeshYOffset[i], currentHeight, extraMeshLeft[i]);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].material, null, roadCreator, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
         }
 
         if (transform.childCount == 3)
@@ -135,17 +129,17 @@ public class RoadSegment : MonoBehaviour
             float startExtraWidthRight = extraWidth;
             float endExtraWidthRight = extraWidth;
 
-            for (int i = 0; i < extraMeshLeft.Count; i++)
+            for (int i = 0; i < extraMeshes.Count; i++)
             {
-                if (extraMeshLeft[i] == true)
+                if (extraMeshes[i].left == true)
                 {
-                    startExtraWidthLeft += extraMeshStartWidth[i];
-                    endExtraWidthLeft += extraMeshEndWidth[i];
+                    startExtraWidthLeft += extraMeshes[i].startWidth;
+                    endExtraWidthLeft += extraMeshes[i].endWidth;
                 }
                 else
                 {
-                    startExtraWidthRight += extraMeshStartWidth[i];
-                    endExtraWidthRight += extraMeshEndWidth[i];
+                    startExtraWidthRight += extraMeshes[i].startWidth;
+                    endExtraWidthRight += extraMeshes[i].endWidth;
                 }
             }
 

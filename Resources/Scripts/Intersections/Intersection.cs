@@ -29,13 +29,7 @@ public class Intersection : MonoBehaviour
     public float widthPercentageSecondStep = 0.6f;
     public float extraWidth = 0.2f;
 
-    public List<bool> extraMeshOpen = new List<bool>();
-    public List<int> extraMeshIndex = new List<int>();
-    public List<Material> extraMeshMaterial = new List<Material>();
-    public List<PhysicMaterial> extraMeshPhysicMaterial = new List<PhysicMaterial>();
-    public List<float> extraMeshStartWidth = new List<float>();
-    public List<float> extraMeshEndWidth = new List<float>();
-    public List<float> extraMeshYOffset = new List<float>();
+    public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
@@ -271,15 +265,15 @@ public class Intersection : MonoBehaviour
             float[] endWidths = new float[firstVertexIndexes.Count];
             float[] heights = new float[firstVertexIndexes.Count];
 
-            for (int i = 0; i < extraMeshOpen.Count; i++)
+            for (int i = 0; i < extraMeshes.Count; i++)
             {
                 int endVertexIndex;
                 float currentLength = 0f;
-                Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshIndex[i]]];
+                Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index]];
 
-                if (extraMeshIndex[i] < firstVertexIndexes.Count - 1)
+                if (extraMeshes[i].index < firstVertexIndexes.Count - 1)
                 {
-                    endVertexIndex = firstVertexIndexes[extraMeshIndex[i] + 1];
+                    endVertexIndex = firstVertexIndexes[extraMeshes[i].index + 1];
                 }
                 else
                 {
@@ -291,18 +285,18 @@ public class Intersection : MonoBehaviour
                 uvs.Clear();
                 vertexIndex = 0;
 
-                for (int j = firstVertexIndexes[extraMeshIndex[i]]; j < endVertexIndex; j += 2)
+                for (int j = firstVertexIndexes[extraMeshes[i].index]; j < endVertexIndex; j += 2)
                 {
                     currentLength += Vector3.Distance(lastPosition, vertices[j]);
 
                     Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
-                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshStartWidth[i], extraMeshEndWidth[i], currentLength / totalLength[extraMeshIndex[i]]) + Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], currentLength / totalLength[extraMeshIndex[i]])));
-                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshYOffset[i] + heights[extraMeshIndex[i]], 0);
-                    extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshIndex[i]], endWidths[extraMeshIndex[i]], currentLength / totalLength[extraMeshIndex[i]]));
-                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshIndex[i]], 0);
+                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLength[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength[extraMeshes[i].index])));
+                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshes[i].yOffset + heights[extraMeshes[i].index], 0);
+                    extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength[extraMeshes[i].index]));
+                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshes[i].index], 0);
 
-                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshIndex[i]])));
-                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshIndex[i]])));
+                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
+                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
 
                     if (j < endVertexIndex - 2)
                     {
@@ -321,12 +315,12 @@ public class Intersection : MonoBehaviour
 
                 transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = mesh;
                 transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = mesh;
-                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMaterial = extraMeshPhysicMaterial[i];
-                transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { extraMeshMaterial[i] };
+                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMaterial = extraMeshes[i].physicMaterial;
+                transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { extraMeshes[i].material };
 
-                startWidths[extraMeshIndex[i]] += extraMeshStartWidth[i];
-                endWidths[extraMeshIndex[i]] += extraMeshEndWidth[i];
-                heights[extraMeshIndex[i]] += extraMeshYOffset[i];
+                startWidths[extraMeshes[i].index] += extraMeshes[i].startWidth;
+                endWidths[extraMeshes[i].index] += extraMeshes[i].endWidth;
+                heights[extraMeshes[i].index] += extraMeshes[i].yOffset;
             }
 
             if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
@@ -387,14 +381,7 @@ public class Intersection : MonoBehaviour
         for (int i = transform.GetChild(0).childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(transform.GetChild(0).GetChild(i).gameObject);
-
-            extraMeshOpen.Clear();
-            extraMeshMaterial.Clear();
-            extraMeshIndex.Clear();
-            extraMeshPhysicMaterial.Clear();
-            extraMeshStartWidth.Clear();
-            extraMeshEndWidth.Clear();
-            extraMeshYOffset.Clear();
+            extraMeshes.Clear();
         }
     }
 
