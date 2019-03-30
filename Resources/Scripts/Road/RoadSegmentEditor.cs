@@ -103,7 +103,7 @@ public class RoadSegmentEditor : Editor
         RoadSegment inspectedSegment = (RoadSegment)target;
         for (int i = 0; i < inspectedSegment.extraMeshes.Count; i++)
         {
-            bool open = EditorGUILayout.Foldout(inspectedSegment.extraMeshes[i].open, "Extra mesh #" + i);
+            bool open = EditorGUILayout.Foldout(inspectedSegment.extraMeshes[i].open, "Extra Mesh " + i);
             if (open == true)
             {
                 bool left = EditorGUILayout.Toggle("Left", inspectedSegment.extraMeshes[i].left);

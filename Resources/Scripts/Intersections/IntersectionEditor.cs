@@ -131,6 +131,13 @@ public class IntersectionEditor : Editor
         {
             intersection.CreateMesh();
         }
+
+        if (GUILayout.Button("Reset Curve Points"))
+        {
+            intersection.ResetCurvePointPositions();
+            intersection.CreateCurvePoints();
+            intersection.CreateMesh();
+        }
     }
 
     private void OnSceneGUI()
