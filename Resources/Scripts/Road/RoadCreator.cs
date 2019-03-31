@@ -289,12 +289,7 @@ public class RoadCreator : MonoBehaviour
                 segment.terrainOption = oldLastSegment.terrainOption;
 
                 segment.bridgeGenerator = oldLastSegment.bridgeGenerator;
-                segment.bridgeMaterials = oldLastSegment.bridgeMaterials;
-                segment.yOffsetFirstStep = oldLastSegment.yOffsetFirstStep;
-                segment.yOffsetSecondStep = oldLastSegment.yOffsetSecondStep;
-                segment.widthPercentageFirstStep = oldLastSegment.widthPercentageFirstStep;
-                segment.widthPercentageSecondStep = oldLastSegment.widthPercentageSecondStep;
-                segment.extraWidth = oldLastSegment.extraWidth;
+                segment.bridgeSettings = oldLastSegment.bridgeSettings;
 
                 segment.placePillars = oldLastSegment.placePillars;
                 segment.pillarPrefab = oldLastSegment.pillarPrefab;
@@ -666,12 +661,17 @@ public class RoadCreator : MonoBehaviour
 
         intersection.AddComponent<Intersection>();
         intersection.GetComponent<Intersection>().yOffset = heightOffset;
-        intersection.GetComponent<Intersection>().bridgeGenerator = segment.bridgeGenerator;
-        intersection.GetComponent<Intersection>().yOffsetFirstStep = segment.yOffsetFirstStep;
-        intersection.GetComponent<Intersection>().yOffsetSecondStep = segment.yOffsetSecondStep;
-        intersection.GetComponent<Intersection>().widthPercentageFirstStep = segment.widthPercentageFirstStep;
-        intersection.GetComponent<Intersection>().widthPercentageSecondStep = segment.widthPercentageSecondStep;
-        intersection.GetComponent<Intersection>().extraWidth = segment.extraWidth;
+
+        if (segment.bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+        {
+            intersection.GetComponent<Intersection>().bridgeGenerator = Intersection.BridgeGenerator.simple;
+        }
+
+        intersection.GetComponent<Intersection>().yOffsetFirstStep = segment.bridgeSettings.yOffsetFirstStep;
+        intersection.GetComponent<Intersection>().yOffsetSecondStep = segment.bridgeSettings.yOffsetSecondStep;
+        intersection.GetComponent<Intersection>().widthPercentageFirstStep = segment.bridgeSettings.widthPercentageFirstStep;
+        intersection.GetComponent<Intersection>().widthPercentageSecondStep = segment.bridgeSettings.widthPercentageSecondStep;
+        intersection.GetComponent<Intersection>().extraWidth = segment.bridgeSettings.extraWidth;
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
         intersection.GetComponent<Intersection>().xzPillarScale = segment.xzPillarScale;

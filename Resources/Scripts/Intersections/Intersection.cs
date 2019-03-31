@@ -15,7 +15,8 @@ public class Intersection : MonoBehaviour
     public GameObject objectToMove;
     public bool stretchTexture = false;
 
-    public RoadSegment.BridgeGenerator bridgeGenerator;
+    public enum BridgeGenerator { none, simple};
+    public BridgeGenerator bridgeGenerator;
     public Material[] bridgeMaterials;
 
     public bool placePillars = true;
@@ -128,6 +129,14 @@ public class Intersection : MonoBehaviour
             if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
             {
                 bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+            }
+
+            for (int i = 0; i < extraMeshes.Count; i++)
+            {
+                if (extraMeshes[i].material == null)
+                {
+                    extraMeshes[i].material = Resources.Load("Materials/Low Poly/Asphalt") as Material;
+                }
             }
 
             if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
@@ -323,7 +332,7 @@ public class Intersection : MonoBehaviour
                 heights[extraMeshes[i].index] += extraMeshes[i].yOffset;
             }
 
-            if (bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+            if (bridgeGenerator == BridgeGenerator.simple)
             {
                 BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
             }

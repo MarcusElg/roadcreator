@@ -77,13 +77,14 @@ public class RoadSegmentEditor : Editor
 
         if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex > 0)
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeMaterials"), true);
-            serializedObject.FindProperty("yOffsetFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", serializedObject.FindProperty("yOffsetFirstStep").floatValue), 0, 2);
-            serializedObject.FindProperty("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", serializedObject.FindProperty("yOffsetSecondStep").floatValue), 0, 2);
-            serializedObject.FindProperty("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", serializedObject.FindProperty("widthPercentageFirstStep").floatValue), 0, 1);
-            serializedObject.FindProperty("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", serializedObject.FindProperty("widthPercentageSecondStep").floatValue), 0, 1);
-            serializedObject.FindProperty("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", serializedObject.FindProperty("extraWidth").floatValue), 0, 1);
-
+            SerializedProperty bridgeSettings = serializedObject.FindProperty("bridgeSettings");
+            EditorGUILayout.PropertyField(bridgeSettings.FindPropertyRelative("bridgeMaterials"), true);
+            bridgeSettings.FindPropertyRelative("yOffsetFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", bridgeSettings.FindPropertyRelative("yOffsetFirstStep").floatValue), 0, 2);
+            bridgeSettings.FindPropertyRelative("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", bridgeSettings.FindPropertyRelative("yOffsetSecondStep").floatValue), 0, 2);
+            bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue), 0, 1);
+            bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue), 0, 1);
+            bridgeSettings.FindPropertyRelative("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", bridgeSettings.FindPropertyRelative("extraWidth").floatValue), 0, 1);
+            
             GUILayout.Space(20);
             GUILayout.Label("Pillar Placement", guiStyle);
             serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);

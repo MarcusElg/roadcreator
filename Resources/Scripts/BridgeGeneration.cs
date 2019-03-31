@@ -15,7 +15,7 @@ public class BridgeGeneration
         float totalDistance = 0;
         float currentDistance = 0;
 
-        GameObject bridge = new GameObject("Bridge");
+        GameObject bridge = new GameObject("Bridge Base");
 
         for (int i = 1; i < points.Length; i++)
         {
@@ -56,17 +56,17 @@ public class BridgeGeneration
             vertices.Add((points[i] - left * roadWidthLeft) - segment.transform.position);
             vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, points[i].y + heightOffset - segment.transform.position.y, vertices[verticeIndex].z);
             vertices.Add((points[i] - left * roadWidthLeft) - segment.transform.position);
-            vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 1].z);
-            vertices.Add((points[i] - left * roadWidthLeft * segment.widthPercentageFirstStep) - segment.transform.position);
-            vertices[verticeIndex + 2] = new Vector3(vertices[verticeIndex + 2].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 2].z);
-            vertices.Add((points[i] - left * roadWidthLeft * segment.widthPercentageFirstStep * segment.widthPercentageSecondStep) - segment.transform.position);
-            vertices[verticeIndex + 3] = new Vector3(vertices[verticeIndex + 3].x, points[i].y - segment.yOffsetFirstStep - segment.yOffsetSecondStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 3].z);
-            vertices.Add((points[i] + left * roadWidthRight * segment.widthPercentageFirstStep * segment.widthPercentageSecondStep) - segment.transform.position);
-            vertices[verticeIndex + 4] = new Vector3(vertices[verticeIndex + 4].x, points[i].y - segment.yOffsetFirstStep - segment.yOffsetSecondStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 4].z);
-            vertices.Add((points[i] + left * roadWidthRight * segment.widthPercentageFirstStep) - segment.transform.position);
-            vertices[verticeIndex + 5] = new Vector3(vertices[verticeIndex + 5].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 5].z);
+            vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, points[i].y - segment.bridgeSettings.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 1].z);
+            vertices.Add((points[i] - left * roadWidthLeft * segment.bridgeSettings.widthPercentageFirstStep) - segment.transform.position);
+            vertices[verticeIndex + 2] = new Vector3(vertices[verticeIndex + 2].x, points[i].y - segment.bridgeSettings.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 2].z);
+            vertices.Add((points[i] - left * roadWidthLeft * segment.bridgeSettings.widthPercentageFirstStep * segment.bridgeSettings.widthPercentageSecondStep) - segment.transform.position);
+            vertices[verticeIndex + 3] = new Vector3(vertices[verticeIndex + 3].x, points[i].y - segment.bridgeSettings.yOffsetFirstStep - segment.bridgeSettings.yOffsetSecondStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 3].z);
+            vertices.Add((points[i] + left * roadWidthRight * segment.bridgeSettings.widthPercentageFirstStep * segment.bridgeSettings.widthPercentageSecondStep) - segment.transform.position);
+            vertices[verticeIndex + 4] = new Vector3(vertices[verticeIndex + 4].x, points[i].y - segment.bridgeSettings.yOffsetFirstStep - segment.bridgeSettings.yOffsetSecondStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 4].z);
+            vertices.Add((points[i] + left * roadWidthRight * segment.bridgeSettings.widthPercentageFirstStep) - segment.transform.position);
+            vertices[verticeIndex + 5] = new Vector3(vertices[verticeIndex + 5].x, points[i].y - segment.bridgeSettings.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 5].z);
             vertices.Add((points[i] + left * roadWidthRight) - segment.transform.position);
-            vertices[verticeIndex + 6] = new Vector3(vertices[verticeIndex + 6].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 6].z);
+            vertices[verticeIndex + 6] = new Vector3(vertices[verticeIndex + 6].x, points[i].y - segment.bridgeSettings.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 6].z);
             vertices.Add((points[i] + left * roadWidthRight) - segment.transform.position);
             vertices[verticeIndex + 7] = new Vector3(vertices[verticeIndex + 7].x, points[i].y - segment.transform.position.y + heightOffset, vertices[verticeIndex + 7].z);
 
@@ -168,6 +168,11 @@ public class BridgeGeneration
         BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials);
     }
 
+    public static void GenerateSuspensionBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, Transform previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint)
+    {
+        GenerateSimpleBridge(points, nextPoints, previousPoint, segment, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, materials, startPoint, controlPoint, endPoint);
+    }
+
     public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge)
     {
         float currentDistance = 0;
@@ -182,13 +187,13 @@ public class BridgeGeneration
 
             if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
             {
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.yOffsetFirstStep + segment.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
                 lastPosition = currentPosition;
                 placedFirstPillar = true;
             }
             else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
             {
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.yOffsetFirstStep + segment.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
                 lastPosition = currentPosition;
             }
         }

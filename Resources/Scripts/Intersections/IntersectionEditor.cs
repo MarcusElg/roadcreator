@@ -53,14 +53,14 @@ public class IntersectionEditor : Editor
 
         GUILayout.Space(20);
         GUILayout.Label("Bridge", guiStyle);
-        intersection.bridgeGenerator = (RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", intersection.bridgeGenerator);
+        intersection.bridgeGenerator = (Intersection.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", intersection.bridgeGenerator);
 
-        if (intersection.bridgeGenerator != RoadSegment.BridgeGenerator.none)
+        if (intersection.bridgeGenerator != Intersection.BridgeGenerator.none)
         {
             EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeMaterials"), true);
         }
 
-        if (intersection.bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+        if (intersection.bridgeGenerator == Intersection.BridgeGenerator.simple)
         {
             intersection.yOffsetFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", intersection.yOffsetFirstStep), 0, 2);
             intersection.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.yOffsetSecondStep), 0, 2);

@@ -18,15 +18,9 @@ public class RoadSegment : MonoBehaviour
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
 
-    public enum BridgeGenerator { none, simple };
+    public enum BridgeGenerator { none, simple, suspension };
     public BridgeGenerator bridgeGenerator;
-    public Material[] bridgeMaterials;
-
-    public float yOffsetFirstStep = 0.25f;
-    public float yOffsetSecondStep = 0.5f;
-    public float widthPercentageFirstStep = 0.6f;
-    public float widthPercentageSecondStep = 0.6f;
-    public float extraWidth = 0.2f;
+    public BridgeSettings bridgeSettings;
 
     public bool placePillars = true;
     public GameObject pillarPrefab;
@@ -49,9 +43,9 @@ public class RoadSegment : MonoBehaviour
             baseRoadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
         }
 
-        if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
+        if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
         {
-            bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+            bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
         }
 
         if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
@@ -124,10 +118,10 @@ public class RoadSegment : MonoBehaviour
 
         if (bridgeGenerator == BridgeGenerator.simple)
         {
-            float startExtraWidthLeft = extraWidth;
-            float endExtraWidthLeft = extraWidth;
-            float startExtraWidthRight = extraWidth;
-            float endExtraWidthRight = extraWidth;
+            float startExtraWidthLeft = bridgeSettings.extraWidth;
+            float endExtraWidthLeft = bridgeSettings.extraWidth;
+            float startExtraWidthRight = bridgeSettings.extraWidth;
+            float endExtraWidthRight = bridgeSettings.extraWidth;
 
             for (int i = 0; i < extraMeshes.Count; i++)
             {
@@ -143,7 +137,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeMaterials, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position);
+            BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeSettings.bridgeMaterials, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position);
         }
     }
 
