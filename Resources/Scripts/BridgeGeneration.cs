@@ -7,12 +7,11 @@ public class BridgeGeneration
 
     public static void GenerateSimpleBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, Transform previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint)
     {
-        Vector3[] vertices = new Vector3[points.Length * 8];
-        Vector2[] uvs = new Vector2[vertices.Length];
-        int numberTriangles = 4 * (points.Length - 1) + 1;
-        int[] triangles = new int[numberTriangles * 24];
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector2> uvs = new List<Vector2>();
+        List<Vector2> extraUvs = new List<Vector2>();
+        List<int> triangles = new List<int>();
         int verticeIndex = 0;
-        int triangleIndex = 0;
         float totalDistance = 0;
         float currentDistance = 0;
 
@@ -54,99 +53,97 @@ public class BridgeGeneration
 
             // |_   _|
             //   \_/
-            vertices[verticeIndex] = (points[i] - left * roadWidthLeft) - segment.transform.position;
-            vertices[verticeIndex].y = points[i].y + heightOffset - segment.transform.position.y;
-            vertices[verticeIndex + 1] = (points[i] - left * roadWidthLeft) - segment.transform.position;
-            vertices[verticeIndex + 1].y = points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y;
-            vertices[verticeIndex + 2] = (points[i] - left * roadWidthLeft * segment.widthPercentageFirstStep) - segment.transform.position;
-            vertices[verticeIndex + 2].y = points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y;
-            vertices[verticeIndex + 3] = (points[i] - left * roadWidthLeft * segment.widthPercentageFirstStep * segment.widthPercentageSecondStep) - segment.transform.position;
-            vertices[verticeIndex + 3].y = points[i].y - segment.yOffsetFirstStep - segment.yOffsetSecondStep + heightOffset - segment.transform.position.y;
+            vertices.Add((points[i] - left * roadWidthLeft) - segment.transform.position);
+            vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, points[i].y + heightOffset - segment.transform.position.y, vertices[verticeIndex].z);
+            vertices.Add((points[i] - left * roadWidthLeft) - segment.transform.position);
+            vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 1].z);
+            vertices.Add((points[i] - left * roadWidthLeft * segment.widthPercentageFirstStep) - segment.transform.position);
+            vertices[verticeIndex + 2] = new Vector3(vertices[verticeIndex + 2].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 2].z);
+            vertices.Add((points[i] - left * roadWidthLeft * segment.widthPercentageFirstStep * segment.widthPercentageSecondStep) - segment.transform.position);
+            vertices[verticeIndex + 3] = new Vector3(vertices[verticeIndex + 3].x, points[i].y - segment.yOffsetFirstStep - segment.yOffsetSecondStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 3].z);
+            vertices.Add((points[i] + left * roadWidthRight * segment.widthPercentageFirstStep * segment.widthPercentageSecondStep) - segment.transform.position);
+            vertices[verticeIndex + 4] = new Vector3(vertices[verticeIndex + 4].x, points[i].y - segment.yOffsetFirstStep - segment.yOffsetSecondStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 4].z);
+            vertices.Add((points[i] + left * roadWidthRight * segment.widthPercentageFirstStep) - segment.transform.position);
+            vertices[verticeIndex + 5] = new Vector3(vertices[verticeIndex + 5].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 5].z);
+            vertices.Add((points[i] + left * roadWidthRight) - segment.transform.position);
+            vertices[verticeIndex + 6] = new Vector3(vertices[verticeIndex + 6].x, points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y, vertices[verticeIndex + 6].z);
+            vertices.Add((points[i] + left * roadWidthRight) - segment.transform.position);
+            vertices[verticeIndex + 7] = new Vector3(vertices[verticeIndex + 7].x, points[i].y - segment.transform.position.y + heightOffset, vertices[verticeIndex + 7].z);
 
-            vertices[verticeIndex + 4] = (points[i] + left * roadWidthRight * segment.widthPercentageFirstStep * segment.widthPercentageSecondStep) - segment.transform.position;
-            vertices[verticeIndex + 4].y = points[i].y - segment.yOffsetFirstStep - segment.yOffsetSecondStep + heightOffset - segment.transform.position.y;
-            vertices[verticeIndex + 5] = (points[i] + left * roadWidthRight * segment.widthPercentageFirstStep) - segment.transform.position;
-            vertices[verticeIndex + 5].y = points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y;
-            vertices[verticeIndex + 6] = (points[i] + left * roadWidthRight) - segment.transform.position;
-            vertices[verticeIndex + 6].y = points[i].y - segment.yOffsetFirstStep + heightOffset - segment.transform.position.y;
-            vertices[verticeIndex + 7] = (points[i] + left * roadWidthRight) - segment.transform.position;
-            vertices[verticeIndex + 7].y = points[i].y - segment.transform.position.y + heightOffset;
-
-            uvs[verticeIndex] = new Vector2(0, currentDistance / totalDistance);
-            uvs[verticeIndex + 1] = new Vector2(1, currentDistance / totalDistance);
-            uvs[verticeIndex + 2] = new Vector2(0, currentDistance / totalDistance);
-            uvs[verticeIndex + 3] = new Vector2(1, currentDistance / totalDistance);
-            uvs[verticeIndex + 4] = new Vector2(0, currentDistance / totalDistance);
-            uvs[verticeIndex + 5] = new Vector2(1, currentDistance / totalDistance);
-            uvs[verticeIndex + 6] = new Vector2(0, currentDistance / totalDistance);
-            uvs[verticeIndex + 7] = new Vector2(1, currentDistance / totalDistance);
+            uvs.Add(new Vector2(0, currentDistance / totalDistance));
+            uvs.Add(new Vector2(1, currentDistance / totalDistance));
+            uvs.Add(new Vector2(0, currentDistance / totalDistance));
+            uvs.Add(new Vector2(1, currentDistance / totalDistance));
+            uvs.Add(new Vector2(0, currentDistance / totalDistance));
+            uvs.Add(new Vector2(1, currentDistance / totalDistance));
+            uvs.Add(new Vector2(0, currentDistance / totalDistance));
+            uvs.Add(new Vector2(1, currentDistance / totalDistance));
 
             if (i < points.Length - 1)
             {
                 for (int j = 0; j < 7; j += 1)
                 {
-                    triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
-                    triangles[triangleIndex + 1 + j * 6] = verticeIndex + j;
-                    triangles[triangleIndex + 2 + j * 6] = verticeIndex + 9 + j;
+                    triangles.Add(verticeIndex + 1 + j);
+                    triangles.Add(verticeIndex + j);
+                    triangles.Add(verticeIndex + 9 + j);
 
-                    triangles[triangleIndex + 3 + j * 6] = verticeIndex + 0 + j;
-                    triangles[triangleIndex + 4 + j * 6] = verticeIndex + 8 + j;
-                    triangles[triangleIndex + 5 + j * 6] = verticeIndex + 9 + j;
+                    triangles.Add(verticeIndex + 0 + j);
+                    triangles.Add(verticeIndex + 8 + j);
+                    triangles.Add(verticeIndex + 9 + j);
                 }
 
-                triangles[triangleIndex + 42] = verticeIndex + 0;
-                triangles[triangleIndex + 43] = verticeIndex + 7;
-                triangles[triangleIndex + 44] = verticeIndex + 8;
+                triangles.Add(verticeIndex + 0);
+                triangles.Add(verticeIndex + 7);
+                triangles.Add(verticeIndex + 8);
 
-                triangles[triangleIndex + 45] = verticeIndex + 8;
-                triangles[triangleIndex + 46] = verticeIndex + 7;
-                triangles[triangleIndex + 47] = verticeIndex + 15;
+                triangles.Add(verticeIndex + 8);
+                triangles.Add(verticeIndex + 7);
+                triangles.Add(verticeIndex + 15);
 
                 if (i == points.Length - 2)
                 {
                     // Start cap
-                    triangles[triangleIndex + 48] = 0;
-                    triangles[triangleIndex + 49] = 1;
-                    triangles[triangleIndex + 50] = 7;
+                    triangles.Add(0);
+                    triangles.Add(1);
+                    triangles.Add(7);
 
-                    triangles[triangleIndex + 51] = 1;
-                    triangles[triangleIndex + 52] = 6;
-                    triangles[triangleIndex + 53] = 7;
+                    triangles.Add(1);
+                    triangles.Add(6);
+                    triangles.Add(7);
 
-                    triangles[triangleIndex + 54] = 2;
-                    triangles[triangleIndex + 55] = 3;
-                    triangles[triangleIndex + 56] = 5;
+                    triangles.Add(2);
+                    triangles.Add(3);
+                    triangles.Add(5);
 
-                    triangles[triangleIndex + 57] = 3;
-                    triangles[triangleIndex + 58] = 4;
-                    triangles[triangleIndex + 59] = 5;
+                    triangles.Add(3);
+                    triangles.Add(4);
+                    triangles.Add(5);
 
                     // End cap
-                    triangles[triangleIndex + 60] = verticeIndex + 15;
-                    triangles[triangleIndex + 61] = verticeIndex + 9;
-                    triangles[triangleIndex + 62] = verticeIndex + 8;
+                    triangles.Add(verticeIndex + 15);
+                    triangles.Add(verticeIndex + 9);
+                    triangles.Add(verticeIndex + 8);
 
-                    triangles[triangleIndex + 63] = verticeIndex + 15;
-                    triangles[triangleIndex + 64] = verticeIndex + 14;
-                    triangles[triangleIndex + 65] = verticeIndex + 9;
+                    triangles.Add(verticeIndex + 15);
+                    triangles.Add(verticeIndex + 14);
+                    triangles.Add(verticeIndex + 9);
 
-                    triangles[triangleIndex + 66] = verticeIndex + 13;
-                    triangles[triangleIndex + 67] = verticeIndex + 11;
-                    triangles[triangleIndex + 68] = verticeIndex + 10;
+                    triangles.Add(verticeIndex + 13);
+                    triangles.Add(verticeIndex + 11);
+                    triangles.Add(verticeIndex + 10);
 
-                    triangles[triangleIndex + 69] = verticeIndex + 11;
-                    triangles[triangleIndex + 70] = verticeIndex + 13;
-                    triangles[triangleIndex + 71] = verticeIndex + 12;
+                    triangles.Add(verticeIndex + 11);
+                    triangles.Add(verticeIndex + 13);
+                    triangles.Add(verticeIndex + 12);
                 }
 
                 GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
             }
 
             verticeIndex += 8;
-            triangleIndex += 54;
         }
 
-        BridgeGeneration.CreateBridge(bridge, segment.transform, vertices, triangles, uvs, materials);
+        BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials);
     }
 
     public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge)
@@ -218,11 +215,10 @@ public class BridgeGeneration
 
     public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Intersection intersection, Material[] materials, float[] startWidths, float[] endWidths, int[] startVertices)
     {
-        Vector3[] vertices = new Vector3[inputVertices.Length * 3];
-        Vector2[] uvs = new Vector2[vertices.Length];
-        int[] triangles = new int[inputVertices.Length * 30];
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector2> uvs = new List<Vector2>();
+        List<int> triangles = new List<int>();
         int verticeIndex = 0;
-        int triangleIndex = 0;
         int currentSegment = 0;
         Vector3 lastVertexPosition = inputVertices[0];
         float currentDistance = 0f;
@@ -261,25 +257,25 @@ public class BridgeGeneration
 
             //   _|
             // _/
-            vertices[verticeIndex] = inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth);
-            vertices[verticeIndex].y = inputVertices[i].y - inputVertices[i].y;
-            vertices[verticeIndex + 1] = inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth);
-            vertices[verticeIndex + 1].y = inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 2] = inputVertices[i + 1] - verticeDifference * intersection.widthPercentageFirstStep - verticeDifference.normalized * (intersection.extraWidth + currentWidth);
-            vertices[verticeIndex + 2].y = inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y;
-            vertices[verticeIndex + 3] = inputVertices[i + 1] - verticeDifference.normalized * (intersection.extraWidth + currentWidth) - verticeDifference * intersection.widthPercentageFirstStep * intersection.widthPercentageSecondStep;
-            vertices[verticeIndex + 3].y = inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y;
-            vertices[verticeIndex + 4] = inputVertices[i + 1];
-            vertices[verticeIndex + 4].y = inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y;
-            vertices[verticeIndex + 5] = inputVertices[i + 1];
-            vertices[verticeIndex + 5].y = inputVertices[i].y - inputVertices[i].y;
+            vertices.Add(inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth));
+            vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, inputVertices[i].y - inputVertices[i].y, vertices[verticeIndex].z);
+            vertices.Add(inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth));
+            vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y, vertices[verticeIndex + 1].z);
+            vertices.Add(inputVertices[i + 1] - verticeDifference * intersection.widthPercentageFirstStep - verticeDifference.normalized * (intersection.extraWidth + currentWidth));
+            vertices[verticeIndex + 2] = new Vector3(vertices[verticeIndex + 2].x, inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y, vertices[verticeIndex + 2].z);
+            vertices.Add(inputVertices[i + 1] - verticeDifference.normalized * (intersection.extraWidth + currentWidth) - verticeDifference * intersection.widthPercentageFirstStep * intersection.widthPercentageSecondStep);
+            vertices[verticeIndex + 3] = new Vector3(vertices[verticeIndex + 3].x, inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y, vertices[verticeIndex + 3].z);
+            vertices.Add(inputVertices[i + 1]);
+            vertices[verticeIndex + 4] = new Vector3(vertices[verticeIndex + 4].x, inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y, vertices[verticeIndex + 4].z);
+            vertices.Add(inputVertices[i + 1]);
+            vertices[verticeIndex + 5] = new Vector3(vertices[verticeIndex + 5].x, inputVertices[i].y - inputVertices[i].y, vertices[verticeIndex + 5].z);
 
-            uvs[verticeIndex] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
-            uvs[verticeIndex + 1] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
-            uvs[verticeIndex + 2] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
-            uvs[verticeIndex + 3] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
-            uvs[verticeIndex + 4] = new Vector2(0, currentDistance / totalDistances[currentSegment]);
-            uvs[verticeIndex + 5] = new Vector2(1, currentDistance / totalDistances[currentSegment]);
+            uvs.Add(new Vector2(0, currentDistance / totalDistances[currentSegment]));
+            uvs.Add(new Vector2(1, currentDistance / totalDistances[currentSegment]));
+            uvs.Add(new Vector2(0, currentDistance / totalDistances[currentSegment]));
+            uvs.Add(new Vector2(1, currentDistance / totalDistances[currentSegment]));
+            uvs.Add(new Vector2(0, currentDistance / totalDistances[currentSegment]));
+            uvs.Add(new Vector2(1, currentDistance / totalDistances[currentSegment]));
 
             if (i < inputVertices.Length)
             {
@@ -287,47 +283,45 @@ public class BridgeGeneration
                 {
                     for (int j = 0; j < 4; j += 1)
                     {
-                        triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
-                        triangles[triangleIndex + 1 + j * 6] = verticeIndex + 6 + j;
-                        triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
+                        triangles.Add(verticeIndex + 1 + j);
+                        triangles.Add(verticeIndex + 6 + j);
+                        triangles.Add(verticeIndex + j);
 
-                        triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
-                        triangles[triangleIndex + 4 + j * 6] = verticeIndex + 7 + j;
-                        triangles[triangleIndex + 5 + j * 6] = verticeIndex + 6 + j;
+                        triangles.Add(verticeIndex + 1 + j);
+                        triangles.Add(verticeIndex + 7 + j);
+                        triangles.Add(verticeIndex + 6 + j);
                     }
 
                     // Top cover
-                    triangles[triangleIndex + 24] = verticeIndex + 0;
-                    triangles[triangleIndex + 25] = verticeIndex + 6;
-                    triangles[triangleIndex + 26] = verticeIndex + 5;
+                    triangles.Add(verticeIndex + 0);
+                    triangles.Add(verticeIndex + 6);
+                    triangles.Add(verticeIndex + 5);
 
-                    triangles[triangleIndex + 27] = verticeIndex + 6;
-                    triangles[triangleIndex + 28] = verticeIndex + 11;
-                    triangles[triangleIndex + 29] = verticeIndex + 5;
+                    triangles.Add(verticeIndex + 6);
+                    triangles.Add(verticeIndex + 11);
+                    triangles.Add(verticeIndex + 5);
                 }
                 else
                 {
                     for (int j = 0; j < 4; j += 1)
                     {
-                        triangles[triangleIndex + j * 6] = verticeIndex + 1 + j;
-                        triangles[triangleIndex + 1 + j * 6] = j;
-                        triangles[triangleIndex + 2 + j * 6] = verticeIndex + j;
+                        triangles.Add(verticeIndex + 1 + j);
+                        triangles.Add(j);
+                        triangles.Add(verticeIndex + j);
 
-                        triangles[triangleIndex + 3 + j * 6] = verticeIndex + 1 + j;
-                        triangles[triangleIndex + 4 + j * 6] = j + 1;
-                        triangles[triangleIndex + 5 + j * 6] = j;
+                        triangles.Add(verticeIndex + 1 + j);
+                        triangles.Add(j + 1);
+                        triangles.Add(j);
                     }
                 }
             }
 
             verticeIndex += 6;
-            triangleIndex += 30;
-
             lastVertexPosition = inputVertices[i];
         }
 
         CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.yOffsetFirstStep + intersection.yOffsetSecondStep, 0), intersection);
-        BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices, triangles, uvs, materials);
+        BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), null, materials);
     }
 
     public static void CreatePillarIntersection(Transform parent, GameObject prefab, Vector3 position, Intersection intersection)
@@ -353,7 +347,7 @@ public class BridgeGeneration
         }
     }
 
-    public static void CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Material[] materials)
+    public static void CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector2[] extraUvs, Material[] materials)
     {
         bridge.transform.SetParent(parent);
         bridge.transform.SetAsLastSibling();

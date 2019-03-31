@@ -210,11 +210,9 @@ public class RoadSegment : MonoBehaviour
 
     private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, RoadCreator roadCreator, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
-        Vector3[] vertices = new Vector3[points.Length * 2];
-        int numTriangles = 2 * (points.Length - 1);
-        int[] triangles = new int[numTriangles * 3];
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
         int verticeIndex = 0;
-        int triangleIndex = 0;
         float totalDistance = 0;
         float currentDistance = 0;
 
@@ -250,10 +248,10 @@ public class RoadSegment : MonoBehaviour
 
             if (name == "Road")
             {
-                vertices[verticeIndex] = (points[i] + left * roadWidth) - segment.position;
-                vertices[verticeIndex].y = correctedHeightOffset + points[i].y - segment.position.y;
-                vertices[verticeIndex + 1] = (points[i] - left * roadWidth) - segment.position;
-                vertices[verticeIndex + 1].y = correctedHeightOffset + points[i].y - segment.position.y;
+                vertices.Add((points[i] + left * roadWidth) - segment.position);
+                vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, correctedHeightOffset + points[i].y - segment.position.y, vertices[verticeIndex].z);
+                vertices.Add((points[i] - left * roadWidth) - segment.position);
+                vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, correctedHeightOffset + points[i].y - segment.position.y, vertices[verticeIndex + 1].z);
             }
             else
             {
@@ -262,33 +260,32 @@ public class RoadSegment : MonoBehaviour
 
                 if (extraMeshLeft == true)
                 {
-                    vertices[verticeIndex] = (points[i] + left * -modifiedXOffset) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset;
-                    vertices[verticeIndex + 1] = (points[i] + left * (-modifiedXOffset - width)) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y - heightOffset;
+                    vertices.Add((points[i] + left * -modifiedXOffset) - segment.position);
+                    vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset, vertices[verticeIndex].z);
+                    vertices.Add((points[i] + left * (-modifiedXOffset - width)) - segment.position);
+                    vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, correctedHeightOffset + yOffset + points[i].y - segment.position.y - heightOffset, vertices[verticeIndex + 1].z);
                 }
                 else
                 {
-                    vertices[verticeIndex] = (points[i] + left * (modifiedXOffset + width)) - segment.position;
-                    vertices[verticeIndex].y = correctedHeightOffset + yOffset + points[i].y - segment.position.y - heightOffset;
-                    vertices[verticeIndex + 1] = (points[i] + left * modifiedXOffset) - segment.position;
-                    vertices[verticeIndex + 1].y = correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset;
+                    vertices.Add((points[i] + left * (modifiedXOffset + width)) - segment.position);
+                    vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, correctedHeightOffset + yOffset + points[i].y - segment.position.y - heightOffset, vertices[verticeIndex].z);
+                    vertices.Add((points[i] + left * modifiedXOffset) - segment.position);
+                    vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset, vertices[verticeIndex + 1].z);
                 }
             }
 
             if (i < points.Length - 1)
             {
-                triangles[triangleIndex] = verticeIndex;
-                triangles[triangleIndex + 1] = verticeIndex + 2;
-                triangles[triangleIndex + 2] = verticeIndex + 1;
+                triangles.Add(verticeIndex);
+                triangles.Add(verticeIndex + 2);
+                triangles.Add(verticeIndex + 1);
 
-                triangles[triangleIndex + 3] = verticeIndex + 1;
-                triangles[triangleIndex + 4] = verticeIndex + 2;
-                triangles[triangleIndex + 5] = verticeIndex + 3;
+                triangles.Add(verticeIndex + 1);
+                triangles.Add(verticeIndex + 2);
+                triangles.Add(verticeIndex + 3);
             }
 
             verticeIndex += 2;
-            triangleIndex += 6;
         }
 
         // Terrain deformation
@@ -349,7 +346,7 @@ public class RoadSegment : MonoBehaviour
         // First
         if (previousVertices != null)
         {
-            if (vertices.Length > 4 && previousVertices.Length > 3 && name == "Road")
+            if (vertices.Count > 4 && previousVertices.Length > 3 && name == "Road")
             {
                 vertices = fixVertices(0, vertices, (vertices[2] - vertices[4]).normalized);
                 vertices = fixVertices(1, vertices, (vertices[3] - vertices[5]).normalized);
@@ -357,8 +354,8 @@ public class RoadSegment : MonoBehaviour
         }
 
         Mesh generatedMesh = new Mesh();
-        generatedMesh.vertices = vertices;
-        generatedMesh.triangles = triangles;
+        generatedMesh.vertices = vertices.ToArray();
+        generatedMesh.triangles = triangles.ToArray();
 
         if (name == "Road")
         {
@@ -383,12 +380,12 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private Vector3[] fixVertices(int position, Vector3[] vertices, Vector3 forward)
+    private List<Vector3> fixVertices(int position, List<Vector3> vertices, Vector3 forward)
     {
         int startVertex = 0;
         for (int i = position; startVertex == 0; i += 2)
         {
-            if (i > vertices.Length - 1)
+            if (i > vertices.Count - 1)
             {
                 return vertices;
             }
