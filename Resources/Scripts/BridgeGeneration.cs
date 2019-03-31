@@ -119,6 +119,17 @@ public class BridgeGeneration
                     triangles.Add(4);
                     triangles.Add(5);
 
+                    for (int j = 0; j < 2; j++)
+                    {
+                        extraUvs.Add(new Vector2(1, 0));
+                        extraUvs.Add(new Vector2(0, 0));
+                        extraUvs.Add(new Vector2(1, 1));
+
+                        extraUvs.Add(new Vector2(0, 0));
+                        extraUvs.Add(new Vector2(0, 1));
+                        extraUvs.Add(new Vector2(1, 1));
+                    }
+
                     // End cap
                     triangles.Add(verticeIndex + 15);
                     triangles.Add(verticeIndex + 9);
@@ -132,9 +143,20 @@ public class BridgeGeneration
                     triangles.Add(verticeIndex + 11);
                     triangles.Add(verticeIndex + 10);
 
-                    triangles.Add(verticeIndex + 11);
                     triangles.Add(verticeIndex + 13);
                     triangles.Add(verticeIndex + 12);
+                    triangles.Add(verticeIndex + 11);
+
+                    for (int j = 0; j < 2; j++)
+                    {
+                        extraUvs.Add(new Vector2(1, 0));
+                        extraUvs.Add(new Vector2(0, 1));
+                        extraUvs.Add(new Vector2(1, 1));
+
+                        extraUvs.Add(new Vector2(1, 0));
+                        extraUvs.Add(new Vector2(0, 0));
+                        extraUvs.Add(new Vector2(0, 1));
+                    }
                 }
 
                 GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
@@ -364,7 +386,16 @@ public class BridgeGeneration
         for (int i = 0; i < triangles.Length; i++)
         {
             flatShadedVertices[i] = vertices[triangles[i]];
-            flatShadedUvs[i] = uvs[triangles[i]];
+
+            if (extraUvs != null && i >= triangles.Length - 24)
+            {
+                flatShadedUvs[i] = extraUvs[i - triangles.Length + 24];
+            }
+            else
+            {
+                flatShadedUvs[i] = uvs[triangles[i]];
+            }
+
             triangles[i] = i;
         }
 

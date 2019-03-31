@@ -162,7 +162,7 @@ public class RoadCreator : MonoBehaviour
                     Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial);
                     float textureRepeat = length / 4 * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY;
                     material.SetVector("_Tiling", new Vector2(1, textureRepeat));
-                    transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial = material;
+                    //transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial = material;
                 }
             }
         }
