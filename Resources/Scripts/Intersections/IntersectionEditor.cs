@@ -57,16 +57,12 @@ public class IntersectionEditor : Editor
 
         if (intersection.bridgeGenerator != Intersection.BridgeGenerator.none)
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeMaterials"), true);
-        }
-
-        if (intersection.bridgeGenerator == Intersection.BridgeGenerator.simple)
-        {
-            intersection.yOffsetFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", intersection.yOffsetFirstStep), 0, 2);
-            intersection.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.yOffsetSecondStep), 0, 2);
-            intersection.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.widthPercentageFirstStep), 0, 1);
-            intersection.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.widthPercentageSecondStep), 0, 1);
-            intersection.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.extraWidth), 0, 1);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeSettings").FindPropertyRelative("bridgeMaterials"), true);
+            intersection.bridgeSettings.yOffsetFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", intersection.bridgeSettings.yOffsetFirstStep), 0, 2);
+            intersection.bridgeSettings.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.bridgeSettings.yOffsetSecondStep), 0, 2);
+            intersection.bridgeSettings.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.bridgeSettings.widthPercentageFirstStep), 0, 1);
+            intersection.bridgeSettings.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.bridgeSettings.widthPercentageSecondStep), 0, 1);
+            intersection.bridgeSettings.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.bridgeSettings.extraWidth), 0, 1);
 
             GUILayout.Space(20);
             GUILayout.Label("Pillar Placement", guiStyle);
@@ -79,6 +75,7 @@ public class IntersectionEditor : Editor
                 intersection.xzPillarScale = EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale);
             }
         }
+
         GUILayout.Space(20);
         GUILayout.Label("Extra Meshes", guiStyle);
         for (int i = 0; i < intersection.extraMeshes.Count; i++)

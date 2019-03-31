@@ -284,16 +284,16 @@ public class BridgeGeneration
 
             //   _|
             // _/
-            vertices.Add(inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth));
+            vertices.Add(inputVertices[i] - verticeDifference.normalized * (intersection.bridgeSettings.extraWidth + currentWidth));
             vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, inputVertices[i].y - inputVertices[i].y, vertices[verticeIndex].z);
-            vertices.Add(inputVertices[i] - verticeDifference.normalized * (intersection.extraWidth + currentWidth));
-            vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y, vertices[verticeIndex + 1].z);
-            vertices.Add(inputVertices[i + 1] - verticeDifference * intersection.widthPercentageFirstStep - verticeDifference.normalized * (intersection.extraWidth + currentWidth));
-            vertices[verticeIndex + 2] = new Vector3(vertices[verticeIndex + 2].x, inputVertices[i].y - intersection.yOffsetFirstStep - inputVertices[i].y, vertices[verticeIndex + 2].z);
-            vertices.Add(inputVertices[i + 1] - verticeDifference.normalized * (intersection.extraWidth + currentWidth) - verticeDifference * intersection.widthPercentageFirstStep * intersection.widthPercentageSecondStep);
-            vertices[verticeIndex + 3] = new Vector3(vertices[verticeIndex + 3].x, inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y, vertices[verticeIndex + 3].z);
+            vertices.Add(inputVertices[i] - verticeDifference.normalized * (intersection.bridgeSettings.extraWidth + currentWidth));
+            vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, inputVertices[i].y - intersection.bridgeSettings.yOffsetFirstStep - inputVertices[i].y, vertices[verticeIndex + 1].z);
+            vertices.Add(inputVertices[i + 1] - verticeDifference * intersection.bridgeSettings.widthPercentageFirstStep - verticeDifference.normalized * (intersection.bridgeSettings.extraWidth + currentWidth));
+            vertices[verticeIndex + 2] = new Vector3(vertices[verticeIndex + 2].x, inputVertices[i].y - intersection.bridgeSettings.yOffsetFirstStep - inputVertices[i].y, vertices[verticeIndex + 2].z);
+            vertices.Add(inputVertices[i + 1] - verticeDifference.normalized * (intersection.bridgeSettings.extraWidth + currentWidth) - verticeDifference * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep);
+            vertices[verticeIndex + 3] = new Vector3(vertices[verticeIndex + 3].x, inputVertices[i].y - intersection.bridgeSettings.yOffsetFirstStep - intersection.bridgeSettings.yOffsetSecondStep - inputVertices[i].y, vertices[verticeIndex + 3].z);
             vertices.Add(inputVertices[i + 1]);
-            vertices[verticeIndex + 4] = new Vector3(vertices[verticeIndex + 4].x, inputVertices[i].y - intersection.yOffsetFirstStep - intersection.yOffsetSecondStep - inputVertices[i].y, vertices[verticeIndex + 4].z);
+            vertices[verticeIndex + 4] = new Vector3(vertices[verticeIndex + 4].x, inputVertices[i].y - intersection.bridgeSettings.yOffsetFirstStep - intersection.bridgeSettings.yOffsetSecondStep - inputVertices[i].y, vertices[verticeIndex + 4].z);
             vertices.Add(inputVertices[i + 1]);
             vertices[verticeIndex + 5] = new Vector3(vertices[verticeIndex + 5].x, inputVertices[i].y - inputVertices[i].y, vertices[verticeIndex + 5].z);
 
@@ -347,7 +347,7 @@ public class BridgeGeneration
             lastVertexPosition = inputVertices[i];
         }
 
-        CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.yOffsetFirstStep + intersection.yOffsetSecondStep, 0), intersection);
+        CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0), intersection);
         BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), null, materials);
     }
 

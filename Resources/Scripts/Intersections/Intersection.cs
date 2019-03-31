@@ -15,20 +15,14 @@ public class Intersection : MonoBehaviour
     public GameObject objectToMove;
     public bool stretchTexture = false;
 
-    public enum BridgeGenerator { none, simple};
+    public enum BridgeGenerator { none, simple };
     public BridgeGenerator bridgeGenerator;
-    public Material[] bridgeMaterials;
+    public BridgeSettings bridgeSettings;
 
     public bool placePillars = true;
     public GameObject pillarPrefab;
     public float extraPillarHeight = 0.2f;
     public float xzPillarScale = 3;
-
-    public float yOffsetFirstStep = 0.25f;
-    public float yOffsetSecondStep = 0.5f;
-    public float widthPercentageFirstStep = 0.6f;
-    public float widthPercentageSecondStep = 0.6f;
-    public float extraWidth = 0.2f;
 
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
@@ -126,9 +120,9 @@ public class Intersection : MonoBehaviour
                 baseMaterial = Resources.Load("Materials/Low Poly/Intersections/Asphalt Intersection") as Material;
             }
 
-            if (bridgeMaterials == null || bridgeMaterials.Length == 0 || bridgeMaterials[0] == null)
+            if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
             {
-                bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+                bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
             }
 
             for (int i = 0; i < extraMeshes.Count; i++)
@@ -334,7 +328,7 @@ public class Intersection : MonoBehaviour
 
             if (bridgeGenerator == BridgeGenerator.simple)
             {
-                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
+                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeSettings.bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
             }
 
             CreateCurvePoints();

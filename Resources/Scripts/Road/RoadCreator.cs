@@ -667,11 +667,11 @@ public class RoadCreator : MonoBehaviour
             intersection.GetComponent<Intersection>().bridgeGenerator = Intersection.BridgeGenerator.simple;
         }
 
-        intersection.GetComponent<Intersection>().yOffsetFirstStep = segment.bridgeSettings.yOffsetFirstStep;
-        intersection.GetComponent<Intersection>().yOffsetSecondStep = segment.bridgeSettings.yOffsetSecondStep;
-        intersection.GetComponent<Intersection>().widthPercentageFirstStep = segment.bridgeSettings.widthPercentageFirstStep;
-        intersection.GetComponent<Intersection>().widthPercentageSecondStep = segment.bridgeSettings.widthPercentageSecondStep;
-        intersection.GetComponent<Intersection>().extraWidth = segment.bridgeSettings.extraWidth;
+        if (segment.bridgeSettings.GetType() != typeof(SuspensionBridgeSettings))
+        {
+            intersection.GetComponent<Intersection>().bridgeSettings = segment.bridgeSettings;
+        }
+
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
         intersection.GetComponent<Intersection>().xzPillarScale = segment.xzPillarScale;
