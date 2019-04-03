@@ -51,6 +51,16 @@ public class PrefabLineEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        if (prefabCreator.spacing == -1)
+        {
+            if (prefabCreator.prefab == null)
+            {
+                prefabCreator.prefab = Resources.Load("Prefabs/Low Poly/Concrete Barrier") as GameObject;
+            }
+
+            prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
+        }
+
         EditorGUI.BeginChangeCheck();
         prefabCreator.pointCalculationDivisions = Mathf.Clamp(EditorGUILayout.FloatField("Point Calculation Divisions", prefabCreator.pointCalculationDivisions), 1, 1000);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
@@ -86,10 +96,7 @@ public class PrefabLineEditor : Editor
 
             if (GUILayout.Button("Calculate Spacing (X)") == true)
             {
-                if (prefabCreator.prefab != null)
-                {
-                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
-                }
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
             }
 
             if (GUILayout.Button("Calculate Spacing (Z)") == true)

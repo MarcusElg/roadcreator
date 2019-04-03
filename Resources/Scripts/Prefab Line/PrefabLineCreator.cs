@@ -18,7 +18,7 @@ public class PrefabLineCreator : MonoBehaviour
     public bool bendObjects = true;
     public float bendMultiplier = 1;
     public bool fillGap = true;
-    public float spacing = 1;
+    public float spacing = -1;
     public bool rotateAlongCurve = true;
 
     public enum RotationDirection { forward, backward, left, right };
@@ -65,9 +65,9 @@ public class PrefabLineCreator : MonoBehaviour
         GameObject point = new GameObject(name);
         point.AddComponent<BoxCollider>();
         point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+        point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
         point.transform.SetParent(transform.GetChild(0));
         point.transform.position = raycastHit;
-        point.hideFlags = HideFlags.NotEditable;
         point.layer = globalSettings.ignoreMouseRayLayer;
         return point;
     }

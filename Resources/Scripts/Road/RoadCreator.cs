@@ -92,6 +92,11 @@ public class RoadCreator : MonoBehaviour
                     {
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
+
+                        if (transform.GetChild(0).GetChild(i).Find("Bridge Base") != null)
+                        {
+                            DestroyImmediate(transform.GetChild(0).GetChild(i).Find("Bridge Base").gameObject);
+                        }
                     }
                 }
             }
@@ -162,7 +167,7 @@ public class RoadCreator : MonoBehaviour
                     Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial);
                     float textureRepeat = length / 4 * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY;
                     material.SetVector("_Tiling", new Vector2(1, textureRepeat));
-                    //transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial = material;
+                    transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial = material;
                 }
             }
         }
@@ -243,7 +248,7 @@ public class RoadCreator : MonoBehaviour
         point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
         point.transform.SetParent(parent);
         point.transform.position = position;
-        point.hideFlags = HideFlags.NotEditable;
+        point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
         point.layer = globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
 
@@ -667,11 +672,7 @@ public class RoadCreator : MonoBehaviour
             intersection.GetComponent<Intersection>().bridgeGenerator = Intersection.BridgeGenerator.simple;
         }
 
-        if (segment.bridgeSettings.GetType() != typeof(SuspensionBridgeSettings))
-        {
-            intersection.GetComponent<Intersection>().bridgeSettings = segment.bridgeSettings;
-        }
-
+        intersection.GetComponent<Intersection>().bridgeSettings = segment.bridgeSettings;
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
         intersection.GetComponent<Intersection>().xzPillarScale = segment.xzPillarScale;

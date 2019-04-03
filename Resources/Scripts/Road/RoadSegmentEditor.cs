@@ -84,7 +84,21 @@ public class RoadSegmentEditor : Editor
             bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue), 0, 1);
             bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue), 0, 1);
             bridgeSettings.FindPropertyRelative("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", bridgeSettings.FindPropertyRelative("extraWidth").floatValue), 0, 1);
-            
+
+            if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex == 2)
+            {
+                GUILayout.Space(20);
+                GUILayout.Label("Suspension Bridge", guiStyle);
+
+                bridgeSettings.FindPropertyRelative("cablePrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Cable Prefab", bridgeSettings.FindPropertyRelative("cablePrefab").objectReferenceValue, typeof(GameObject), false);
+                bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
+                bridgeSettings.FindPropertyRelative("cableScale").floatValue = Mathf.Max(EditorGUILayout.FloatField("Cable Scale", bridgeSettings.FindPropertyRelative("cableScale").floatValue), 0);
+                bridgeSettings.FindPropertyRelative("topCableScale").floatValue = Mathf.Max(EditorGUILayout.FloatField("Top Cable Scale", bridgeSettings.FindPropertyRelative("topCableScale").floatValue), 0);
+                bridgeSettings.FindPropertyRelative("cableGap").floatValue = Mathf.Max(EditorGUILayout.FloatField("Cable Gap", bridgeSettings.FindPropertyRelative("cableGap").floatValue), 0);
+                bridgeSettings.FindPropertyRelative("height").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Height", bridgeSettings.FindPropertyRelative("height").floatValue), 0.5f, 50f);
+                bridgeSettings.FindPropertyRelative("widthOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Offset", bridgeSettings.FindPropertyRelative("widthOffset").floatValue), -0.5f, 5);
+            }
+
             GUILayout.Space(20);
             GUILayout.Label("Pillar Placement", guiStyle);
             serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
@@ -135,7 +149,8 @@ public class RoadSegmentEditor : Editor
                         }
                     }
                 }
-            } else
+            }
+            else
             {
                 for (int j = 0; j < targets.Length; j++)
                 {
