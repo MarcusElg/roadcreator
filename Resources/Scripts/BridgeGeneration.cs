@@ -206,19 +206,19 @@ public class BridgeGeneration
                 currentSegmentDistance -= Vector3.Distance(lastPosition, currentPosition);
             }
 
-            if (currentSegmentDistance > distancePerSegment * totalDistance / 2)
-            {
-                upwards = false;
-                currentSegmentDistance = distancePerSegment * totalDistance / 2;
-            }
-            else if (currentSegmentDistance <= 0)
-            {
-                upwards = true;
-                currentSegmentDistance = 0;
-            }
-
             if (currentDistance >= segment.bridgeSettings.cableGap)
             {
+                if (currentSegmentDistance > distancePerSegment * totalDistance / 2)
+                {
+                    upwards = false;
+                    currentSegmentDistance = distancePerSegment * totalDistance / 2;
+                }
+                else if (currentSegmentDistance <= 0)
+                {
+                    upwards = true;
+                    currentSegmentDistance = 0;
+                }
+
                 Vector3 left = Misc.CalculateLeft(lastPosition, currentPosition);
                 float height = segment.bridgeSettings.height * currentSegmentDistance / (distancePerSegment * totalDistance);
                 float roadWidth = Mathf.Lerp(segment.startRoadWidth, segment.endRoadWidth, currentTotalDistance / totalDistance);
@@ -234,7 +234,7 @@ public class BridgeGeneration
                 cable.transform.position = currentPosition + roadWidthLeft * left + new Vector3(0, height / 2, 0);
                 cable.transform.rotation = Quaternion.LookRotation(left, Vector3.up);
                 cable.transform.localScale = new Vector3(segment.bridgeSettings.cableScale, height, segment.bridgeSettings.cableScale);
-                currentLeftCablePosition = cable.transform.position;
+                currentLeftCablePosition = cable.transform.position + new Vector3 (0, height / 2, 0);
 
                 // Right cable
                 cable = GameObject.Instantiate(segment.bridgeSettings.cablePrefab);
@@ -245,18 +245,18 @@ public class BridgeGeneration
                 cable.transform.position = currentPosition + roadWidthRight * -left + new Vector3(0, height / 2, 0);
                 cable.transform.rotation = Quaternion.LookRotation(-left, Vector3.up);
                 cable.transform.localScale = new Vector3(segment.bridgeSettings.cableScale, height, segment.bridgeSettings.cableScale);
-                currentRightCablePosition = cable.transform.position;
+                currentRightCablePosition = cable.transform.position + new Vector3(0, height / 2, 0);
 
                 // Top Cables
-                GenerateTopCable(segment, bridge.transform, Misc.GetCenter(leftCablePosition, currentLeftCablePosition) + new Vector3(0, height / 2, 0), (leftCablePosition - currentLeftCablePosition).normalized, Vector3.Distance(currentLeftCablePosition, leftCablePosition));
-                GenerateTopCable(segment, bridge.transform, Misc.GetCenter(rightCablePosition, currentRightCablePosition) + new Vector3(0, height / 2, 0), (rightCablePosition - currentRightCablePosition).normalized, Vector3.Distance(currentRightCablePosition, rightCablePosition));
+                GenerateTopCable(segment, bridge.transform, Misc.GetCenter(leftCablePosition, currentLeftCablePosition), (leftCablePosition - currentLeftCablePosition).normalized, Vector3.Distance(currentLeftCablePosition, leftCablePosition));
+                GenerateTopCable(segment, bridge.transform, Misc.GetCenter(rightCablePosition, currentRightCablePosition), (rightCablePosition - currentRightCablePosition).normalized, Vector3.Distance(currentRightCablePosition, rightCablePosition));
 
                 if (currentTotalDistance + segment.bridgeSettings.cableGap > totalDistance)
                 {
                     // Top Cables
                     left = Misc.CalculateLeft(points[points.Length - 2], points[points.Length - 1]);
-                    GenerateTopCable(segment, bridge.transform, Misc.GetCenter(endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset), currentLeftCablePosition) + new Vector3(0, height / 2, 0), ((endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)) - currentLeftCablePosition).normalized, Vector3.Distance(currentLeftCablePosition, endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)));
-                    GenerateTopCable(segment, bridge.transform, Misc.GetCenter(endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset), currentRightCablePosition) + new Vector3(0, height / 2, 0), ((endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)) - currentRightCablePosition).normalized, Vector3.Distance(currentRightCablePosition, endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)));
+                    GenerateTopCable(segment, bridge.transform, Misc.GetCenter(endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset), currentLeftCablePosition), ((endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)) - currentLeftCablePosition).normalized, Vector3.Distance(currentLeftCablePosition, endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)));
+                    GenerateTopCable(segment, bridge.transform, Misc.GetCenter(endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset), currentRightCablePosition), ((endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)) - currentRightCablePosition).normalized, Vector3.Distance(currentRightCablePosition, endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)));
                 }
 
                 leftCablePosition = currentLeftCablePosition;
