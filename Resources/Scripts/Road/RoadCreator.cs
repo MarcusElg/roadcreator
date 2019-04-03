@@ -88,14 +88,14 @@ public class RoadCreator : MonoBehaviour
                 }
                 else
                 {
-                    for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
+                    for (int j = 0; j < transform.GetChild(0).GetChild(i).childCount; j++)
                     {
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
 
-                        if (transform.GetChild(0).GetChild(i).Find("Bridge Base") != null)
+                        if (transform.GetChild(0).GetChild(i).childCount == 3)
                         {
-                            DestroyImmediate(transform.GetChild(0).GetChild(i).Find("Bridge Base").gameObject);
+                            DestroyImmediate(transform.GetChild(0).GetChild(i).GetChild(2).gameObject);
                         }
                     }
                 }
@@ -160,7 +160,7 @@ public class RoadCreator : MonoBehaviour
                 }
             }
 
-            if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().bridgeGenerator == RoadSegment.BridgeGenerator.simple)
+            if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().bridgeGenerator != RoadSegment.BridgeGenerator.none)
             {
                 if (transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial != null)
                 {
@@ -825,6 +825,8 @@ public class RoadCreator : MonoBehaviour
                         transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(i).GetComponent<MeshFilter>().sharedMesh = null;
                         transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(i).GetComponent<MeshCollider>().sharedMesh = null;
                     }
+
+                    CreateMesh();
                 }
             }
             else
