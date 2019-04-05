@@ -251,6 +251,7 @@ public class RoadCreator : MonoBehaviour
         point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
         point.layer = globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
+        point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
 
         return point;
     }

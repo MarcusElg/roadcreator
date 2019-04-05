@@ -5,4 +5,6 @@ using UnityEngine;
 [System.Serializable]
 public class Point : MonoBehaviour {
 
+    public bool roadPoint = true;
+
 }

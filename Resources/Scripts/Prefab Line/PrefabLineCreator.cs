@@ -69,6 +69,9 @@ public class PrefabLineCreator : MonoBehaviour
         point.transform.SetParent(transform.GetChild(0));
         point.transform.position = raycastHit;
         point.layer = globalSettings.ignoreMouseRayLayer;
+        point.AddComponent<Point>();
+        point.GetComponent<Point>().roadPoint = false;
+        point.hideFlags = HideFlags.NotEditable;
         return point;
     }
 

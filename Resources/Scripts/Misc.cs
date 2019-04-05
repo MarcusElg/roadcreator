@@ -269,5 +269,4 @@ public static class Misc
             Debug.Log("There are no meshes to combine");
         }
     }
-
 }
