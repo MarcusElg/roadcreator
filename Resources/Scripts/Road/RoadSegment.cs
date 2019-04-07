@@ -179,7 +179,7 @@ public class RoadSegment : MonoBehaviour
             }
 
             // Center Guidelines
-            left = Misc.CalculateLeft(transform.GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(2).position);
+            left = Misc.CalculateLeft(currentPoints[(currentPoints.Length + 1) / 2], currentPoints[(currentPoints.Length + 1) / 2 + 1]);
 
             centerGuidelinePoints = new Vector3[guidelineAmount * 2];
             for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
