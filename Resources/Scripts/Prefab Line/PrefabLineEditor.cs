@@ -76,9 +76,13 @@ public class PrefabLineEditor : Editor
             {
                 prefabCreator.yRotationRandomization = 0;
             }
-        }
 
-        prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
+            prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
+        } else if (prefabCreator.bendObjects == true)
+        {
+            Debug.Log("Rotate alongst curve has to be true to be able to use bend objects");
+            prefabCreator.bendObjects = false;
+        }
 
         if (prefabCreator.rotateAlongCurve == true)
         {
@@ -207,30 +211,23 @@ public class PrefabLineEditor : Editor
             Draw(guiEvent, hitPosition);
         }
 
-        if (EditorWindow.mouseOverWindow == SceneView.currentDrawingSceneView)
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
         {
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
+            Vector3 hitPosition = raycastHit.point;
+
+            if (guiEvent.control == true)
             {
-                Vector3 hitPosition = raycastHit.point;
-
-                if (guiEvent.control == true)
-                {
-                    hitPosition = Misc.Round(hitPosition);
-                }
-
-                if (guiEvent.shift == false)
-                {
-                    prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
-                }
-                else
-                {
-                    prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
-                }
+                hitPosition = Misc.Round(hitPosition);
             }
-        }
-        else
-        {
-            prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
+
+            if (guiEvent.shift == false)
+            {
+                prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
+            }
+            else
+            {
+                prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
+            }
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
