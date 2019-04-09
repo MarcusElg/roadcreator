@@ -32,9 +32,9 @@ public class RoadSegment : MonoBehaviour
 
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
-    public Vector3[] startGuidelinePoints;
-    public Vector3[] centerGuidelinePoints;
-    public Vector3[] endGuidelinePoints;
+    public RoadGuideline startGuidelinePoints;
+    public RoadGuideline centerGuidelinePoints;
+    public RoadGuideline endGuidelinePoints;
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {
@@ -162,35 +162,21 @@ public class RoadSegment : MonoBehaviour
     {
         // Start Guidelines
         Vector3 left;
-        int guidelineAmount = transform.parent.parent.GetComponent<RoadCreator>().globalSettings.amountRoadGuidelines;
+        float roadGuidelinesLength = transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesLength;
 
-        if (guidelineAmount > 0)
+        if (roadGuidelinesLength > 0)
         {
             if (first == true)
             {
                 left = Misc.CalculateLeft(currentPoints[0], currentPoints[1]);
-
-                startGuidelinePoints = new Vector3[guidelineAmount * 2];
-                for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
-                {
-                    startGuidelinePoints[i] = transform.GetChild(0).GetChild(0).position + left * (i + 1);
-                    startGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(0).position - left * (i + 1);
-                }
+                startGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(0).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(0).position - left * roadGuidelinesLength);
             }
 
             // Center Guidelines
             left = Misc.CalculateLeft(currentPoints[(currentPoints.Length + 1) / 2], currentPoints[(currentPoints.Length + 1) / 2 + 1]);
-
-            centerGuidelinePoints = new Vector3[guidelineAmount * 2];
-            for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
-            {
-                centerGuidelinePoints[i] = transform.GetChild(0).GetChild(1).position + left * (i + 1);
-                centerGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(1).position - left * (i + 1);
-            }
+            centerGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(1).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(1).position - left * roadGuidelinesLength);
 
             // End guidelines
-            endGuidelinePoints = new Vector3[guidelineAmount * 2];
-
             if (nextPoints == null)
             {
                 left = Misc.CalculateLeft(currentPoints[currentPoints.Length - 2], currentPoints[currentPoints.Length - 1]);
@@ -201,15 +187,11 @@ public class RoadSegment : MonoBehaviour
             }
             else
             {
-                endGuidelinePoints = new Vector3[0];
+                endGuidelinePoints = null;
                 return;
             }
 
-            for (int i = 0; i < (guidelineAmount * 2) - 1; i += 2)
-            {
-                endGuidelinePoints[i] = transform.GetChild(0).GetChild(2).position + left * (i + 1);
-                endGuidelinePoints[i + 1] = transform.GetChild(0).GetChild(2).position - left * (i + 1);
-            }
+            centerGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(2).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(2).position, transform.GetChild(0).GetChild(2).position - left * roadGuidelinesLength);
         }
         else
         {

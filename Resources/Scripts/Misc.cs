@@ -16,6 +16,13 @@ public static class Misc
         return Vector3.Lerp(startToMiddle, end, time);
     }
 
+    public static Vector3 Lerp3CenterHeight(Vector3 start, Vector3 middle, Vector3 end, float time)
+    {
+        Vector3 position = Lerp3(start, middle, end, time);
+        position.y = Mathf.Lerp(Mathf.Lerp(start.y, Misc.GetCenter(start.y, end.y), time), end.y, time);
+        return position;
+    }
+
     public static Vector3 Round(Vector3 toRound)
     {
         return new Vector3(Mathf.Round(toRound.x), Mathf.Round(toRound.y), Mathf.Round(toRound.z));
@@ -107,41 +114,60 @@ public static class Misc
         RoadSegment[] roadSegments = GameObject.FindObjectsOfType<RoadSegment>();
         Vector3 nearest = MaxVector3;
         float nearestDistance = float.MaxValue;
+        Vector2 mousePosition = new Vector3(hitPosition.x, hitPosition.z);
 
         for (int i = 0; i < roadSegments.Length; i++)
         {
-            if (roadSegments[i].startGuidelinePoints != null && roadSegments[i].centerGuidelinePoints != null && roadSegments[i].endGuidelinePoints != null)
+            RoadGuideline roadGuideline = roadSegments[i].startGuidelinePoints;
+
+            if (roadGuideline != null)
             {
-                Vector3[] guidelines = new Vector3[roadSegments[i].startGuidelinePoints.Length + roadSegments[i].centerGuidelinePoints.Length + roadSegments[i].endGuidelinePoints.Length];
-                roadSegments[i].startGuidelinePoints.CopyTo(guidelines, 0);
-                roadSegments[i].centerGuidelinePoints.CopyTo(guidelines, roadSegments[i].startGuidelinePoints.Length);
-                roadSegments[i].endGuidelinePoints.CopyTo(guidelines, roadSegments[i].startGuidelinePoints.Length + roadSegments[i].centerGuidelinePoints.Length);
-
-                Vector3 nearestVector = MaxVector3;
-                float nearestDistanceInSegment = float.MaxValue;
-
-                if (guidelines != null)
+                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().globalSettings);
+                if (nearestOnLine != MaxVector3)
                 {
-                    for (int j = 0; j < guidelines.Length; j++)
-                    {
-                        float distance = Vector3.Distance(new Vector3(hitPosition.x, 0, hitPosition.z), new Vector3(guidelines[j].x, 0, guidelines[j].z));
-                        if (distance < 1f && distance < nearestDistanceInSegment)
-                        {
-                            nearestVector = guidelines[j];
-                            nearestDistanceInSegment = distance;
-                        }
-                    }
+                    nearest = nearestOnLine;
+                    nearestDistance = Vector2.Distance(mousePosition, new Vector2(nearestOnLine.x, nearestOnLine.z));
                 }
+            }
 
-                if (nearestDistanceInSegment < nearestDistance)
+            roadGuideline = roadSegments[i].centerGuidelinePoints;
+            if (roadGuideline != null)
+            {
+                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().globalSettings);
+                if (nearestOnLine != MaxVector3)
                 {
-                    nearestDistance = nearestDistanceInSegment;
-                    nearest = nearestVector;
+                    nearest = nearestOnLine;
+                    nearestDistance = Vector2.Distance(mousePosition, new Vector2(nearestOnLine.x, nearestOnLine.z));
+                }
+            }
+
+            roadGuideline = roadSegments[i].endGuidelinePoints;
+            if (roadGuideline != null)
+            {
+                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().globalSettings);
+                if (nearestOnLine != MaxVector3)
+                {
+                    nearest = nearestOnLine;
+                    nearestDistance = Vector2.Distance(mousePosition, new Vector2(nearestOnLine.x, nearestOnLine.z));
                 }
             }
         }
 
         return nearest;
+    }
+
+    private static Vector3 CheckGuideline(float nearestDistance, Vector3 mousePosition, RoadGuideline roadGuideline, GlobalSettings globalSettings)
+    {
+        Vector3 nearestLinePoint = Misc.FindNearestPointOnLine(new Vector2(roadGuideline.startPoint.x, roadGuideline.startPoint.z), new Vector2(roadGuideline.endPoint.x, roadGuideline.endPoint.z), mousePosition);
+        float distance = Vector2.Distance(mousePosition, nearestLinePoint);
+
+        if (distance < nearestDistance && distance < globalSettings.roadGuidelinesSnapDistance)
+        {
+            nearestDistance = distance;
+            return new Vector3(nearestLinePoint.x, roadGuideline.centerPoint.y, nearestLinePoint.y);
+        }
+
+        return MaxVector3;
     }
 
     public static void DrawRoadGuidelines(Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
@@ -162,7 +188,7 @@ public static class Misc
         }
     }
 
-    private static void DrawRoadGuidelines(Vector3[] guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
+    private static void DrawRoadGuidelines(RoadGuideline guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
         if (roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings == null)
         {
@@ -178,16 +204,20 @@ public static class Misc
             Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesColour;
         }
 
-        if (guidelines != null && guidelines.Length > 0 && (Vector3.Distance(new Vector3(mousePosition.x, 0, mousePosition.z), new Vector3(roadSegment.transform.GetChild(0).GetChild(child).position.x, 0, roadSegment.transform.GetChild(0).GetChild(child).position.z)) < guidelines.Length + 1) && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
+        if (guidelines != null && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
         {
-            Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 2]);
-            Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines[guidelines.Length - 1]);
-            Vector3 left = CalculateLeft(guidelines[2], guidelines[0]);
-            Handles.DrawLine((left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position, (-left * roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize) + roadSegment.transform.GetChild(0).GetChild(child).position);
+            Vector2 mousePositionXZ = new Vector3(mousePosition.x, mousePosition.z);
+            Vector2 nereastPoint = Misc.FindNearestPointOnLine(new Vector2(guidelines.startPoint.x, guidelines.startPoint.z), new Vector2(guidelines.endPoint.x, guidelines.endPoint.z), mousePositionXZ);
 
-            for (int j = 0; j < guidelines.Length; j++)
+            if (Vector2.Distance(mousePositionXZ, nereastPoint) < roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesDistance)
             {
-                Handles.DrawSolidDisc(guidelines[j], Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize * 0.75f);
+                Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines.startPoint);
+                Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines.endPoint);
+                Handles.DrawSolidDisc(guidelines.centerPoint, Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize * 0.75f);
+
+                Vector3 left = CalculateLeft(guidelines.startPoint, guidelines.endPoint);
+                Handles.DrawLine(guidelines.startPoint - left * 0.5f, guidelines.startPoint + left * 0.5f);
+                Handles.DrawLine(guidelines.endPoint - left * 0.5f, guidelines.endPoint + left * 0.5f);
             }
         }
     }
@@ -268,5 +298,19 @@ public static class Misc
         {
             Debug.Log("There are no meshes to combine");
         }
+    }
+
+    public static Vector2 FindNearestPointOnLine(Vector2 start, Vector2 end, Vector2 point)
+    {
+        //Get heading
+        Vector2 heading = (end - start);
+        float magnitudeMax = heading.magnitude;
+        heading.Normalize();
+
+        //Do projection from the point but clamp it
+        Vector2 lhs = point - start;
+        float dotProduct = Vector2.Dot(lhs, heading);
+        dotProduct = Mathf.Clamp(dotProduct, 0f, magnitudeMax);
+        return start + heading * dotProduct;
     }
 }

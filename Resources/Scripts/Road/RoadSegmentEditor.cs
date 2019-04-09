@@ -201,16 +201,6 @@ public class RoadSegmentEditor : Editor
                 points.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
             }
         }
-
-        if (GameObject.FindObjectOfType<GlobalSettings>().debug == true)
-        {
-            GUILayout.Space(20);
-            GUILayout.Label("Debug", guiStyle);
-            GUILayout.Label(serializedObject.FindProperty("curved").boolValue.ToString());
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("startGuidelinePoints"), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("centerGuidelinePoints"), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("endGuidelinePoints"), true);
-        }
     }
 
     private void Change()

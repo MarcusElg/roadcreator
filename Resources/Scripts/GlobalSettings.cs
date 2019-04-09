@@ -10,16 +10,18 @@ public class GlobalSettings : MonoBehaviour
     public float resolution = 0.25f;
     public int ignoreMouseRayLayer = 9;
     public int roadLayer = 10;
-    public int oldAmountRoadGuidelines = 5;
-    public int amountRoadGuidelines = 5;
+
+    public float oldRoadGuidelinesLength = 5;
+    public float roadGuidelinesLength = 5;
+    public float roadGuidelinesDistance = 10;
+    public float roadGuidelinesSnapDistance = 1;
+
     public Color pointColour = Color.red;
     public Color controlPointColour = Color.yellow;
     public Color intersectionColour = Color.green;
     public Color cursorColour = Color.blue;
     public Color roadGuidelinesColour = Misc.lightGreen;
     public Color roadControlGuidelinesColour = Misc.darkGreen;
-
-    public bool debug = false;
     public bool roadCurved = true;
 
     public void UpdateRoadGuidelines()

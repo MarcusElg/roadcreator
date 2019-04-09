@@ -186,11 +186,6 @@ public class Intersection : MonoBehaviour
                         modifiedT = 0.5f;
                     }
 
-                    if (modifiedT > 1)
-                    {
-                        modifiedT = 1;
-                    }
-
                     vertices.Add(Misc.Lerp3(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
 
                     if (t > 0)

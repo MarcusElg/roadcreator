@@ -61,14 +61,6 @@ public class RoadEditor : Editor
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
 
-        if (roadCreator.globalSettings.debug == true)
-        {
-            GUILayout.Space(20);
-            GUILayout.Label("Debug", guiStyle);
-            GUILayout.Label(roadCreator.startIntersectionConnectionIndex.ToString());
-            GUILayout.Label(roadCreator.endIntersectionConnectionIndex.ToString());
-        }
-
         if (GUILayout.Button("Reset Road"))
         {
             ResetObject();

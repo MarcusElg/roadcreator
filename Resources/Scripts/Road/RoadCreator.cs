@@ -1028,8 +1028,7 @@ public class RoadCreator : MonoBehaviour
 
         for (float t = 0; t < 1; t += distancePerDivision / 10)
         {
-            Vector3 position = Misc.Lerp3(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
-            position.y = Mathf.Lerp(Mathf.Lerp(segment.GetChild(0).GetChild(0).position.y, Misc.GetCenter(segment.GetChild(0).GetChild(2).position.y, segment.GetChild(0).GetChild(0).position.y), t), segment.GetChild(0).GetChild(2).position.y, t);
+            Vector3 position = Misc.Lerp3CenterHeight(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position, t);
 
             float calculatedDistance = Vector3.Distance(position, lastPosition);
             if (t + distancePerDivision / 10 >= 1)

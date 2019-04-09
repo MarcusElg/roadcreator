@@ -58,15 +58,20 @@ public class GlobalSettingsEditor : Editor
         settings.ignoreMouseRayLayer = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.ignoreMouseRayLayer), 9, 31);
         settings.roadLayer = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.roadLayer), 9, 31);
 
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
+
         EditorGUI.BeginChangeCheck();
-        settings.amountRoadGuidelines = Mathf.Clamp(EditorGUILayout.IntField("Amount Of Road Guidelines (each side)", settings.amountRoadGuidelines), 0, 15);
+        GUILayout.Space(20);
+        GUILayout.Label("Road Guidelines", guiStyle);
+        settings.roadGuidelinesLength = Mathf.Clamp(EditorGUILayout.FloatField("Road Guidelines Length (each side)", settings.roadGuidelinesLength), 0, 15);
+        settings.roadGuidelinesDistance = Mathf.Clamp(EditorGUILayout.FloatField("Road Guidelines Display Distance", settings.roadGuidelinesDistance), 1, 50);
+        settings.roadGuidelinesSnapDistance = Mathf.Clamp(EditorGUILayout.FloatField("Road Guidelines Snap Distance", settings.roadGuidelinesSnapDistance), 0.1f, 5);
+
         if (EditorGUI.EndChangeCheck() == true)
         {
             settings.UpdateRoadGuidelines();
         }
-
-        GUIStyle guiStyle = new GUIStyle();
-        guiStyle.fontStyle = FontStyle.Bold;
 
         GUILayout.Space(20);
         GUILayout.Label("Colours", guiStyle);
@@ -87,8 +92,6 @@ public class GlobalSettingsEditor : Editor
             settings.roadControlGuidelinesColour = Misc.darkGreen;
         }
         GUILayout.Space(20);
-
-        settings.debug = EditorGUILayout.Toggle("Debug", settings.debug);
     }
 
     private void OnSceneGUI()

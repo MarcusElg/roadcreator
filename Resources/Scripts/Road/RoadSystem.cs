@@ -61,14 +61,14 @@ public class RoadSystem : MonoBehaviour
 
         if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 45), (int)(SceneView.lastActiveSceneView.position.height - 95)))
         {
-            if (globalSettings.amountRoadGuidelines > 0)
+            if (globalSettings.roadGuidelinesLength > 0)
             {
-                globalSettings.oldAmountRoadGuidelines = globalSettings.amountRoadGuidelines;
-                globalSettings.amountRoadGuidelines = 0;
+                globalSettings.oldRoadGuidelinesLength = globalSettings.roadGuidelinesLength;
+                globalSettings.roadGuidelinesLength = 0;
             }
             else
             {
-                globalSettings.amountRoadGuidelines = globalSettings.oldAmountRoadGuidelines;
+                globalSettings.roadGuidelinesLength = globalSettings.oldRoadGuidelinesLength;
             }
 
             globalSettings.UpdateRoadGuidelines();
@@ -120,7 +120,7 @@ public class RoadSystem : MonoBehaviour
                 GUI.DrawTexture(new Rect(90, 5, 30, 30), straightRoad);
             }
 
-            if (globalSettings.amountRoadGuidelines > 0)
+            if (globalSettings.roadGuidelinesLength > 0)
             {
                 GUI.DrawTexture(new Rect(125, 5, 30, 30), roadGuidelinesOn);
             }
