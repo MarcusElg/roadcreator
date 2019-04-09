@@ -166,5 +166,6 @@ public class IntersectionEditor : Editor
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        SceneView.currentDrawingSceneView.Repaint();
     }
 }

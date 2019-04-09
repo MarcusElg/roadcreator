@@ -231,6 +231,7 @@ public class PrefabLineEditor : Editor
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        SceneView.currentDrawingSceneView.Repaint();
     }
 
     private void Draw(Event guiEvent, Vector3 hitPosition)

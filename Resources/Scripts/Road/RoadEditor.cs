@@ -193,6 +193,7 @@ public class RoadEditor : Editor
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        SceneView.currentDrawingSceneView.Repaint();
     }
 
     private void CreatePoints()
