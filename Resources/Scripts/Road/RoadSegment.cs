@@ -191,7 +191,7 @@ public class RoadSegment : MonoBehaviour
                 return;
             }
 
-            centerGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(2).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(2).position, transform.GetChild(0).GetChild(2).position - left * roadGuidelinesLength);
+            endGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(2).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(2).position, transform.GetChild(0).GetChild(2).position - left * roadGuidelinesLength);
         }
         else
         {

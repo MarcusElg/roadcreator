@@ -211,8 +211,8 @@ public static class Misc
 
             if (Vector2.Distance(mousePositionXZ, nereastPoint) < roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesDistance)
             {
-                Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines.startPoint);
-                Handles.DrawLine(roadSegment.transform.GetChild(0).GetChild(child).position, guidelines.endPoint);
+                Handles.DrawLine(guidelines.centerPoint, guidelines.startPoint);
+                Handles.DrawLine(guidelines.centerPoint, guidelines.endPoint);
                 Handles.DrawSolidDisc(guidelines.centerPoint, Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize * 0.75f);
 
                 Vector3 left = CalculateLeft(guidelines.startPoint, guidelines.endPoint);
