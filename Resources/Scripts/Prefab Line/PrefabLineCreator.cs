@@ -198,11 +198,14 @@ public class PrefabLineCreator : MonoBehaviour
                 }
 
                 placedPrefab.transform.SetParent(transform.GetChild(1));
-                placedPrefab.transform.position = Misc.GetCenter(currentPoints.startPoints[j], currentPoints.endPoints[j]);
                 placedPrefab.name = "Prefab";
                 placedPrefab.layer = globalSettings.roadLayer;
                 placedPrefab.transform.localScale = new Vector3(scale, scale, scale);
-                Vector3 left = Misc.CalculateLeft(currentPoints.startPoints[j], currentPoints.endPoints[j]);
+
+                Vector3 startPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j]));
+                Vector3 endPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j]));
+                placedPrefab.transform.position = Misc.GetCenter(startPoint, endPoint);
+                Vector3 left = Misc.CalculateLeft(startPoint, endPoint);
                 Vector3 forward = new Vector3(left.z, 0, -left.x);
 
                 if (rotateAlongCurve == true)
@@ -229,22 +232,21 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     Mesh mesh = GameObject.Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
                     Vector3[] vertices = mesh.vertices;
-                    float distanceToChange = Mathf.Abs((Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * placedPrefab.transform.position).z - (Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * currentPoints.prefabPoints[j]).z);
-
-                    Vector3 controlPoint;
-                    if (currentPoints.rotateTowardsLeft[j] == false)
-                    {
-                        distanceToChange = -distanceToChange;
-                    }
-
-                    controlPoint = mesh.bounds.center + new Vector3(0, 0, distanceToChange * 4);
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
                         float distance = Mathf.Abs(vertices[i].x - mesh.bounds.min.x);
                         float distanceCovered = (distance / mesh.bounds.size.x);
-                        Vector3 lerpedPoint = Misc.Lerp3(new Vector3(-mesh.bounds.extents.x, 0, 0), controlPoint, new Vector3(mesh.bounds.extents.x, 0, 0), distanceCovered);
-                        vertices[i].z = vertices[i].z - (lerpedPoint).z;
+                        float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], distanceCovered);
+                        int pointIndex = Mathf.FloorToInt(currentTime);
+
+                        if (distanceCovered > 0 && distanceCovered < 1)
+                        {
+                            Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
+                            float y = vertices[i].y;
+                            vertices[i] += (Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position)) / scale - new Vector3(vertices[i].x, 0, 0);
+                            vertices[i].y = y;
+                        }
                     }
 
                     mesh.vertices = vertices;
@@ -263,8 +265,8 @@ public class PrefabLineCreator : MonoBehaviour
                 if (yModification != PrefabLineCreator.YModification.none)
                 {
                     Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
-                    float startHeight = currentPoints.startPoints[j].y;
-                    float endHeight = currentPoints.endPoints[j].y;
+                    float startHeight = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j])).y;
+                    float endHeight = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j])).y;
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
@@ -404,15 +406,16 @@ public class PrefabLineCreator : MonoBehaviour
     public PointPackage CalculatePoints()
     {
         List<Vector3> prefabPoints = new List<Vector3>();
-        List<Vector3> startPoints = new List<Vector3>();
-        List<Vector3> endPoints = new List<Vector3>();
-        List<bool> rotateTowardsLeft = new List<bool>();
+        List<float> startTimes = new List<float>();
+        List<float> endTimes = new List<float>();
+        List<Vector3> lerpPoints = new List<Vector3>();
 
         Vector3 firstPoint = transform.GetChild(0).GetChild(0).position;
         Vector3 controlPoint = transform.GetChild(0).GetChild(1).position;
         Vector3 endPoint = transform.GetChild(0).GetChild(2).position;
+
         float distance = Misc.CalculateDistance(firstPoint, controlPoint, endPoint);
-        startPoints.Add(firstPoint);
+        startTimes.Add(0);
         Vector3 lastPoint = firstPoint;
         bool endPointAdded = true;
 
@@ -431,25 +434,18 @@ public class PrefabLineCreator : MonoBehaviour
 
             for (float t = 0; t < 1; t += distancePerDivision / pointCalculationDivisions)
             {
-                if (t > 1)
-                {
-                    t = 1;
-                }
-
-                currentPoint = Misc.Lerp3(firstPoint, controlPoint, endPoint, t);
-                currentPoint.y = Mathf.Lerp(Mathf.Lerp(firstPoint.y, Misc.GetCenter(firstPoint.y, endPoint.y), t), endPoint.y, t);
+                currentPoint = Misc.Lerp3CenterHeight(firstPoint, controlPoint, endPoint, t);
 
                 float currentDistance = Vector3.Distance(new Vector3(lastPoint.x, 0, lastPoint.z), new Vector3(currentPoint.x, 0, currentPoint.z));
 
                 if (currentDistance > spacing / 2 && endPointAdded == false)
                 {
-                    endPoints.Add(currentPoint);
-                    startPoints.Add(currentPoint);
+                    endTimes.Add(i / 2 + t);
+                    startTimes.Add(i / 2 + t);
                     endPointAdded = true;
-                    rotateTowardsLeft.Add(IsSegmentLeft(startPoints[startPoints.Count - 2], prefabPoints[prefabPoints.Count - 1], endPoints[endPoints.Count - 1]));
                 }
 
-                if (endPointAdded == true && ((currentDistance > spacing) || (startPoints.Count == 1 && currentDistance > spacing / 2)))
+                if (endPointAdded == true && ((currentDistance > spacing) || (startTimes.Count == 1 && currentDistance > spacing / 2)))
                 {
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;
@@ -457,29 +453,16 @@ public class PrefabLineCreator : MonoBehaviour
                 }
             }
 
-            if (endPoints.Count < prefabPoints.Count && (i + 2) >= transform.GetChild(0).childCount - 2)
+            if (endTimes.Count < prefabPoints.Count && (i + 2) >= transform.GetChild(0).childCount - 2)
             {
-                endPoints.Add(currentPoint);
-                rotateTowardsLeft.Add(IsSegmentLeft(startPoints[startPoints.Count - 1], prefabPoints[prefabPoints.Count - 1], endPoints[endPoints.Count - 1]));
+                endTimes.Add(i / 2 + 0.999f);
             }
+
+            lerpPoints.Add(firstPoint);
+            lerpPoints.Add(controlPoint);
+            lerpPoints.Add(endPoint);
         }
 
-        return new PointPackage(prefabPoints.ToArray(), startPoints.ToArray(), endPoints.ToArray(), rotateTowardsLeft.ToArray());
+        return new PointPackage(prefabPoints.ToArray(), lerpPoints.ToArray(), startTimes.ToArray(), endTimes.ToArray());
     }
-
-    private bool IsSegmentLeft(Vector3 startPosition, Vector3 prefabPosition, Vector3 endPosition)
-    {
-        //(b.X - a.X)*(c.Y - a.Y) - (b.Y - a.Y)*(c.X - a.X);
-        float direction = ((float)endPosition.x - startPosition.x) * ((float)prefabPosition.z - startPosition.z) - ((float)endPosition.z - startPosition.z) * ((float)prefabPosition.x - startPosition.x);
-
-        if (direction < 0.0f)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
 }

@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 
-public class PointPackage {
+public class PointPackage
+{
 
     public Vector3[] prefabPoints;
-    public Vector3[] startPoints;
-    public Vector3[] endPoints;
-    public bool[] rotateTowardsLeft;
+    public Vector3[] lerpPoints;
+    public float[] startTimes;
+    public float[] endTimes;
 
-    public PointPackage (Vector3[] prefabPoints, Vector3[] startPoints, Vector3[] endPoints, bool[] rotateTowardsLeft = null)
+    public PointPackage(Vector3[] prefabPoints, Vector3[] lerpPoints, float[] startTimes, float[] endTimes)
     {
         this.prefabPoints = prefabPoints;
-        this.startPoints = startPoints;
-        this.endPoints = endPoints;
-        this.rotateTowardsLeft = rotateTowardsLeft;
+        this.lerpPoints = lerpPoints;
+        this.startTimes = startTimes;
+        this.endTimes = endTimes;
     }
 
 }

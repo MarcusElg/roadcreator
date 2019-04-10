@@ -205,7 +205,7 @@ public class PrefabLineEditor : Editor
 
             if (prefabCreator.transform.childCount > 0 && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
             {
-                points = CalculatePoints(guiEvent, hitPosition);
+                points = CalculateTemporaryPoints(guiEvent, hitPosition);
             }
 
             Draw(guiEvent, hitPosition);
@@ -288,7 +288,7 @@ public class PrefabLineEditor : Editor
         Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
     }
 
-    private Vector3[] CalculatePoints(Event guiEvent, Vector3 hitPosition)
+    private Vector3[] CalculateTemporaryPoints(Event guiEvent, Vector3 hitPosition)
     {
         float divisions;
         int lastIndex = prefabCreator.transform.GetChild(0).GetChild(prefabCreator.transform.GetChild(0).childCount - 1).GetSiblingIndex();
