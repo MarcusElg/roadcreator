@@ -71,7 +71,7 @@ public class PrefabLineCreator : MonoBehaviour
         point.layer = globalSettings.ignoreMouseRayLayer;
         point.AddComponent<Point>();
         point.GetComponent<Point>().roadPoint = false;
-        point.hideFlags = HideFlags.NotEditable;
+        point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
         return point;
     }
 

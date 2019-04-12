@@ -9,8 +9,16 @@ public class PointEditor : Editor
     private void OnSceneGUI()
     {
         Point point = (Point)target;
-        RoadCreator roadCreator = point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
-        PrefabLineCreator prefabLine = point.transform.parent.parent.GetComponent<PrefabLineCreator>();
+        RoadCreator roadCreator = null;
+        PrefabLineCreator prefabLine = null;
+
+        if (point.roadPoint == true)
+        {
+            roadCreator = point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+        } else
+        {
+            prefabLine = point.transform.parent.parent.GetComponent<PrefabLineCreator>();
+        }
 
         if (point.transform.hasChanged == true)
         {
