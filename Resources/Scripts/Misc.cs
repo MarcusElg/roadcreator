@@ -31,11 +31,14 @@ public static class Misc
     public static float CalculateDistance(Vector3 startPosition, Vector3 controlPosition, Vector3 endPosition)
     {
         float distance = 0;
-        for (float t = 0.1f; t <= 1.1f; t += 0.1f)
+        Vector3 lastPosition = startPosition;
+        for (float t = 0.01f; t <= 1f; t += 0.01f)
         {
-            distance += Vector3.Distance(Lerp3(startPosition, controlPosition, endPosition, t), Lerp3(startPosition, controlPosition, endPosition, t - 0.1f));
+            Vector3 currentPosition = Lerp3(startPosition, controlPosition, endPosition, t);
+            distance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
+            lastPosition = currentPosition;
         }
-
+        
         return distance;
     }
 

@@ -15,8 +15,7 @@ public class Intersection : MonoBehaviour
     public GameObject objectToMove;
     public bool stretchTexture = false;
 
-    public enum BridgeGenerator { none, simple };
-    public BridgeGenerator bridgeGenerator;
+    public bool generateBridge = true;
     public BridgeSettings bridgeSettings;
 
     public bool placePillars = true;
@@ -100,17 +99,19 @@ public class Intersection : MonoBehaviour
             {
                 if (roads[i].startIntersection == this)
                 {
+                    Undo.RecordObject(roads[i], "Remove Intersection");
                     roads[i].startIntersection = null;
-                    break;
+                    roads[i].startIntersectionConnectionIndex = -1; 
                 }
                 else if (roads[i].endIntersection == this)
                 {
-                    roads[i].endIntersection = this;
-                    break;
+                    Undo.RecordObject(roads[i], "Remove Intersection");
+                    roads[i].endIntersection = null;
+                    roads[i].endIntersectionConnectionIndex = -1;
                 }
             }
 
-            GameObject.DestroyImmediate(gameObject);
+            Undo.DestroyObjectImmediate(gameObject);
         }
         else
         {
@@ -135,7 +136,7 @@ public class Intersection : MonoBehaviour
 
             if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
             {
-                pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Cylinder Bridge Pillar") as GameObject;
+                pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Pillars/Cylinder Bridge Pillar") as GameObject;
             }
 
             List<Vector3> vertices = new List<Vector3>();
@@ -178,6 +179,12 @@ public class Intersection : MonoBehaviour
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
 
+                for (float t = 0; t <= 1; t += 0.1f)
+                {
+                    Vector3 pos = Misc.Lerp3(Vector3.zero, new Vector3(0.5f, 0.5f, 0.5f), Vector3.one, t);
+                    Debug.Log(pos.x + ", "+ pos.y + ", " + pos.z);
+                }
+
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
                 {
                     float modifiedT = t;
@@ -185,9 +192,10 @@ public class Intersection : MonoBehaviour
                     {
                         modifiedT = 0.5f;
                     }
+                    //vertices.Add(Vector3.Lerp(firstPoint, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+                    vertices.Add(Misc.Lerp3CenterHeight(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
 
-                    vertices.Add(Misc.Lerp3(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
-
+                    //vertices.Add(Misc.Lerp3CenterHeight(firstPoint, Misc.GetCenter(firstPoint, nextPoint), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
                     if (t > 0)
                     {
                         exactLengths[i] += Vector3.Distance(lastVertexPosition, vertices[vertices.Count - 1]);
@@ -200,13 +208,13 @@ public class Intersection : MonoBehaviour
 
                     if (modifiedT < 0.5f)
                     {
-                        Vector3 point = Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) + new Vector3(0, yOffset, 0) - transform.position;
+                        Vector3 point = Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) - transform.position;
                         point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
                         vertices.Add(point);
                     }
                     else
                     {
-                        Vector3 point = Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) + new Vector3(0, yOffset, 0) - transform.position;
+                        Vector3 point = Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) - transform.position;
                         point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
                         vertices.Add(point);
                     }
@@ -267,7 +275,7 @@ public class Intersection : MonoBehaviour
             {
                 int endVertexIndex;
                 float currentLength = 0f;
-                Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index]];
+                Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index] + 1];
 
                 if (extraMeshes[i].index < firstVertexIndexes.Count - 1)
                 {
@@ -285,7 +293,7 @@ public class Intersection : MonoBehaviour
 
                 for (int j = firstVertexIndexes[extraMeshes[i].index]; j < endVertexIndex; j += 2)
                 {
-                    currentLength += Vector3.Distance(lastPosition, vertices[j]);
+                    currentLength += Vector3.Distance(lastPosition, vertices[j + 1]);
 
                     Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
                     extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLength[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength[extraMeshes[i].index])));
@@ -302,7 +310,7 @@ public class Intersection : MonoBehaviour
                         vertexIndex += 2;
                     }
 
-                    lastPosition = vertices[j];
+                    lastPosition = vertices[j + 1];
                 }
 
                 Mesh mesh = new Mesh();
@@ -321,7 +329,7 @@ public class Intersection : MonoBehaviour
                 heights[extraMeshes[i].index] += extraMeshes[i].yOffset;
             }
 
-            if (bridgeGenerator == BridgeGenerator.simple)
+            if (generateBridge == true)
             {
                 BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeSettings.bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
             }

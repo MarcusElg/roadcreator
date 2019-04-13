@@ -160,7 +160,7 @@ public class RoadCreator : MonoBehaviour
                 }
             }
 
-            if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().bridgeGenerator != RoadSegment.BridgeGenerator.none)
+            if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateSimpleBridge == true)
             {
                 if (transform.GetChild(0).GetChild(i).GetChild(2).GetComponent<MeshRenderer>().sharedMaterial != null)
                 {
@@ -175,7 +175,42 @@ public class RoadCreator : MonoBehaviour
 
     public void UndoUpdate()
     {
-        CreateMesh();
+        if (startIntersection == null && endIntersection == null)
+        {
+            CreateMesh();
+        }
+        else
+        {
+            if (endIntersection != null)
+            {
+                for (int i = 0; i < endIntersection.connections.Count; i++)
+                {
+                    if (endIntersection.connections[i].road.transform.GetSiblingIndex() == 0)
+                    {
+                        endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(endIntersection);
+                    }
+                    else
+                    {
+                        endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(endIntersection);
+                    }
+                }
+            }
+
+            if (startIntersection != null)
+            {
+                for (int i = 0; i < startIntersection.connections.Count; i++)
+                {
+                    if (startIntersection.connections[i].road.transform.GetSiblingIndex() == 0)
+                    {
+                        startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(startIntersection);
+                    }
+                    else
+                    {
+                        startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(startIntersection);
+                    }
+                }
+            }
+        }
     }
 
     public void CreatePoints(Vector3 hitPosition)
@@ -294,7 +329,8 @@ public class RoadCreator : MonoBehaviour
                 segment.flipped = oldLastSegment.flipped;
                 segment.terrainOption = oldLastSegment.terrainOption;
 
-                segment.bridgeGenerator = oldLastSegment.bridgeGenerator;
+                segment.generateSimpleBridge = oldLastSegment.generateSimpleBridge;
+                segment.generateCustomBridge = oldLastSegment.generateCustomBridge;
                 segment.bridgeSettings = oldLastSegment.bridgeSettings;
 
                 segment.placePillars = oldLastSegment.placePillars;
@@ -371,10 +407,12 @@ public class RoadCreator : MonoBehaviour
             {
                 if (end[i] == true)
                 {
+                    Undo.RecordObject(roads[i], "Remove Intersection");
                     roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
                 }
                 else
                 {
+                    Undo.RecordObject(roads[i], "Remove Intersection");
                     roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
                 }
             }
@@ -436,10 +474,12 @@ public class RoadCreator : MonoBehaviour
             {
                 if (end[i] == true)
                 {
+                    Undo.RecordObject(roads[i], "Remove Intersection");
                     roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
                 }
                 else
                 {
+                    Undo.RecordObject(roads[i], "Remove Intersection");
                     roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
                 }
             }
@@ -644,15 +684,18 @@ public class RoadCreator : MonoBehaviour
 
     public void RemoveIntersectionConnection(Intersection intersection, int connectionIndex, bool start)
     {
+        Undo.RecordObject(intersection, "Remove Intersection");
         intersection.connections.RemoveAt(System.Array.IndexOf(intersection.connections.ToArray(), intersection.connections[connectionIndex]));
 
         if (start == true)
         {
+            Undo.RecordObject(this, "Remove Intersection");
             startIntersection = null;
             startIntersectionConnectionIndex = -1;
         }
         else
         {
+            Undo.RecordObject(this, "Remove Intersection");
             endIntersection = null;
             endIntersectionConnectionIndex = -1;
         }
@@ -667,12 +710,7 @@ public class RoadCreator : MonoBehaviour
 
         intersection.AddComponent<Intersection>();
         intersection.GetComponent<Intersection>().yOffset = heightOffset;
-
-        if (segment.bridgeGenerator == RoadSegment.BridgeGenerator.simple)
-        {
-            intersection.GetComponent<Intersection>().bridgeGenerator = Intersection.BridgeGenerator.simple;
-        }
-
+        intersection.GetComponent<Intersection>().generateBridge = segment.generateSimpleBridge;
         intersection.GetComponent<Intersection>().bridgeSettings = segment.bridgeSettings;
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
@@ -713,12 +751,14 @@ public class RoadCreator : MonoBehaviour
         {
             CreateIntersectionConnectionFirst(intersection.GetComponent<Intersection>(), gameObject);
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection = intersection;
+            Undo.RecordObject(gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>(), "Create Intersection");
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex = intersection.connections.Count - 1;
         }
         else
         {
             CreateIntersectionConnectionLast(intersection.GetComponent<Intersection>(), gameObject);
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection = intersection;
+            Undo.RecordObject(gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>(), "Create Intersection");
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex = intersection.connections.Count - 1;
         }
     }

@@ -16,7 +16,6 @@ public class PrefabLineCreator : MonoBehaviour
     public float terrainCheckHeight = 1;
 
     public bool bendObjects = true;
-    public float bendMultiplier = 1;
     public bool fillGap = true;
     public float spacing = -1;
     public bool rotateAlongCurve = true;
@@ -36,6 +35,33 @@ public class PrefabLineCreator : MonoBehaviour
     public void UndoUpdate()
     {
         PlacePrefabs();
+    }
+
+    public void Setup ()
+    {
+        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        {
+            globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
+        }
+        else if (globalSettings == null)
+        {
+            globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+        }
+
+        if (transform.childCount == 0 || transform.GetChild(0).name != "Points")
+        {
+            GameObject points = new GameObject("Points");
+            points.transform.SetParent(transform);
+            points.transform.SetAsFirstSibling();
+            points.hideFlags = HideFlags.NotEditable;
+        }
+
+        if (transform.childCount < 2 || transform.GetChild(1).name != "Objects")
+        {
+            GameObject objects = new GameObject("Objects");
+            objects.transform.SetParent(transform);
+            objects.hideFlags = HideFlags.NotEditable;
+        }
     }
 
     public void CreatePoints(Vector3 hitPosition)
@@ -175,6 +201,11 @@ public class PrefabLineCreator : MonoBehaviour
         if (fillGap == true && rotationDirection != PrefabLineCreator.RotationDirection.left && rotationDirection != PrefabLineCreator.RotationDirection.right)
         {
             rotationDirection = PrefabLineCreator.RotationDirection.left;
+        }
+
+        if (spacing == -1)
+        {
+            spacing = prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * scale;
         }
 
         if (transform.GetChild(0).childCount > 2)

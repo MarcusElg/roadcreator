@@ -13,13 +13,8 @@ public class BridgeSettings
     public float widthPercentageSecondStep = 0.6f;
     public float extraWidth = 0.2f;
 
-    // Suspension bridge
-    public GameObject cablePrefab;
+    // Custom mesh
+    public GameObject bridgeMesh;
     public int sections = 1;
-    public float cableScale = 1;
-    public float topCableScale = 1.5f;
-    public float cableGap = 1;
-    public float height = 10f;
-    public float widthOffset = 0f;
 
 }

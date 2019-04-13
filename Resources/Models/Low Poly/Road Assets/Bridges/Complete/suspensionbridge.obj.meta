@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 26dfd31c1d978744ab91719ff6e20a4c
+guid: 40e38bb1a2a4dcc4db39e18f572b9b82
 ModelImporter:
   serializedVersion: 25
   internalIDToNameTable: []
@@ -7,8 +7,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: None
-    second: {fileID: 2100000, guid: d797e90cb82c23140be15bac79e8e882, type: 2}
+      name: Cable
+    second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Centerpiece
+    second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

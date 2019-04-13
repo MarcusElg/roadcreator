@@ -167,120 +167,40 @@ public class BridgeGeneration
         return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials);
     }
 
-    public static void GenerateSuspensionBridge(Vector3[] points, Vector3[] nextPoints, Vector3 previousPoint, RoadSegment segment, Transform previousSegment, float startExtraWidthLeft, float endExtraWidthLeft, float startExtraWidthRight, float endExtraWidthRight, Material[] materials, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint)
+    public static void GenerateCustomBridge(RoadSegment segment)
     {
-        GameObject bridge = GenerateSimpleBridge(points, nextPoints, previousPoint, segment, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, materials, startPoint, controlPoint, endPoint);
+        GameObject prefabLine = new GameObject("Custom Bridge");
+        prefabLine.hideFlags = HideFlags.NotEditable;
+        prefabLine.transform.SetParent(segment.transform, false);
+        prefabLine.AddComponent<PrefabLineCreator>();
+        prefabLine.GetComponent<PrefabLineCreator>().prefab = segment.bridgeSettings.bridgeMesh;
+        prefabLine.GetComponent<PrefabLineCreator>().pointCalculationDivisions = 1000;
+        prefabLine.GetComponent<PrefabLineCreator>().Setup();
+        prefabLine.GetComponent<PrefabLineCreator>().fillGap = false;
+        prefabLine.GetComponent<PrefabLineCreator>().yModification = PrefabLineCreator.YModification.matchCurve;
 
-        float totalDistance = 0;
-        float currentDistance = 0;
-        float currentTotalDistance = 0;
-        Vector3 lastPosition = startPoint;
-        Vector3 lastCablePosition = startPoint;
-        Vector3 currentLeftCablePosition = Vector3.zero;
-        Vector3 currentRightCablePosition = Vector3.zero;
-        Vector3 leftCablePosition = startPoint + Misc.CalculateLeft(points[0], points[1]) * (segment.startRoadWidth + startExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset);
-        Vector3 rightCablePosition = startPoint - Misc.CalculateLeft(points[0], points[1]) * (segment.startRoadWidth + startExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset);
+        Vector3 startPoint = segment.transform.GetChild(0).GetChild(0).transform.position;
+        Vector3 centerPoint = segment.transform.GetChild(0).GetChild(1).transform.position;
+        Vector3 endPoint = segment.transform.GetChild(0).GetChild(2).transform.position;
 
-        for (int i = 1; i < points.Length; i++)
+        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", startPoint);
+        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Control Point", centerPoint);
+        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", endPoint);
+
+        float totalLength = Misc.CalculateDistance(startPoint, centerPoint, endPoint);
+        prefabLine.GetComponent<PrefabLineCreator>().scale = totalLength / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / segment.bridgeSettings.sections;
+
+        prefabLine.GetComponent<PrefabLineCreator>().spacing = -1;
+        prefabLine.GetComponent<PrefabLineCreator>().PlacePrefabs();
+
+        // Fix x-scale
+        for (int i = 0; i < prefabLine.transform.GetChild(1).childCount; i++)
         {
-            totalDistance += Vector3.Distance(points[i - 1], points[i]);
+            Vector3 scale = prefabLine.transform.GetChild(1).GetChild(i).localScale;
+            scale.z = 1;
+            scale.y = 1;
+            prefabLine.transform.GetChild(1).GetChild(i).localScale = scale;
         }
-
-        bool upwards = true;
-        float distancePerSegment = 1f / segment.bridgeSettings.sections;
-        float currentSegmentDistance = 0;
-
-        for (float t = 0; t <= 1; t += 0.001f)
-        {
-            Vector3 currentPosition = Misc.Lerp3(startPoint, controlPoint, endPoint, t);
-            currentPosition.y = Mathf.Lerp(Mathf.Lerp(startPoint.y, Misc.GetCenter(endPoint.y, startPoint.y), t), endPoint.y, t);
-            currentDistance = Vector3.Distance(lastCablePosition, currentPosition);
-            currentTotalDistance += Vector3.Distance(lastPosition, currentPosition);
-
-            if (upwards == true)
-            {
-                currentSegmentDistance += Vector3.Distance(lastPosition, currentPosition);
-            }
-            else
-            {
-                currentSegmentDistance -= Vector3.Distance(lastPosition, currentPosition);
-            }
-
-            if (currentDistance >= segment.bridgeSettings.cableGap)
-            {
-                if (currentSegmentDistance > distancePerSegment * totalDistance / 2)
-                {
-                    upwards = false;
-                    currentSegmentDistance = distancePerSegment * totalDistance / 2;
-                }
-                else if (currentSegmentDistance <= 0)
-                {
-                    upwards = true;
-                    currentSegmentDistance = 0;
-                }
-
-                Vector3 left = Misc.CalculateLeft(lastPosition, currentPosition);
-                float height = segment.bridgeSettings.height * currentSegmentDistance / (distancePerSegment * totalDistance);
-                float roadWidth = Mathf.Lerp(segment.startRoadWidth, segment.endRoadWidth, currentTotalDistance / totalDistance);
-                float roadWidthLeft = roadWidth + Mathf.Lerp(startExtraWidthLeft, endExtraWidthLeft, currentTotalDistance / totalDistance) - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset;
-                float roadWidthRight = roadWidth + Mathf.Lerp(startExtraWidthRight, endExtraWidthRight, currentTotalDistance / totalDistance) - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset;
-
-                // Left cable
-                GameObject cable = GameObject.Instantiate(segment.bridgeSettings.cablePrefab);
-                cable.name = "Cable";
-                cable.hideFlags = HideFlags.NotEditable;
-                cable.layer = segment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
-                cable.transform.SetParent(bridge.transform);
-                cable.transform.position = currentPosition + roadWidthLeft * left + new Vector3(0, height / 2, 0);
-                cable.transform.rotation = Quaternion.LookRotation(left, Vector3.up);
-                cable.transform.localScale = new Vector3(segment.bridgeSettings.cableScale, height, segment.bridgeSettings.cableScale);
-                currentLeftCablePosition = cable.transform.position + new Vector3 (0, height / 2, 0);
-
-                // Right cable
-                cable = GameObject.Instantiate(segment.bridgeSettings.cablePrefab);
-                cable.name = "Cable";
-                cable.hideFlags = HideFlags.NotEditable;
-                cable.layer = segment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
-                cable.transform.SetParent(bridge.transform);
-                cable.transform.position = currentPosition + roadWidthRight * -left + new Vector3(0, height / 2, 0);
-                cable.transform.rotation = Quaternion.LookRotation(-left, Vector3.up);
-                cable.transform.localScale = new Vector3(segment.bridgeSettings.cableScale, height, segment.bridgeSettings.cableScale);
-                currentRightCablePosition = cable.transform.position + new Vector3(0, height / 2, 0);
-
-                // Top Cables
-                GenerateTopCable(segment, bridge.transform, Misc.GetCenter(leftCablePosition, currentLeftCablePosition), (leftCablePosition - currentLeftCablePosition).normalized, Vector3.Distance(currentLeftCablePosition, leftCablePosition));
-                GenerateTopCable(segment, bridge.transform, Misc.GetCenter(rightCablePosition, currentRightCablePosition), (rightCablePosition - currentRightCablePosition).normalized, Vector3.Distance(currentRightCablePosition, rightCablePosition));
-
-                if (currentTotalDistance + segment.bridgeSettings.cableGap > totalDistance)
-                {
-                    // Top Cables
-                    left = Misc.CalculateLeft(points[points.Length - 2], points[points.Length - 1]);
-                    GenerateTopCable(segment, bridge.transform, Misc.GetCenter(endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset), currentLeftCablePosition), ((endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)) - currentLeftCablePosition).normalized, Vector3.Distance(currentLeftCablePosition, endPoint + left * (segment.endRoadWidth + endExtraWidthLeft - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)));
-                    GenerateTopCable(segment, bridge.transform, Misc.GetCenter(endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset), currentRightCablePosition), ((endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)) - currentRightCablePosition).normalized, Vector3.Distance(currentRightCablePosition, endPoint - left * (segment.endRoadWidth + endExtraWidthRight - segment.bridgeSettings.extraWidth + segment.bridgeSettings.widthOffset)));
-                }
-
-                leftCablePosition = currentLeftCablePosition;
-                rightCablePosition = currentRightCablePosition;
-                lastCablePosition = currentPosition;
-            }
-
-            lastPosition = currentPosition;
-        }
-    }
-
-    public static GameObject GenerateTopCable(RoadSegment segment, Transform parent, Vector3 position, Vector3 lookDirection, float height)
-    {
-        GameObject cable = GameObject.Instantiate(segment.bridgeSettings.cablePrefab);
-        cable.name = "Top Cable";
-        cable.hideFlags = HideFlags.NotEditable;
-        cable.layer = segment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
-        cable.transform.SetParent(parent);
-        cable.transform.position = position;
-        cable.transform.rotation = Quaternion.LookRotation(lookDirection);
-        cable.transform.Rotate(new Vector3(90, 0, 0), Space.Self);
-        cable.transform.localScale = new Vector3(segment.bridgeSettings.topCableScale, height, segment.bridgeSettings.topCableScale);
-
-        return cable;
     }
 
     public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge)

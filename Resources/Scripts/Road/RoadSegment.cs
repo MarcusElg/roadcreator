@@ -18,8 +18,8 @@ public class RoadSegment : MonoBehaviour
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
 
-    public enum BridgeGenerator { none, simple, suspension };
-    public BridgeGenerator bridgeGenerator;
+    public bool generateSimpleBridge = true;
+    public bool generateCustomBridge = false;
     public BridgeSettings bridgeSettings = new BridgeSettings();
 
     public bool placePillars = true;
@@ -48,19 +48,24 @@ public class RoadSegment : MonoBehaviour
             bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
         }
 
-        if (bridgeSettings.cablePrefab == null)
-        {
-            bridgeSettings.cablePrefab = Resources.Load("Prefabs/Low Poly/Bridges/Cable") as GameObject;
-        }
-
         if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
         {
-            pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Oval Bridge Pillar") as GameObject;
+            pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
+        }
+
+        if (bridgeSettings.bridgeMesh == null || bridgeSettings.bridgeMesh.GetComponent<MeshFilter>() == null)
+        {
+            bridgeSettings.bridgeMesh = Resources.Load("Prefabs/Low Poly/Bridges/Complete/Suspension Bridge") as GameObject;
         }
 
         if (transform.Find("Bridge Base") != null)
         {
             DestroyImmediate(transform.Find("Bridge Base").gameObject);
+        }
+
+        if (transform.Find("Custom Bridge") != null)
+        {
+            DestroyImmediate(transform.Find("Custom Bridge").gameObject);
         }
 
         for (int i = 0; i < extraMeshes.Count; i++)
@@ -121,12 +126,7 @@ public class RoadSegment : MonoBehaviour
             GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].material, null, roadCreator, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
         }
 
-        if (transform.childCount == 3)
-        {
-            DestroyImmediate(transform.GetChild(2).gameObject);
-        }
-
-        if (bridgeGenerator != BridgeGenerator.none)
+        if (generateSimpleBridge == true || generateCustomBridge == true)
         {
             float startExtraWidthLeft = bridgeSettings.extraWidth;
             float endExtraWidthLeft = bridgeSettings.extraWidth;
@@ -147,13 +147,14 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            if (bridgeGenerator == BridgeGenerator.simple)
+            if (generateSimpleBridge == true)
             {
                 BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeSettings.bridgeMaterials, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position);
             }
-            else if (bridgeGenerator == BridgeGenerator.suspension)
+
+            if (generateCustomBridge == true)
             {
-                BridgeGeneration.GenerateSuspensionBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeSettings.bridgeMaterials, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position);
+                BridgeGeneration.GenerateCustomBridge(this);
             }
         }
     }

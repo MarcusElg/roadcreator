@@ -73,44 +73,40 @@ public class RoadSegmentEditor : Editor
 
         GUILayout.Space(20);
         GUILayout.Label("Bridge", guiStyle);
-        serializedObject.FindProperty("bridgeGenerator").enumValueIndex = (int)(RoadSegment.BridgeGenerator)EditorGUILayout.EnumPopup("Generator", (RoadSegment.BridgeGenerator)Enum.GetValues(typeof(RoadSegment.BridgeGenerator)).GetValue(serializedObject.FindProperty("bridgeGenerator").enumValueIndex));
 
-        if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex > 0)
-        {
-            SerializedProperty bridgeSettings = serializedObject.FindProperty("bridgeSettings");
+        SerializedProperty bridgeSettings = serializedObject.FindProperty("bridgeSettings");
+        serializedObject.FindProperty("generateSimpleBridge").boolValue = EditorGUILayout.Toggle("Generate Simple Bridge", serializedObject.FindProperty("generateSimpleBridge").boolValue);
+        if (serializedObject.FindProperty("generateSimpleBridge").boolValue == true)
+        { 
             EditorGUILayout.PropertyField(bridgeSettings.FindPropertyRelative("bridgeMaterials"), true);
             bridgeSettings.FindPropertyRelative("yOffsetFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", bridgeSettings.FindPropertyRelative("yOffsetFirstStep").floatValue), 0, 2);
             bridgeSettings.FindPropertyRelative("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", bridgeSettings.FindPropertyRelative("yOffsetSecondStep").floatValue), 0, 2);
             bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue), 0, 1);
             bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue), 0, 1);
             bridgeSettings.FindPropertyRelative("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", bridgeSettings.FindPropertyRelative("extraWidth").floatValue), 0, 1);
+        }
 
-            if (serializedObject.FindProperty("bridgeGenerator").enumValueIndex == 2)
-            {
-                GUILayout.Space(20);
-                GUILayout.Label("Suspension Bridge", guiStyle);
+        GUILayout.Space(20);
+        GUILayout.Label("Custom Bridge Mesh", guiStyle);
 
-                bridgeSettings.FindPropertyRelative("cablePrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Cable Prefab", bridgeSettings.FindPropertyRelative("cablePrefab").objectReferenceValue, typeof(GameObject), false);
-                bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
-                bridgeSettings.FindPropertyRelative("cableScale").floatValue = Mathf.Max(EditorGUILayout.FloatField("Cable Scale", bridgeSettings.FindPropertyRelative("cableScale").floatValue), 0);
-                bridgeSettings.FindPropertyRelative("topCableScale").floatValue = Mathf.Max(EditorGUILayout.FloatField("Top Cable Scale", bridgeSettings.FindPropertyRelative("topCableScale").floatValue), 0);
-                bridgeSettings.FindPropertyRelative("cableGap").floatValue = Mathf.Max(EditorGUILayout.FloatField("Cable Gap", bridgeSettings.FindPropertyRelative("cableGap").floatValue), 0);
-                bridgeSettings.FindPropertyRelative("height").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Height", bridgeSettings.FindPropertyRelative("height").floatValue), 0.5f, 50f);
-                bridgeSettings.FindPropertyRelative("widthOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Offset", bridgeSettings.FindPropertyRelative("widthOffset").floatValue), -0.5f, 5);
-            }
+        serializedObject.FindProperty("generateCustomBridge").boolValue = EditorGUILayout.Toggle("Generate Custom Bridge", serializedObject.FindProperty("generateCustomBridge").boolValue);
+        if (serializedObject.FindProperty("generateCustomBridge").boolValue == true)
+        {
+            bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Bridge Mesh", bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue, typeof(GameObject), false);
+            bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
+        }
 
-            GUILayout.Space(20);
-            GUILayout.Label("Pillar Placement", guiStyle);
-            serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
-            if (serializedObject.FindProperty("placePillars").boolValue == true)
-            {
-                serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
-                serializedObject.FindProperty("pillarGap").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Gap", serializedObject.FindProperty("pillarGap").floatValue));
-                serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
-                serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
-                serializedObject.FindProperty("xzPillarScale").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("XZ Pillar Scale", serializedObject.FindProperty("xzPillarScale").floatValue));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
-            }
+        GUILayout.Space(20);
+        GUILayout.Label("Pillar Placement", guiStyle);
+        serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
+        if (serializedObject.FindProperty("placePillars").boolValue == true)
+        {
+            serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
+            serializedObject.FindProperty("pillarGap").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Gap", serializedObject.FindProperty("pillarGap").floatValue));
+            serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
+            serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
+            serializedObject.FindProperty("xzPillarScale").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("XZ Pillar Scale", serializedObject.FindProperty("xzPillarScale").floatValue));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
         }
 
         GUILayout.Space(20);

@@ -13,30 +13,7 @@ public class PrefabLineEditor : Editor
     private void OnEnable()
     {
         prefabCreator = (PrefabLineCreator)target;
-
-        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
-        {
-            prefabCreator.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-        }
-        else if (prefabCreator.globalSettings == null)
-        {
-            prefabCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
-        }
-
-        if (prefabCreator.transform.childCount == 0 || prefabCreator.transform.GetChild(0).name != "Points")
-        {
-            GameObject points = new GameObject("Points");
-            points.transform.SetParent(prefabCreator.transform);
-            points.transform.SetAsFirstSibling();
-            points.hideFlags = HideFlags.NotEditable;
-        }
-
-        if (prefabCreator.transform.childCount < 2 || prefabCreator.transform.GetChild(1).name != "Objects")
-        {
-            GameObject objects = new GameObject("Objects");
-            objects.transform.SetParent(prefabCreator.transform);
-            objects.hideFlags = HideFlags.NotEditable;
-        }
+        prefabCreator.Setup();
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
