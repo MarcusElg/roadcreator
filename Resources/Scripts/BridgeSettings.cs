@@ -16,5 +16,6 @@ public class BridgeSettings
     // Custom mesh
     public GameObject bridgeMesh;
     public int sections = 1;
+    public float yScale = 1;
 
 }

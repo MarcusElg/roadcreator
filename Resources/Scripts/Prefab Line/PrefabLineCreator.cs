@@ -24,7 +24,9 @@ public class PrefabLineCreator : MonoBehaviour
     public RotationDirection rotationDirection = RotationDirection.left;
     public float yRotationRandomization;
 
-    public float scale = 1;
+    public float xScale = -1;
+    public float yScale = 1;
+    public float zScale = 1;
     public float pointCalculationDivisions = 100;
 
     public GameObject objectToMove;
@@ -37,7 +39,7 @@ public class PrefabLineCreator : MonoBehaviour
         PlacePrefabs();
     }
 
-    public void Setup ()
+    public void Setup()
     {
         if (GameObject.FindObjectOfType<GlobalSettings>() == null)
         {
@@ -51,7 +53,7 @@ public class PrefabLineCreator : MonoBehaviour
         if (transform.childCount == 0 || transform.GetChild(0).name != "Points")
         {
             GameObject points = new GameObject("Points");
-            points.transform.SetParent(transform);
+            points.transform.SetParent(transform, false);
             points.transform.SetAsFirstSibling();
             points.hideFlags = HideFlags.NotEditable;
         }
@@ -59,7 +61,7 @@ public class PrefabLineCreator : MonoBehaviour
         if (transform.childCount < 2 || transform.GetChild(1).name != "Objects")
         {
             GameObject objects = new GameObject("Objects");
-            objects.transform.SetParent(transform);
+            objects.transform.SetParent(transform, false);
             objects.hideFlags = HideFlags.NotEditable;
         }
     }
@@ -86,7 +88,7 @@ public class PrefabLineCreator : MonoBehaviour
         }
     }
 
-    public GameObject CreatePoint(string name, Vector3 raycastHit)
+    public GameObject CreatePoint(string name, Vector3 raycastHit, bool nonEditable = false)
     {
         GameObject point = new GameObject(name);
         point.AddComponent<BoxCollider>();
@@ -98,6 +100,13 @@ public class PrefabLineCreator : MonoBehaviour
         point.AddComponent<Point>();
         point.GetComponent<Point>().roadPoint = false;
         point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
+
+        if (nonEditable == true)
+        {
+            point.hideFlags = HideFlags.NotEditable;
+            point.GetComponent<BoxCollider>().enabled = false;
+        }
+
         return point;
     }
 
@@ -205,7 +214,7 @@ public class PrefabLineCreator : MonoBehaviour
 
         if (spacing == -1)
         {
-            spacing = prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * scale;
+            spacing = prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * xScale;
         }
 
         if (transform.GetChild(0).childCount > 2)
@@ -231,7 +240,7 @@ public class PrefabLineCreator : MonoBehaviour
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.name = "Prefab";
                 placedPrefab.layer = globalSettings.roadLayer;
-                placedPrefab.transform.localScale = new Vector3(scale, scale, scale);
+                placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
 
                 Vector3 startPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j]));
                 Vector3 endPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j]));
@@ -275,7 +284,8 @@ public class PrefabLineCreator : MonoBehaviour
                         {
                             Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
                             float y = vertices[i].y;
-                            vertices[i] += (Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position)) / scale - new Vector3(vertices[i].x, 0, 0);
+                            Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);
+                            vertices[i] += new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) - new Vector3(vertices[i].x, 0, 0);
                             vertices[i].y = y;
                         }
                     }
@@ -304,9 +314,10 @@ public class PrefabLineCreator : MonoBehaviour
                         if (yModification == PrefabLineCreator.YModification.matchTerrain)
                         {
                             RaycastHit raycastHit;
-                            if (Physics.Raycast(placedPrefab.transform.position + (placedPrefab.transform.rotation * vertices[i] * scale) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << globalSettings.ignoreMouseRayLayer | 1 << globalSettings.roadLayer)))
+                            Vector3 vertexPosition = placedPrefab.transform.rotation * vertices[i];
+                            if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << globalSettings.ignoreMouseRayLayer | 1 << globalSettings.roadLayer)))
                             {
-                                vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / scale;
+                                vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / yScale;
                             }
                         }
                         else if (yModification == PrefabLineCreator.YModification.matchCurve)
@@ -318,7 +329,7 @@ public class PrefabLineCreator : MonoBehaviour
                                 time = 1 - time;
                             }
 
-                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, time) - placedPrefab.transform.position.y) / scale;
+                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, time) - placedPrefab.transform.position.y) / yScale;
                         }
                     }
 
@@ -345,7 +356,7 @@ public class PrefabLineCreator : MonoBehaviour
                     {
                         if (Mathf.Abs(lastVertices[i].x - GetMaxX()) < 0.001f)
                         {
-                            lastVertexPositions.Add((transform.GetChild(1).GetChild(j - 1).transform.rotation * (scale * lastVertices[i])) + transform.GetChild(1).GetChild(j - 1).transform.position);
+                            lastVertexPositions.Add((transform.GetChild(1).GetChild(j - 1).transform.rotation * (new Vector3(xScale * lastVertices[i].x, yScale * lastVertices[i].y, zScale * lastVertices[i].z))) + transform.GetChild(1).GetChild(j - 1).transform.position);
                         }
                     }
 
@@ -362,20 +373,20 @@ public class PrefabLineCreator : MonoBehaviour
                             for (int k = 0; k < lastVertexPositions.Count; k++)
                             {
                                 float localZ = (Quaternion.Euler(0, -(transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - transform.GetChild(1).GetChild(j - 1).transform.position)).z;
-                                float zDifference = Mathf.Abs(localZ - (vertices[i].z * scale));
+                                float zDifference = Mathf.Abs(localZ - (vertices[i].z * zScale));
                                 if (zDifference < 0.001f)
                                 {
                                     if (yModification == PrefabLineCreator.YModification.none)
                                     {
-                                        if (Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * scale) + placedPrefab.transform.position.y)) < currentDistance)
+                                        if (Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * yScale) + placedPrefab.transform.position.y)) < currentDistance)
                                         {
                                             nearestVertex = lastVertexPositions[k];
-                                            currentDistance = Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * scale) + placedPrefab.transform.position.y));
+                                            currentDistance = Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * yScale) + placedPrefab.transform.position.y));
                                         }
                                     }
                                     else
                                     {
-                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (placedPrefab.transform.rotation * (scale * vertices[i])) + placedPrefab.transform.position);
+                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (placedPrefab.transform.rotation * (new Vector3(xScale * vertices[i].x, yScale * vertices[i].y, zScale * vertices[i].z))) + placedPrefab.transform.position);
 
                                         if (calculatedDistance < currentDistance)
                                         {
@@ -388,8 +399,8 @@ public class PrefabLineCreator : MonoBehaviour
 
                             if (nearestVertex != Vector3.zero)
                             {
-                                float scaleModifier = 1 / scale;
-                                vertices[i] = Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - placedPrefab.transform.position) * scaleModifier;
+                                Vector3 rotatedPoint = Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - placedPrefab.transform.position);
+                                vertices[i] = new Vector3(rotatedPoint.x * (1 / xScale), rotatedPoint.y * (1 / yScale), rotatedPoint.z * (1 / zScale));
                             }
                         }
                     }

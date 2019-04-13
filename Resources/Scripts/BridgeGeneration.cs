@@ -167,7 +167,7 @@ public class BridgeGeneration
         return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials);
     }
 
-    public static void GenerateCustomBridge(RoadSegment segment)
+    public static void GenerateCustomBridge(RoadSegment segment, float extraWidthLeft, float extraWidthRight)
     {
         GameObject prefabLine = new GameObject("Custom Bridge");
         prefabLine.hideFlags = HideFlags.NotEditable;
@@ -183,24 +183,17 @@ public class BridgeGeneration
         Vector3 centerPoint = segment.transform.GetChild(0).GetChild(1).transform.position;
         Vector3 endPoint = segment.transform.GetChild(0).GetChild(2).transform.position;
 
-        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", startPoint);
-        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Control Point", centerPoint);
-        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", endPoint);
+        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", startPoint, true);
+        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Control Point", centerPoint, true);
+        prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", endPoint, true);
 
         float totalLength = Misc.CalculateDistance(startPoint, centerPoint, endPoint);
-        prefabLine.GetComponent<PrefabLineCreator>().scale = totalLength / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / segment.bridgeSettings.sections;
+        prefabLine.GetComponent<PrefabLineCreator>().xScale = totalLength / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / segment.bridgeSettings.sections;
+        prefabLine.GetComponent<PrefabLineCreator>().yScale = segment.bridgeSettings.yScale;
+        prefabLine.GetComponent<PrefabLineCreator>().zScale = (segment.startRoadWidth + extraWidthLeft + extraWidthRight) / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.z;
 
         prefabLine.GetComponent<PrefabLineCreator>().spacing = -1;
         prefabLine.GetComponent<PrefabLineCreator>().PlacePrefabs();
-
-        // Fix x-scale
-        for (int i = 0; i < prefabLine.transform.GetChild(1).childCount; i++)
-        {
-            Vector3 scale = prefabLine.transform.GetChild(1).GetChild(i).localScale;
-            scale.z = 1;
-            scale.y = 1;
-            prefabLine.transform.GetChild(1).GetChild(i).localScale = scale;
-        }
     }
 
     public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge)

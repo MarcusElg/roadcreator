@@ -94,6 +94,7 @@ public class RoadSegmentEditor : Editor
         {
             bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Bridge Mesh", bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue, typeof(GameObject), false);
             bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
+            bridgeSettings.FindPropertyRelative("yScale").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Scale", bridgeSettings.FindPropertyRelative("yScale").floatValue), 0.1f, 3);
         }
 
         GUILayout.Space(20);

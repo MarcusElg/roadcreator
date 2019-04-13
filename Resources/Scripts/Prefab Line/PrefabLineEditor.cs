@@ -35,7 +35,7 @@ public class PrefabLineEditor : Editor
                 prefabCreator.prefab = Resources.Load("Prefabs/Low Poly/Concrete Barrier") as GameObject;
             }
 
-            prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
+            prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.xScale;
         }
 
         EditorGUI.BeginChangeCheck();
@@ -77,14 +77,14 @@ public class PrefabLineEditor : Editor
 
             if (GUILayout.Button("Calculate Spacing (X)") == true)
             {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.xScale;
             }
 
             if (GUILayout.Button("Calculate Spacing (Z)") == true)
             {
                 if (prefabCreator.prefab != null)
                 {
-                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2 * prefabCreator.scale;
+                    prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z * 2 * prefabCreator.zScale;
                 }
             }
         }
@@ -99,7 +99,9 @@ public class PrefabLineEditor : Editor
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.startPrefab = (GameObject)EditorGUILayout.ObjectField("Start Prefab", prefabCreator.startPrefab, typeof(GameObject), false);
         prefabCreator.endPrefab = (GameObject)EditorGUILayout.ObjectField("End Prefab", prefabCreator.endPrefab, typeof(GameObject), false);
-        prefabCreator.scale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Scale", prefabCreator.scale), 0.1f, 10);
+        prefabCreator.xScale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab X Scale", prefabCreator.xScale), 0.1f, 10);
+        prefabCreator.yScale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Y Scale", prefabCreator.yScale), 0.1f, 10);
+        prefabCreator.zScale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Z Scale", prefabCreator.zScale), 0.1f, 10);
 
         if (EditorGUI.EndChangeCheck() == true)
         {
@@ -116,7 +118,7 @@ public class PrefabLineEditor : Editor
 
             if (prefabCreator.fillGap == true || prefabCreator.bendObjects == true)
             {
-                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.scale;
+                prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.xScale;
             }
 
             prefabCreator.PlacePrefabs();
@@ -143,72 +145,75 @@ public class PrefabLineEditor : Editor
 
     public void OnSceneGUI()
     {
-        Event guiEvent = Event.current;
-
-        Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
-
-        RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+        if (prefabCreator.hideFlags != HideFlags.NotEditable)
         {
-            Vector3 hitPosition = raycastHit.point;
+            Event guiEvent = Event.current;
 
-            if (guiEvent.control == true)
+            Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
+
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
             {
-                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
-                if (nearestGuideline != Misc.MaxVector3)
+                Vector3 hitPosition = raycastHit.point;
+
+                if (guiEvent.control == true)
                 {
-                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                    if (nearestGuideline != Misc.MaxVector3)
+                    {
+                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                    }
+                    else
+                    {
+                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                    }
+                }
+
+                if (guiEvent.type == EventType.MouseDown)
+                {
+                    if (guiEvent.button == 0)
+                    {
+                        if (guiEvent.shift == true)
+                        {
+                            prefabCreator.CreatePoints(hitPosition);
+                        }
+                    }
+                    else if (guiEvent.button == 1 && guiEvent.shift == true)
+                    {
+                        prefabCreator.RemovePoints();
+                    }
+                }
+
+                if (prefabCreator.transform.childCount > 0 && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
+                {
+                    points = CalculateTemporaryPoints(guiEvent, hitPosition);
+                }
+
+                Draw(guiEvent, hitPosition);
+            }
+
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
+            {
+                Vector3 hitPosition = raycastHit.point;
+
+                if (guiEvent.control == true)
+                {
+                    hitPosition = Misc.Round(hitPosition);
+                }
+
+                if (guiEvent.shift == false)
+                {
+                    prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
                 }
                 else
                 {
-                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                    prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
                 }
             }
 
-            if (guiEvent.type == EventType.MouseDown)
-            {
-                if (guiEvent.button == 0)
-                {
-                    if (guiEvent.shift == true)
-                    {
-                        prefabCreator.CreatePoints(hitPosition);
-                    }
-                }
-                else if (guiEvent.button == 1 && guiEvent.shift == true)
-                {
-                    prefabCreator.RemovePoints();
-                }
-            }
-
-            if (prefabCreator.transform.childCount > 0 && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
-            {
-                points = CalculateTemporaryPoints(guiEvent, hitPosition);
-            }
-
-            Draw(guiEvent, hitPosition);
+            GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+            SceneView.currentDrawingSceneView.Repaint();
         }
-
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
-        {
-            Vector3 hitPosition = raycastHit.point;
-
-            if (guiEvent.control == true)
-            {
-                hitPosition = Misc.Round(hitPosition);
-            }
-
-            if (guiEvent.shift == false)
-            {
-                prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
-            }
-            else
-            {
-                prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
-            }
-        }
-
-        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
-        SceneView.currentDrawingSceneView.Repaint();
     }
 
     private void Draw(Event guiEvent, Vector3 hitPosition)

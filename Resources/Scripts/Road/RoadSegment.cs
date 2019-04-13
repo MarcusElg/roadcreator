@@ -154,7 +154,7 @@ public class RoadSegment : MonoBehaviour
 
             if (generateCustomBridge == true)
             {
-                BridgeGeneration.GenerateCustomBridge(this);
+                BridgeGeneration.GenerateCustomBridge(this, startExtraWidthLeft, startExtraWidthRight);
             }
         }
     }
