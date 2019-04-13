@@ -91,11 +91,11 @@ public class BridgeGeneration
                     triangles.Add(verticeIndex + 9 + j);
                 }
 
-                triangles.Add(verticeIndex + 0);
-                triangles.Add(verticeIndex + 7);
+                triangles.Add(verticeIndex);
+                triangles.Add(verticeIndex + 15);
                 triangles.Add(verticeIndex + 8);
 
-                triangles.Add(verticeIndex + 8);
+                triangles.Add(verticeIndex);
                 triangles.Add(verticeIndex + 7);
                 triangles.Add(verticeIndex + 15);
 
