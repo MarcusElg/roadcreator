@@ -182,7 +182,6 @@ public class Intersection : MonoBehaviour
                 for (float t = 0; t <= 1; t += 0.1f)
                 {
                     Vector3 pos = Misc.Lerp3(Vector3.zero, new Vector3(0.5f, 0.5f, 0.5f), Vector3.one, t);
-                    Debug.Log(pos.x + ", "+ pos.y + ", " + pos.z);
                 }
 
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
@@ -192,10 +191,14 @@ public class Intersection : MonoBehaviour
                     {
                         modifiedT = 0.5f;
                     }
-                    //vertices.Add(Vector3.Lerp(firstPoint, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+                   
+                    if (t > 1)
+                    {
+                        modifiedT = 1;
+                    }
+
                     vertices.Add(Misc.Lerp3CenterHeight(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
 
-                    //vertices.Add(Misc.Lerp3CenterHeight(firstPoint, Misc.GetCenter(firstPoint, nextPoint), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
                     if (t > 0)
                     {
                         exactLengths[i] += Vector3.Distance(lastVertexPosition, vertices[vertices.Count - 1]);

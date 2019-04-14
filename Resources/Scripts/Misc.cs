@@ -10,16 +10,15 @@ public static class Misc
     public static Color lightGreen = new Color(0.34f, 1, 0.44f);
     public static Color darkGreen = new Color(0.11f, 0.35f, 0.13f);
 
-    public static Vector3 Lerp3(Vector3 start, Vector3 middle, Vector3 end, float time)
+    public static Vector3 Lerp3(Vector3 start, Vector3 center, Vector3 end, float time)
     {
-        Vector3 startToMiddle = Vector3.Lerp(start, middle, time);
-        return Vector3.Lerp(startToMiddle, end, time);
+        return Mathf.Pow(1 - time, 2) * start + 2 * (1 - time) * time * center + Mathf.Pow(time, 2) * end;
     }
 
-    public static Vector3 Lerp3CenterHeight(Vector3 start, Vector3 middle, Vector3 end, float time)
+    public static Vector3 Lerp3CenterHeight(Vector3 start, Vector3 center, Vector3 end, float time)
     {
-        Vector3 position = Lerp3(start, middle, end, time);
-        position.y = Mathf.Lerp(Mathf.Lerp(start.y, Misc.GetCenter(start.y, end.y), time), end.y, time);
+        Vector3 position = Lerp3(start, center, end, time);
+        position.y = Mathf.Lerp(start.y, end.y, time);
         return position;
     }
 

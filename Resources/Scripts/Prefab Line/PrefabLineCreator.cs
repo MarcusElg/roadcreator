@@ -317,10 +317,8 @@ public class PrefabLineCreator : MonoBehaviour
                                 lastPointPosition = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f);
                             }
 
-                            Vector3 vertexLeft = (Misc.CalculateLeft(new Vector3(lastPointPosition.x, 0, lastPointPosition.z), new Vector3(currentPointPositon.x, 0, currentPointPositon.z)));
                             Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);
-
-                            vertices[i] += new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) - new Vector3(vertices[i].x, 0, 0) + vertexLeft * currentWidth;
+                            vertices[i] += new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) - new Vector3(vertices[i].x, 0, 0) + Vector3.forward * currentWidth;
                             vertices[i].y = y;
                         }
                         else if (distanceCovered > 0 && distanceCovered < 1)

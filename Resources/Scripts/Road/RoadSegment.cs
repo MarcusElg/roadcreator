@@ -18,7 +18,7 @@ public class RoadSegment : MonoBehaviour
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
 
-    public bool generateSimpleBridge = true;
+    public bool generateSimpleBridge = false;
     public bool generateCustomBridge = false;
     public BridgeSettings bridgeSettings = new BridgeSettings();
 
