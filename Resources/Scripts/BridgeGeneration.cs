@@ -195,6 +195,7 @@ public class BridgeGeneration
         prefabLine.GetComponent<PrefabLineCreator>().startWidthRight = startWidthRight;
         prefabLine.GetComponent<PrefabLineCreator>().endWidthLeft = endWidthLeft;
         prefabLine.GetComponent<PrefabLineCreator>().endWidthRight = endWidthRight;
+        prefabLine.GetComponent<PrefabLineCreator>().xOffset = segment.bridgeSettings.xOffset;
 
         prefabLine.GetComponent<PrefabLineCreator>().spacing = -1;
         prefabLine.GetComponent<PrefabLineCreator>().PlacePrefabs();

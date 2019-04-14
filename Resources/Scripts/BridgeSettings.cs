@@ -17,5 +17,6 @@ public class BridgeSettings
     public GameObject bridgeMesh;
     public int sections = 1;
     public float yScale = 1;
+    public float xOffset = 0;
 
 }

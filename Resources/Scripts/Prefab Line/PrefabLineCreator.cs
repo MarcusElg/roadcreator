@@ -35,6 +35,7 @@ public class PrefabLineCreator : MonoBehaviour
     public float startWidthRight;
     public float endWidthLeft;
     public float endWidthRight;
+    public float xOffset;
 
     public GameObject objectToMove;
     private bool mouseDown;
@@ -295,26 +296,12 @@ public class PrefabLineCreator : MonoBehaviour
                             if (vertices[i].z > 0)
                             {
                                 // Left
-                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z;
+                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z - xOffset;
                             }
                             else
                             {
                                 // Right
-                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z;
-                            }
-
-                            Vector3 currentPointPositon = Misc.MaxVector3;
-                            Vector3 lastPointPosition = Misc.MaxVector3;
-
-                            if (distanceCovered == 0)
-                            {
-                                currentPointPositon = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f);
-                                lastPointPosition = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime);
-                            }
-                            else
-                            {
-                                currentPointPositon = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime);
-                                lastPointPosition = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f);
+                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z + xOffset;
                             }
 
                             Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);

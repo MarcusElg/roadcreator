@@ -75,15 +75,21 @@ public class RoadSegmentEditor : Editor
         GUILayout.Label("Bridge", guiStyle);
 
         SerializedProperty bridgeSettings = serializedObject.FindProperty("bridgeSettings");
+
+        if (serializedObject.FindProperty("generateSimpleBridge").boolValue == true || serializedObject.FindProperty("generateCustomBridge").boolValue == true)
+        {
+            bridgeSettings.FindPropertyRelative("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", bridgeSettings.FindPropertyRelative("extraWidth").floatValue), 0, 1);
+            GUILayout.Space(20);
+        }
+
         serializedObject.FindProperty("generateSimpleBridge").boolValue = EditorGUILayout.Toggle("Generate Simple Bridge", serializedObject.FindProperty("generateSimpleBridge").boolValue);
         if (serializedObject.FindProperty("generateSimpleBridge").boolValue == true)
-        { 
+        {
             EditorGUILayout.PropertyField(bridgeSettings.FindPropertyRelative("bridgeMaterials"), true);
             bridgeSettings.FindPropertyRelative("yOffsetFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", bridgeSettings.FindPropertyRelative("yOffsetFirstStep").floatValue), 0, 2);
             bridgeSettings.FindPropertyRelative("yOffsetSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", bridgeSettings.FindPropertyRelative("yOffsetSecondStep").floatValue), 0, 2);
             bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", bridgeSettings.FindPropertyRelative("widthPercentageFirstStep").floatValue), 0, 1);
             bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", bridgeSettings.FindPropertyRelative("widthPercentageSecondStep").floatValue), 0, 1);
-            bridgeSettings.FindPropertyRelative("extraWidth").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", bridgeSettings.FindPropertyRelative("extraWidth").floatValue), 0, 1);
         }
 
         GUILayout.Space(20);
@@ -95,6 +101,7 @@ public class RoadSegmentEditor : Editor
             bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Bridge Mesh", bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue, typeof(GameObject), false);
             bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
             bridgeSettings.FindPropertyRelative("yScale").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Scale", bridgeSettings.FindPropertyRelative("yScale").floatValue), 0.1f, 3);
+            bridgeSettings.FindPropertyRelative("xOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("X Offset", bridgeSettings.FindPropertyRelative("xOffset").floatValue), -2, 2);
         }
 
         GUILayout.Space(20);
