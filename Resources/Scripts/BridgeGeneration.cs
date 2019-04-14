@@ -167,7 +167,7 @@ public class BridgeGeneration
         return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials);
     }
 
-    public static void GenerateCustomBridge(RoadSegment segment, float extraWidthLeft, float extraWidthRight)
+    public static void GenerateCustomBridge(RoadSegment segment, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
     {
         GameObject prefabLine = new GameObject("Custom Bridge");
         prefabLine.hideFlags = HideFlags.NotEditable;
@@ -188,9 +188,13 @@ public class BridgeGeneration
         prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", endPoint, true);
 
         float totalLength = Misc.CalculateDistance(startPoint, centerPoint, endPoint);
+        prefabLine.GetComponent<PrefabLineCreator>().bridgeMode = true;
         prefabLine.GetComponent<PrefabLineCreator>().xScale = totalLength / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / segment.bridgeSettings.sections;
         prefabLine.GetComponent<PrefabLineCreator>().yScale = segment.bridgeSettings.yScale;
-        prefabLine.GetComponent<PrefabLineCreator>().zScale = (segment.startRoadWidth + extraWidthLeft + extraWidthRight) / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.z;
+        prefabLine.GetComponent<PrefabLineCreator>().startWidthLeft = startWidthLeft;
+        prefabLine.GetComponent<PrefabLineCreator>().startWidthRight = startWidthRight;
+        prefabLine.GetComponent<PrefabLineCreator>().endWidthLeft = endWidthLeft;
+        prefabLine.GetComponent<PrefabLineCreator>().endWidthRight = endWidthRight;
 
         prefabLine.GetComponent<PrefabLineCreator>().spacing = -1;
         prefabLine.GetComponent<PrefabLineCreator>().PlacePrefabs();

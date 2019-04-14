@@ -29,9 +29,15 @@ public class PrefabLineCreator : MonoBehaviour
     public float zScale = 1;
     public float pointCalculationDivisions = 100;
 
+    // Bridges
+    public bool bridgeMode = false;
+    public float startWidthLeft;
+    public float startWidthRight;
+    public float endWidthLeft;
+    public float endWidthRight;
+
     public GameObject objectToMove;
     private bool mouseDown;
-
     public GlobalSettings globalSettings;
 
     public void UndoUpdate()
@@ -280,7 +286,44 @@ public class PrefabLineCreator : MonoBehaviour
                         float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], distanceCovered);
                         int pointIndex = Mathf.FloorToInt(currentTime);
 
-                        if (distanceCovered > 0 && distanceCovered < 1)
+                        if (bridgeMode == true)
+                        {
+                            Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
+                            float y = vertices[i].y;
+
+                            float currentWidth;
+                            if (vertices[i].z > 0)
+                            {
+                                // Left
+                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z;
+                            }
+                            else
+                            {
+                                // Right
+                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z;
+                            }
+
+                            Vector3 currentPointPositon = Misc.MaxVector3;
+                            Vector3 lastPointPosition = Misc.MaxVector3;
+
+                            if (distanceCovered == 0)
+                            {
+                                currentPointPositon = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f);
+                                lastPointPosition = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime);
+                            }
+                            else
+                            {
+                                currentPointPositon = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime);
+                                lastPointPosition = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f);
+                            }
+
+                            Vector3 vertexLeft = (Misc.CalculateLeft(new Vector3(lastPointPosition.x, 0, lastPointPosition.z), new Vector3(currentPointPositon.x, 0, currentPointPositon.z)));
+                            Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);
+
+                            vertices[i] += new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) - new Vector3(vertices[i].x, 0, 0) + vertexLeft * currentWidth;
+                            vertices[i].y = y;
+                        }
+                        else if (distanceCovered > 0 && distanceCovered < 1)
                         {
                             Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
                             float y = vertices[i].y;
