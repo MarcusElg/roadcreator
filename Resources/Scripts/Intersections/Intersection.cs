@@ -31,7 +31,20 @@ public class Intersection : MonoBehaviour
         {
             if (objectToMove == null)
             {
-                if (raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject)
+                bool isConnectedPoint = false;
+                if ((raycastHit.transform.name == "Start Point" || raycastHit.transform.name == "End Point") && raycastHit.transform.GetComponent<Point>().roadPoint == true)
+                {
+                    for (int i = 0; i < connections.Count; i++)
+                    {
+                        if (connections[i].road == raycastHit.transform.GetComponent<Point>())
+                        {
+                            isConnectedPoint = true;
+                            break;
+                        }
+                    }
+                }
+
+                if ((raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject) || isConnectedPoint == true)
                 {
                     if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
                     {
@@ -51,27 +64,45 @@ public class Intersection : MonoBehaviour
         {
             objectToMove.GetComponent<BoxCollider>().enabled = true;
 
-            int nextIndex = objectToMove.transform.GetSiblingIndex();
-            if (nextIndex >= connections.Count)
+            if (objectToMove.transform.name == "Connection Point")
             {
-                nextIndex = 0;
-            }
-
-            Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex() - 1].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
-            center.y -= yOffset;
-            connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
-            objectToMove = null;
-            CreateMesh(false);
-
-            for (int i = 0; i < connections.Count; i++)
-            {
-                nextIndex = i + 2;
+                int nextIndex = objectToMove.transform.GetSiblingIndex();
                 if (nextIndex >= connections.Count)
                 {
                     nextIndex = 0;
                 }
 
-                transform.GetChild(i + 1).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
+                Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex() - 1].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
+                center.y -= yOffset;
+                connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
+                objectToMove = null;
+                CreateMesh();
+
+                for (int i = 0; i < connections.Count; i++)
+                {
+                    nextIndex = i + 2;
+                    if (nextIndex >= connections.Count)
+                    {
+                        nextIndex = 0;
+                    }
+
+                    transform.GetChild(i + 1).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
+                }
+            }
+            else
+            {
+                CreateMesh();
+                objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
+
+                if (objectToMove.transform.name == "Start Point")
+                {
+                    objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(this);
+                } else
+                {
+                    objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(this);
+                }
+
+                objectToMove = null;
             }
         }
     }
@@ -101,7 +132,7 @@ public class Intersection : MonoBehaviour
                 {
                     Undo.RecordObject(roads[i], "Remove Intersection");
                     roads[i].startIntersection = null;
-                    roads[i].startIntersectionConnectionIndex = -1; 
+                    roads[i].startIntersectionConnectionIndex = -1;
                 }
                 else if (roads[i].endIntersection == this)
                 {
@@ -191,7 +222,7 @@ public class Intersection : MonoBehaviour
                     {
                         modifiedT = 0.5f;
                     }
-                   
+
                     if (t > 1)
                     {
                         modifiedT = 1;

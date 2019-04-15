@@ -161,8 +161,22 @@ public class IntersectionEditor : Editor
                 }
             }
 
+            Handles.color = intersection.globalSettings.pointColour;
+            for (int i = 0; i < intersection.connections.Count; i++)
+            {
+                Handles.CylinderHandleCap(0, intersection.connections[i].road.transform.position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+
             Handles.color = intersection.globalSettings.cursorColour;
-            Handles.CylinderHandleCap(0, raycastHit.point, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+
+            if (raycastHit.transform.name.Contains("Point"))
+            {
+                Handles.CylinderHandleCap(0, raycastHit.transform.position, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
+            else
+            {
+                Handles.CylinderHandleCap(0, raycastHit.point, Quaternion.Euler(90, 0, 0), intersection.globalSettings.pointSize, EventType.Repaint);
+            }
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
