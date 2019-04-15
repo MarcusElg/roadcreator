@@ -198,7 +198,15 @@ public class PrefabLineEditor : Editor
 
                 if (guiEvent.control == true)
                 {
-                    hitPosition = Misc.Round(hitPosition);
+                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                    if (nearestGuideline != Misc.MaxVector3)
+                    {
+                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                    }
+                    else
+                    {
+                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                    }
                 }
 
                 if (guiEvent.shift == false)

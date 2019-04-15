@@ -172,7 +172,15 @@ public class RoadEditor : Editor
 
                 if (guiEvent.control == true)
                 {
-                    hitPosition = Misc.Round(hitPosition);
+                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                    if (nearestGuideline != Misc.MaxVector3)
+                    {
+                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                    }
+                    else
+                    {
+                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                    }
                 }
 
                 if (guiEvent.shift == false)
@@ -253,7 +261,7 @@ public class RoadEditor : Editor
 
                 if (guiEvent.shift == true)
                 {
-                    Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(j).GetChild(0).GetChild(1).position, hitPosition);
+                    Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(j).GetChild(0).GetChild(1).position, mousePosition);
                 }
 
                 if (points != null && guiEvent.shift == true)
@@ -267,7 +275,7 @@ public class RoadEditor : Editor
                 if (guiEvent.shift == true)
                 {
                     Handles.color = Color.black;
-                    Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(0).position, hitPosition);
+                    Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(0).position, mousePosition);
                 }
             }
         }
@@ -277,13 +285,13 @@ public class RoadEditor : Editor
             if (guiEvent.shift == true && roadCreator.endIntersection == null)
             {
                 Handles.color = Color.black;
-                Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).position, hitPosition);
+                Handles.DrawLine(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).position, mousePosition);
             }
         }
 
         // Mouse position
         Handles.color = roadCreator.globalSettings.cursorColour;
-        Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+        Handles.CylinderHandleCap(0, mousePosition, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
     }
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)

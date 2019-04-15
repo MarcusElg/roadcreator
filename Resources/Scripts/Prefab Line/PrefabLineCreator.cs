@@ -24,7 +24,7 @@ public class PrefabLineCreator : MonoBehaviour
     public RotationDirection rotationDirection = RotationDirection.left;
     public float yRotationRandomization;
 
-    public float xScale = -1;
+    public float xScale = 1;
     public float yScale = 1;
     public float zScale = 1;
     public float pointCalculationDivisions = 100;
