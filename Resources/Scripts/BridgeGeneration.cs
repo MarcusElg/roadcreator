@@ -175,7 +175,7 @@ public class BridgeGeneration
         GameObject prefabLine = new GameObject("Custom Bridge");
         prefabLine.hideFlags = HideFlags.NotEditable;
         prefabLine.transform.SetParent(segment.transform, false);
-        prefabLine.AddComponent<PrefabLineCreator>();   
+        prefabLine.AddComponent<PrefabLineCreator>();
         prefabLine.GetComponent<PrefabLineCreator>().Setup();
 
         Vector3 startPoint = segment.transform.GetChild(0).GetChild(0).transform.position;
@@ -386,7 +386,11 @@ public class BridgeGeneration
             lastVertexPosition = inputVertices[i];
         }
 
-        CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0), intersection);
+        if (intersection.placePillars == true)
+        {
+            CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0), intersection);
+        }
+
         BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), null, materials);
     }
 
