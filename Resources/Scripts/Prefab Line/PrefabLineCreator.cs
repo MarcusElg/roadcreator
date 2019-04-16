@@ -293,27 +293,26 @@ public class PrefabLineCreator : MonoBehaviour
                             Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
 
                             float currentWidth;
-                            if (vertices[i].z < 0)
+                            if (vertices[i].z > 0)
                             {
-                                // Left
-                                currentWidth = -Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) - mesh.vertices[0].z + xOffset;
+                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z - xOffset;
                             }
                             else
                             {
-                                // Right
-                                currentWidth = Mathf.Lerp(startWidthRight, endWidthRight, currentTime) + mesh.vertices[0].z - xOffset;
+                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z + xOffset;
                             }
 
-                            Vector3 vertexLeft = Misc.MaxVector3;
+                            Vector3 right = Misc.MaxVector3;
                             if (currentTime <= 0.99f)
                             {
-                                vertexLeft = Misc.CalculateLeft(Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f), lerpedPoint);
-                            } else
+                                right = Misc.CalculateLeft(lerpedPoint, Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f));
+                            }
+                            else
                             {
-                                vertexLeft = Misc.CalculateLeft(lerpedPoint, Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f));
+                                right = Misc.CalculateLeft(Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f), lerpedPoint);
                             }
 
-                            Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position + vertexLeft * (vertices[i].z + currentWidth));
+                            Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position + right * (vertices[i].z + currentWidth));
                             vertices[i] = new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) + new Vector3(0, vertices[i].y, 0);
                         }
                         else if (distanceCovered > 0 && distanceCovered < 1)

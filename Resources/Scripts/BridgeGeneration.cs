@@ -172,11 +172,8 @@ public class BridgeGeneration
         GameObject prefabLine = new GameObject("Custom Bridge");
         prefabLine.hideFlags = HideFlags.NotEditable;
         prefabLine.transform.SetParent(segment.transform, false);
-        prefabLine.AddComponent<PrefabLineCreator>();
-        prefabLine.GetComponent<PrefabLineCreator>().prefab = segment.bridgeSettings.bridgeMesh;
-        prefabLine.GetComponent<PrefabLineCreator>().pointCalculationDivisions = 1000;
+        prefabLine.AddComponent<PrefabLineCreator>();   
         prefabLine.GetComponent<PrefabLineCreator>().Setup();
-        prefabLine.GetComponent<PrefabLineCreator>().fillGap = false;
 
         Vector3 startPoint = segment.transform.GetChild(0).GetChild(0).transform.position;
         Vector3 centerPoint = segment.transform.GetChild(0).GetChild(1).transform.position;
@@ -187,6 +184,9 @@ public class BridgeGeneration
         prefabLine.GetComponent<PrefabLineCreator>().CreatePoint("Point", endPoint, true);
 
         float totalLength = Misc.CalculateDistance(startPoint, centerPoint, endPoint);
+        prefabLine.GetComponent<PrefabLineCreator>().prefab = segment.bridgeSettings.bridgeMesh;
+        prefabLine.GetComponent<PrefabLineCreator>().pointCalculationDivisions = 1000;
+        prefabLine.GetComponent<PrefabLineCreator>().fillGap = false;
         prefabLine.GetComponent<PrefabLineCreator>().bridgeMode = true;
         prefabLine.GetComponent<PrefabLineCreator>().xScale = totalLength / segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / segment.bridgeSettings.sections;
         prefabLine.GetComponent<PrefabLineCreator>().yScale = segment.bridgeSettings.yScale;

@@ -1,7 +1,7 @@
 # Blender MTL File: 'None'
 # Material Count: 2
 
-newmtl Cable.001
+newmtl Cable
 Ns 0.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.800000 0.800000 0.800000
@@ -11,7 +11,7 @@ Ni 1.000000
 d 1.000000
 illum 2
 
-newmtl Centerpiece.001
+newmtl Centerpiece
 Ns 92.156863
 Ka 1.000000 1.000000 1.000000
 Kd 0.640000 0.078876 0.034818
