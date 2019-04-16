@@ -15,6 +15,10 @@ A free road creation tool for unity.
 - Includes a prefab line tool to place prefabs along a series of curves (can also curve the mesh to get a smoother curve)
 - Options to curve the mesh and also to fill in the gap between them to get a smootly curved and connected line of prefabs
 
+### Bridges:
+- Generate bridges with only a few click!.
+- Currently two different suspension bridges as well as a classic concreate bridge are included but you can easly add your own. The tool with modify the bridge mesh so that it fits the mesh perfectly.
+- Generate pillars automaticly with options such as: gap, scale and rotation direction
 
 ### Intersections Etc:
 - Procedurally generated intersections, easly create them by connecting two roads end/start points
