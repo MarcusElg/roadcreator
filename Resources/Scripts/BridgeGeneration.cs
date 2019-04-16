@@ -158,7 +158,10 @@ public class BridgeGeneration
                     }
                 }
 
-                GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
+                if (segment.placePillars == true)
+                {
+                    GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
+                }
             }
 
             verticeIndex += 8;
