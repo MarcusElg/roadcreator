@@ -177,7 +177,6 @@ public class BridgeGeneration
         prefabLine.GetComponent<PrefabLineCreator>().pointCalculationDivisions = 1000;
         prefabLine.GetComponent<PrefabLineCreator>().Setup();
         prefabLine.GetComponent<PrefabLineCreator>().fillGap = false;
-        prefabLine.GetComponent<PrefabLineCreator>().yModification = PrefabLineCreator.YModification.matchCurve;
 
         Vector3 startPoint = segment.transform.GetChild(0).GetChild(0).transform.position;
         Vector3 centerPoint = segment.transform.GetChild(0).GetChild(1).transform.position;
@@ -196,7 +195,6 @@ public class BridgeGeneration
         prefabLine.GetComponent<PrefabLineCreator>().endWidthLeft = endWidthLeft;
         prefabLine.GetComponent<PrefabLineCreator>().endWidthRight = endWidthRight;
         prefabLine.GetComponent<PrefabLineCreator>().xOffset = segment.bridgeSettings.xOffset;
-        prefabLine.GetComponent<PrefabLineCreator>().rotationDirection = PrefabLineCreator.RotationDirection.right;
 
         prefabLine.GetComponent<PrefabLineCreator>().spacing = -1;
         prefabLine.GetComponent<PrefabLineCreator>().PlacePrefabs();
@@ -210,19 +208,28 @@ public class BridgeGeneration
 
         for (float t = 0; t <= 1; t += 0.01f)
         {
-            Vector3 currentPosition = Misc.Lerp3(startPoint, controlPoint, endPoint, t);
-            currentPosition.y = Mathf.Lerp(Mathf.Lerp(startPoint.y, Misc.GetCenter(endPoint.y, startPoint.y), t), endPoint.y, t);
+            Vector3 currentPosition = Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, t);
             currentDistance = Vector3.Distance(lastPosition, currentPosition);
+            Vector3 forward = (currentPosition - lastPosition).normalized;
+
+            if (t == 0)
+            {
+                forward = (Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, 0.01f) - startPoint).normalized;
+            }
+            else if (t == 1)
+            {
+                forward = (currentPosition - Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, 0.99f)).normalized;
+            }
 
             if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
             {
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward);
                 lastPosition = currentPosition;
                 placedFirstPillar = true;
             }
             else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
             {
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (currentPosition - lastPosition).normalized);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward);
                 lastPosition = currentPosition;
             }
         }
