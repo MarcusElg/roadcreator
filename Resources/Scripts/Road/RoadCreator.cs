@@ -1057,6 +1057,11 @@ public class RoadCreator : MonoBehaviour
 
     public Vector3[] CalculatePoints(Transform segment)
     {
+        if (settings == null)
+        {
+            settings = RoadCreatorSettings.GetSerializedSettings();
+        }
+
         float distance = Misc.CalculateDistance(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position);
         float divisions = settings.FindProperty("resolution").floatValue * 4 * distance;
         divisions = Mathf.Max(2, divisions);

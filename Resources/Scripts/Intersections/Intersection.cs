@@ -277,6 +277,7 @@ public class Intersection : MonoBehaviour
                 mesh.vertices = vertices.ToArray();
                 mesh.triangles = triangles.ToArray();
                 mesh.uv = uvs.ToArray();
+                mesh.RecalculateNormals();
 
                 GetComponent<MeshFilter>().sharedMesh = mesh;
                 GetComponent<MeshCollider>().sharedMesh = mesh;
@@ -352,6 +353,7 @@ public class Intersection : MonoBehaviour
                 mesh.vertices = extraMeshVertices.ToArray();
                 mesh.triangles = triangles.ToArray();
                 mesh.uv = uvs.ToArray();
+                mesh.RecalculateNormals();
                 vertexIndex = 0;
 
                 transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = mesh;

@@ -360,6 +360,7 @@ public class RoadSegment : MonoBehaviour
             generatedMesh = GenerateUvs(generatedMesh, extraMeshLeft);
         }
 
+        generatedMesh.RecalculateNormals();
         mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
