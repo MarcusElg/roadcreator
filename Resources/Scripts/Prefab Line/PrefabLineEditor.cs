@@ -55,7 +55,8 @@ public class PrefabLineEditor : Editor
             }
 
             prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
-        } else if (prefabCreator.bendObjects == true)
+        }
+        else if (prefabCreator.bendObjects == true)
         {
             Debug.Log("Rotate alongst curve has to be true to be able to use bend objects");
             prefabCreator.bendObjects = false;
@@ -152,7 +153,7 @@ public class PrefabLineEditor : Editor
             Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
             {
                 Vector3 hitPosition = raycastHit.point;
 
@@ -192,7 +193,7 @@ public class PrefabLineEditor : Editor
                 Draw(guiEvent, hitPosition);
             }
 
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.roadLayer)))
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
             {
                 Vector3 hitPosition = raycastHit.point;
 
@@ -232,13 +233,13 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.transform.GetChild(0).GetChild(i).name == "Point")
             {
-                Handles.color = prefabCreator.globalSettings.pointColour;
-                Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
+                Handles.color = prefabCreator.settings.FindProperty("pointColour").colorValue;
+                Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
             }
             else
             {
-                Handles.color = prefabCreator.globalSettings.controlPointColour;
-                Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
+                Handles.color = prefabCreator.settings.FindProperty("controlPointColour").colorValue;
+                Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
             }
         }
 
@@ -274,8 +275,8 @@ public class PrefabLineEditor : Editor
         }
 
         // Mouse position
-        Handles.color = prefabCreator.globalSettings.cursorColour;
-        Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.globalSettings.pointSize, EventType.Repaint);
+        Handles.color = prefabCreator.settings.FindProperty("cursorColour").colorValue;
+        Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
     }
 
     private Vector3[] CalculateTemporaryPoints(Event guiEvent, Vector3 hitPosition)
@@ -303,7 +304,7 @@ public class PrefabLineEditor : Editor
             Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(lastIndex - 1).position, prefabCreator.transform.GetChild(0).GetChild(lastIndex).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.globalSettings.ignoreMouseRayLayer | 1 << prefabCreator.globalSettings.roadLayer)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
             {
                 position.y = raycastHit.point.y;
             }

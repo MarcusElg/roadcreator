@@ -39,7 +39,7 @@ public class PrefabLineCreator : MonoBehaviour
 
     public GameObject objectToMove;
     private bool mouseDown;
-    public GlobalSettings globalSettings;
+    public SerializedObject settings;
 
     public void UndoUpdate()
     {
@@ -48,13 +48,9 @@ public class PrefabLineCreator : MonoBehaviour
 
     public void Setup()
     {
-        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        if (settings == null)
         {
-            globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-        }
-        else if (globalSettings == null)
-        {
-            globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+            settings = RoadCreatorSettings.GetSerializedSettings();
         }
 
         if (transform.childCount == 0 || transform.GetChild(0).name != "Points")
@@ -77,7 +73,7 @@ public class PrefabLineCreator : MonoBehaviour
     {
         if (transform.GetChild(0).childCount > 0 && transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).name == "Point")
         {
-            if (globalSettings.roadCurved == true)
+            if (settings.FindProperty("roadCurved").boolValue == true)
             {
                 Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", hitPosition), "Create Point");
             }
@@ -99,11 +95,11 @@ public class PrefabLineCreator : MonoBehaviour
     {
         GameObject point = new GameObject(name);
         point.AddComponent<BoxCollider>();
-        point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+        point.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
         point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
         point.transform.SetParent(transform.GetChild(0));
         point.transform.position = raycastHit;
-        point.layer = globalSettings.ignoreMouseRayLayer;
+        point.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
         point.AddComponent<Point>();
         point.GetComponent<Point>().roadPoint = false;
         point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
@@ -246,7 +242,7 @@ public class PrefabLineCreator : MonoBehaviour
 
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.name = "Prefab";
-                placedPrefab.layer = globalSettings.roadLayer;
+                placedPrefab.layer = settings.FindProperty("roadLayer").intValue;
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
                 placedPrefab.hideFlags = HideFlags.NotEditable;
 
@@ -350,7 +346,7 @@ public class PrefabLineCreator : MonoBehaviour
                         {
                             RaycastHit raycastHit;
                             Vector3 vertexPosition = placedPrefab.transform.rotation * vertices[i];
-                            if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << globalSettings.ignoreMouseRayLayer | 1 << globalSettings.roadLayer)))
+                            if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
                             {
                                 vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / yScale;
                             }

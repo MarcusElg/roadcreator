@@ -25,13 +25,9 @@ public class RoadEditor : Editor
             segments.hideFlags = HideFlags.NotEditable;
         }
 
-        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        if (roadCreator.settings == null)
         {
-            roadCreator.globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-        }
-        else if (roadCreator.globalSettings == null)
-        {
-            roadCreator.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+            roadCreator.settings = RoadCreatorSettings.GetSerializedSettings();
         }
 
         lastTool = Tools.current;
@@ -113,7 +109,7 @@ public class RoadEditor : Editor
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("ignoreMouseRayLayer").intValue)))
         {
             hitPosition = raycastHit.point;
 
@@ -166,7 +162,7 @@ public class RoadEditor : Editor
 
         if (EditorWindow.mouseOverWindow == SceneView.currentDrawingSceneView)
         {
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.roadLayer)))
+            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("roadLayer").intValue)))
             {
                 hitPosition = raycastHit.point;
 
@@ -235,14 +231,14 @@ public class RoadEditor : Editor
             {
                 if (roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).name != "Control Point")
                 {
-                    Handles.color = roadCreator.globalSettings.pointColour;
+                    Handles.color = roadCreator.settings.FindProperty("pointColour").colorValue;
                 }
                 else
                 {
-                    Handles.color = roadCreator.globalSettings.controlPointColour;
+                    Handles.color = roadCreator.settings.FindProperty("controlPointColour").colorValue;
                 }
 
-                Handles.CylinderHandleCap(0, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).transform.position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+                Handles.CylinderHandleCap(0, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).transform.position, Quaternion.Euler(90, 0, 0), roadCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
             }
         }
 
@@ -290,8 +286,8 @@ public class RoadEditor : Editor
         }
 
         // Mouse position
-        Handles.color = roadCreator.globalSettings.cursorColour;
-        Handles.CylinderHandleCap(0, mousePosition, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+        Handles.color = roadCreator.settings.FindProperty("cursorColour").colorValue;
+        Handles.CylinderHandleCap(0, mousePosition, Quaternion.Euler(90, 0, 0), roadCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
     }
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)
@@ -311,7 +307,7 @@ public class RoadEditor : Editor
             Vector3 position = Misc.Lerp3(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("ignoreMouseRayLayer").intValue)))
             {
                 position.y = raycastHit.point.y;
             }

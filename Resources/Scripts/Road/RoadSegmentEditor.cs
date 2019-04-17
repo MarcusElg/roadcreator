@@ -9,14 +9,6 @@ using UnityEditor;
 public class RoadSegmentEditor : Editor
 {
 
-    private void OnEnable()
-    {
-        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
-        {
-            ((RoadSegment)target).transform.parent.parent.GetComponent<RoadCreator>().globalSettings = new GameObject("Global Settings").AddComponent<GlobalSettings>();
-        }
-    }
-
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
@@ -179,7 +171,7 @@ public class RoadSegmentEditor : Editor
                 extraMesh.AddComponent<MeshCollider>();
                 extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
                 extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer;
+                extraMesh.layer = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue;
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }

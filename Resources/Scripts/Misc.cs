@@ -37,7 +37,7 @@ public static class Misc
             distance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
             lastPosition = currentPosition;
         }
-        
+
         return distance;
     }
 
@@ -124,7 +124,7 @@ public static class Misc
 
             if (roadGuideline != null)
             {
-                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().globalSettings);
+                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().settings);
                 if (nearestOnLine != MaxVector3)
                 {
                     nearest = nearestOnLine;
@@ -135,7 +135,7 @@ public static class Misc
             roadGuideline = roadSegments[i].centerGuidelinePoints;
             if (roadGuideline != null)
             {
-                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().globalSettings);
+                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().settings);
                 if (nearestOnLine != MaxVector3)
                 {
                     nearest = nearestOnLine;
@@ -146,7 +146,7 @@ public static class Misc
             roadGuideline = roadSegments[i].endGuidelinePoints;
             if (roadGuideline != null)
             {
-                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().globalSettings);
+                Vector3 nearestOnLine = CheckGuideline(nearestDistance, mousePosition, roadGuideline, roadSegments[i].transform.parent.parent.GetComponent<RoadCreator>().settings);
                 if (nearestOnLine != MaxVector3)
                 {
                     nearest = nearestOnLine;
@@ -158,12 +158,12 @@ public static class Misc
         return nearest;
     }
 
-    private static Vector3 CheckGuideline(float nearestDistance, Vector3 mousePosition, RoadGuideline roadGuideline, GlobalSettings globalSettings)
+    private static Vector3 CheckGuideline(float nearestDistance, Vector3 mousePosition, RoadGuideline roadGuideline, SerializedObject settings)
     {
         Vector3 nearestLinePoint = Misc.FindNearestPointOnLine(new Vector2(roadGuideline.startPoint.x, roadGuideline.startPoint.z), new Vector2(roadGuideline.endPoint.x, roadGuideline.endPoint.z), mousePosition);
         float distance = Vector2.Distance(mousePosition, nearestLinePoint);
 
-        if (distance < nearestDistance && distance < globalSettings.roadGuidelinesSnapDistance)
+        if (distance < nearestDistance && distance < settings.FindProperty("roadGuidelinesSnapDistance").floatValue)
         {
             nearestDistance = distance;
             return new Vector3(nearestLinePoint.x, roadGuideline.centerPoint.y, nearestLinePoint.y);
@@ -192,18 +192,18 @@ public static class Misc
 
     private static void DrawRoadGuidelines(RoadGuideline guidelines, int child, RoadSegment roadSegment, Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
-        if (roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings == null)
+        if (roadSegment.transform.parent.parent.GetComponent<RoadCreator>().settings == null)
         {
-            roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+            roadSegment.transform.parent.parent.GetComponent<RoadCreator>().settings = RoadCreatorSettings.GetSerializedSettings();
         }
 
         if (child == 1)
         {
-            Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadControlGuidelinesColour;
+            Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadControlGuidelinesColour").colorValue;
         }
         else
         {
-            Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesColour;
+            Handles.color = roadSegment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadGuidelinesColour").colorValue;
         }
 
         if (guidelines != null && roadSegment.transform.GetChild(0).GetChild(child).gameObject != objectToMove && roadSegment.transform.GetChild(0).GetChild(child).gameObject != extraObjectToMove)
@@ -211,11 +211,11 @@ public static class Misc
             Vector2 mousePositionXZ = new Vector3(mousePosition.x, mousePosition.z);
             Vector2 nereastPoint = Misc.FindNearestPointOnLine(new Vector2(guidelines.startPoint.x, guidelines.startPoint.z), new Vector2(guidelines.endPoint.x, guidelines.endPoint.z), mousePositionXZ);
 
-            if (Vector2.Distance(mousePositionXZ, nereastPoint) < roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesDistance)
+            if (Vector2.Distance(mousePositionXZ, nereastPoint) < roadSegment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadGuidelinesDistance").floatValue)
             {
                 Handles.DrawLine(guidelines.centerPoint, guidelines.startPoint);
                 Handles.DrawLine(guidelines.centerPoint, guidelines.endPoint);
-                Handles.DrawSolidDisc(guidelines.centerPoint, Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.pointSize * 0.75f);
+                Handles.DrawSolidDisc(guidelines.centerPoint, Vector3.up, roadSegment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("pointSize").floatValue * 0.75f);
 
                 Vector3 left = CalculateLeft(guidelines.startPoint, guidelines.endPoint);
                 Handles.DrawLine(guidelines.startPoint - left * 0.5f, guidelines.startPoint + left * 0.5f);

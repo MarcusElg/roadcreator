@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.Windows;
 
-[HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Global-Settings")]
-public class GlobalSettings : MonoBehaviour
+public class RoadCreatorSettings : ScriptableObject
 {
 
     public float pointSize = 0.5f;
@@ -24,7 +25,29 @@ public class GlobalSettings : MonoBehaviour
     public Color roadControlGuidelinesColour = Misc.darkGreen;
     public bool roadCurved = true;
 
-    public void UpdateRoadGuidelines()
+    private static RoadCreatorSettings GetOrCreateSettings()
+    {
+        RoadCreatorSettings settings = AssetDatabase.LoadAssetAtPath<RoadCreatorSettings>("Assets/Editor/RoadCreatorSettings.asset");
+        if (settings == null)
+        {
+            if (Directory.Exists("Assets/Editor") == false)
+            {
+                Directory.CreateDirectory("Assets/Editor");
+            }
+
+            settings = ScriptableObject.CreateInstance<RoadCreatorSettings>();
+            AssetDatabase.CreateAsset(settings, "Assets/Editor/RoadCreatorSettings.asset");
+            AssetDatabase.SaveAssets();
+        }
+        return settings;
+    }
+
+    public static SerializedObject GetSerializedSettings()
+    {
+        return new SerializedObject(GetOrCreateSettings());
+    }
+
+    public static void UpdateRoadGuidelines()
     {
         RoadCreator[] objects = GameObject.FindObjectsOfType<RoadCreator>();
 

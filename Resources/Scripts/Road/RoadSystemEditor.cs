@@ -15,14 +15,9 @@ public class RoadSystemEditor : Editor
     {
         roadSystem = (RoadSystem)target;
 
-        if (GameObject.FindObjectOfType<GlobalSettings>() == null)
+        if (roadSystem.settings == null)
         {
-            new GameObject("Global Settings").AddComponent<GlobalSettings>();
-        }
-
-        if (roadSystem.globalSettings == null)
-        {
-            roadSystem.globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+            roadSystem.settings = RoadCreatorSettings.GetSerializedSettings();
         }
 
         lastTool = Tools.current;

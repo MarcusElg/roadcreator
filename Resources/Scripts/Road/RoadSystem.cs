@@ -17,7 +17,7 @@ public class RoadSystem : MonoBehaviour
     Texture roadGuidelinesOn;
     Texture roadGuidelinesOff;
 
-    public GlobalSettings globalSettings;
+    public SerializedObject settings;
     public GUIStyle largeBoldText;
 
     public void ShowCreationButtons()
@@ -50,28 +50,29 @@ public class RoadSystem : MonoBehaviour
         // Detect click
         if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 80), (int)(SceneView.lastActiveSceneView.position.height - 95)))
         {
-            if (globalSettings.roadCurved == true)
+            if (settings.FindProperty("roadCurved").boolValue == true)
             {
-                globalSettings.roadCurved = false;
-            } else
+                settings.FindProperty("roadCurved").boolValue = false;
+            }
+            else
             {
-                globalSettings.roadCurved = true;
+                settings.FindProperty("roadCurved").boolValue = true;
             }
         }
 
         if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 45), (int)(SceneView.lastActiveSceneView.position.height - 95)))
         {
-            if (globalSettings.roadGuidelinesLength > 0)
+            if (settings.FindProperty("roadGuidelinesLength").floatValue > 0)
             {
-                globalSettings.oldRoadGuidelinesLength = globalSettings.roadGuidelinesLength;
-                globalSettings.roadGuidelinesLength = 0;
+                settings.FindProperty("oldRoadGuidelinesLength").floatValue = settings.FindProperty("roadGuidelinesLength").floatValue;
+                settings.FindProperty("roadGuidelinesLength").floatValue = 0;
             }
             else
             {
-                globalSettings.roadGuidelinesLength = globalSettings.oldRoadGuidelinesLength;
+                settings.FindProperty("roadGuidelinesLength").floatValue = settings.FindProperty("oldRoadGuidelinesLength").floatValue;
             }
 
-            globalSettings.UpdateRoadGuidelines();
+            RoadCreatorSettings.UpdateRoadGuidelines();
         }
 
         if (ClickedButton(1) == true)
@@ -109,9 +110,9 @@ public class RoadSystem : MonoBehaviour
 
         GUI.Label(new Rect(5, 10, 100, 40), "Settings:", largeBoldText);
 
-        if (globalSettings != null)
+        if (settings != null)
         {
-            if (globalSettings.roadCurved == true)
+            if (settings.FindProperty("roadCurved").boolValue == true)
             {
                 GUI.DrawTexture(new Rect(90, 5, 30, 30), curvedRoad);
             }
@@ -120,7 +121,7 @@ public class RoadSystem : MonoBehaviour
                 GUI.DrawTexture(new Rect(90, 5, 30, 30), straightRoad);
             }
 
-            if (globalSettings.roadGuidelinesLength > 0)
+            if (settings.FindProperty("roadGuidelinesLength").floatValue > 0)
             {
                 GUI.DrawTexture(new Rect(125, 5, 30, 30), roadGuidelinesOn);
             }

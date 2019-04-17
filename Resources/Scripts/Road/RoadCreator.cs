@@ -11,7 +11,7 @@ public class RoadCreator : MonoBehaviour
     public float heightOffset = 0.02f;
     public bool createIntersections = true;
 
-    public GlobalSettings globalSettings;
+    public SerializedObject settings;
     public Preset segmentPreset;
     public GameObject objectToMove = null;
     public GameObject extraObjectToMove = null;
@@ -219,7 +219,7 @@ public class RoadCreator : MonoBehaviour
         {
             if (transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).childCount == 1)
             {
-                if (globalSettings.roadCurved == true)
+                if (settings.FindProperty("roadCurved").boolValue == true)
                 {
                     // Create control point
                     Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0), hitPosition), "Created Point");
@@ -244,7 +244,7 @@ public class RoadCreator : MonoBehaviour
                 Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
                 Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), segment.transform.position), "Created Point");
 
-                if (globalSettings.roadCurved == true)
+                if (settings.FindProperty("roadCurved").boolValue == true)
                 {
                     segment.curved = true;
                     Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), hitPosition), "Created Point");
@@ -265,13 +265,13 @@ public class RoadCreator : MonoBehaviour
             Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Point");
             Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), hitPosition), "Created Point");
 
-            if (globalSettings.roadCurved == false)
+            if (settings.FindProperty("roadCurved").boolValue == true)
             {
-                segment.curved = false;
+                segment.curved = true;
             }
             else
             {
-                segment.curved = true;
+                segment.curved = false;
             }
         }
     }
@@ -280,11 +280,11 @@ public class RoadCreator : MonoBehaviour
     {
         GameObject point = new GameObject(name);
         point.gameObject.AddComponent<BoxCollider>();
-        point.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+        point.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
         point.transform.SetParent(parent);
         point.transform.position = position;
         point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
-        point.layer = globalSettings.ignoreMouseRayLayer;
+        point.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
         point.AddComponent<Point>();
         point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
 
@@ -315,7 +315,7 @@ public class RoadCreator : MonoBehaviour
         mainMesh.AddComponent<MeshRenderer>();
         mainMesh.AddComponent<MeshFilter>();
         mainMesh.AddComponent<MeshCollider>();
-        mainMesh.layer = globalSettings.roadLayer;
+        mainMesh.layer = settings.FindProperty("roadLayer").intValue;
 
         if (segmentPreset == null)
         {
@@ -348,7 +348,7 @@ public class RoadCreator : MonoBehaviour
                     extraMesh.AddComponent<MeshCollider>();
                     extraMesh.transform.SetParent(segment.transform.GetChild(1));
                     extraMesh.transform.localPosition = Vector3.zero;
-                    extraMesh.layer = globalSettings.roadLayer;
+                    extraMesh.layer = settings.FindProperty("roadLayer").intValue;
                     extraMesh.hideFlags = HideFlags.NotEditable;
 
                     segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
@@ -367,7 +367,7 @@ public class RoadCreator : MonoBehaviour
                 extraMesh.AddComponent<MeshCollider>();
                 extraMesh.transform.SetParent(segment.transform.GetChild(1));
                 extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = globalSettings.roadLayer;
+                extraMesh.layer = settings.FindProperty("roadLayer").intValue;
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }
@@ -543,7 +543,7 @@ public class RoadCreator : MonoBehaviour
             RaycastHit raycastHitPoint;
             RaycastHit raycastHitRoad;
 
-            if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << globalSettings.ignoreMouseRayLayer) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
+            if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << settings.FindProperty("ignoreMouseRayLayer").intValue) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
             {
                 // Found Point
                 if (point.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().createIntersections == false)
@@ -587,7 +587,7 @@ public class RoadCreator : MonoBehaviour
                 intersection.GetComponent<Intersection>().ResetExtraMeshes();
                 intersection.GetComponent<Intersection>().CreateMesh();
             }
-            else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, globalSettings.ignoreMouseRayLayer) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
+            else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, settings.FindProperty("ignoreMouseRayLayer").intValue) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
             {
                 //Found road
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
@@ -1052,13 +1052,13 @@ public class RoadCreator : MonoBehaviour
         objectToMove = null;
 
         CreateMesh();
-        globalSettings.UpdateRoadGuidelines();
+        RoadCreatorSettings.UpdateRoadGuidelines();
     }
 
     public Vector3[] CalculatePoints(Transform segment)
     {
         float distance = Misc.CalculateDistance(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position);
-        float divisions = globalSettings.resolution * 4 * distance;
+        float divisions = settings.FindProperty("resolution").floatValue * 4 * distance;
         divisions = Mathf.Max(2, divisions);
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;
@@ -1090,7 +1090,7 @@ public class RoadCreator : MonoBehaviour
         if (segment.terrainOption == RoadSegment.TerrainOption.adapt)
         {
             RaycastHit raycastHit;
-            if (Physics.Raycast(originalPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << globalSettings.ignoreMouseRayLayer) | (1 << globalSettings.roadLayer))))
+            if (Physics.Raycast(originalPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << settings.FindProperty("ignoreMouseRayLayer").intValue) | (1 << settings.FindProperty("roadLayer").intValue))))
             {
                 return raycastHit.point;
             }

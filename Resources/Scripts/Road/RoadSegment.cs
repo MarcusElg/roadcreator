@@ -163,7 +163,7 @@ public class RoadSegment : MonoBehaviour
     {
         // Start Guidelines
         Vector3 left;
-        float roadGuidelinesLength = transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadGuidelinesLength;
+        float roadGuidelinesLength = transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadGuidelinesLength").floatValue;
 
         if (roadGuidelinesLength > 0)
         {
@@ -287,7 +287,7 @@ public class RoadSegment : MonoBehaviour
         {
             float[,] modifiedHeights;
             RaycastHit raycastHit;
-            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadCreator.globalSettings.roadLayer | 1 << roadCreator.globalSettings.ignoreMouseRayLayer)))
+            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadCreator.settings.FindProperty("roadLayer").intValue | 1 << roadCreator.settings.FindProperty("ignoreMouseRayLayer").intValue)))
             {
                 Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
                 if (terrain != null)

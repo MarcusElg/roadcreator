@@ -246,7 +246,7 @@ public class BridgeGeneration
         pillar.hideFlags = HideFlags.NotEditable;
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.roadLayer | 1 << segment.transform.parent.parent.GetComponent<RoadCreator>().globalSettings.ignoreMouseRayLayer)))
+        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue | 1 << segment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("ignoreMouseRayLayer").intValue)))
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
@@ -402,7 +402,7 @@ public class BridgeGeneration
         pillar.hideFlags = HideFlags.NotEditable;
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.globalSettings.roadLayer | 1 << intersection.globalSettings.ignoreMouseRayLayer)))
+        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.settings.FindProperty("roadLayer").intValue | 1 << intersection.settings.FindProperty("ignoreMouseRayLayer").intValue)))
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);

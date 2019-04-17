@@ -15,7 +15,8 @@ public class PointEditor : Editor
         if (point.roadPoint == true)
         {
             roadCreator = point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
-        } else
+        }
+        else
         {
             prefabLine = point.transform.parent.parent.GetComponent<PrefabLineCreator>();
         }
@@ -42,26 +43,27 @@ public class PointEditor : Editor
         {
             if (point.name == "Control Point")
             {
-                Handles.color = roadCreator.globalSettings.controlPointColour;
-            } else
+                Handles.color = roadCreator.settings.FindProperty("controlPointColour").colorValue;
+            }
+            else
             {
-                Handles.color = roadCreator.globalSettings.pointColour;
+                Handles.color = roadCreator.settings.FindProperty("pointColour").colorValue;
             }
 
-            Handles.CylinderHandleCap(0, point.transform.position, Quaternion.Euler(90, 0, 0), roadCreator.globalSettings.pointSize, EventType.Repaint);
+            Handles.CylinderHandleCap(0, point.transform.position, Quaternion.Euler(90, 0, 0), roadCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
         }
         else
         {
             if (point.name == "Control Point")
             {
-                Handles.color = prefabLine.globalSettings.controlPointColour;
+                Handles.color = prefabLine.settings.FindProperty("controlPointColour").colorValue;
             }
             else
             {
-                Handles.color = prefabLine.globalSettings.pointColour;
+                Handles.color = prefabLine.settings.FindProperty("pointColour").colorValue;
             }
 
-            Handles.CylinderHandleCap(0, point.transform.position, Quaternion.Euler(90, 0, 0), prefabLine.globalSettings.pointSize, EventType.Repaint);
+            Handles.CylinderHandleCap(0, point.transform.position, Quaternion.Euler(90, 0, 0), prefabLine.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
         }
     }
 }

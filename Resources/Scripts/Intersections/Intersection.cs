@@ -11,7 +11,7 @@ public class Intersection : MonoBehaviour
     public PhysicMaterial physicMaterial;
     public List<IntersectionConnection> connections = new List<IntersectionConnection>();
     public float yOffset;
-    public GlobalSettings globalSettings;
+    public SerializedObject settings;
     public GameObject objectToMove;
     public bool stretchTexture = false;
 
@@ -97,7 +97,8 @@ public class Intersection : MonoBehaviour
                 if (objectToMove.transform.name == "Start Point")
                 {
                     objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(this);
-                } else
+                }
+                else
                 {
                     objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(this);
                 }
@@ -109,9 +110,9 @@ public class Intersection : MonoBehaviour
 
     public void CreateMesh(bool fromRoad = false)
     {
-        if (globalSettings == null)
+        if (settings == null)
         {
-            globalSettings = GameObject.FindObjectOfType<GlobalSettings>();
+            settings = RoadCreatorSettings.GetSerializedSettings();
         }
 
         for (int i = 0; i < connections.Count; i++)
@@ -206,7 +207,7 @@ public class Intersection : MonoBehaviour
                     return;
                 }
 
-                float segments = totalLength[i] * globalSettings.resolution * 5;
+                float segments = totalLength[i] * settings.FindProperty("resolution").floatValue * 5;
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
 
@@ -389,9 +390,9 @@ public class Intersection : MonoBehaviour
             GameObject curvePoint = null;
             curvePoint = new GameObject("Connection Point");
             curvePoint.transform.SetParent(transform);
-            curvePoint.layer = globalSettings.ignoreMouseRayLayer;
+            curvePoint.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
             curvePoint.AddComponent<BoxCollider>();
-            curvePoint.GetComponent<BoxCollider>().size = new Vector3(globalSettings.pointSize, globalSettings.pointSize, globalSettings.pointSize);
+            curvePoint.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
             curvePoint.transform.position = connections[i].curvePoint.ToNormalVector3();
             curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset + transform.position.y, curvePoint.transform.position.z);
         }
