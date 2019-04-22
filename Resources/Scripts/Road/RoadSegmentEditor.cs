@@ -133,6 +133,24 @@ public class RoadSegmentEditor : Editor
                     }
                 }
 
+                if (GUILayout.Button("Duplicate Extra Mesh") == true)
+                {
+                    for (int j = 0; j < targets.Length; j++)
+                    {
+                        RoadSegment currentSegment = (RoadSegment)targets[j];
+                        currentSegment.extraMeshes.Add(currentSegment.extraMeshes[currentSegment.extraMeshes.Count - 1]);
+
+                        GameObject extraMesh = new GameObject("Extra Mesh");
+                        extraMesh.AddComponent<MeshFilter>();
+                        extraMesh.AddComponent<MeshRenderer>();
+                        extraMesh.AddComponent<MeshCollider>();
+                        extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
+                        extraMesh.transform.localPosition = Vector3.zero;
+                        extraMesh.layer = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue;
+                        extraMesh.hideFlags = HideFlags.NotEditable;
+                    }
+                }
+
                 if (GUILayout.Button("Remove Extra Mesh") == true)
                 {
                     for (int j = 0; j < targets.Length; j++)

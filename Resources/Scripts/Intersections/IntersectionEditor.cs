@@ -85,6 +85,20 @@ public class IntersectionEditor : Editor
                 intersection.extraMeshes[i].endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshes[i].endWidth), 0);
                 intersection.extraMeshes[i].yOffset = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshes[i].yOffset);
 
+                if (GUILayout.Button("Duplicate Extra Mesh") == true)
+                {
+                    intersection.extraMeshes.Add(intersection.extraMeshes[intersection.extraMeshes.Count - 1]);
+
+                    GameObject extraMesh = new GameObject("Extra Mesh");
+                    extraMesh.AddComponent<MeshFilter>();
+                    extraMesh.AddComponent<MeshRenderer>();
+                    extraMesh.AddComponent<MeshCollider>();
+                    extraMesh.transform.SetParent(intersection.transform.GetChild(0));
+                    extraMesh.transform.localPosition = Vector3.zero;
+                    extraMesh.layer = intersection.settings.FindProperty("roadLayer").intValue;
+                    extraMesh.hideFlags = HideFlags.NotEditable;
+                }
+
                 if (GUILayout.Button("Remove Extra Mesh") == true && intersection.transform.GetChild(0).childCount > 0)
                 {
                     intersection.extraMeshes.RemoveAt(i);
