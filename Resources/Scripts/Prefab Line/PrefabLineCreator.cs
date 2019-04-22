@@ -244,7 +244,7 @@ public class PrefabLineCreator : MonoBehaviour
                 placedPrefab.name = "Prefab";
                 placedPrefab.layer = settings.FindProperty("roadLayer").intValue;
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
-                placedPrefab.hideFlags = HideFlags.NotEditable;
+                placedPrefab.hideFlags = HideFlags.HideInHierarchy;
 
                 Vector3 startPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j]));
                 Vector3 endPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j]));
