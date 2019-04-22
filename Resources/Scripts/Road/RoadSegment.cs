@@ -43,22 +43,22 @@ public class RoadSegment : MonoBehaviour
     {
         if (baseRoadMaterial == null)
         {
-            baseRoadMaterial = Resources.Load("Materials/Low Poly/Roads/2 Lane Roads/2L Road") as Material;
+            baseRoadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
         }
 
         if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
         {
-            bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+            bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Concrete") as Material };
         }
 
         if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
         {
-            pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
+            pillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
         }
 
         if (bridgeSettings.bridgeMesh == null || bridgeSettings.bridgeMesh.GetComponent<MeshFilter>() == null)
         {
-            bridgeSettings.bridgeMesh = Resources.Load("Prefabs/Low Poly/Bridges/Complete/Suspension Bridge") as GameObject;
+            bridgeSettings.bridgeMesh = Resources.Load("Prefabs/Bridges/Complete/Suspension Bridge") as GameObject;
         }
 
         if (transform.Find("Bridge Base") != null)
@@ -75,7 +75,7 @@ public class RoadSegment : MonoBehaviour
         {
             if (extraMeshes[i].material == null)
             {
-                extraMeshes[i].material = Resources.Load("Materials/Low Poly/Asphalt") as Material;
+                extraMeshes[i].material = Resources.Load("Materials/Asphalt") as Material;
             }
         }
 

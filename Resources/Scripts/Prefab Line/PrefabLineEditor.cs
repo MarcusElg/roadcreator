@@ -32,7 +32,7 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.prefab == null)
             {
-                prefabCreator.prefab = Resources.Load("Prefabs/Low Poly/Concrete Barrier") as GameObject;
+                prefabCreator.prefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
             }
 
             prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.xScale;
@@ -108,11 +108,11 @@ public class PrefabLineEditor : Editor
         {
             if (prefabCreator.prefab == null)
             {
-                prefabCreator.prefab = Resources.Load("Prefabs/Low Poly/Concrete Barrier") as GameObject;
+                prefabCreator.prefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
             }
             else if (prefabCreator.prefab.GetComponent<MeshFilter>() == null)
             {
-                prefabCreator.prefab = Resources.Load("Prefabs/Low Poly/Concrete Barrier") as GameObject;
+                prefabCreator.prefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
                 Debug.Log("Selected prefab must have a mesh filter attached. Prefab has been changed to the concrete barrier");
                 return;
             }

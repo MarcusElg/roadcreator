@@ -150,25 +150,25 @@ public class Intersection : MonoBehaviour
 
             if (baseMaterial == null)
             {
-                baseMaterial = Resources.Load("Materials/Low Poly/Intersections/Asphalt Intersection") as Material;
+                baseMaterial = Resources.Load("Materials/Intersections/Asphalt Intersection") as Material;
             }
 
             if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
             {
-                bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Low Poly/Concrete") as Material };
+                bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Concrete") as Material };
             }
 
             for (int i = 0; i < extraMeshes.Count; i++)
             {
                 if (extraMeshes[i].material == null)
                 {
-                    extraMeshes[i].material = Resources.Load("Materials/Low Poly/Asphalt") as Material;
+                    extraMeshes[i].material = Resources.Load("Materials/Asphalt") as Material;
                 }
             }
 
             if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
             {
-                pillarPrefab = Resources.Load("Prefabs/Low Poly/Bridges/Pillars/Cylinder Bridge Pillar") as GameObject;
+                pillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Cylinder Bridge Pillar") as GameObject;
             }
 
             List<Vector3> vertices = new List<Vector3>();

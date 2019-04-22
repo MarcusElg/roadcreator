@@ -33,19 +33,19 @@ public class RoadSystem : MonoBehaviour
 
         if (createRoad == null)
         {
-            createRoad = Resources.Load("Textures/Low Poly/Ui/createroad") as Texture;
-            createPrefabLine = Resources.Load("Textures/Low Poly/Ui/createprefabline") as Texture;
-            createTrafficLight = Resources.Load("Textures/Low Poly/Ui/createtrafficlight") as Texture;
+            createRoad = Resources.Load("Textures/Ui/createroad") as Texture;
+            createPrefabLine = Resources.Load("Textures/Ui/createprefabline") as Texture;
+            createTrafficLight = Resources.Load("Textures/Ui/createtrafficlight") as Texture;
 
-            straightRoad = Resources.Load("Textures/Low Poly/Ui/straightroad") as Texture;
-            curvedRoad = Resources.Load("Textures/Low Poly/Ui/curvedroad") as Texture;
+            straightRoad = Resources.Load("Textures/Ui/straightroad") as Texture;
+            curvedRoad = Resources.Load("Textures/Ui/curvedroad") as Texture;
 
-            roadGuidelinesOn = Resources.Load("Textures/Low Poly/Ui/roadguidelineson") as Texture;
-            roadGuidelinesOff = Resources.Load("Textures/Low Poly/Ui/roadguidelinesoff") as Texture;
+            roadGuidelinesOn = Resources.Load("Textures/Ui/roadguidelineson") as Texture;
+            roadGuidelinesOff = Resources.Load("Textures/Ui/roadguidelinesoff") as Texture;
         }
 
         Rect windowRect = new Rect(SceneView.lastActiveSceneView.position.width - 170, SceneView.lastActiveSceneView.position.height - 85, 160, 75);
-        windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Low Poly/Ui/Object Creator Gui Skin") as GUISkin).window);
+        windowRect = GUILayout.Window(0, windowRect, DrawWindow, "", (Resources.Load("Textures/Ui/Object Creator Gui Skin") as GUISkin).window);
 
         // Detect click
         if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 80), (int)(SceneView.lastActiveSceneView.position.height - 95)))
@@ -95,7 +95,7 @@ public class RoadSystem : MonoBehaviour
         }
         else if (ClickedButton(3) == true)
         {
-            GameObject gameObject = Instantiate(Resources.Load("Prefabs/Low Poly/Traffic Light") as GameObject);
+            GameObject gameObject = Instantiate(Resources.Load("Prefabs/Traffic Light") as GameObject);
             gameObject.name = "Traffic Light";
             gameObject.transform.SetParent(transform);
             Selection.activeGameObject = gameObject;
