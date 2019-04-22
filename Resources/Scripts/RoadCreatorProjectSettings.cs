@@ -21,7 +21,6 @@ public class RoadCreatorProjectSettings
                 if (EditorGUI.EndChangeCheck() == true)
                 {
                     settings.ApplyModifiedPropertiesWithoutUndo();
-
                     Transform[] objects = GameObject.FindObjectsOfType<Transform>();
 
                     for (int i = 0; i < objects.Length; i++)
@@ -31,6 +30,8 @@ public class RoadCreatorProjectSettings
                             objects[i].GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
                         }
                     }
+
+                    UpdateSettings();
                 }
 
                 EditorGUI.BeginChangeCheck();
@@ -39,6 +40,7 @@ public class RoadCreatorProjectSettings
                 if (EditorGUI.EndChangeCheck() == true)
                 {
                     settings.ApplyModifiedPropertiesWithoutUndo();
+                    UpdateSettings();
 
                     RoadCreator[] roads = GameObject.FindObjectsOfType<RoadCreator>();
                     for (int i = 0; i < roads.Length; i++)
@@ -60,6 +62,7 @@ public class RoadCreatorProjectSettings
                 if (EditorGUI.EndChangeCheck() == true)
                 {
                     settings.ApplyModifiedPropertiesWithoutUndo();
+                    UpdateSettings();
                 }
 
                 GUIStyle guiStyle = new GUIStyle();
@@ -75,6 +78,7 @@ public class RoadCreatorProjectSettings
                 if (EditorGUI.EndChangeCheck() == true)
                 {
                     settings.ApplyModifiedPropertiesWithoutUndo();
+                    UpdateSettings();
                     RoadCreatorSettings.UpdateRoadGuidelines();
                 }
 
@@ -101,11 +105,45 @@ public class RoadCreatorProjectSettings
                 if (EditorGUI.EndChangeCheck() == true)
                 {
                     settings.ApplyModifiedPropertiesWithoutUndo();
+                    UpdateSettings();
                 }
             }
         };
 
         return settingsProvider;
+    }
+
+    private static void UpdateSettings()
+    {
+        RoadSystem[] roadSystems = GameObject.FindObjectsOfType<RoadSystem>();
+        for (int i = 0; i < roadSystems.Length; i++)
+        {
+            for (int j = 0; j < roadSystems[i].transform.childCount; j++)
+            {
+                Transform transform = roadSystems[i].transform.GetChild(j);
+
+                if (transform.GetComponent<RoadCreator>() != null)
+                {
+                    transform.GetComponent<RoadCreator>().settings = RoadCreatorSettings.GetSerializedSettings();
+                }
+                else if (transform.GetComponent<RoadSegment>() != null)
+                {
+                    transform.GetComponent<RoadSegment>().settings = RoadCreatorSettings.GetSerializedSettings();
+                }
+                else if (transform.GetComponent<PrefabLineCreator>() != null)
+                {
+                    transform.GetComponent<PrefabLineCreator>().settings = RoadCreatorSettings.GetSerializedSettings();
+                }
+                else if (transform.GetComponent<Intersection>() != null)
+                {
+                    transform.GetComponent<Intersection>().settings = RoadCreatorSettings.GetSerializedSettings();
+                }
+                else if (transform.GetComponent<RoadSystem>() != null)
+                {
+                    transform.GetComponent<RoadSystem>().settings = RoadCreatorSettings.GetSerializedSettings();
+                }
+            }
+        }
     }
 
 }

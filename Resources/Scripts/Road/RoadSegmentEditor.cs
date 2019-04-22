@@ -9,6 +9,17 @@ using UnityEditor;
 public class RoadSegmentEditor : Editor
 {
 
+    private void OnEnable()
+    {
+        if (((RoadSegment)target).settings == null)
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                ((RoadSegment)targets[i]).settings = RoadCreatorSettings.GetSerializedSettings();
+            }
+        }
+    }
+
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
@@ -146,7 +157,7 @@ public class RoadSegmentEditor : Editor
                         extraMesh.AddComponent<MeshCollider>();
                         extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
                         extraMesh.transform.localPosition = Vector3.zero;
-                        extraMesh.layer = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue;
+                        extraMesh.layer = ((RoadSegment)targets[i]).settings.FindProperty("roadLayer").intValue;
                         extraMesh.hideFlags = HideFlags.NotEditable;
                     }
                 }
@@ -189,7 +200,7 @@ public class RoadSegmentEditor : Editor
                 extraMesh.AddComponent<MeshCollider>();
                 extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
                 extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = ((RoadSegment)targets[i]).transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue;
+                extraMesh.layer = ((RoadSegment)targets[i]).settings.FindProperty("roadLayer").intValue;
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }

@@ -6,6 +6,19 @@ using UnityEditor;
 [CustomEditor(typeof(Point))]
 public class PointEditor : Editor
 {
+    private Tool lastTool;
+
+    private void OnEnable()
+    {
+        lastTool = Tools.current;
+        Tools.current = Tool.Move;
+    }
+
+    private void OnDisable()
+    {
+        Tools.current = lastTool;
+    }
+
     private void OnSceneGUI()
     {
         Point point = (Point)target;

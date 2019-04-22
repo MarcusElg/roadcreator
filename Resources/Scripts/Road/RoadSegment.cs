@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 [HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Segments")]
 public class RoadSegment : MonoBehaviour
@@ -35,6 +36,8 @@ public class RoadSegment : MonoBehaviour
     public RoadGuideline startGuidelinePoints;
     public RoadGuideline centerGuidelinePoints;
     public RoadGuideline endGuidelinePoints;
+
+    public SerializedObject settings;
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {
@@ -161,9 +164,14 @@ public class RoadSegment : MonoBehaviour
 
     private void SetGuidelines(Vector3[] currentPoints, Vector3[] nextPoints, bool first)
     {
+        if (settings == null)
+        {
+            settings = RoadCreatorSettings.GetSerializedSettings();
+        }
+
         // Start Guidelines
         Vector3 left;
-        float roadGuidelinesLength = transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadGuidelinesLength").floatValue;
+        float roadGuidelinesLength = settings.FindProperty("roadGuidelinesLength").floatValue;
 
         if (roadGuidelinesLength > 0)
         {
@@ -287,7 +295,7 @@ public class RoadSegment : MonoBehaviour
         {
             float[,] modifiedHeights;
             RaycastHit raycastHit;
-            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << roadCreator.settings.FindProperty("roadLayer").intValue | 1 << roadCreator.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << settings.FindProperty("roadLayer").intValue | 1 << settings.FindProperty("ignoreMouseRayLayer").intValue)))
             {
                 Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
                 if (terrain != null)

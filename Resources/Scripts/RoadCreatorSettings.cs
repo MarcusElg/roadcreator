@@ -39,6 +39,7 @@ public class RoadCreatorSettings : ScriptableObject
             AssetDatabase.CreateAsset(settings, "Assets/Editor/RoadCreatorSettings.asset");
             AssetDatabase.SaveAssets();
         }
+
         return settings;
     }
 
