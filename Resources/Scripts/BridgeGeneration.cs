@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class BridgeGeneration
 {
@@ -167,7 +168,7 @@ public class BridgeGeneration
             verticeIndex += 8;
         }
 
-        return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials);
+        return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials, segment.settings);
     }
 
     public static void GenerateCustomBridge(RoadSegment segment, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
@@ -391,7 +392,7 @@ public class BridgeGeneration
             CreatePillarIntersection(bridge.transform, intersection.pillarPrefab, intersection.transform.position - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0), intersection);
         }
 
-        BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), null, materials);
+        BridgeGeneration.CreateBridge(bridge, intersection.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), null, materials, intersection.settings);
     }
 
     public static void CreatePillarIntersection(Transform parent, GameObject prefab, Vector3 position, Intersection intersection)
@@ -417,7 +418,7 @@ public class BridgeGeneration
         }
     }
 
-    public static GameObject CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector2[] extraUvs, Material[] materials)
+    public static GameObject CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector2[] extraUvs, Material[] materials, SerializedObject settings)
     {
         bridge.transform.SetParent(parent);
         bridge.transform.SetAsLastSibling();
@@ -426,6 +427,11 @@ public class BridgeGeneration
         bridge.AddComponent<MeshFilter>();
         bridge.AddComponent<MeshRenderer>();
         bridge.AddComponent<MeshCollider>();
+
+        if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+        {
+            bridge.hideFlags = HideFlags.HideInHierarchy;
+        }
 
         // Flat shaded triangles
         Vector3[] flatShadedVertices = new Vector3[triangles.Length];

@@ -397,6 +397,11 @@ public class Intersection : MonoBehaviour
             curvePoint.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
             curvePoint.transform.position = connections[i].curvePoint.ToNormalVector3();
             curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset + transform.position.y, curvePoint.transform.position.z);
+
+            if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+            {
+                curvePoint.hideFlags = HideFlags.HideInHierarchy;
+            }
         }
 
         if (transform.Find("Bridge") != null)

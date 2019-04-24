@@ -306,7 +306,15 @@ public class RoadCreator : MonoBehaviour
         GameObject meshes = new GameObject("Meshes");
         meshes.transform.SetParent(segment.transform);
         meshes.transform.localPosition = Vector3.zero;
-        meshes.hideFlags = HideFlags.NotEditable;
+
+        if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+        {
+            meshes.hideFlags = HideFlags.HideInHierarchy;
+        }
+        else
+        {
+            meshes.hideFlags = HideFlags.NotEditable;
+        }
 
         GameObject mainMesh = new GameObject("Main Mesh");
         mainMesh.transform.SetParent(meshes.transform);
@@ -724,8 +732,17 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
         intersection.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
 
-        GameObject gameObject = new GameObject("Extra Meshes");
-        gameObject.transform.SetParent(intersection.transform, false);
+        GameObject extraMeshes = new GameObject("Extra Meshes");
+        extraMeshes.transform.SetParent(intersection.transform, false);
+
+        if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+        {
+            extraMeshes.hideFlags = HideFlags.HideInHierarchy;
+        }
+        else
+        {
+            extraMeshes.hideFlags = HideFlags.NotEditable;
+        }
 
         return intersection;
     }

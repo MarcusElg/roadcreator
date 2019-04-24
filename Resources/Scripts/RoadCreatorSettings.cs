@@ -11,6 +11,7 @@ public class RoadCreatorSettings : ScriptableObject
     public float resolution = 0.25f;
     public int ignoreMouseRayLayer = 9;
     public int roadLayer = 10;
+    public bool hideNonEditableChildren = true;
 
     public float oldRoadGuidelinesLength = 5;
     public float roadGuidelinesLength = 5;

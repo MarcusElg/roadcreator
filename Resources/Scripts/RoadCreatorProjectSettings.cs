@@ -58,6 +58,7 @@ public class RoadCreatorProjectSettings
                 EditorGUI.BeginChangeCheck();
                 settings.FindProperty("ignoreMouseRayLayer").intValue = Mathf.Clamp(EditorGUILayout.IntField("Ignore Mouse Ray Layer", settings.FindProperty("ignoreMouseRayLayer").intValue), 9, 31);
                 settings.FindProperty("roadLayer").intValue = Mathf.Clamp(EditorGUILayout.IntField("Road Layer", settings.FindProperty("roadLayer").intValue), 9, 31);
+                settings.FindProperty("hideNonEditableChildren").boolValue = EditorGUILayout.Toggle("Hide Non-editable Children", settings.FindProperty("hideNonEditableChildren").boolValue);
 
                 if (EditorGUI.EndChangeCheck() == true)
                 {
