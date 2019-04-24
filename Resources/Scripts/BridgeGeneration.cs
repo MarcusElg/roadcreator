@@ -179,6 +179,14 @@ public class BridgeGeneration
         prefabLine.AddComponent<PrefabLineCreator>();
         prefabLine.GetComponent<PrefabLineCreator>().Setup();
 
+        if (segment.settings.FindProperty("hideNonEditableChildren").boolValue == true)
+        {
+            prefabLine.hideFlags = HideFlags.HideInHierarchy;
+        } else
+        {
+            prefabLine.hideFlags = HideFlags.NotEditable;
+        }
+
         Vector3 startPoint = segment.transform.GetChild(0).GetChild(0).transform.position;
         Vector3 centerPoint = segment.transform.GetChild(0).GetChild(1).transform.position;
         Vector3 endPoint = segment.transform.GetChild(0).GetChild(2).transform.position;
