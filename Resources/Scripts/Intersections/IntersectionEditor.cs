@@ -66,8 +66,8 @@ public class IntersectionEditor : Editor
             if (intersection.placePillars == true)
             {
                 intersection.pillarPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", intersection.pillarPrefab, typeof(GameObject), false);
-                intersection.extraPillarHeight = EditorGUILayout.FloatField("Extra Pillar Height", intersection.extraPillarHeight);
-                intersection.xzPillarScale = EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale);
+                intersection.extraPillarHeight = Mathf.Max(0, EditorGUILayout.FloatField("Extra Pillar Height", intersection.extraPillarHeight));
+                intersection.xzPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale));
             }
         }
 

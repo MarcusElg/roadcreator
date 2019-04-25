@@ -346,7 +346,8 @@ public class RoadCreator : MonoBehaviour
                 segment.pillarGap = oldLastSegment.pillarGap;
                 segment.pillarPlacementOffset = oldLastSegment.pillarPlacementOffset;
                 segment.extraPillarHeight = oldLastSegment.extraPillarHeight;
-                segment.xzPillarScale = oldLastSegment.xzPillarScale;
+                segment.xPillarScale = oldLastSegment.xPillarScale;
+                segment.zPillarScale = oldLastSegment.zPillarScale;
 
                 for (int i = 0; i < oldLastSegment.extraMeshes.Count; i++)
                 {
@@ -722,7 +723,7 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<Intersection>().bridgeSettings = segment.bridgeSettings;
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
-        intersection.GetComponent<Intersection>().xzPillarScale = segment.xzPillarScale;
+        intersection.GetComponent<Intersection>().xzPillarScale = segment.xPillarScale;
 
         intersection.AddComponent<MeshFilter>();
         intersection.AddComponent<MeshRenderer>();

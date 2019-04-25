@@ -280,7 +280,7 @@ public class BridgeGeneration
 
 
             float heightDifference = groundPosition.y - centerPosition.y;
-            pillar.transform.localScale = new Vector3(segment.xzPillarScale, (-heightDifference + segment.extraPillarHeight) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, segment.xzPillarScale);
+            pillar.transform.localScale = new Vector3(segment.xPillarScale, (-heightDifference + segment.extraPillarHeight) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, segment.zPillarScale);
         }
         else
         {
