@@ -193,7 +193,7 @@ public class RoadSegmentEditor : Editor
         {
             for (int i = 0; i < targets.Length; i++)
             {
-                ((RoadSegment)targets[i]).extraMeshes.Add(new ExtraMesh(true, true, Resources.Load("Materials/Asphalt") as Material, null, 1, 1, 0));
+                ((RoadSegment)targets[i]).extraMeshes.Add(new ExtraMesh(true, true, (Material)((RoadSegment)targets[i]).settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue, null, 1, 1, 0));
 
                 GameObject extraMesh = new GameObject("Extra Mesh");
                 extraMesh.AddComponent<MeshFilter>();

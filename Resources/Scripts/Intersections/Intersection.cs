@@ -150,25 +150,31 @@ public class Intersection : MonoBehaviour
 
             if (baseMaterial == null)
             {
-                baseMaterial = Resources.Load("Materials/Intersections/Asphalt Intersection") as Material;
+                baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
             }
 
             if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
             {
-                bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Concrete") as Material };
+                Material[] materials = new Material[settings.FindProperty("defaultSimpleBridgeMaterials").arraySize];
+                for (int i = 0; i < settings.FindProperty("defaultSimpleBridgeMaterials").arraySize; i++)
+                {
+                    materials[i] = (Material)settings.FindProperty("defaultSimpleBridgeMaterials").GetArrayElementAtIndex(i).objectReferenceValue;
+                }
+
+                bridgeSettings.bridgeMaterials = materials;
             }
 
             for (int i = 0; i < extraMeshes.Count; i++)
             {
                 if (extraMeshes[i].material == null)
                 {
-                    extraMeshes[i].material = Resources.Load("Materials/Asphalt") as Material;
+                    extraMeshes[i].material = (Material)settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue;
                 }
             }
 
             if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
             {
-                pillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Cylinder Bridge Pillar") as GameObject;
+                pillarPrefab = (GameObject)settings.FindProperty("defaultPillarPrefab").objectReferenceValue;
             }
 
             List<Vector3> vertices = new List<Vector3>();

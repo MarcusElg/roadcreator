@@ -18,6 +18,15 @@ public class RoadCreatorSettings : ScriptableObject
     public float roadGuidelinesDistance = 10;
     public float roadGuidelinesSnapDistance = 1;
 
+    public Material defaultBaseMaterial;
+    public Material defaultRoadOverlayMaterial;
+    public Material defaultExtraMeshMaterial;
+    public Material defaultIntersectionOverlayMaterial;
+    public Material[] defaultSimpleBridgeMaterials;
+    public GameObject defaultPillarPrefab;
+    public GameObject defaultCustomBridgePrefab;
+    public GameObject defaultPrefabLinePrefab;
+
     public Color pointColour = Color.red;
     public Color controlPointColour = Color.yellow;
     public Color intersectionColour = Color.green;
@@ -26,7 +35,12 @@ public class RoadCreatorSettings : ScriptableObject
     public Color roadControlGuidelinesColour = Misc.darkGreen;
     public bool roadCurved = true;
 
-    private static RoadCreatorSettings GetOrCreateSettings()
+    private void OnEnable()
+    {
+        CheckDefaults();
+    }
+
+    public static RoadCreatorSettings GetOrCreateSettings()
     {
         RoadCreatorSettings settings = AssetDatabase.LoadAssetAtPath<RoadCreatorSettings>("Assets/Editor/RoadCreatorSettings.asset");
         if (settings == null)
@@ -56,6 +70,49 @@ public class RoadCreatorSettings : ScriptableObject
         for (int i = 0; i < objects.Length; i++)
         {
             objects[i].CreateMesh();
+        }
+    }
+
+    public void CheckDefaults()
+    {
+        if (defaultBaseMaterial == null)
+        {
+            defaultBaseMaterial = Resources.Load("Materials/Asphalt") as Material;
+        }
+
+        if (defaultRoadOverlayMaterial == null)
+        {
+            defaultRoadOverlayMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+        }
+
+        if (defaultExtraMeshMaterial == null)
+        {
+            defaultExtraMeshMaterial = Resources.Load("Materials/Asphalt") as Material;
+        }
+
+        if (defaultIntersectionOverlayMaterial == null)
+        {
+            defaultIntersectionOverlayMaterial = Resources.Load("Materials/Intersections/Asphalt Intersection") as Material;
+        }
+
+        if (defaultSimpleBridgeMaterials == null || defaultSimpleBridgeMaterials.Length == 0)
+        {
+            defaultSimpleBridgeMaterials = new Material[] { Resources.Load("Materials/Concrete") as Material };
+        }
+
+        if (defaultPillarPrefab == null)
+        {
+            defaultPillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
+        }
+
+        if (defaultCustomBridgePrefab == null)
+        {
+            defaultCustomBridgePrefab = Resources.Load("Prefabs/Bridges/Complete/Suspension Bridge") as GameObject;
+        }
+
+        if (defaultPrefabLinePrefab == null)
+        {
+            defaultPrefabLinePrefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
         }
     }
 

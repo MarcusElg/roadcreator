@@ -141,6 +141,9 @@ public class RoadCreator : MonoBehaviour
                         lastTextureRepeat = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Tiling").y;
                         lastTextureOffset = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Offset").y;
                         material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                    } else
+                    {
+                        material.SetVector("_Offset", new Vector2(0, 0));
                     }
 
                     transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
@@ -153,6 +156,9 @@ public class RoadCreator : MonoBehaviour
                         if (i > 0)
                         {
                             material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                        } else
+                        {
+                            material.SetVector("_Offset", new Vector2(0, 0));
                         }
 
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials = new Material[2] { transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[0], material };
@@ -362,6 +368,10 @@ public class RoadCreator : MonoBehaviour
 
                     segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
                 }
+            }
+            else
+            {
+                segment.overlayRoadMaterial = (Material)settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue;
             }
         }
         else

@@ -85,6 +85,37 @@ public class RoadCreatorProjectSettings
 
                 EditorGUI.BeginChangeCheck();
                 GUILayout.Space(20);
+                GUILayout.Label("Defaults", guiStyle);
+                settings.FindProperty("defaultBaseMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Base Material", settings.FindProperty("defaultBaseMaterial").objectReferenceValue, typeof(Material), false);
+                settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Road Overlay Material", settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue, typeof(Material), false);
+                settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Extra Mesh Material", settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue, typeof(Material), false);
+                settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Intersection Overlay Material", settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue, typeof(Material), false);
+                EditorGUILayout.PropertyField(settings.FindProperty("defaultSimpleBridgeMaterials"), true);
+                settings.FindProperty("defaultPillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Pillar Prefab", settings.FindProperty("defaultPillarPrefab").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Custom Bridge Prefab", settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Prefab Line Prefab", settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue, typeof(GameObject), false);
+
+                if (GUILayout.Button("Reset Default Values"))
+                {
+                    settings.FindProperty("defaultBaseMaterial").objectReferenceValue = null;
+                    settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue = null;
+                    settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue = null;
+                    settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue = null;
+                    settings.FindProperty("defaultSimpleBridgeMaterials").ClearArray();
+                    settings.FindProperty("defaultPillarPrefab").objectReferenceValue = null;
+                    settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue = null;
+                    settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue = null;
+                }
+
+                if (EditorGUI.EndChangeCheck() == true)
+                {
+                    settings.ApplyModifiedPropertiesWithoutUndo();
+                    RoadCreatorSettings.GetOrCreateSettings().CheckDefaults();
+                    UpdateSettings();
+                }
+
+                EditorGUI.BeginChangeCheck();
+                GUILayout.Space(20);
                 GUILayout.Label("Colours", guiStyle);
                 settings.FindProperty("pointColour").colorValue = EditorGUILayout.ColorField("Point Colour", settings.FindProperty("pointColour").colorValue);
                 settings.FindProperty("controlPointColour").colorValue = EditorGUILayout.ColorField("Control Point Colour", settings.FindProperty("controlPointColour").colorValue);

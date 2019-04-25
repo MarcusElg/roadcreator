@@ -210,7 +210,7 @@ public class PrefabLineCreator : MonoBehaviour
     {
         if (prefab == null)
         {
-            prefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
+            prefab = (GameObject)settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue;
         }
 
         for (int i = transform.GetChild(1).childCount - 1; i >= 0; i--)

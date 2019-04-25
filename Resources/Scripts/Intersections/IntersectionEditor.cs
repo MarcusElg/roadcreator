@@ -113,7 +113,7 @@ public class IntersectionEditor : Editor
 
         if (GUILayout.Button("Add Extra Mesh"))
         {
-            intersection.extraMeshes.Add(new ExtraMesh(true, 0, Resources.Load("Materials/Asphalt") as Material, null, 1, 1, 0));
+            intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue, null, 1, 1, 0));
 
             GameObject extraMesh = new GameObject("Extra Mesh");
             extraMesh.AddComponent<MeshFilter>();

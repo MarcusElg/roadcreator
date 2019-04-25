@@ -42,24 +42,35 @@ public class RoadSegment : MonoBehaviour
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {
+        if (settings == null)
+        {
+            settings = RoadCreatorSettings.GetSerializedSettings();
+        }
+
         if (baseRoadMaterial == null)
         {
-            baseRoadMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
+            baseRoadMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
         }
 
         if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
         {
-            bridgeSettings.bridgeMaterials = new Material[] { Resources.Load("Materials/Concrete") as Material };
+            Material[] materials = new Material[settings.FindProperty("defaultSimpleBridgeMaterials").arraySize];
+            for (int i = 0; i < settings.FindProperty("defaultSimpleBridgeMaterials").arraySize; i++)
+            {
+                materials[i] = (Material)settings.FindProperty("defaultSimpleBridgeMaterials").GetArrayElementAtIndex(i).objectReferenceValue;
+            }
+
+            bridgeSettings.bridgeMaterials = materials;
         }
 
         if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
         {
-            pillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
+            pillarPrefab = (GameObject)settings.FindProperty("defaultPillarPrefab").objectReferenceValue;
         }
 
         if (bridgeSettings.bridgeMesh == null || bridgeSettings.bridgeMesh.GetComponent<MeshFilter>() == null)
         {
-            bridgeSettings.bridgeMesh = Resources.Load("Prefabs/Bridges/Complete/Suspension Bridge") as GameObject;
+            bridgeSettings.bridgeMesh = (GameObject)settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue;
         }
 
         if (transform.Find("Bridge Base") != null)
@@ -76,7 +87,7 @@ public class RoadSegment : MonoBehaviour
         {
             if (extraMeshes[i].material == null)
             {
-                extraMeshes[i].material = Resources.Load("Materials/Asphalt") as Material;
+                extraMeshes[i].material = (Material)settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue;
             }
         }
 
