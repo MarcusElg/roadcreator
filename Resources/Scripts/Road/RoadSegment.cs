@@ -85,9 +85,17 @@ public class RoadSegment : MonoBehaviour
 
         for (int i = 0; i < extraMeshes.Count; i++)
         {
-            if (extraMeshes[i].material == null)
+            if (extraMeshes[i].baseMaterial == null)
             {
-                extraMeshes[i].material = (Material)settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue;
+                extraMeshes[i].baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
+            }
+        }
+
+        for (int i = 0; i < extraMeshes.Count; i++)
+        {
+            if (extraMeshes[i].overlayMaterial == null)
+            {
+                extraMeshes[i].overlayMaterial = (Material)settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue;
             }
         }
 
@@ -138,7 +146,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].material, null, roadCreator, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].baseMaterial, extraMeshes[i].overlayMaterial, roadCreator, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
         }
 
         if (generateSimpleBridge == true || generateCustomBridge == true)

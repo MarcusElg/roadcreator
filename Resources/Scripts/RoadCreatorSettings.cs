@@ -20,7 +20,7 @@ public class RoadCreatorSettings : ScriptableObject
 
     public Material defaultBaseMaterial;
     public Material defaultRoadOverlayMaterial;
-    public Material defaultExtraMeshMaterial;
+    public Material defaultExtraMeshOverlayMaterial;
     public Material defaultIntersectionOverlayMaterial;
     public Material[] defaultSimpleBridgeMaterials;
     public GameObject defaultPillarPrefab;
@@ -83,11 +83,6 @@ public class RoadCreatorSettings : ScriptableObject
         if (defaultRoadOverlayMaterial == null)
         {
             defaultRoadOverlayMaterial = Resources.Load("Materials/Roads/2 Lane Roads/2L Road") as Material;
-        }
-
-        if (defaultExtraMeshMaterial == null)
-        {
-            defaultExtraMeshMaterial = Resources.Load("Materials/Asphalt") as Material;
         }
 
         if (defaultIntersectionOverlayMaterial == null)

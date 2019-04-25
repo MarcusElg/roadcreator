@@ -79,7 +79,8 @@ public class IntersectionEditor : Editor
             if (intersection.extraMeshes[i].open == true)
             {
                 intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count - 1);
-                intersection.extraMeshes[i].material = (Material)EditorGUILayout.ObjectField("Material", intersection.extraMeshes[i].material, typeof(Material), false);
+                intersection.extraMeshes[i].baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.extraMeshes[i].baseMaterial, typeof(Material), false);
+                intersection.extraMeshes[i].overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.extraMeshes[i].overlayMaterial, typeof(Material), false);
                 intersection.extraMeshes[i].physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", intersection.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
                 intersection.extraMeshes[i].startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", intersection.extraMeshes[i].startWidth), 0);
                 intersection.extraMeshes[i].endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshes[i].endWidth), 0);
@@ -113,7 +114,7 @@ public class IntersectionEditor : Editor
 
         if (GUILayout.Button("Add Extra Mesh"))
         {
-            intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue, null, 1, 1, 0));
+            intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)intersection.settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, 0));
 
             GameObject extraMesh = new GameObject("Extra Mesh");
             extraMesh.AddComponent<MeshFilter>();

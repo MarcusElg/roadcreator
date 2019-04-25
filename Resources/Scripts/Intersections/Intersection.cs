@@ -147,7 +147,6 @@ public class Intersection : MonoBehaviour
         }
         else
         {
-
             if (baseMaterial == null)
             {
                 baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
@@ -166,9 +165,17 @@ public class Intersection : MonoBehaviour
 
             for (int i = 0; i < extraMeshes.Count; i++)
             {
-                if (extraMeshes[i].material == null)
+                if (extraMeshes[i].baseMaterial == null)
                 {
-                    extraMeshes[i].material = (Material)settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue;
+                    extraMeshes[i].baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
+                }
+            }
+
+            for (int i = 0; i < extraMeshes.Count; i++)
+            {
+                if (extraMeshes[i].overlayMaterial == null)
+                {
+                    extraMeshes[i].overlayMaterial = (Material)settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue;
                 }
             }
 
@@ -365,7 +372,15 @@ public class Intersection : MonoBehaviour
                 transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = mesh;
                 transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = mesh;
                 transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMaterial = extraMeshes[i].physicMaterial;
-                transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { extraMeshes[i].material };
+
+                if (overlayMaterial == null)
+                {
+                    transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+                }
+                else
+                {
+                    transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, extraMeshes[i].overlayMaterial };
+                }
 
                 startWidths[extraMeshes[i].index] += extraMeshes[i].startWidth;
                 endWidths[extraMeshes[i].index] += extraMeshes[i].endWidth;

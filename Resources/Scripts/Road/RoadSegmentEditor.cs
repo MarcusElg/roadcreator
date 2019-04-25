@@ -130,7 +130,8 @@ public class RoadSegmentEditor : Editor
             if (open == true)
             {
                 bool left = EditorGUILayout.Toggle("Left", inspectedSegment.extraMeshes[i].left);
-                Material material = (Material)EditorGUILayout.ObjectField("Material", inspectedSegment.extraMeshes[i].material, typeof(Material), false);
+                Material baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", inspectedSegment.extraMeshes[i].baseMaterial, typeof(Material), false);
+                Material overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", inspectedSegment.extraMeshes[i].overlayMaterial, typeof(Material), false);
                 PhysicMaterial physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", inspectedSegment.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
                 float startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", inspectedSegment.extraMeshes[i].startWidth), 0);
                 float endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", inspectedSegment.extraMeshes[i].endWidth), 0);
@@ -141,7 +142,7 @@ public class RoadSegmentEditor : Editor
                     RoadSegment currentSegment = (RoadSegment)targets[j];
                     if (currentSegment.extraMeshes.Count > i)
                     {
-                        currentSegment.extraMeshes[i] = new ExtraMesh(open, left, material, physicMaterial, startWidth, endWidth, yOffset);
+                        currentSegment.extraMeshes[i] = new ExtraMesh(open, left, baseMaterial, overlayMaterial, physicMaterial, startWidth, endWidth, yOffset);
                     }
                 }
 
@@ -183,7 +184,7 @@ public class RoadSegmentEditor : Editor
                     RoadSegment currentSegment = (RoadSegment)targets[j];
                     if (currentSegment.extraMeshes.Count > i)
                     {
-                        currentSegment.extraMeshes[i] = new ExtraMesh(open, currentSegment.extraMeshes[i].left, currentSegment.extraMeshes[i].material, currentSegment.extraMeshes[i].physicMaterial, currentSegment.extraMeshes[i].startWidth, currentSegment.extraMeshes[i].endWidth, currentSegment.extraMeshes[i].yOffset);
+                        currentSegment.extraMeshes[i] = new ExtraMesh(open, currentSegment.extraMeshes[i].left, currentSegment.extraMeshes[i].baseMaterial, currentSegment.extraMeshes[i].overlayMaterial, currentSegment.extraMeshes[i].physicMaterial, currentSegment.extraMeshes[i].startWidth, currentSegment.extraMeshes[i].endWidth, currentSegment.extraMeshes[i].yOffset);
                     }
                 }
             }
@@ -193,7 +194,7 @@ public class RoadSegmentEditor : Editor
         {
             for (int i = 0; i < targets.Length; i++)
             {
-                ((RoadSegment)targets[i]).extraMeshes.Add(new ExtraMesh(true, true, (Material)((RoadSegment)targets[i]).settings.FindProperty("defaultExtraMeshMaterial").objectReferenceValue, null, 1, 1, 0));
+                ((RoadSegment)targets[i]).extraMeshes.Add(new ExtraMesh(true, true, (Material)((RoadSegment)targets[i]).settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)((RoadSegment)targets[i]).settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, 0));
 
                 GameObject extraMesh = new GameObject("Extra Mesh");
                 extraMesh.AddComponent<MeshFilter>();

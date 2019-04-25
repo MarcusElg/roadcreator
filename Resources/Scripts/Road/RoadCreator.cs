@@ -141,7 +141,8 @@ public class RoadCreator : MonoBehaviour
                         lastTextureRepeat = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Tiling").y;
                         lastTextureOffset = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Offset").y;
                         material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
-                    } else
+                    }
+                    else
                     {
                         material.SetVector("_Offset", new Vector2(0, 0));
                     }
@@ -156,7 +157,8 @@ public class RoadCreator : MonoBehaviour
                         if (i > 0)
                         {
                             material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
-                        } else
+                        }
+                        else
                         {
                             material.SetVector("_Offset", new Vector2(0, 0));
                         }
@@ -734,6 +736,7 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<Intersection>().placePillars = segment.placePillars;
         intersection.GetComponent<Intersection>().extraPillarHeight = segment.extraPillarHeight;
         intersection.GetComponent<Intersection>().xzPillarScale = segment.xPillarScale;
+        intersection.GetComponent<Intersection>().overlayMaterial = (Material)settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue;
 
         intersection.AddComponent<MeshFilter>();
         intersection.AddComponent<MeshRenderer>();
