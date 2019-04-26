@@ -519,7 +519,6 @@ public class PrefabLineCreator : MonoBehaviour
             for (float t = 0; t < 1; t += distancePerDivision / pointCalculationDivisions)
             {
                 currentPoint = Misc.Lerp3CenterHeight(firstPoint, controlPoint, endPoint, t);
-
                 float currentDistance = Vector3.Distance(new Vector3(lastPoint.x, 0, lastPoint.z), new Vector3(currentPoint.x, 0, currentPoint.z));
 
                 if (currentDistance > spacing / 2 && endPointAdded == false)

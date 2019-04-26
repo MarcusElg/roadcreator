@@ -25,6 +25,7 @@ public class RoadSegment : MonoBehaviour
 
     public bool placePillars = true;
     public GameObject pillarPrefab;
+    public bool adaptGapToCustomBridge = false;
     public float pillarGap = 5;
     public float pillarPlacementOffset = 5;
     public float extraPillarHeight = 0.2f;
@@ -170,6 +171,8 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
+            PrefabLineCreator customBridge = null;
+
             if (generateSimpleBridge == true)
             {
                 BridgeGeneration.GenerateSimpleBridge(points, nextSegmentPoints, previousPoint, this, previousSegment, startExtraWidthLeft, endExtraWidthLeft, startExtraWidthRight, endExtraWidthRight, bridgeSettings.bridgeMaterials, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position);
@@ -177,7 +180,19 @@ public class RoadSegment : MonoBehaviour
 
             if (generateCustomBridge == true)
             {
-                BridgeGeneration.GenerateCustomBridge(this, startExtraWidthLeft + startRoadWidth, startExtraWidthRight + startRoadWidth, endExtraWidthLeft + endRoadWidth, endExtraWidthRight + endRoadWidth);
+                customBridge = BridgeGeneration.GenerateCustomBridge(this, startExtraWidthLeft + startRoadWidth, startExtraWidthRight + startRoadWidth, endExtraWidthLeft + endRoadWidth, endExtraWidthRight + endRoadWidth);
+            }
+
+            if (placePillars == true)
+            {
+                if (generateSimpleBridge == true)
+                {
+                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Bridge Base").gameObject, true, customBridge);
+                }
+                else if (generateCustomBridge == true)
+                {
+                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Custom Bridge").gameObject, false, customBridge);
+                }
             }
         }
     }

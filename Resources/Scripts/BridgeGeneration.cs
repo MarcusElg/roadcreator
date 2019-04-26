@@ -158,11 +158,6 @@ public class BridgeGeneration
                         extraUvs.Add(new Vector2(0, 1));
                     }
                 }
-
-                if (segment.placePillars == true)
-                {
-                    GeneratePillars(points, startPoint, controlPoint, endPoint, segment, bridge);
-                }
             }
 
             verticeIndex += 8;
@@ -171,7 +166,7 @@ public class BridgeGeneration
         return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials, segment.settings);
     }
 
-    public static void GenerateCustomBridge(RoadSegment segment, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
+    public static PrefabLineCreator GenerateCustomBridge(RoadSegment segment, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
     {
         GameObject prefabLine = new GameObject("Custom Bridge");
         prefabLine.hideFlags = HideFlags.NotEditable;
@@ -182,7 +177,8 @@ public class BridgeGeneration
         if (segment.settings.FindProperty("hideNonEditableChildren").boolValue == true)
         {
             prefabLine.hideFlags = HideFlags.HideInHierarchy;
-        } else
+        }
+        else
         {
             prefabLine.hideFlags = HideFlags.NotEditable;
         }
@@ -210,49 +206,66 @@ public class BridgeGeneration
 
         prefabLine.GetComponent<PrefabLineCreator>().spacing = -1;
         prefabLine.GetComponent<PrefabLineCreator>().PlacePrefabs();
+
+        return prefabLine.GetComponent<PrefabLineCreator>();
     }
 
-    public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge)
+    public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge, bool simple, PrefabLineCreator customBridge)
     {
         float currentDistance = 0;
         Vector3 lastPosition = startPoint;
         bool placedFirstPillar = false;
 
-        for (float t = 0; t <= 1; t += 0.01f)
+        if (segment.adaptGapToCustomBridge == true && segment.generateCustomBridge == true)
         {
-            Vector3 currentPosition = Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, t);
-            currentDistance = Vector3.Distance(lastPosition, currentPosition);
-            Vector3 forward = (currentPosition - lastPosition).normalized;
+            for (int i = 0; i < customBridge.transform.GetChild(1).childCount; i++)
+            {
+                CreatePillar(bridge.transform, segment.pillarPrefab, customBridge.transform.GetChild(1).GetChild(i).position - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, -customBridge.transform.GetChild(1).GetChild(i).transform.right, simple);
+            }
+        }
+        else
+        {
+            for (float t = 0; t <= 1; t += 0.01f)
+            {
+                Vector3 currentPosition = Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, t);
+                currentDistance = Vector3.Distance(lastPosition, currentPosition);
+                Vector3 forward = (currentPosition - lastPosition).normalized;
 
-            if (t == 0)
-            {
-                forward = (Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, 0.01f) - startPoint).normalized;
-            }
-            else if (t == 1)
-            {
-                forward = (currentPosition - Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, 0.99f)).normalized;
-            }
+                if (t == 0)
+                {
+                    forward = (Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, 0.01f) - startPoint).normalized;
+                }
+                else if (t == 1)
+                {
+                    forward = (currentPosition - Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, 0.99f)).normalized;
+                }
 
-            if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
-            {
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward);
-                lastPosition = currentPosition;
-                placedFirstPillar = true;
-            }
-            else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
-            {
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward);
-                lastPosition = currentPosition;
+                if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
+                {
+                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple);
+                    lastPosition = currentPosition;
+                    placedFirstPillar = true;
+                }
+                else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
+                {
+                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple);
+                    lastPosition = currentPosition;
+                }
             }
         }
     }
 
-    public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, RoadSegment segment, Vector3 forward)
+    public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, RoadSegment segment, Vector3 forward, bool simple)
     {
         GameObject pillar = GameObject.Instantiate(prefab);
         pillar.name = "Pillar";
         pillar.transform.SetParent(parent);
         pillar.hideFlags = HideFlags.NotEditable;
+
+        if (simple == false)
+        {
+            position += new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0);
+        }
 
         RaycastHit raycastHit;
         if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue | 1 << segment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("ignoreMouseRayLayer").intValue)))

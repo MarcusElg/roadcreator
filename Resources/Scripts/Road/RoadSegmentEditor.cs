@@ -109,16 +109,26 @@ public class RoadSegmentEditor : Editor
 
         GUILayout.Space(20);
         GUILayout.Label("Pillar Placement", guiStyle);
-        serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
-        if (serializedObject.FindProperty("placePillars").boolValue == true)
+        if (serializedObject.FindProperty("generateSimpleBridge").boolValue == true || serializedObject.FindProperty("generateCustomBridge").boolValue == true)
         {
-            serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
-            serializedObject.FindProperty("pillarGap").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Gap", serializedObject.FindProperty("pillarGap").floatValue));
-            serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
-            serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
-            serializedObject.FindProperty("xPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale", serializedObject.FindProperty("xPillarScale").floatValue));
-            serializedObject.FindProperty("zPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Pillar Scale", serializedObject.FindProperty("zPillarScale").floatValue));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
+
+            serializedObject.FindProperty("placePillars").boolValue = EditorGUILayout.Toggle("Place Pillars", serializedObject.FindProperty("placePillars").boolValue);
+            if (serializedObject.FindProperty("placePillars").boolValue == true)
+            {
+                serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
+                serializedObject.FindProperty("adaptGapToCustomBridge").boolValue = EditorGUILayout.Toggle("Adapt Gap To Custom Bridge", serializedObject.FindProperty("adaptGapToCustomBridge").boolValue);
+
+                if (serializedObject.FindProperty("adaptGapToCustomBridge").boolValue == false || serializedObject.FindProperty("generateCustomBridge").boolValue == false)
+                {
+                    serializedObject.FindProperty("pillarGap").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Gap", serializedObject.FindProperty("pillarGap").floatValue));
+                    serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
+                }
+
+                serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
+                serializedObject.FindProperty("xPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale", serializedObject.FindProperty("xPillarScale").floatValue));
+                serializedObject.FindProperty("zPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Pillar Scale", serializedObject.FindProperty("zPillarScale").floatValue));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
+            }
         }
 
         GUILayout.Space(20);
