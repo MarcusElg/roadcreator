@@ -28,10 +28,20 @@ public class PointEditor : Editor
         if (point.roadPoint == true)
         {
             roadCreator = point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+
+            if (roadCreator.settings == null)
+            {
+                roadCreator.settings = RoadCreatorSettings.GetSerializedSettings();
+            }
         }
         else
         {
             prefabLine = point.transform.parent.parent.GetComponent<PrefabLineCreator>();
+
+            if (prefabLine.settings == null)
+            {
+                prefabLine.settings = RoadCreatorSettings.GetSerializedSettings();
+            }
         }
 
         if (point.transform.hasChanged == true)

@@ -218,9 +218,12 @@ public class BridgeGeneration
 
         if (segment.adaptGapToCustomBridge == true && segment.generateCustomBridge == true)
         {
+            PointPackage prefabPoints = customBridge.CalculatePoints();
+
             for (int i = 0; i < customBridge.transform.GetChild(1).childCount; i++)
             {
-                CreatePillar(bridge.transform, segment.pillarPrefab, customBridge.transform.GetChild(1).GetChild(i).position - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, -customBridge.transform.GetChild(1).GetChild(i).transform.right, simple);
+                Vector3 currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, customBridge.transform.GetChild(1).GetChild(i).transform.right, simple);
             }
         }
         else
