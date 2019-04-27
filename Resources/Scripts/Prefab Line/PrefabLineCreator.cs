@@ -75,6 +75,9 @@ public class PrefabLineCreator : MonoBehaviour
                 objects.hideFlags = HideFlags.NotEditable;
             }
         }
+
+        startPrefab = (GameObject)settings.FindProperty("defaultPrefabLineStartPrefab").objectReferenceValue;
+        endPrefab = (GameObject)settings.FindProperty("defaultPrefabLineEndPrefab").objectReferenceValue;
     }
 
     public void CreatePoints(Vector3 hitPosition)

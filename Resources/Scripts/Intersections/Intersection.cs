@@ -181,7 +181,7 @@ public class Intersection : MonoBehaviour
 
             if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
             {
-                pillarPrefab = (GameObject)settings.FindProperty("defaultPillarPrefab").objectReferenceValue;
+                pillarPrefab = (GameObject)settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue;
             }
 
             List<Vector3> vertices = new List<Vector3>();

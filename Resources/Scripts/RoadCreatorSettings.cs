@@ -24,8 +24,11 @@ public class RoadCreatorSettings : ScriptableObject
     public Material defaultIntersectionOverlayMaterial;
     public Material[] defaultSimpleBridgeMaterials;
     public GameObject defaultPillarPrefab;
+    public GameObject defaultBridgePillarPrefab;
     public GameObject defaultCustomBridgePrefab;
     public GameObject defaultPrefabLinePrefab;
+    public GameObject defaultPrefabLineStartPrefab;
+    public GameObject defaultPrefabLineEndPrefab;
 
     public Color pointColour = Color.red;
     public Color controlPointColour = Color.yellow;
@@ -98,6 +101,11 @@ public class RoadCreatorSettings : ScriptableObject
         if (defaultPillarPrefab == null)
         {
             defaultPillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
+        }
+
+        if (defaultBridgePillarPrefab == null)
+        {
+            defaultBridgePillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Cylinder Bridge Pillar") as GameObject;
         }
 
         if (defaultCustomBridgePrefab == null)
