@@ -88,7 +88,7 @@ public class RoadCreator : MonoBehaviour
                 }
                 else
                 {
-                    for (int j = 0; j < transform.GetChild(0).GetChild(i).childCount; j++)
+                    for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
                     {
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                         transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
@@ -905,6 +905,7 @@ public class RoadCreator : MonoBehaviour
             {
                 Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(2).gameObject);
                 Undo.DestroyObjectImmediate(transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).GetChild(1).gameObject);
+                transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>().curved = true;
                 CreateMesh();
             }
         }

@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Base
+    second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Cable
     second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
   - first:

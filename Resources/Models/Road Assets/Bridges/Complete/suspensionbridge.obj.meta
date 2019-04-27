@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Base
+    second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Cable
     second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
   - first:
@@ -14,6 +19,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Centerpiece
     second: {fileID: 2100000, guid: d3a54da144ce2f149b43325a3e71abf8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Concrete
+    second: {fileID: 2100000, guid: f5283313330996048b65df8f1f4eebb5, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

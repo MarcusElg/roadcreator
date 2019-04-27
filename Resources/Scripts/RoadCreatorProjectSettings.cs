@@ -151,7 +151,7 @@ public class RoadCreatorProjectSettings
         return settingsProvider;
     }
 
-    private static void UpdateSettings()
+    public static void UpdateSettings()
     {
         RoadSystem[] roadSystems = GameObject.FindObjectsOfType<RoadSystem>();
         for (int i = 0; i < roadSystems.Length; i++)

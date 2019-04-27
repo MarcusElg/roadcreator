@@ -24,6 +24,11 @@ public class RoadSystem : MonoBehaviour
     {
         HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
 
+        if (settings == null)
+        {
+            settings = RoadCreatorSettings.GetSerializedSettings();
+        }
+
         if (largeBoldText == null)
         {
             largeBoldText = new GUIStyle();
@@ -58,6 +63,9 @@ public class RoadSystem : MonoBehaviour
             {
                 settings.FindProperty("roadCurved").boolValue = true;
             }
+
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            RoadCreatorProjectSettings.UpdateSettings();
         }
 
         if (ClickedButton((int)(SceneView.lastActiveSceneView.position.width - 45), (int)(SceneView.lastActiveSceneView.position.height - 95)))
@@ -72,6 +80,7 @@ public class RoadSystem : MonoBehaviour
                 settings.FindProperty("roadGuidelinesLength").floatValue = settings.FindProperty("oldRoadGuidelinesLength").floatValue;
             }
 
+            settings.ApplyModifiedPropertiesWithoutUndo();
             RoadCreatorSettings.UpdateRoadGuidelines();
         }
 
