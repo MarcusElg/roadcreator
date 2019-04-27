@@ -26,6 +26,4 @@ A free road creation tool for unity.
 - Includes a bunch of roads and road related assets like turn markings and road signs
 - Create timed traffic lights
 
-For info about planned features and bugs see https://trello.com/b/WgYWoShS/road-creator
-
 Forum post: https://forum.unity.com/threads/1-0-free-road-creator.629983/
