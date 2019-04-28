@@ -19,7 +19,7 @@ A free road creation tool for unity.
 
 ### Bridges 
 - Generate bridges with only a few click!.
-- Currently two different suspension bridges as well as a classic concreate bridge are included but you can easly add your own. The tool with modify the bridge mesh so that it fits the mesh perfectly
+- Currently six are included but you can easly add your own. The tool with modify the bridge mesh so that it fits the mesh perfectly
 - Generate pillars automaticly with options such as: gap, scale and rotation direction
 - Adapt gap to custom bridge option to automatically align the pillars with the custom bridge mesh.
 
