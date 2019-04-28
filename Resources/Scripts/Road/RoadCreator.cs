@@ -31,6 +31,15 @@ public class RoadCreator : MonoBehaviour
 
             for (int i = 0; i < transform.GetChild(0).childCount; i++)
             {
+                if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().terrainOption != RoadSegment.TerrainOption.ignore && (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateSimpleBridge == true || transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateCustomBridge == true))
+                {
+                    transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().terrainOption = RoadSegment.TerrainOption.ignore;
+                    Debug.Log("Terrain option has to be set to ignore to generate bridges");
+                }
+            }
+
+            for (int i = 0; i < transform.GetChild(0).childCount; i++)
+            {
                 if (transform.GetChild(0).GetChild(i).GetChild(0).childCount == 3)
                 {
                     Vector3 previousPoint = Misc.MaxVector3;
