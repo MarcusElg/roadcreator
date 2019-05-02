@@ -120,7 +120,7 @@ public class RoadSegmentEditor : Editor
             if (serializedObject.FindProperty("placePillars").boolValue == true)
             {
                 serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Pillar Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
-                serializedObject.FindProperty("adaptGapToCustomBridge").boolValue = EditorGUILayout.Toggle("Adapt Gap To Custom Bridge", serializedObject.FindProperty("adaptGapToCustomBridge").boolValue);
+                serializedObject.FindProperty("adaptGapToCustomBridge").boolValue = EditorGUILayout.Toggle("Adapt To Custom Bridge", serializedObject.FindProperty("adaptGapToCustomBridge").boolValue);
 
                 if (serializedObject.FindProperty("adaptGapToCustomBridge").boolValue == false || serializedObject.FindProperty("generateCustomBridge").boolValue == false)
                 {

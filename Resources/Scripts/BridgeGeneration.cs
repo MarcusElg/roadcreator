@@ -223,25 +223,29 @@ public class BridgeGeneration
             {
                 Vector3 currentPosition;
                 Vector3 right;
+                float width;
 
                 if (segment.bridgeIsOffsetted == true)
                 {
                     currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                     right = customBridge.transform.GetChild(1).GetChild(i).transform.right;
+                    width = Mathf.Lerp(startWidthLeft + startWidthRight + segment.startRoadWidth * 2, endWidthLeft + endWidthRight + segment.endRoadWidth * 2, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                 }
                 else
                 {
                     currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i]);
                     right = (Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i] += 0.01f) - currentPosition).normalized;
+                    width = Mathf.Lerp(startWidthLeft + startWidthRight + segment.startRoadWidth * 2, endWidthLeft + endWidthRight + segment.endRoadWidth * 2, prefabPoints.startTimes[i]);
                 }
 
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, right, simple);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, right, simple, width);
             }
 
             if (segment.bridgeIsOffsetted == false)
             {
+                float width = endWidthLeft + endWidthRight + segment.endRoadWidth * 2;
                 Vector3 currentPosition = currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.endTimes[customBridge.transform.GetChild(1).childCount - 1]);
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.endTimes[customBridge.transform.GetChild(1).childCount - 1] - 0.01f) - currentPosition).normalized, simple);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.endTimes[customBridge.transform.GetChild(1).childCount - 1] - 0.01f) - currentPosition).normalized, simple, width);
             }
         }
         else
@@ -263,20 +267,20 @@ public class BridgeGeneration
 
                 if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
                 {
-                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple);
+                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple, 0);
                     lastPosition = currentPosition;
                     placedFirstPillar = true;
                 }
                 else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
                 {
-                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple);
+                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple, 0);
                     lastPosition = currentPosition;
                 }
             }
         }
     }
 
-    public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, RoadSegment segment, Vector3 forward, bool simple)
+    public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, RoadSegment segment, Vector3 forward, bool simple, float width)
     {
         GameObject pillar = GameObject.Instantiate(prefab);
         pillar.name = "Pillar";
@@ -312,9 +316,15 @@ public class BridgeGeneration
                 pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
             }
 
+            float x = segment.xPillarScale;
+
+            if (segment.adaptGapToCustomBridge == true)
+            {
+                x = width / segment.pillarPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.size.x;
+            }
 
             float heightDifference = groundPosition.y - centerPosition.y;
-            pillar.transform.localScale = new Vector3(segment.xPillarScale, (-heightDifference + segment.extraPillarHeight) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, segment.zPillarScale);
+            pillar.transform.localScale = new Vector3(x, (-heightDifference + segment.extraPillarHeight) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, segment.zPillarScale);
         }
         else
         {
