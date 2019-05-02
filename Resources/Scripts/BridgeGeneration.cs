@@ -169,7 +169,6 @@ public class BridgeGeneration
     public static PrefabLineCreator GenerateCustomBridge(RoadSegment segment, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
     {
         GameObject prefabLine = new GameObject("Custom Bridge");
-        prefabLine.hideFlags = HideFlags.NotEditable;
         prefabLine.transform.SetParent(segment.transform, false);
         prefabLine.AddComponent<PrefabLineCreator>();
         prefabLine.GetComponent<PrefabLineCreator>().Setup();
@@ -210,7 +209,7 @@ public class BridgeGeneration
         return prefabLine.GetComponent<PrefabLineCreator>();
     }
 
-    public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge, bool simple, PrefabLineCreator customBridge)
+    public static void GeneratePillars(Vector3[] points, Vector3 startPoint, Vector3 controlPoint, Vector3 endPoint, RoadSegment segment, GameObject bridge, bool simple, PrefabLineCreator customBridge, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
     {
         float currentDistance = 0;
         Vector3 lastPosition = startPoint;
@@ -222,8 +221,27 @@ public class BridgeGeneration
 
             for (int i = 0; i < customBridge.transform.GetChild(1).childCount; i++)
             {
-                Vector3 currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, customBridge.transform.GetChild(1).GetChild(i).transform.right, simple);
+                Vector3 currentPosition;
+                Vector3 right;
+
+                if (segment.bridgeIsOffsetted == true)
+                {
+                    currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
+                    right = customBridge.transform.GetChild(1).GetChild(i).transform.right;
+                }
+                else
+                {
+                    currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i]);
+                    right = (Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i] += 0.01f) - currentPosition).normalized;
+                }
+
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, right, simple);
+            }
+
+            if (segment.bridgeIsOffsetted == false)
+            {
+                Vector3 currentPosition = currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.endTimes[customBridge.transform.GetChild(1).childCount - 1]);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, (Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.endTimes[customBridge.transform.GetChild(1).childCount - 1] - 0.01f) - currentPosition).normalized, simple);
             }
         }
         else

@@ -26,12 +26,19 @@ public class RoadSegment : MonoBehaviour
     public bool placePillars = true;
     public GameObject pillarPrefab;
     public bool adaptGapToCustomBridge = false;
+    public bool bridgeIsOffsetted = true;
+
+    // Spaced
     public float pillarGap = 5;
     public float pillarPlacementOffset = 5;
     public float extraPillarHeight = 0.2f;
     public float xPillarScale = 1;
     public float zPillarScale = 1;
     public PrefabLineCreator.RotationDirection rotationDirection;
+
+    // Connected
+    public GameObject connectedPillarPrefab;
+    public int pillars = 1;
 
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
@@ -187,11 +194,11 @@ public class RoadSegment : MonoBehaviour
             {
                 if (generateSimpleBridge == true)
                 {
-                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Bridge Base").gameObject, true, customBridge);
+                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Bridge Base").gameObject, true, customBridge, startExtraWidthLeft, startExtraWidthRight, endExtraWidthLeft, endExtraWidthRight);
                 }
                 else if (generateCustomBridge == true)
                 {
-                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Custom Bridge").gameObject, false, customBridge);
+                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Custom Bridge").gameObject, false, customBridge, startExtraWidthLeft, startExtraWidthRight, endExtraWidthLeft, endExtraWidthRight);
                 }
             }
         }

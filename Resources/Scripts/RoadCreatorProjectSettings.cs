@@ -92,7 +92,8 @@ public class RoadCreatorProjectSettings
                 settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Intersection Overlay Material", settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue, typeof(Material), false);
                 EditorGUILayout.PropertyField(settings.FindProperty("defaultSimpleBridgeMaterials"), true);
                 settings.FindProperty("defaultPillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Pillar Prefab", settings.FindProperty("defaultPillarPrefab").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Bridge Pillar Prefab", settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Spaced Bridge Pillar Prefab", settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("defaultConnectedBridgePillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Connected Bridge Pillar Prefab", settings.FindProperty("defaultConnectedBridgePillarPrefab").objectReferenceValue, typeof(GameObject), false);
                 settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Custom Bridge Prefab", settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue, typeof(GameObject), false);
                 settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Prefab Line Prefab", settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue, typeof(GameObject), false);
                 settings.FindProperty("defaultPrefabLineStartPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Prefab Line Start Prefab", settings.FindProperty("defaultPrefabLineStartPrefab").objectReferenceValue, typeof(GameObject), false);
@@ -106,6 +107,7 @@ public class RoadCreatorProjectSettings
                     settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultSimpleBridgeMaterials").ClearArray();
                     settings.FindProperty("defaultPillarPrefab").objectReferenceValue = null;
+                    settings.FindProperty("defaultConnectedBridgePillarPrefab").objectReferenceValue = null;
                     settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue = null;
                     settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue = null;
                     settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue = null;
