@@ -24,7 +24,6 @@ public class RoadCreatorSettings : ScriptableObject
     public Material defaultIntersectionOverlayMaterial;
     public Material[] defaultSimpleBridgeMaterials;
     public GameObject defaultPillarPrefab;
-    public GameObject defaultConnectedBridgePillarPrefab;
     public GameObject defaultBridgePillarPrefab;
     public GameObject defaultCustomBridgePrefab;
     public GameObject defaultPrefabLinePrefab;
@@ -102,11 +101,6 @@ public class RoadCreatorSettings : ScriptableObject
         if (defaultPillarPrefab == null)
         {
             defaultPillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Oval Bridge Pillar") as GameObject;
-        }
-
-        if (defaultConnectedBridgePillarPrefab == null)
-        {
-            defaultConnectedBridgePillarPrefab = Resources.Load("Prefabs/Bridges/Pillars/Large Arc Bridge Pillar") as GameObject;
         }
 
         if (defaultBridgePillarPrefab == null)

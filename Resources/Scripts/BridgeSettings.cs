@@ -18,5 +18,6 @@ public class BridgeSettings
     public int sections = 1;
     public float yScale = 1;
     public float xOffset = 0;
+    public bool adaptToTerrain = false;
 
 }

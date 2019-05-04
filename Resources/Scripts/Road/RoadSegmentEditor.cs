@@ -109,6 +109,7 @@ public class RoadSegmentEditor : Editor
             bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
             bridgeSettings.FindPropertyRelative("yScale").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Scale", bridgeSettings.FindPropertyRelative("yScale").floatValue), 0.1f, 10);
             bridgeSettings.FindPropertyRelative("xOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("X Offset", bridgeSettings.FindPropertyRelative("xOffset").floatValue), -2, 2);
+            bridgeSettings.FindPropertyRelative("adaptToTerrain").boolValue = EditorGUILayout.Toggle("Adapt To Terrain", bridgeSettings.FindPropertyRelative("adaptToTerrain").boolValue);
         }
 
         GUILayout.Space(20);
@@ -127,13 +128,14 @@ public class RoadSegmentEditor : Editor
                     serializedObject.FindProperty("pillarGap").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Gap", serializedObject.FindProperty("pillarGap").floatValue));
                     serializedObject.FindProperty("pillarPlacementOffset").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", serializedObject.FindProperty("pillarPlacementOffset").floatValue));
                 }
-                else
-                {
-                    serializedObject.FindProperty("bridgeIsOffsetted").boolValue = EditorGUILayout.Toggle("Bridge Is Offsetted", serializedObject.FindProperty("bridgeIsOffsetted").boolValue);
-                }
 
                 serializedObject.FindProperty("extraPillarHeight").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", serializedObject.FindProperty("extraPillarHeight").floatValue));
-                serializedObject.FindProperty("xPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale", serializedObject.FindProperty("xPillarScale").floatValue));
+
+                if (serializedObject.FindProperty("adaptGapToCustomBridge").boolValue == false)
+                {
+                    serializedObject.FindProperty("xPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale", serializedObject.FindProperty("xPillarScale").floatValue));
+                }
+
                 serializedObject.FindProperty("zPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Pillar Scale", serializedObject.FindProperty("zPillarScale").floatValue));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
             }

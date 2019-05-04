@@ -26,7 +26,6 @@ public class RoadSegment : MonoBehaviour
     public bool placePillars = true;
     public GameObject pillarPrefab;
     public bool adaptGapToCustomBridge = false;
-    public bool bridgeIsOffsetted = true;
 
     // Spaced
     public float pillarGap = 5;

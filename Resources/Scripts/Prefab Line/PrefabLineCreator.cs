@@ -31,11 +31,11 @@ public class PrefabLineCreator : MonoBehaviour
 
     // Bridges
     public bool bridgeMode = false;
+    public BridgeSettings bridgeSettings;
     public float startWidthLeft;
     public float startWidthRight;
     public float endWidthLeft;
     public float endWidthRight;
-    public float xOffset;
 
     public GameObject objectToMove;
     private bool mouseDown;
@@ -256,6 +256,11 @@ public class PrefabLineCreator : MonoBehaviour
                 placedPrefab.layer = settings.FindProperty("roadLayer").intValue;
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
 
+                if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+                {
+                    placedPrefab.hideFlags = HideFlags.HideInHierarchy;
+                }
+                else
                 {
                     placedPrefab.hideFlags = HideFlags.NotEditable;
                 }
@@ -305,11 +310,11 @@ public class PrefabLineCreator : MonoBehaviour
                             float currentWidth;
                             if (vertices[i].z > 0)
                             {
-                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z - xOffset;
+                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z - bridgeSettings.xOffset;
                             }
                             else
                             {
-                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z + xOffset;
+                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z + bridgeSettings.xOffset;
                             }
 
                             Vector3 right = Misc.MaxVector3;
@@ -389,6 +394,36 @@ public class PrefabLineCreator : MonoBehaviour
                     {
                         DestroyImmediate(placedPrefab.GetComponent<Collider>());
                         placedPrefab.AddComponent(type);
+                    }
+                }
+                else if (bridgeSettings.adaptToTerrain == true)
+                {
+                    // Change bottom vertices
+                    RaycastHit raycastHit;
+                    Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
+
+                    if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
+                    {
+                        for (int i = 0; i < vertices.Length; i++)
+                        {
+                            if (Mathf.Abs(prefab.GetComponent<MeshFilter>().sharedMesh.vertices[i].y - prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) < 0.0001f)
+                            {
+                                vertices[i] = new Vector3(vertices[i].x, raycastHit.point.y - (placedPrefab.transform.position.y / yScale) - 0.2f, vertices[i].z);
+                            }
+                        }
+
+                        Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
+                        mesh.vertices = vertices;
+                        placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+                        placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+
+                        // Change collider to match
+                        System.Type type = placedPrefab.GetComponent<Collider>().GetType();
+                        if (type != null)
+                        {
+                            DestroyImmediate(placedPrefab.GetComponent<Collider>());
+                            placedPrefab.AddComponent(type);
+                        }
                     }
                 }
 
