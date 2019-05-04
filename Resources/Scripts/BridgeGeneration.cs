@@ -221,14 +221,12 @@ public class BridgeGeneration
 
             for (int i = 0; i < customBridge.transform.GetChild(1).childCount; i++)
             {
-                Vector3 currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i]);
+                Vector3 currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                 // Correct position to extra meshes
                 float difference = Mathf.Lerp(startWidthLeft, endWidthLeft, prefabPoints.startTimes[i]) - Mathf.Lerp(startWidthRight, endWidthRight, prefabPoints.startTimes[i]);
                 currentPosition += difference * customBridge.transform.GetChild(1).GetChild(i).transform.forward / 2;
                 float width = Mathf.Lerp(startWidthLeft + startWidthRight + segment.startRoadWidth * 2, endWidthLeft + endWidthRight + segment.endRoadWidth * 2, prefabPoints.startTimes[i]);
-                Vector3 left = (Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i]) - Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, prefabPoints.startTimes[i] - 0.01f)).normalized;
-
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * segment.bridgeSettings.yScale + segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, left, simple, width);
+                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, Mathf.Abs(segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) * segment.bridgeSettings.yScale, 0), segment, -customBridge.transform.GetChild(1).GetChild(i).transform.right, simple, width);
             }
         }
         else
@@ -270,13 +268,9 @@ public class BridgeGeneration
         pillar.transform.SetParent(parent);
         pillar.hideFlags = HideFlags.NotEditable;
 
-        if (simple == false)
-        {
-            position += new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0);
-        }
-
         RaycastHit raycastHit;
-        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("roadLayer").intValue | 1 << segment.transform.parent.parent.GetComponent<RoadCreator>().settings.FindProperty("ignoreMouseRayLayer").intValue)))
+        Debug.DrawRay(position, Vector3.down, Color.green, 10);
+        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.settings.FindProperty("roadLayer").intValue | 1 << segment.settings.FindProperty("ignoreMouseRayLayer").intValue)))
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
@@ -301,9 +295,9 @@ public class BridgeGeneration
 
             float x = segment.xPillarScale;
 
-            if (segment.adaptGapToCustomBridge == true)
+            if (segment.adaptGapToCustomBridge == true && segment.generateCustomBridge == true)
             {
-                x = width / segment.pillarPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.size.x;
+                x = width / segment.pillarPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * segment.xPillarScaleMultiplier;
             }
 
             float heightDifference = groundPosition.y - centerPosition.y;
