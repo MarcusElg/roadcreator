@@ -223,9 +223,9 @@ public class BridgeGeneration
             {
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(customBridge.transform.GetChild(0).GetChild(0).position, customBridge.transform.GetChild(0).GetChild(1).position, customBridge.transform.GetChild(0).GetChild(2).position, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                 // Correct position to extra meshes
-                float difference = Mathf.Lerp(startWidthLeft, endWidthLeft, prefabPoints.startTimes[i]) - Mathf.Lerp(startWidthRight, endWidthRight, prefabPoints.startTimes[i]);
+                float difference = Mathf.Lerp(startWidthLeft, endWidthLeft, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i])) - Mathf.Lerp(startWidthRight, endWidthRight, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                 currentPosition += difference * customBridge.transform.GetChild(1).GetChild(i).transform.forward / 2;
-                float width = Mathf.Lerp(startWidthLeft + startWidthRight + segment.startRoadWidth * 2, endWidthLeft + endWidthRight + segment.endRoadWidth * 2, prefabPoints.startTimes[i]);
+                float width = Mathf.Lerp(startWidthLeft + startWidthRight + segment.startRoadWidth * 2, endWidthLeft + endWidthRight + segment.endRoadWidth * 2, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                 CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, Mathf.Abs(segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) * segment.bridgeSettings.yScale, 0), segment, -customBridge.transform.GetChild(1).GetChild(i).transform.right, simple, width);
             }
         }
