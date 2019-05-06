@@ -271,232 +271,249 @@ public class PrefabLineCreator : MonoBehaviour
                 Vector3 left = Misc.CalculateLeft(startPoint, endPoint);
                 Vector3 forward = new Vector3(left.z, 0, -left.x);
 
-                if (rotateAlongCurve == true)
+                RotatePrefabs(placedPrefab, forward, left);
+                BendPrefabs(placedPrefab, currentPoints, j);
+                YModifyPrefabs(placedPrefab, currentPoints, j);
+                FillGapsBetweenPrefabs(placedPrefab, j);
+            }
+        }
+    }
+
+    private void RotatePrefabs(GameObject placedPrefab, Vector3 forward, Vector3 left)
+    {
+        if (rotateAlongCurve == true)
+        {
+            if (rotationDirection == PrefabLineCreator.RotationDirection.forward)
+            {
+                placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(forward).eulerAngles.x, Quaternion.LookRotation(forward).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(forward).eulerAngles.z);
+            }
+            else if (rotationDirection == PrefabLineCreator.RotationDirection.backward)
+            {
+                placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(-forward).eulerAngles.x, Quaternion.LookRotation(-forward).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(-forward).eulerAngles.z);
+            }
+            else if (rotationDirection == PrefabLineCreator.RotationDirection.left)
+            {
+                placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(left).eulerAngles.x, Quaternion.LookRotation(left).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(left).eulerAngles.z);
+            }
+            else if (rotationDirection == PrefabLineCreator.RotationDirection.right)
+            {
+                placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(-left).eulerAngles.x, Quaternion.LookRotation(-left).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(-left).eulerAngles.z);
+            }
+        }
+    }
+
+    private void BendPrefabs(GameObject placedPrefab, PointPackage currentPoints, int j)
+    {
+        if (bendObjects == true)
+        {
+            Mesh mesh = GameObject.Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
+            Vector3[] vertices = mesh.vertices;
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                float distance = Mathf.Abs(vertices[i].x - mesh.bounds.min.x);
+                float distanceCovered = (distance / mesh.bounds.size.x);
+                float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], distanceCovered);
+                int pointIndex = Mathf.FloorToInt(currentTime);
+
+                if (bridgeMode == true)
                 {
-                    if (rotationDirection == PrefabLineCreator.RotationDirection.forward)
+                    Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
+
+                    float currentWidth;
+                    if (vertices[i].z > 0)
                     {
-                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(forward).eulerAngles.x, Quaternion.LookRotation(forward).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(forward).eulerAngles.z);
+                        currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z - bridgeSettings.xOffset;
                     }
-                    else if (rotationDirection == PrefabLineCreator.RotationDirection.backward)
+                    else
                     {
-                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(-forward).eulerAngles.x, Quaternion.LookRotation(-forward).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(-forward).eulerAngles.z);
+                        currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z + bridgeSettings.xOffset;
                     }
-                    else if (rotationDirection == PrefabLineCreator.RotationDirection.left)
+
+                    Vector3 right = Misc.MaxVector3;
+                    if (currentTime <= 0.99f)
                     {
-                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(left).eulerAngles.x, Quaternion.LookRotation(left).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(left).eulerAngles.z);
+                        right = Misc.CalculateLeft(lerpedPoint, Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f));
                     }
-                    else if (rotationDirection == PrefabLineCreator.RotationDirection.right)
+                    else
                     {
-                        placedPrefab.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(-left).eulerAngles.x, Quaternion.LookRotation(-left).eulerAngles.y + Random.Range(-yRotationRandomization / 2, yRotationRandomization / 2), Quaternion.LookRotation(-left).eulerAngles.z);
+                        right = Misc.CalculateLeft(Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f), lerpedPoint);
                     }
+
+                    Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position + right * (vertices[i].z + currentWidth));
+                    vertices[i] = new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) + new Vector3(0, vertices[i].y, 0);
                 }
-
-                if (bendObjects == true)
+                else if (distanceCovered > 0 && distanceCovered < 1)
                 {
-                    Mesh mesh = GameObject.Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
-                    Vector3[] vertices = mesh.vertices;
-
-                    for (var i = 0; i < vertices.Length; i++)
-                    {
-                        float distance = Mathf.Abs(vertices[i].x - mesh.bounds.min.x);
-                        float distanceCovered = (distance / mesh.bounds.size.x);
-                        float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], distanceCovered);
-                        int pointIndex = Mathf.FloorToInt(currentTime);
-
-                        if (bridgeMode == true)
-                        {
-                            Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
-
-                            float currentWidth;
-                            if (vertices[i].z > 0)
-                            {
-                                currentWidth = Mathf.Lerp(startWidthLeft, endWidthLeft, currentTime) + mesh.vertices[0].z - bridgeSettings.xOffset;
-                            }
-                            else
-                            {
-                                currentWidth = -Mathf.Lerp(startWidthRight, endWidthRight, currentTime) - mesh.vertices[0].z + bridgeSettings.xOffset;
-                            }
-
-                            Vector3 right = Misc.MaxVector3;
-                            if (currentTime <= 0.99f)
-                            {
-                                right = Misc.CalculateLeft(lerpedPoint, Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f));
-                            }
-                            else
-                            {
-                                right = Misc.CalculateLeft(Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f), lerpedPoint);
-                            }
-
-                            Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position + right * (vertices[i].z + currentWidth));
-                            vertices[i] = new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) + new Vector3(0, vertices[i].y, 0);
-                        }
-                        else if (distanceCovered > 0 && distanceCovered < 1)
-                        {
-                            Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
-                            float y = vertices[i].y;
-                            Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);
-                            vertices[i] += new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) - new Vector3(vertices[i].x, 0, 0);
-                            vertices[i].y = y;
-                        }
-                    }
-
-                    mesh.vertices = vertices;
-                    mesh.RecalculateBounds();
-                    placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-
-                    // Change collider to match
-                    System.Type type = placedPrefab.GetComponent<Collider>().GetType();
-                    if (type != null)
-                    {
-                        DestroyImmediate(placedPrefab.GetComponent<Collider>());
-                        placedPrefab.AddComponent(type);
-                    }
+                    Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
+                    float y = vertices[i].y;
+                    Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);
+                    vertices[i] += new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) - new Vector3(vertices[i].x, 0, 0);
+                    vertices[i].y = y;
                 }
+            }
 
-                if (yModification != PrefabLineCreator.YModification.none)
+            mesh.vertices = vertices;
+            mesh.RecalculateBounds();
+            placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+
+            // Change collider to match
+            System.Type type = placedPrefab.GetComponent<Collider>().GetType();
+            if (type != null)
+            {
+                DestroyImmediate(placedPrefab.GetComponent<Collider>());
+                placedPrefab.AddComponent(type);
+            }
+        }
+    }
+
+    private void YModifyPrefabs(GameObject placedPrefab, PointPackage currentPoints, int j)
+    {
+        if (yModification != PrefabLineCreator.YModification.none)
+        {
+            Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
+            float startHeight = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j])).y;
+            float endHeight = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j])).y;
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                if (yModification == PrefabLineCreator.YModification.matchTerrain)
                 {
-                    Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
-                    float startHeight = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j])).y;
-                    float endHeight = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j])).y;
-
-                    for (var i = 0; i < vertices.Length; i++)
-                    {
-                        if (yModification == PrefabLineCreator.YModification.matchTerrain)
-                        {
-                            RaycastHit raycastHit;
-                            Vector3 vertexPosition = placedPrefab.transform.rotation * vertices[i];
-                            if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
-                            {
-                                vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / yScale;
-                            }
-                        }
-                        else if (yModification == PrefabLineCreator.YModification.matchCurve)
-                        {
-                            float time = Misc.Remap(vertices[i].x, placedPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, placedPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1);
-
-                            if (rotationDirection == PrefabLineCreator.RotationDirection.right)
-                            {
-                                time = 1 - time;
-                            }
-
-                            vertices[i].y += (Mathf.Lerp(startHeight, endHeight, time) - placedPrefab.transform.position.y) / yScale;
-                        }
-                    }
-
-                    Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
-                    mesh.vertices = vertices;
-                    placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-                    placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
-
-                    // Change collider to match
-                    System.Type type = placedPrefab.GetComponent<Collider>().GetType();
-                    if (type != null)
-                    {
-                        DestroyImmediate(placedPrefab.GetComponent<Collider>());
-                        placedPrefab.AddComponent(type);
-                    }
-                }
-                else if (bridgeSettings.adaptToTerrain == true)
-                {
-                    // Change bottom vertices
                     RaycastHit raycastHit;
-                    Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
-
-                    if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
+                    Vector3 vertexPosition = placedPrefab.transform.rotation * vertices[i];
+                    if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
                     {
-                        for (int i = 0; i < vertices.Length; i++)
-                        {
-                            if (Mathf.Abs(prefab.GetComponent<MeshFilter>().sharedMesh.vertices[i].y - prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) < 0.0001f)
-                            {
-                                vertices[i] = new Vector3(vertices[i].x, raycastHit.point.y - (placedPrefab.transform.position.y / yScale) - 0.2f, vertices[i].z);
-                            }
-                        }
+                        vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / yScale;
+                    }
+                }
+                else if (yModification == PrefabLineCreator.YModification.matchCurve)
+                {
+                    float time = Misc.Remap(vertices[i].x, placedPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.x, placedPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.max.x, 0, 1);
 
-                        Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
-                        mesh.vertices = vertices;
-                        placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-                        placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+                    if (rotationDirection == PrefabLineCreator.RotationDirection.right)
+                    {
+                        time = 1 - time;
+                    }
 
-                        // Change collider to match
-                        System.Type type = placedPrefab.GetComponent<Collider>().GetType();
-                        if (type != null)
-                        {
-                            DestroyImmediate(placedPrefab.GetComponent<Collider>());
-                            placedPrefab.AddComponent(type);
-                        }
+                    vertices[i].y += (Mathf.Lerp(startHeight, endHeight, time) - placedPrefab.transform.position.y) / yScale;
+                }
+            }
+
+            Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
+            mesh.vertices = vertices;
+            placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+            placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+
+            // Change collider to match
+            System.Type type = placedPrefab.GetComponent<Collider>().GetType();
+            if (type != null)
+            {
+                DestroyImmediate(placedPrefab.GetComponent<Collider>());
+                placedPrefab.AddComponent(type);
+            }
+        }
+        else if (bridgeSettings.adaptToTerrain == true)
+        {
+            // Change bottom vertices
+            RaycastHit raycastHit;
+            Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
+
+            if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
+            {
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    if (Mathf.Abs(prefab.GetComponent<MeshFilter>().sharedMesh.vertices[i].y - prefab.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) < 0.0001f)
+                    {
+                        vertices[i] = new Vector3(vertices[i].x, raycastHit.point.y - (placedPrefab.transform.position.y / yScale) - 0.2f, vertices[i].z);
                     }
                 }
 
-                if (fillGap == true && j > 0)
+                Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
+                mesh.vertices = vertices;
+                placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+                placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+
+                // Change collider to match
+                System.Type type = placedPrefab.GetComponent<Collider>().GetType();
+                if (type != null)
                 {
-                    // Add last vertices
-                    List<Vector3> lastVertexPositions = new List<Vector3>();
-                    Vector3[] lastVertices = transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
-                    for (int i = 0; i < lastVertices.Length; i++)
-                    {
-                        if (Mathf.Abs(lastVertices[i].x - GetMaxX()) < 0.001f)
-                        {
-                            lastVertexPositions.Add((transform.GetChild(1).GetChild(j - 1).transform.rotation * (new Vector3(xScale * lastVertices[i].x, yScale * lastVertices[i].y, zScale * lastVertices[i].z))) + transform.GetChild(1).GetChild(j - 1).transform.position);
-                        }
-                    }
+                    DestroyImmediate(placedPrefab.GetComponent<Collider>());
+                    placedPrefab.AddComponent(type);
+                }
+            }
+        }
+    }
 
-                    // Move current vertices to last ones
-                    Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
-                    Vector3[] vertices = mesh.vertices;
-                    for (int i = 0; i < vertices.Length; i++)
-                    {
-                        if (Mathf.Abs(vertices[i].x - GetMinX()) < 0.001f)
-                        {
-                            Vector3 nearestVertex = Vector3.zero;
-                            float currentDistance = float.MaxValue;
+    private void FillGapsBetweenPrefabs(GameObject placedPrefab, int j)
+    {
+        if (fillGap == true && j > 0)
+        {
+            // Add last vertices
+            List<Vector3> lastVertexPositions = new List<Vector3>();
+            Vector3[] lastVertices = transform.GetChild(1).GetChild(j - 1).GetComponent<MeshFilter>().sharedMesh.vertices;
+            for (int i = 0; i < lastVertices.Length; i++)
+            {
+                if (Mathf.Abs(lastVertices[i].x - GetMaxX()) < 0.001f)
+                {
+                    lastVertexPositions.Add((transform.GetChild(1).GetChild(j - 1).transform.rotation * (new Vector3(xScale * lastVertices[i].x, yScale * lastVertices[i].y, zScale * lastVertices[i].z))) + transform.GetChild(1).GetChild(j - 1).transform.position);
+                }
+            }
 
-                            for (int k = 0; k < lastVertexPositions.Count; k++)
+            // Move current vertices to last ones
+            Mesh mesh = Instantiate(placedPrefab.GetComponent<MeshFilter>().sharedMesh);
+            Vector3[] vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                if (Mathf.Abs(vertices[i].x - GetMinX()) < 0.001f)
+                {
+                    Vector3 nearestVertex = Vector3.zero;
+                    float currentDistance = float.MaxValue;
+
+                    for (int k = 0; k < lastVertexPositions.Count; k++)
+                    {
+                        float localZ = (Quaternion.Euler(0, -(transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - transform.GetChild(1).GetChild(j - 1).transform.position)).z;
+                        float zDifference = Mathf.Abs(localZ - (vertices[i].z * zScale));
+                        if (zDifference < 0.001f)
+                        {
+                            if (yModification == PrefabLineCreator.YModification.none)
                             {
-                                float localZ = (Quaternion.Euler(0, -(transform.GetChild(1).GetChild(j - 1).transform.rotation.eulerAngles.y), 0) * (lastVertexPositions[k] - transform.GetChild(1).GetChild(j - 1).transform.position)).z;
-                                float zDifference = Mathf.Abs(localZ - (vertices[i].z * zScale));
-                                if (zDifference < 0.001f)
+                                if (Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * yScale) + placedPrefab.transform.position.y)) < currentDistance)
                                 {
-                                    if (yModification == PrefabLineCreator.YModification.none)
-                                    {
-                                        if (Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * yScale) + placedPrefab.transform.position.y)) < currentDistance)
-                                        {
-                                            nearestVertex = lastVertexPositions[k];
-                                            currentDistance = Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * yScale) + placedPrefab.transform.position.y));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (placedPrefab.transform.rotation * (new Vector3(xScale * vertices[i].x, yScale * vertices[i].y, zScale * vertices[i].z))) + placedPrefab.transform.position);
-
-                                        if (calculatedDistance < currentDistance)
-                                        {
-                                            currentDistance = calculatedDistance;
-                                            nearestVertex = lastVertexPositions[k];
-                                        }
-                                    }
+                                    nearestVertex = lastVertexPositions[k];
+                                    currentDistance = Mathf.Abs(lastVertexPositions[k].y - ((vertices[i].y * yScale) + placedPrefab.transform.position.y));
                                 }
                             }
-
-                            if (nearestVertex != Vector3.zero)
+                            else
                             {
-                                Vector3 rotatedPoint = Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - placedPrefab.transform.position);
-                                vertices[i] = new Vector3(rotatedPoint.x * (1 / xScale), rotatedPoint.y * (1 / yScale), rotatedPoint.z * (1 / zScale));
+                                float calculatedDistance = Vector3.Distance(lastVertexPositions[k], (placedPrefab.transform.rotation * (new Vector3(xScale * vertices[i].x, yScale * vertices[i].y, zScale * vertices[i].z))) + placedPrefab.transform.position);
+
+                                if (calculatedDistance < currentDistance)
+                                {
+                                    currentDistance = calculatedDistance;
+                                    nearestVertex = lastVertexPositions[k];
+                                }
                             }
                         }
                     }
 
-                    mesh.vertices = vertices;
-                    placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
-                    placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
-
-                    // Change collider to match
-                    System.Type type = placedPrefab.GetComponent<Collider>().GetType();
-                    if (type != null)
+                    if (nearestVertex != Vector3.zero)
                     {
-                        DestroyImmediate(placedPrefab.GetComponent<Collider>());
-                        placedPrefab.AddComponent(type);
+                        Vector3 rotatedPoint = Quaternion.Euler(0, -placedPrefab.transform.rotation.eulerAngles.y, 0) * (nearestVertex - placedPrefab.transform.position);
+                        vertices[i] = new Vector3(rotatedPoint.x * (1 / xScale), rotatedPoint.y * (1 / yScale), rotatedPoint.z * (1 / zScale));
                     }
                 }
+            }
+
+            mesh.vertices = vertices;
+            placedPrefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+            placedPrefab.GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+
+            // Change collider to match
+            System.Type type = placedPrefab.GetComponent<Collider>().GetType();
+            if (type != null)
+            {
+                DestroyImmediate(placedPrefab.GetComponent<Collider>());
+                placedPrefab.AddComponent(type);
             }
         }
     }

@@ -97,9 +97,17 @@ public class PrefabLineEditor : Editor
             prefabCreator.terrainCheckHeight = Mathf.Max(0, EditorGUILayout.FloatField("Check Terrain Height", prefabCreator.terrainCheckHeight));
         }
 
+        GUIStyle guiStyle = new GUIStyle();
+        guiStyle.fontStyle = FontStyle.Bold;
+
+        GUILayout.Space(20);
+        GUILayout.Label("Prefabs", guiStyle);
         prefabCreator.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabCreator.prefab, typeof(GameObject), false);
         prefabCreator.startPrefab = (GameObject)EditorGUILayout.ObjectField("Start Prefab", prefabCreator.startPrefab, typeof(GameObject), false);
         prefabCreator.endPrefab = (GameObject)EditorGUILayout.ObjectField("End Prefab", prefabCreator.endPrefab, typeof(GameObject), false);
+
+        GUILayout.Space(20);
+        GUILayout.Label("Scaling", guiStyle);
         prefabCreator.xScale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab X Scale", prefabCreator.xScale), 0.1f, 10);
         prefabCreator.yScale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Y Scale", prefabCreator.yScale), 0.1f, 10);
         prefabCreator.zScale = Mathf.Clamp(EditorGUILayout.FloatField("Prefab Z Scale", prefabCreator.zScale), 0.1f, 10);
