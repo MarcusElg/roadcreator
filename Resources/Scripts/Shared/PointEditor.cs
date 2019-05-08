@@ -10,8 +10,16 @@ public class PointEditor : Editor
 
     private void OnEnable()
     {
-        lastTool = Tools.current;
-        Tools.current = Tool.Move;
+        Point point = (Point)target;
+        if (point.roadPoint == true && ((point.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() == point.transform.parent.parent.parent.childCount - 1 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection != null) || (point.name == "Start Point" && point.transform.parent.parent.GetSiblingIndex() == 0 && point.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection != null)))
+        {
+            Selection.activeGameObject = point.transform.parent.parent.parent.parent.gameObject;
+        }
+        else
+        {
+            lastTool = Tools.current;
+            Tools.current = Tool.Move;
+        }
     }
 
     private void OnDisable()

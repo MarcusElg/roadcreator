@@ -17,11 +17,12 @@ public class RoadCreator : MonoBehaviour
     public GameObject extraObjectToMove = null;
     private bool mouseDown;
     public bool sDown;
+    public bool aDown;
 
-    public Intersection startIntersection;
-    public Intersection endIntersection;
-    public int startIntersectionConnectionIndex = -1;
-    public int endIntersectionConnectionIndex = -1;
+    public Intersection startIntersection = null;
+    public Intersection endIntersection = null;
+    public IntersectionConnection startIntersectionConnection = null;
+    public IntersectionConnection endIntersectionConnection = null;
 
     public void CreateMesh(bool fromIntersection = false)
     {
@@ -48,10 +49,10 @@ public class RoadCreator : MonoBehaviour
                     {
                         currentPoints = CalculatePoints(transform.GetChild(0).GetChild(i));
 
-                        if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == 0 && startIntersection != null && startIntersectionConnectionIndex != -1 && startIntersectionConnectionIndex < startIntersection.connections.Count)
+                        if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == 0 && startIntersection != null && startIntersectionConnection != null)
                         {
-                            previousPoint = startIntersection.connections[startIntersectionConnectionIndex].lastPoint.ToNormalVector3() + (currentPoints[0] - currentPoints[1]).normalized;
-                            previousPoint.y = startIntersection.yOffset + startIntersection.connections[startIntersectionConnectionIndex].lastPoint.y;
+                            previousPoint = startIntersectionConnection.lastPoint.ToNormalVector3() + (currentPoints[0] - currentPoints[1]).normalized;
+                            previousPoint.y = startIntersection.yOffset + startIntersectionConnection.lastPoint.y;
                         }
                     }
 
@@ -76,11 +77,11 @@ public class RoadCreator : MonoBehaviour
                     {
                         Vector3[] nextPoints = null;
 
-                        if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == transform.GetChild(0).childCount - 1 && endIntersectionConnectionIndex != -1 && endIntersection != null && endIntersectionConnectionIndex < endIntersection.connections.Count)
+                        if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == transform.GetChild(0).childCount - 1 && endIntersection != null && endIntersectionConnection != null)
                         {
                             nextPoints = new Vector3[1];
-                            nextPoints[0] = endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3() + (currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2]).normalized;
-                            nextPoints[0].y = endIntersection.yOffset + endIntersection.connections[endIntersectionConnectionIndex].lastPoint.y;
+                            nextPoints[0] = endIntersectionConnection.lastPoint.ToNormalVector3() + (currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2]).normalized;
+                            nextPoints[0].y = endIntersection.yOffset + endIntersectionConnection.lastPoint.y;
                         }
 
                         if (i - 1 >= 0)
@@ -113,15 +114,15 @@ public class RoadCreator : MonoBehaviour
 
         if (fromIntersection == false)
         {
-            if (startIntersectionConnectionIndex != -1 && startIntersection != null)
+            if (startIntersectionConnection != null && startIntersection != null)
             {
-                UpdateStartConnectionData(startIntersection);
+                UpdateStartConnectionData();
                 startIntersection.CreateMesh(true);
             }
 
-            if (endIntersectionConnectionIndex != -1 && endIntersection != null)
+            if (endIntersectionConnection != null && endIntersection != null)
             {
-                UpdateEndConnectionData(endIntersection);
+                UpdateEndConnectionData();
                 endIntersection.CreateMesh(true);
             }
         }
@@ -135,46 +136,30 @@ public class RoadCreator : MonoBehaviour
         {
             for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
             {
-                if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial != null)
+                Material[] materials = transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials;
+                float textureRepeat = length / 4 * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY;
+
+                for (int k = 0; k < transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials.Length; k++)
                 {
-                    float textureRepeat = length / 4 * transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().textureTilingY;
-
-                    Material material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial);
-                    material.SetVector("_Tiling", new Vector2(1, textureRepeat));
-
-                    float lastTextureRepeat = 0;
-                    float lastTextureOffset = 0;
-
-                    if (i > 0)
+                    if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[k] != null)
                     {
-                        lastTextureRepeat = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Tiling").y;
-                        lastTextureOffset = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Offset").y;
-                        material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
-                    }
-                    else
-                    {
-                        material.SetVector("_Offset", new Vector2(0, 0));
-                    }
-
-                    transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterial = material;
-
-                    if (transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials.Length > 1)
-                    {
-                        material = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[1]);
-                        material.SetVector("_Tiling", new Vector2(1, textureRepeat));
+                        materials[k] = new Material(transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[k]);
+                        materials[k].SetVector("_Tiling", new Vector2(1, textureRepeat));
 
                         if (i > 0)
                         {
-                            material.SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                            float lastTextureRepeat = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Tiling").y;
+                            float lastTextureOffset = transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.GetVector("_Offset").y;
+                            materials[k].SetVector("_Offset", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
                         }
                         else
                         {
-                            material.SetVector("_Offset", new Vector2(0, 0));
+                            materials[k].SetVector("_Offset", new Vector2(0, 0));
                         }
-
-                        transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials = new Material[2] { transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials[0], material };
                     }
                 }
+
+                transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshRenderer>().sharedMaterials = materials;
             }
 
             if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateSimpleBridge == true)
@@ -192,42 +177,16 @@ public class RoadCreator : MonoBehaviour
 
     public void UndoUpdate()
     {
-        if (startIntersection == null && endIntersection == null)
-        {
-            CreateMesh();
-        }
-        else
-        {
-            if (endIntersection != null)
-            {
-                for (int i = 0; i < endIntersection.connections.Count; i++)
-                {
-                    if (endIntersection.connections[i].road.transform.GetSiblingIndex() == 0)
-                    {
-                        endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(endIntersection);
-                    }
-                    else
-                    {
-                        endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(endIntersection);
-                    }
-                }
-            }
+        objectToMove = null;
+        extraObjectToMove = null;
 
-            if (startIntersection != null)
-            {
-                for (int i = 0; i < startIntersection.connections.Count; i++)
-                {
-                    if (startIntersection.connections[i].road.transform.GetSiblingIndex() == 0)
-                    {
-                        startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(startIntersection);
-                    }
-                    else
-                    {
-                        startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(startIntersection);
-                    }
-                }
-            }
+        Intersection[] intersections = GameObject.FindObjectsOfType<Intersection>();
+        for (int i = 0; i < intersections.Length; i++)
+        {
+            intersections[i].CreateMesh();
         }
+
+        CreateMesh();
     }
 
     public void CreatePoints(Vector3 hitPosition)
@@ -342,43 +301,18 @@ public class RoadCreator : MonoBehaviour
         mainMesh.AddComponent<MeshCollider>();
         mainMesh.layer = settings.FindProperty("roadLayer").intValue;
 
+        CopySegmentData(segment);
+
+        return segment;
+    }
+
+    private void CopySegmentData(RoadSegment segment)
+    {
         if (segmentPreset == null)
         {
             if (transform.GetChild(0).childCount > 1)
             {
-                RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
-                segment.baseRoadMaterial = oldLastSegment.baseRoadMaterial;
-                segment.overlayRoadMaterial = oldLastSegment.overlayRoadMaterial;
-                segment.startRoadWidth = oldLastSegment.startRoadWidth;
-                segment.endRoadWidth = oldLastSegment.endRoadWidth;
-                segment.flipped = oldLastSegment.flipped;
-                segment.terrainOption = oldLastSegment.terrainOption;
-
-                segment.generateSimpleBridge = oldLastSegment.generateSimpleBridge;
-                segment.generateCustomBridge = oldLastSegment.generateCustomBridge;
-                segment.bridgeSettings = oldLastSegment.bridgeSettings;
-
-                segment.placePillars = oldLastSegment.placePillars;
-                segment.pillarPrefab = oldLastSegment.pillarPrefab;
-                segment.pillarGap = oldLastSegment.pillarGap;
-                segment.pillarPlacementOffset = oldLastSegment.pillarPlacementOffset;
-                segment.extraPillarHeight = oldLastSegment.extraPillarHeight;
-                segment.xPillarScale = oldLastSegment.xPillarScale;
-                segment.zPillarScale = oldLastSegment.zPillarScale;
-
-                for (int i = 0; i < oldLastSegment.extraMeshes.Count; i++)
-                {
-                    GameObject extraMesh = new GameObject("Extra Mesh");
-                    extraMesh.AddComponent<MeshFilter>();
-                    extraMesh.AddComponent<MeshRenderer>();
-                    extraMesh.AddComponent<MeshCollider>();
-                    extraMesh.transform.SetParent(segment.transform.GetChild(1));
-                    extraMesh.transform.localPosition = Vector3.zero;
-                    extraMesh.layer = settings.FindProperty("roadLayer").intValue;
-                    extraMesh.hideFlags = HideFlags.NotEditable;
-
-                    segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
-                }
+                DuplicateSegmentData(segment);
             }
             else
             {
@@ -401,61 +335,83 @@ public class RoadCreator : MonoBehaviour
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }
-
-        return segment;
     }
 
-    public void UpdateStartConnectionData(Intersection startIntersection)
+    private void DuplicateSegmentData(RoadSegment segment)
     {
-        if (startIntersectionConnectionIndex != -1 && startIntersection != null)
-        {
-            UpdateStartConnectionVariables(startIntersection);
+        RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
+        segment.baseRoadMaterial = oldLastSegment.baseRoadMaterial;
+        segment.overlayRoadMaterial = oldLastSegment.overlayRoadMaterial;
+        segment.startRoadWidth = oldLastSegment.startRoadWidth;
+        segment.endRoadWidth = oldLastSegment.endRoadWidth;
+        segment.flipped = oldLastSegment.flipped;
+        segment.terrainOption = oldLastSegment.terrainOption;
 
-            // Update connection index
-            RoadCreator[] roads = new RoadCreator[startIntersection.connections.Count];
-            IntersectionConnection[] connections = new IntersectionConnection[startIntersection.connections.Count];
-            bool[] end = new bool[startIntersection.connections.Count];
+        segment.generateSimpleBridge = oldLastSegment.generateSimpleBridge;
+        segment.generateCustomBridge = oldLastSegment.generateCustomBridge;
+        segment.bridgeSettings = oldLastSegment.bridgeSettings;
+
+        segment.placePillars = oldLastSegment.placePillars;
+        segment.pillarPrefab = oldLastSegment.pillarPrefab;
+        segment.pillarGap = oldLastSegment.pillarGap;
+        segment.pillarPlacementOffset = oldLastSegment.pillarPlacementOffset;
+        segment.extraPillarHeight = oldLastSegment.extraPillarHeight;
+        segment.xPillarScale = oldLastSegment.xPillarScale;
+        segment.zPillarScale = oldLastSegment.zPillarScale;
+
+        for (int i = 0; i < oldLastSegment.extraMeshes.Count; i++)
+        {
+            GameObject extraMesh = new GameObject("Extra Mesh");
+            extraMesh.AddComponent<MeshFilter>();
+            extraMesh.AddComponent<MeshRenderer>();
+            extraMesh.AddComponent<MeshCollider>();
+            extraMesh.transform.SetParent(segment.transform.GetChild(1));
+            extraMesh.transform.localPosition = Vector3.zero;
+            extraMesh.layer = settings.FindProperty("roadLayer").intValue;
+            extraMesh.hideFlags = HideFlags.NotEditable;
+
+            segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
+        }
+    }
+
+    public void SplitSegment(Vector3 hitPosition, RaycastHit raycastHit)
+    {
+        if (raycastHit.transform.parent.parent.parent.parent != null && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() != null && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() == this && raycastHit.transform.parent.parent.GetChild(0).childCount == 3 && aDown == true)
+        {
+            RoadSegment hitSegment = raycastHit.transform.parent.parent.GetComponent<RoadSegment>();
+            RoadSegment segment = CreateSegment(raycastHit.point);
+            segment.transform.SetSiblingIndex(hitSegment.transform.GetSiblingIndex() + 1);
+
+            // Create new points
+            Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), raycastHit.point), "Created Point");
+            Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), Misc.GetCenter(raycastHit.point, hitSegment.transform.GetChild(0).GetChild(2).position)), "Created Point");
+            Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", segment.transform.GetChild(0), hitSegment.transform.GetChild(0).GetChild(2).position), "Created Point");
+
+            // Move old points
+            hitSegment.transform.GetChild(0).GetChild(2).transform.position = raycastHit.point;
+            hitSegment.transform.GetChild(0).GetChild(1).transform.position = Misc.GetCenter(hitSegment.transform.GetChild(0).GetChild(0).transform.position, hitSegment.transform.GetChild(0).GetChild(2).transform.position);
+
+            CreateMesh();
+            RoadCreatorSettings.UpdateRoadGuidelines();
+        }
+    }
+
+    public void UpdateStartConnectionData()
+    {
+        if (startIntersectionConnection != null && startIntersection != null)
+        {
+            UpdateStartConnectionVariables();
+            startIntersection.connections.Sort();
 
             for (int i = 0; i < startIntersection.connections.Count; i++)
             {
-                roads[i] = startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
-                connections[i] = startIntersection.connections[i];
-
-                if (startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex == -1 || startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null || startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection.connections[startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex] != connections[i])
+                if (startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnection == null || startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null || !startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnection.road.Equals(startIntersection.connections[i].road))
                 {
-                    end[i] = true;
+                    startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionVariables();
                 }
                 else
                 {
-                    end[i] = false;
-                }
-            }
-
-            startIntersection.connections.Sort();
-
-            for (int i = 0; i < roads.Length; i++)
-            {
-                if (end[i] == true)
-                {
-                    Undo.RecordObject(roads[i], "Remove Intersection");
-                    roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
-                }
-                else
-                {
-                    Undo.RecordObject(roads[i], "Remove Intersection");
-                    roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(startIntersection.connections.ToArray(), connections[i]);
-                }
-            }
-
-            for (int i = 0; i < roads.Length; i++)
-            {
-                if (end[i] == true)
-                {
-                    roads[i].UpdateEndConnectionVariables(roads[i].endIntersection);
-                }
-                else
-                {
-                    roads[i].UpdateStartConnectionVariables(roads[i].startIntersection);
+                    startIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionVariables();
                 }
             }
 
@@ -472,57 +428,22 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    public void UpdateEndConnectionData(Intersection endIntersection)
+    public void UpdateEndConnectionData()
     {
-        if (endIntersectionConnectionIndex != -1 && endIntersection != null)
+        if (endIntersectionConnection != null && endIntersection != null)
         {
-            UpdateEndConnectionVariables(endIntersection);
-
-            // Update connection index
-            RoadCreator[] roads = new RoadCreator[endIntersection.connections.Count];
-            IntersectionConnection[] connections = new IntersectionConnection[endIntersection.connections.Count];
-            bool[] end = new bool[endIntersection.connections.Count];
+            UpdateEndConnectionVariables();
+            endIntersection.connections.Sort();
 
             for (int i = 0; i < endIntersection.connections.Count; i++)
             {
-                roads[i] = endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
-                connections[i] = endIntersection.connections[i];
-
-                if (endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex == -1 || endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null || endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection.connections[endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex] != connections[i])
+                if (endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection == null || endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null || !endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection.road.Equals(endIntersection.connections[i].road))
                 {
-                    end[i] = false;
+                    endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionVariables();
                 }
                 else
                 {
-                    end[i] = true;
-                }
-            }
-
-            endIntersection.connections.Sort();
-
-            for (int i = 0; i < roads.Length; i++)
-            {
-                if (end[i] == true)
-                {
-                    Undo.RecordObject(roads[i], "Remove Intersection");
-                    roads[i].endIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
-                }
-                else
-                {
-                    Undo.RecordObject(roads[i], "Remove Intersection");
-                    roads[i].startIntersectionConnectionIndex = System.Array.IndexOf(endIntersection.connections.ToArray(), connections[i]);
-                }
-            }
-
-            for (int i = 0; i < roads.Length; i++)
-            {
-                if (end[i] == true)
-                {
-                    roads[i].UpdateEndConnectionVariables(roads[i].endIntersection);
-                }
-                else
-                {
-                    roads[i].UpdateStartConnectionVariables(roads[i].startIntersection);
+                    endIntersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionVariables();
                 }
             }
 
@@ -539,31 +460,30 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    public void UpdateStartConnectionVariables(Intersection startIntersection)
+    public void UpdateStartConnectionVariables()
     {
         Vector3[] vertices = transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
-        startIntersection.connections[startIntersectionConnectionIndex].leftPoint = new SerializedVector3(vertices[1] + transform.GetChild(0).GetChild(0).transform.position);
-        startIntersection.connections[startIntersectionConnectionIndex].leftPoint.y = startIntersection.transform.position.y;
-        startIntersection.connections[startIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[0] + transform.GetChild(0).GetChild(0).transform.position);
-        startIntersection.connections[startIntersectionConnectionIndex].rightPoint.y = startIntersection.transform.position.y;
-        startIntersection.connections[startIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[0], vertices[1]) + transform.GetChild(0).GetChild(0).transform.position);
-        startIntersection.connections[startIntersectionConnectionIndex].lastPoint.y = startIntersection.transform.position.y;
-        startIntersection.connections[startIntersectionConnectionIndex].length = Vector3.Distance(startIntersection.transform.position, startIntersection.connections[startIntersectionConnectionIndex].lastPoint.ToNormalVector3());
-        startIntersection.connections[startIntersectionConnectionIndex].YRotation = Quaternion.LookRotation((startIntersection.transform.position - startIntersection.connections[startIntersectionConnectionIndex].road.transform.position).normalized).eulerAngles.y;
-
+        startIntersectionConnection.leftPoint = new SerializedVector3(vertices[1] + transform.GetChild(0).GetChild(0).transform.position);
+        startIntersectionConnection.leftPoint.y = startIntersection.transform.position.y;
+        startIntersectionConnection.rightPoint = new SerializedVector3(vertices[0] + transform.GetChild(0).GetChild(0).transform.position);
+        startIntersectionConnection.rightPoint.y = startIntersection.transform.position.y;
+        startIntersectionConnection.lastPoint = new SerializedVector3(Misc.GetCenter(vertices[0], vertices[1]) + transform.GetChild(0).GetChild(0).transform.position);
+        startIntersectionConnection.lastPoint.y = startIntersection.transform.position.y;
+        startIntersectionConnection.length = Vector3.Distance(startIntersection.transform.position, startIntersectionConnection.lastPoint.ToNormalVector3());
+        startIntersectionConnection.YRotation = Quaternion.LookRotation((startIntersection.transform.position - startIntersectionConnection.road.transform.position).normalized).eulerAngles.y;
     }
 
-    public void UpdateEndConnectionVariables(Intersection endIntersection)
+    public void UpdateEndConnectionVariables()
     {
         Vector3[] vertices = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
-        endIntersection.connections[endIntersectionConnectionIndex].leftPoint = new SerializedVector3(vertices[vertices.Length - 2] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
-        endIntersection.connections[endIntersectionConnectionIndex].leftPoint.y = endIntersection.transform.position.y;
-        endIntersection.connections[endIntersectionConnectionIndex].rightPoint = new SerializedVector3(vertices[vertices.Length - 1] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
-        endIntersection.connections[endIntersectionConnectionIndex].rightPoint.y = endIntersection.transform.position.y;
-        endIntersection.connections[endIntersectionConnectionIndex].lastPoint = new SerializedVector3(Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).transform.position);
-        endIntersection.connections[endIntersectionConnectionIndex].lastPoint.y = endIntersection.transform.position.y;
-        endIntersection.connections[endIntersectionConnectionIndex].length = Vector3.Distance(endIntersection.transform.position, endIntersection.connections[endIntersectionConnectionIndex].lastPoint.ToNormalVector3());
-        endIntersection.connections[endIntersectionConnectionIndex].YRotation = Quaternion.LookRotation((endIntersection.transform.position - endIntersection.connections[endIntersectionConnectionIndex].road.transform.position).normalized).eulerAngles.y;
+        endIntersectionConnection.leftPoint = new SerializedVector3(vertices[vertices.Length - 2] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
+        endIntersectionConnection.leftPoint.y = endIntersection.transform.position.y;
+        endIntersectionConnection.rightPoint = new SerializedVector3(vertices[vertices.Length - 1] + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).position);
+        endIntersectionConnection.rightPoint.y = endIntersection.transform.position.y;
+        endIntersectionConnection.lastPoint = new SerializedVector3(Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) + transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).transform.position);
+        endIntersectionConnection.lastPoint.y = endIntersection.transform.position.y;
+        endIntersectionConnection.length = Vector3.Distance(endIntersection.transform.position, endIntersectionConnection.lastPoint.ToNormalVector3());
+        endIntersectionConnection.YRotation = Quaternion.LookRotation((endIntersection.transform.position - endIntersectionConnection.road.transform.position).normalized).eulerAngles.y;
     }
 
     public void CheckForIntersectionGeneration(GameObject point)
@@ -619,7 +539,7 @@ public class RoadCreator : MonoBehaviour
             }
             else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, settings.FindProperty("ignoreMouseRayLayer").intValue) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
             {
-                //Found road
+                //Found intersection
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
                 {
                     CreateMesh();
@@ -627,11 +547,11 @@ public class RoadCreator : MonoBehaviour
                     Vector3 forward = Misc.GetCenter(vertices[0], vertices[1]) - Misc.GetCenter(vertices[2], vertices[3]);
                     point.transform.position += (-forward).normalized * 2;
                     CreateMesh();
-                    CreateIntersectionConnectionFirst(raycastHitRoad.transform.GetComponent<Intersection>(), point);
+                    Undo.RegisterCompleteObjectUndo(this, "Modify Intersection");
+                    startIntersectionConnection = CreateIntersectionConnectionFirst(raycastHitRoad.transform.GetComponent<Intersection>(), point);
                     startIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
-                    startIntersectionConnectionIndex = startIntersection.connections.Count - 1;
 
-                    UpdateStartConnectionData(startIntersection);
+                    UpdateStartConnectionData();
                     startIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
                     startIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                 }
@@ -642,11 +562,11 @@ public class RoadCreator : MonoBehaviour
                     Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
                     point.transform.position += (-forward).normalized * 2;
                     CreateMesh();
-                    CreateIntersectionConnectionLast(raycastHitRoad.transform.GetComponent<Intersection>(), point);
+                    Undo.RegisterCompleteObjectUndo(this, "Modify Intersection");
+                    endIntersectionConnection = CreateIntersectionConnectionLast(raycastHitRoad.transform.GetComponent<Intersection>(), point);
                     endIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
-                    endIntersectionConnectionIndex = endIntersection.connections.Count - 1;
 
-                    UpdateEndConnectionData(endIntersection);
+                    UpdateEndConnectionData();
                     endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
                     endIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                 }
@@ -660,48 +580,21 @@ public class RoadCreator : MonoBehaviour
                 }
                 else
                 {
-                    if (point.transform.GetSiblingIndex() == 0 && startIntersectionConnectionIndex != -1 && startIntersection != null)
+                    if (point.transform.GetSiblingIndex() == 0 && startIntersectionConnection != null && startIntersection != null)
                     {
                         Intersection intersection = startIntersection;
-                        int index = startIntersectionConnectionIndex;
-                        RemoveIntersectionConnection(startIntersection, startIntersectionConnectionIndex, true);
-
-                        for (int i = index; i < intersection.connections.Count; i++)
-                        {
-                            if (i > index - 1)
-                            {
-                                if (intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex == -1 || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection == null || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection != intersection)
-                                {
-                                    intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex -= 1;
-                                }
-                                else
-                                {
-                                    intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex -= 1;
-                                }
-                            }
-                        }
+                        int index = intersection.connections.FindIndex(i => i.road == startIntersectionConnection.road);
+                        RemoveIntersectionConnection(intersection, index, true);
 
                         intersection.ResetCurvePointPositions();
                         intersection.ResetExtraMeshes();
                         intersection.CreateMesh();
                     }
-                    else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnectionIndex != -1 && endIntersection != null)
+                    else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnection != null && endIntersection != null)
                     {
                         Intersection intersection = endIntersection;
-                        int index = endIntersectionConnectionIndex;
-                        RemoveIntersectionConnection(endIntersection, endIntersectionConnectionIndex, false);
-
-                        for (int i = index; i < intersection.connections.Count; i++)
-                        {
-                            if (intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex == -1 || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection == null || intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection != intersection)
-                            {
-                                intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex -= 1;
-                            }
-                            else
-                            {
-                                intersection.connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex -= 1;
-                            }
-                        }
+                        int index = intersection.connections.FindIndex(i => i.road == endIntersectionConnection.road);
+                        RemoveIntersectionConnection(intersection, index, false);
 
                         intersection.ResetCurvePointPositions();
                         intersection.ResetExtraMeshes();
@@ -715,19 +608,19 @@ public class RoadCreator : MonoBehaviour
     public void RemoveIntersectionConnection(Intersection intersection, int connectionIndex, bool start)
     {
         Undo.RecordObject(intersection, "Remove Intersection");
-        intersection.connections.RemoveAt(System.Array.IndexOf(intersection.connections.ToArray(), intersection.connections[connectionIndex]));
+        intersection.connections.RemoveAt(connectionIndex);
 
         if (start == true)
         {
             Undo.RecordObject(this, "Remove Intersection");
             startIntersection = null;
-            startIntersectionConnectionIndex = -1;
+            startIntersectionConnection = null;
         }
         else
         {
             Undo.RecordObject(this, "Remove Intersection");
             endIntersection = null;
-            endIntersectionConnectionIndex = -1;
+            endIntersectionConnection = null;
         }
     }
 
@@ -792,14 +685,14 @@ public class RoadCreator : MonoBehaviour
             CreateIntersectionConnectionFirst(intersection.GetComponent<Intersection>(), gameObject);
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersection = intersection;
             Undo.RecordObject(gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>(), "Create Intersection");
-            gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnectionIndex = intersection.connections.Count - 1;
+            gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnection = intersection.connections[intersection.connections.Count - 1];
         }
         else
         {
             CreateIntersectionConnectionLast(intersection.GetComponent<Intersection>(), gameObject);
             gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersection = intersection;
             Undo.RecordObject(gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>(), "Create Intersection");
-            gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnectionIndex = intersection.connections.Count - 1;
+            gameObject.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection = intersection.connections[intersection.connections.Count - 1];
         }
     }
 
@@ -817,6 +710,7 @@ public class RoadCreator : MonoBehaviour
     public IntersectionConnection CreateIntersectionConnection(Intersection intersection, GameObject point, int firstVertex, int secondVertex)
     {
         IntersectionConnection intersectionConnection = new IntersectionConnection();
+        Undo.RegisterCompleteObjectUndo(intersection, "Modify Intersection");
         intersection.connections.Add(intersectionConnection);
 
         intersectionConnection.leftPoint = new SerializedVector3(point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices[firstVertex] + point.transform.parent.parent.position);
@@ -926,7 +820,7 @@ public class RoadCreator : MonoBehaviour
         {
             if (objectToMove != null)
             {
-                dropMovingPoint();
+                DropMovingPoint();
             }
         }
         else
@@ -1035,12 +929,12 @@ public class RoadCreator : MonoBehaviour
             }
             else if (guiEvent.type == EventType.MouseUp && guiEvent.button == 0 && objectToMove != null)
             {
-                dropMovingPoint();
+                DropMovingPoint();
             }
         }
     }
 
-    public void dropMovingPoint()
+    public void DropMovingPoint()
     {
         mouseDown = false;
         if (objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
@@ -1079,12 +973,12 @@ public class RoadCreator : MonoBehaviour
             }
         }
 
-        if (startIntersectionConnectionIndex != -1)
+        if (startIntersection != null)
         {
             startIntersection.CreateMesh();
         }
 
-        if (endIntersectionConnectionIndex != -1)
+        if (endIntersection != null)
         {
             endIntersection.CreateMesh();
         }

@@ -58,53 +58,59 @@ public class Intersection : MonoBehaviour
         }
         else if (currentEvent.type == EventType.MouseDrag && objectToMove != null)
         {
+            Undo.RecordObject(objectToMove.transform, "Moved Point");
             objectToMove.transform.position = position;
         }
         else if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0 && objectToMove != null)
         {
-            objectToMove.GetComponent<BoxCollider>().enabled = true;
+            DropMovingPoint();
+        }
+    }
 
-            if (objectToMove.transform.name == "Connection Point")
+    private void DropMovingPoint()
+    {
+        objectToMove.GetComponent<BoxCollider>().enabled = true;
+
+        if (objectToMove.transform.name == "Connection Point")
+        {
+            int nextIndex = objectToMove.transform.GetSiblingIndex();
+            if (nextIndex >= connections.Count)
             {
-                int nextIndex = objectToMove.transform.GetSiblingIndex();
+                nextIndex = 0;
+            }
+
+            Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex() - 1].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
+            center.y -= yOffset;
+            connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
+            objectToMove = null;
+            CreateMesh();
+
+            for (int i = 0; i < connections.Count; i++)
+            {
+                nextIndex = i + 2;
                 if (nextIndex >= connections.Count)
                 {
                     nextIndex = 0;
                 }
 
-                Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex() - 1].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
-                center.y -= yOffset;
-                connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
-                objectToMove = null;
-                CreateMesh();
+                transform.GetChild(i + 1).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
+            }
+        }
+        else
+        {
+            CreateMesh();
+            objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
 
-                for (int i = 0; i < connections.Count; i++)
-                {
-                    nextIndex = i + 2;
-                    if (nextIndex >= connections.Count)
-                    {
-                        nextIndex = 0;
-                    }
-
-                    transform.GetChild(i + 1).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
-                }
+            if (objectToMove.transform.name == "Start Point")
+            {
+                objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData();
             }
             else
             {
-                CreateMesh();
-                objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
-
-                if (objectToMove.transform.name == "Start Point")
-                {
-                    objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateStartConnectionData(this);
-                }
-                else
-                {
-                    objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData(this);
-                }
-
-                objectToMove = null;
+                objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().UpdateEndConnectionData();
             }
+
+            objectToMove = null;
         }
     }
 
@@ -125,70 +131,17 @@ public class Intersection : MonoBehaviour
 
         if (connections.Count < 2)
         {
-            RoadCreator[] roads = GameObject.FindObjectsOfType<RoadCreator>();
-
-            for (int i = 0; i < roads.Length; i++)
-            {
-                if (roads[i].startIntersection == this)
-                {
-                    Undo.RecordObject(roads[i], "Remove Intersection");
-                    roads[i].startIntersection = null;
-                    roads[i].startIntersectionConnectionIndex = -1;
-                }
-                else if (roads[i].endIntersection == this)
-                {
-                    Undo.RecordObject(roads[i], "Remove Intersection");
-                    roads[i].endIntersection = null;
-                    roads[i].endIntersectionConnectionIndex = -1;
-                }
-            }
-
-            Undo.DestroyObjectImmediate(gameObject);
+            RemoveIntersection();
         }
         else
         {
-            if (baseMaterial == null)
-            {
-                baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
-            }
-
-            if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
-            {
-                Material[] materials = new Material[settings.FindProperty("defaultSimpleBridgeMaterials").arraySize];
-                for (int i = 0; i < settings.FindProperty("defaultSimpleBridgeMaterials").arraySize; i++)
-                {
-                    materials[i] = (Material)settings.FindProperty("defaultSimpleBridgeMaterials").GetArrayElementAtIndex(i).objectReferenceValue;
-                }
-
-                bridgeSettings.bridgeMaterials = materials;
-            }
-
-            for (int i = 0; i < extraMeshes.Count; i++)
-            {
-                if (extraMeshes[i].baseMaterial == null)
-                {
-                    extraMeshes[i].baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
-                }
-            }
-
-            for (int i = 0; i < extraMeshes.Count; i++)
-            {
-                if (extraMeshes[i].overlayMaterial == null)
-                {
-                    extraMeshes[i].overlayMaterial = (Material)settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue;
-                }
-            }
-
-            if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
-            {
-                pillarPrefab = (GameObject)settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue;
-            }
+            CheckMaterialsAndPrefabs();
 
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
             List<int> firstVertexIndexes = new List<int>();
-            float[] totalLength = new float[connections.Count];
+            float[] totalLengths = new float[connections.Count];
             float[] exactLengths = new float[connections.Count];
             int vertexIndex = 0;
             Vector3 lastVertexPosition = Misc.MaxVector3;
@@ -199,20 +152,20 @@ public class Intersection : MonoBehaviour
                 Vector3 firstCenterPoint = connections[i].lastPoint.ToNormalVector3();
                 Vector3 nextPoint;
                 Vector3 nextCenterPoint;
-                totalLength[i] = connections[i].length;
+                totalLengths[i] = connections[i].length;
                 firstVertexIndexes.Add(vertexIndex);
 
                 if (i == connections.Count - 1)
                 {
                     nextPoint = connections[0].rightPoint.ToNormalVector3();
                     nextCenterPoint = connections[0].lastPoint.ToNormalVector3();
-                    totalLength[i] += connections[0].length;
+                    totalLengths[i] += connections[0].length;
                 }
                 else
                 {
                     nextPoint = connections[i + 1].rightPoint.ToNormalVector3();
                     nextCenterPoint = connections[i + 1].lastPoint.ToNormalVector3();
-                    totalLength[i] += connections[i + 1].length;
+                    totalLengths[i] += connections[i + 1].length;
                 }
 
                 if (connections[i].curvePoint == null)
@@ -220,7 +173,7 @@ public class Intersection : MonoBehaviour
                     return;
                 }
 
-                float segments = totalLength[i] * settings.FindProperty("resolution").floatValue * 5;
+                float segments = totalLengths[i] * settings.FindProperty("resolution").floatValue * 5;
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
 
@@ -306,6 +259,12 @@ public class Intersection : MonoBehaviour
                 }
             }
 
+            float[] startWidths = new float[firstVertexIndexes.Count];
+            float[] endWidths = new float[firstVertexIndexes.Count];
+            float[] heights = new float[firstVertexIndexes.Count];
+
+            GenerateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
+
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 if (transform.GetChild(i).name == "Bridge")
@@ -313,78 +272,6 @@ public class Intersection : MonoBehaviour
                     DestroyImmediate(transform.GetChild(i).gameObject);
                     break;
                 }
-            }
-
-            // Extra meshes
-            float[] startWidths = new float[firstVertexIndexes.Count];
-            float[] endWidths = new float[firstVertexIndexes.Count];
-            float[] heights = new float[firstVertexIndexes.Count];
-
-            for (int i = 0; i < extraMeshes.Count; i++)
-            {
-                int endVertexIndex;
-                float currentLength = 0f;
-                Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index] + 1];
-
-                if (extraMeshes[i].index < firstVertexIndexes.Count - 1)
-                {
-                    endVertexIndex = firstVertexIndexes[extraMeshes[i].index + 1];
-                }
-                else
-                {
-                    endVertexIndex = vertices.Count;
-                }
-
-                List<Vector3> extraMeshVertices = new List<Vector3>();
-                triangles.Clear();
-                uvs.Clear();
-                vertexIndex = 0;
-
-                for (int j = firstVertexIndexes[extraMeshes[i].index]; j < endVertexIndex; j += 2)
-                {
-                    currentLength += Vector3.Distance(lastPosition, vertices[j + 1]);
-
-                    Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
-                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLength[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength[extraMeshes[i].index])));
-                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshes[i].yOffset + heights[extraMeshes[i].index], 0);
-                    extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength[extraMeshes[i].index]));
-                    extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshes[i].index], 0);
-
-                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
-                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
-
-                    if (j < endVertexIndex - 2)
-                    {
-                        triangles = AddTriangles(triangles, vertexIndex);
-                        vertexIndex += 2;
-                    }
-
-                    lastPosition = vertices[j + 1];
-                }
-
-                Mesh mesh = new Mesh();
-                mesh.vertices = extraMeshVertices.ToArray();
-                mesh.triangles = triangles.ToArray();
-                mesh.uv = uvs.ToArray();
-                mesh.RecalculateNormals();
-                vertexIndex = 0;
-
-                transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = mesh;
-                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = mesh;
-                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMaterial = extraMeshes[i].physicMaterial;
-
-                if (overlayMaterial == null)
-                {
-                    transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
-                }
-                else
-                {
-                    transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, extraMeshes[i].overlayMaterial };
-                }
-
-                startWidths[extraMeshes[i].index] += extraMeshes[i].startWidth;
-                endWidths[extraMeshes[i].index] += extraMeshes[i].endWidth;
-                heights[extraMeshes[i].index] += extraMeshes[i].yOffset;
             }
 
             if (generateBridge == true)
@@ -401,6 +288,139 @@ public class Intersection : MonoBehaviour
             {
                 connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh(true);
             }
+        }
+    }
+
+    private void GenerateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
+    {
+        for (int i = 0; i < extraMeshes.Count; i++)
+        {
+            int endVertexIndex;
+            float currentLength = 0f;
+            Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index] + 1];
+
+            if (extraMeshes[i].index < firstVertexIndexes.Count - 1)
+            {
+                endVertexIndex = firstVertexIndexes[extraMeshes[i].index + 1];
+            }
+            else
+            {
+                endVertexIndex = vertices.Count;
+            }
+
+            List<Vector3> extraMeshVertices = new List<Vector3>();
+            List<int> triangles = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+            int vertexIndex = 0;
+
+            for (int j = firstVertexIndexes[extraMeshes[i].index]; j < endVertexIndex; j += 2)
+            {
+                currentLength += Vector3.Distance(lastPosition, vertices[j + 1]);
+
+                Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
+                extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index])));
+                extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshes[i].yOffset + heights[extraMeshes[i].index], 0);
+                extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index]));
+                extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshes[i].index], 0);
+
+                uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
+                uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
+
+                if (j < endVertexIndex - 2)
+                {
+                    triangles = AddTriangles(triangles, vertexIndex);
+                    vertexIndex += 2;
+                }
+
+                lastPosition = vertices[j + 1];
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = extraMeshVertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+            mesh.uv = uvs.ToArray();
+            mesh.RecalculateNormals();
+            vertexIndex = 0;
+
+            transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = mesh;
+            transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = mesh;
+            transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMaterial = extraMeshes[i].physicMaterial;
+
+            if (overlayMaterial == null)
+            {
+                transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+            }
+            else
+            {
+                transform.GetChild(0).GetChild(i).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, extraMeshes[i].overlayMaterial };
+            }
+
+            startWidths[extraMeshes[i].index] += extraMeshes[i].startWidth;
+            endWidths[extraMeshes[i].index] += extraMeshes[i].endWidth;
+            heights[extraMeshes[i].index] += extraMeshes[i].yOffset;
+        }
+    }
+
+    private void RemoveIntersection()
+    {
+        RoadCreator[] roads = GameObject.FindObjectsOfType<RoadCreator>();
+
+        for (int i = 0; i < roads.Length; i++)
+        {
+            if (roads[i].startIntersection == this)
+            {
+                Undo.RecordObject(roads[i], "Remove Intersection");
+                roads[i].startIntersection = null;
+                roads[i].startIntersectionConnection = null;
+            }
+            else if (roads[i].endIntersection == this)
+            {
+                Undo.RecordObject(roads[i], "Remove Intersection");
+                roads[i].endIntersection = null;
+                roads[i].endIntersectionConnection = null;
+            }
+        }
+
+        Undo.DestroyObjectImmediate(gameObject);
+    }
+
+    private void CheckMaterialsAndPrefabs()
+    {
+        if (baseMaterial == null)
+        {
+            baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
+        }
+
+        if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
+        {
+            Material[] materials = new Material[settings.FindProperty("defaultSimpleBridgeMaterials").arraySize];
+            for (int i = 0; i < settings.FindProperty("defaultSimpleBridgeMaterials").arraySize; i++)
+            {
+                materials[i] = (Material)settings.FindProperty("defaultSimpleBridgeMaterials").GetArrayElementAtIndex(i).objectReferenceValue;
+            }
+
+            bridgeSettings.bridgeMaterials = materials;
+        }
+
+        for (int i = 0; i < extraMeshes.Count; i++)
+        {
+            if (extraMeshes[i].baseMaterial == null)
+            {
+                extraMeshes[i].baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
+            }
+        }
+
+        for (int i = 0; i < extraMeshes.Count; i++)
+        {
+            if (extraMeshes[i].overlayMaterial == null)
+            {
+                extraMeshes[i].overlayMaterial = (Material)settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue;
+            }
+        }
+
+        if (pillarPrefab == null || pillarPrefab.GetComponent<MeshFilter>() == null)
+        {
+            pillarPrefab = (GameObject)settings.FindProperty("defaultBridgePillarPrefab").objectReferenceValue;
         }
     }
 
@@ -479,5 +499,23 @@ public class Intersection : MonoBehaviour
         triangles.Add(vertexIndex + 3);
 
         return triangles;
+    }
+
+    public void FixConnectionReferences()
+    {
+        for (int i = 0; i < connections.Count; i++)
+        {
+            if (connections[i].road != null)
+            {
+                if (connections[i].road.Equals(connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection.road))
+                {
+                    connections[i] = connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection;
+                }
+                else
+                {
+                    connections[i] = connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnection;
+                }
+            }
+        }
     }
 }

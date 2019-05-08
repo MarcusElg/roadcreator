@@ -35,6 +35,16 @@ public class RoadEditor : Editor
 
         Undo.undoRedoPerformed += UndoUpdate;
         Undo.undoRedoPerformed += roadCreator.UndoUpdate;
+
+        if (roadCreator.startIntersection != null)
+        {
+            roadCreator.startIntersection.FixConnectionReferences();
+        }
+
+        if (roadCreator.endIntersection != null)
+        {
+            roadCreator.endIntersection.FixConnectionReferences();
+        }
     }
 
     private void OnDisable()
@@ -80,8 +90,8 @@ public class RoadEditor : Editor
             Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
         }
 
-        roadCreator.startIntersectionConnectionIndex = -1;
-        roadCreator.endIntersectionConnectionIndex = -1;
+        roadCreator.startIntersectionConnection = null;
+        roadCreator.endIntersectionConnection = null;
     }
 
     public void UndoUpdate()
@@ -148,6 +158,14 @@ public class RoadEditor : Editor
             {
                 roadCreator.sDown = false;
             }
+            else if (guiEvent.type == EventType.KeyDown && guiEvent.keyCode == KeyCode.A)
+            {
+                roadCreator.aDown = true;
+            }
+            else if (guiEvent.type == EventType.KeyUp && guiEvent.keyCode == KeyCode.A)
+            {
+                roadCreator.aDown = false;
+            }
 
             if (roadCreator.transform.GetChild(0).childCount > 0 && roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
             {
@@ -160,40 +178,52 @@ public class RoadEditor : Editor
             }
         }
 
-        if (EditorWindow.mouseOverWindow == SceneView.currentDrawingSceneView)
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("roadLayer").intValue)))
         {
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("roadLayer").intValue)))
+            hitPosition = raycastHit.point;
+
+            if (guiEvent.control == true)
             {
-                hitPosition = raycastHit.point;
-
-                if (guiEvent.control == true)
+                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                if (nearestGuideline != Misc.MaxVector3)
                 {
-                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
-                    if (nearestGuideline != Misc.MaxVector3)
-                    {
-                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
-                    }
-                    else
-                    {
-                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
-                    }
-                }
-
-                if (guiEvent.shift == false)
-                {
-                    MovePoints(raycastHit);
+                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
                 }
                 else
                 {
-                    hitPosition = Misc.MaxVector3;
-                    MovePoints(raycastHit);
+                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
                 }
             }
+
+            if (guiEvent.shift == false)
+            {
+                MovePoints(raycastHit);
+            }
+            else
+            {
+                hitPosition = Misc.MaxVector3;
+                MovePoints(raycastHit);
+            }
         }
-        else
+
+        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && Physics.Raycast(ray, out raycastHit, 100f, (1 << roadCreator.settings.FindProperty("roadLayer").intValue)))
         {
-            hitPosition = Misc.MaxVector3;
-            MovePoints(raycastHit);
+            hitPosition = raycastHit.point;
+
+            if (guiEvent.control == true)
+            {
+                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                if (nearestGuideline != Misc.MaxVector3)
+                {
+                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                }
+                else
+                {
+                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                }
+            }
+
+            roadCreator.SplitSegment(hitPosition, raycastHit);
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();

@@ -25,6 +25,7 @@ public class IntersectionEditor : Editor
         Tools.current = Tool.None;
 
         intersection.CreateCurvePoints();
+        intersection.FixConnectionReferences();
     }
 
     public void OnDisable()
@@ -192,4 +193,5 @@ public class IntersectionEditor : Editor
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
         SceneView.currentDrawingSceneView.Repaint();
     }
+
 }

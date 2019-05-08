@@ -50,6 +50,34 @@ public class RoadSegment : MonoBehaviour
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {
+        CheckMaterialsAndPrefabs();
+
+        if (transform.Find("Bridge Base") != null)
+        {
+            DestroyImmediate(transform.Find("Bridge Base").gameObject);
+        }
+
+        if (transform.Find("Custom Bridge") != null)
+        {
+            DestroyImmediate(transform.Find("Custom Bridge").gameObject);
+        }
+
+        if (segment.GetSiblingIndex() == 0)
+        {
+            SetGuidelines(points, nextSegmentPoints, true);
+        }
+        else
+        {
+            SetGuidelines(points, nextSegmentPoints, false);
+        }
+
+        GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, roadPhysicsMaterial);
+        GenerateExtraMeshes(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment);
+        GenerateBridges(points, nextSegmentPoints, previousPoint, previousSegment);
+    }
+
+    private void CheckMaterialsAndPrefabs()
+    {
         if (settings == null)
         {
             settings = RoadCreatorSettings.GetSerializedSettings();
@@ -81,16 +109,6 @@ public class RoadSegment : MonoBehaviour
             bridgeSettings.bridgeMesh = (GameObject)settings.FindProperty("defaultCustomBridgePrefab").objectReferenceValue;
         }
 
-        if (transform.Find("Bridge Base") != null)
-        {
-            DestroyImmediate(transform.Find("Bridge Base").gameObject);
-        }
-
-        if (transform.Find("Custom Bridge") != null)
-        {
-            DestroyImmediate(transform.Find("Custom Bridge").gameObject);
-        }
-
         for (int i = 0; i < extraMeshes.Count; i++)
         {
             if (extraMeshes[i].baseMaterial == null)
@@ -106,18 +124,10 @@ public class RoadSegment : MonoBehaviour
                 extraMeshes[i].overlayMaterial = (Material)settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue;
             }
         }
+    }
 
-        if (segment.GetSiblingIndex() == 0)
-        {
-            SetGuidelines(points, nextSegmentPoints, true);
-        }
-        else
-        {
-            SetGuidelines(points, nextSegmentPoints, false);
-        }
-
-        GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, roadCreator, roadPhysicsMaterial);
-
+    private void GenerateExtraMeshes(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment)
+    {
         for (int i = 0; i < extraMeshes.Count; i++)
         {
             float leftYOffset = extraMeshes[i].yOffset;
@@ -154,9 +164,12 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].baseMaterial, extraMeshes[i].overlayMaterial, roadCreator, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].baseMaterial, extraMeshes[i].overlayMaterial, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
         }
+    }
 
+    private void GenerateBridges(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Transform previousSegment)
+    {
         if (generateSimpleBridge == true || generateCustomBridge == true)
         {
             float startExtraWidthLeft = bridgeSettings.extraWidth;
@@ -224,8 +237,11 @@ public class RoadSegment : MonoBehaviour
             }
 
             // Center Guidelines
-            left = Misc.CalculateLeft(currentPoints[(currentPoints.Length + 1) / 2], currentPoints[(currentPoints.Length + 1) / 2 + 1]);
-            centerGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(1).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(1).position - left * roadGuidelinesLength);
+            if (currentPoints.Length > 3)
+            {
+                left = Misc.CalculateLeft(currentPoints[(currentPoints.Length + 1) / 2], currentPoints[(currentPoints.Length + 1) / 2 + 1]);
+                centerGuidelinePoints = new RoadGuideline(transform.GetChild(0).GetChild(1).position + left * roadGuidelinesLength, transform.GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(1).position - left * roadGuidelinesLength);
+            }
 
             // End guidelines
             if (nextPoints == null)
@@ -252,7 +268,7 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, RoadCreator roadCreator, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
