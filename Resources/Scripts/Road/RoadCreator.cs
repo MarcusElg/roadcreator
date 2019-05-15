@@ -342,7 +342,7 @@ public class RoadCreator : MonoBehaviour
         RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
         segment.baseRoadMaterial = oldLastSegment.baseRoadMaterial;
         segment.overlayRoadMaterial = oldLastSegment.overlayRoadMaterial;
-        segment.startRoadWidth = oldLastSegment.startRoadWidth;
+        segment.startRoadWidth = oldLastSegment.endRoadWidth;
         segment.endRoadWidth = oldLastSegment.endRoadWidth;
         segment.flipped = oldLastSegment.flipped;
         segment.terrainOption = oldLastSegment.terrainOption;
@@ -371,6 +371,7 @@ public class RoadCreator : MonoBehaviour
             extraMesh.hideFlags = HideFlags.NotEditable;
 
             segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
+            segment.extraMeshes[segment.extraMeshes.Count - 1].startWidth = oldLastSegment.extraMeshes[i].endWidth;
         }
     }
 
