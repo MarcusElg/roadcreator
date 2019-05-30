@@ -17,18 +17,7 @@ public class RoadEditor : Editor
     private void OnEnable()
     {
         roadCreator = (RoadCreator)target;
-
-        if (roadCreator.transform.childCount == 0)
-        {
-            GameObject segments = new GameObject("Segments");
-            segments.transform.SetParent(roadCreator.transform);
-            segments.hideFlags = HideFlags.NotEditable;
-        }
-
-        if (roadCreator.settings == null)
-        {
-            roadCreator.settings = RoadCreatorSettings.GetSerializedSettings();
-        }
+        roadCreator.Setup();
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
@@ -90,6 +79,8 @@ public class RoadEditor : Editor
             Undo.DestroyObjectImmediate(roadCreator.transform.GetChild(0).GetChild(i).gameObject);
         }
 
+        roadCreator.startIntersection = null;
+        roadCreator.endIntersection = null;
         roadCreator.startIntersectionConnection = null;
         roadCreator.endIntersectionConnection = null;
     }

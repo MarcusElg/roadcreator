@@ -10,13 +10,13 @@ public class Intersection : MonoBehaviour
     public Material overlayMaterial;
     public PhysicMaterial physicMaterial;
     public List<IntersectionConnection> connections = new List<IntersectionConnection>();
-    public float yOffset;
+    public float yOffset = 0.02f;
     public SerializedObject settings;
     public GameObject objectToMove;
     public bool stretchTexture = false;
 
     public bool generateBridge = true;
-    public BridgeSettings bridgeSettings;
+    public BridgeSettings bridgeSettings = new BridgeSettings();
 
     public bool placePillars = true;
     public GameObject pillarPrefab;
@@ -24,6 +24,47 @@ public class Intersection : MonoBehaviour
     public float xzPillarScale = 3;
 
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
+
+    public bool roundaboutMode = false;
+    public float roundaboutRadius = 5f;
+    public float roundaboutWidth = 2f;
+    public float maxRoundaboutRadius = 100;
+    public Material connectionBaseMaterial;
+    public Material connectionOverlayMaterial;
+    public float textureTilingY = 1;
+
+    public void Setup()
+    {
+        if (settings == null)
+        {
+            settings = RoadCreatorSettings.GetSerializedSettings();
+        }
+
+        gameObject.AddComponent<MeshFilter>();
+        gameObject.AddComponent<MeshRenderer>();
+        gameObject.AddComponent<MeshCollider>();
+        gameObject.GetComponent<Transform>().hideFlags = HideFlags.NotEditable;
+        gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
+        gameObject.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
+        gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
+
+        GameObject extraMeshes = new GameObject("Extra Meshes");
+        extraMeshes.transform.SetParent(transform, false);
+
+        if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+        {
+            extraMeshes.hideFlags = HideFlags.HideInHierarchy;
+        }
+        else
+        {
+            extraMeshes.hideFlags = HideFlags.NotEditable;
+        }
+
+        if (roundaboutMode == true)
+        {
+            CreateMesh();
+        }
+    }
 
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
@@ -79,22 +120,36 @@ public class Intersection : MonoBehaviour
                 nextIndex = 0;
             }
 
-            Vector3 center = Misc.GetCenter(connections[objectToMove.transform.GetSiblingIndex() - 1].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3());
-            center.y -= yOffset;
-            connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new SerializedVector3(new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z));
-            objectToMove = null;
-            CreateMesh();
-
-            for (int i = 0; i < connections.Count; i++)
+            if (roundaboutMode == true)
             {
-                nextIndex = i + 2;
-                if (nextIndex >= connections.Count)
+                int index = objectToMove.transform.GetSiblingIndex() - 1;
+
+                if (generateBridge == true)
                 {
-                    nextIndex = 0;
+                    index -= 1;
                 }
 
-                transform.GetChild(i + 1).transform.position = new Vector3(connections[i].curvePoint.ToNormalVector3().x, transform.position.y + yOffset, connections[i].curvePoint.ToNormalVector3().z);
+                if (index % 3 == 0)
+                {
+                    connections[index / 3].curvePoint = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
+                }
+                else if (index % 3 == 1)
+                {
+                    connections[(index - 1) / 3].curvePoint2 = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
+                }
+                else if (index % 3 == 2)
+                {
+                    connections[(index - 2) / 3].curvePoint3 = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
+                }
             }
+            else
+            {
+                connections[objectToMove.transform.GetSiblingIndex() - 1].curvePoint = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
+            }
+
+            objectToMove = null;
+            CreateMesh();
+            CreateCurvePoints();
         }
         else
         {
@@ -129,7 +184,7 @@ public class Intersection : MonoBehaviour
             }
         }
 
-        if (connections.Count < 2)
+        if (connections.Count < 2 && roundaboutMode == false)
         {
             RemoveIntersection();
         }
@@ -137,149 +192,14 @@ public class Intersection : MonoBehaviour
         {
             CheckMaterialsAndPrefabs();
 
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<int> firstVertexIndexes = new List<int>();
-            float[] totalLengths = new float[connections.Count];
-            float[] exactLengths = new float[connections.Count];
-            int vertexIndex = 0;
-            Vector3 lastVertexPosition = Misc.MaxVector3;
-
-            for (int i = 0; i < connections.Count; i++)
+            if (roundaboutMode == true)
             {
-                Vector3 firstPoint = connections[i].leftPoint.ToNormalVector3();
-                Vector3 firstCenterPoint = connections[i].lastPoint.ToNormalVector3();
-                Vector3 nextPoint;
-                Vector3 nextCenterPoint;
-                totalLengths[i] = connections[i].length;
-                firstVertexIndexes.Add(vertexIndex);
-
-                if (i == connections.Count - 1)
-                {
-                    nextPoint = connections[0].rightPoint.ToNormalVector3();
-                    nextCenterPoint = connections[0].lastPoint.ToNormalVector3();
-                    totalLengths[i] += connections[0].length;
-                }
-                else
-                {
-                    nextPoint = connections[i + 1].rightPoint.ToNormalVector3();
-                    nextCenterPoint = connections[i + 1].lastPoint.ToNormalVector3();
-                    totalLengths[i] += connections[i + 1].length;
-                }
-
-                if (connections[i].curvePoint == null)
-                {
-                    return;
-                }
-
-                float segments = totalLengths[i] * settings.FindProperty("resolution").floatValue * 5;
-                segments = Mathf.Max(3, segments);
-                float distancePerSegment = 1f / segments;
-
-                for (float t = 0; t <= 1; t += 0.1f)
-                {
-                    Vector3 pos = Misc.Lerp3(Vector3.zero, new Vector3(0.5f, 0.5f, 0.5f), Vector3.one, t);
-                }
-
-                for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
-                {
-                    float modifiedT = t;
-                    if (Mathf.Abs(0.5f - t) < distancePerSegment && t > 0.5f)
-                    {
-                        modifiedT = 0.5f;
-                    }
-
-                    if (t > 1)
-                    {
-                        modifiedT = 1;
-                    }
-
-                    vertices.Add(Misc.Lerp3CenterHeight(firstPoint, connections[i].curvePoint.ToNormalVector3(), nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
-
-                    if (t > 0)
-                    {
-                        exactLengths[i] += Vector3.Distance(lastVertexPosition, vertices[vertices.Count - 1]);
-                        lastVertexPosition = vertices[vertices.Count - 1];
-                    }
-                    else
-                    {
-                        lastVertexPosition = vertices[vertices.Count - 1];
-                    }
-
-                    if (modifiedT < 0.5f)
-                    {
-                        Vector3 point = Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) - transform.position;
-                        point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
-                        vertices.Add(point);
-                    }
-                    else
-                    {
-                        Vector3 point = Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) - transform.position;
-                        point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
-                        vertices.Add(point);
-                    }
-
-                    uvs.Add(new Vector2(0, modifiedT));
-
-                    if (stretchTexture == true)
-                    {
-                        uvs.Add(new Vector2(1, modifiedT));
-                    }
-                    else
-                    {
-                        uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 2]), modifiedT));
-                    }
-
-                    if (t < 1)
-                    {
-                        triangles = AddTriangles(triangles, vertexIndex);
-                    }
-
-                    vertexIndex += 2;
-                }
-
-                Mesh mesh = new Mesh();
-                mesh.vertices = vertices.ToArray();
-                mesh.triangles = triangles.ToArray();
-                mesh.uv = uvs.ToArray();
-                mesh.RecalculateNormals();
-
-                GetComponent<MeshFilter>().sharedMesh = mesh;
-                GetComponent<MeshCollider>().sharedMesh = mesh;
-                GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-
-                if (overlayMaterial == null)
-                {
-                    GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
-                }
-                else
-                {
-                    GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
-                }
+                GenerateRoundabout();
             }
-
-            float[] startWidths = new float[firstVertexIndexes.Count];
-            float[] endWidths = new float[firstVertexIndexes.Count];
-            float[] heights = new float[firstVertexIndexes.Count];
-
-            GenerateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
-
-            for (int i = transform.childCount - 1; i >= 0; i--)
+            else
             {
-                if (transform.GetChild(i).name == "Bridge")
-                {
-                    DestroyImmediate(transform.GetChild(i).gameObject);
-                    break;
-                }
+                GenerateNormalMesh();
             }
-
-            if (generateBridge == true)
-            {
-                BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeSettings.bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
-            }
-
-            CreateCurvePoints();
         }
 
         if (fromRoad == false)
@@ -289,6 +209,483 @@ public class Intersection : MonoBehaviour
                 connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh(true);
             }
         }
+    }
+
+    private void GenerateNormalMesh()
+    {
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+        List<Vector2> uvs = new List<Vector2>();
+        List<int> firstVertexIndexes = new List<int>();
+        float[] totalLengths = new float[connections.Count];
+        float[] exactLengths = new float[connections.Count];
+        int vertexIndex = 0;
+        Vector3 lastVertexPosition = Misc.MaxVector3;
+
+        for (int i = 0; i < connections.Count; i++)
+        {
+            Vector3 firstPoint = connections[i].leftPoint;
+            Vector3 firstCenterPoint = connections[i].lastPoint;
+            Vector3 nextPoint;
+            Vector3 nextCenterPoint;
+            totalLengths[i] = connections[i].length;
+            firstVertexIndexes.Add(vertexIndex);
+
+            if (i == connections.Count - 1)
+            {
+                nextPoint = connections[0].rightPoint;
+                nextCenterPoint = connections[0].lastPoint;
+                totalLengths[i] += connections[0].length;
+            }
+            else
+            {
+                nextPoint = connections[i + 1].rightPoint;
+                nextCenterPoint = connections[i + 1].lastPoint;
+                totalLengths[i] += connections[i + 1].length;
+            }
+
+            if (connections[i].curvePoint == null)
+            {
+                return;
+            }
+
+            float segments = totalLengths[i] * settings.FindProperty("resolution").floatValue * 5;
+            segments = Mathf.Max(3, segments);
+            float distancePerSegment = 1f / segments;
+
+            for (float t = 0; t <= 1; t += 0.1f)
+            {
+                Vector3 pos = Misc.Lerp3(Vector3.zero, new Vector3(0.5f, 0.5f, 0.5f), Vector3.one, t);
+            }
+
+            for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
+            {
+                float modifiedT = t;
+                if (Mathf.Abs(0.5f - t) < distancePerSegment && t > 0.5f)
+                {
+                    modifiedT = 0.5f;
+                }
+
+                if (t > 1)
+                {
+                    modifiedT = 1;
+                }
+
+                vertices.Add(Misc.Lerp3CenterHeight(firstPoint, connections[i].curvePoint, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
+
+                if (t > 0)
+                {
+                    exactLengths[i] += Vector3.Distance(lastVertexPosition, vertices[vertices.Count - 1]);
+                    lastVertexPosition = vertices[vertices.Count - 1];
+                }
+                else
+                {
+                    lastVertexPosition = vertices[vertices.Count - 1];
+                }
+
+                if (modifiedT < 0.5f)
+                {
+                    Vector3 point = Vector3.Lerp(firstCenterPoint, transform.position, modifiedT * 2) - transform.position;
+                    point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
+                    vertices.Add(point);
+                }
+                else
+                {
+                    Vector3 point = Vector3.Lerp(transform.position, nextCenterPoint, 2 * (modifiedT - 0.5f)) - transform.position;
+                    point.y = Mathf.Lerp(firstPoint.y, nextPoint.y, modifiedT) - transform.position.y + yOffset;
+                    vertices.Add(point);
+                }
+
+                uvs.Add(new Vector2(0, modifiedT));
+
+                if (stretchTexture == true)
+                {
+                    uvs.Add(new Vector2(1, modifiedT));
+                }
+                else
+                {
+                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 2]), modifiedT));
+                }
+
+                if (t < 1)
+                {
+                    triangles = AddTriangles(triangles, vertexIndex);
+                }
+
+                vertexIndex += 2;
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+            mesh.uv = uvs.ToArray();
+            mesh.RecalculateNormals();
+
+            GetComponent<MeshFilter>().sharedMesh = mesh;
+            GetComponent<MeshCollider>().sharedMesh = mesh;
+            GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+
+            if (overlayMaterial == null)
+            {
+                GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+            }
+            else
+            {
+                GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+            }
+        }
+
+        float[] startWidths = new float[firstVertexIndexes.Count];
+        float[] endWidths = new float[firstVertexIndexes.Count];
+        float[] heights = new float[firstVertexIndexes.Count];
+
+        GenerateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
+
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            if (transform.GetChild(i).name == "Bridge")
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+                break;
+            }
+        }
+
+        if (generateBridge == true)
+        {
+            BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeSettings.bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
+        }
+
+        CreateCurvePoints();
+    }
+
+    private void GenerateRoundabout()
+    {
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+        List<int> connectionTriangles = new List<int>();
+        List<Vector2> uvs = new List<Vector2>();
+        List<Vector2> uvs2 = new List<Vector2>();
+
+        int segments = (int)Mathf.Max(6, settings.FindProperty("resolution").floatValue * roundaboutRadius * 30f);
+        float degreesPerSegment = 1f / segments;
+        float textureRepeations = Mathf.PI * roundaboutRadius * 2 * textureTilingY * 0.3f;
+
+        // Create roundabout vertices
+        for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
+        {
+            float modifiedF = f;
+            if (f > 1)
+            {
+                modifiedF = 1;
+            }
+
+            vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius + roundaboutWidth));
+            vertices[vertices.Count - 1] += new Vector3(0, yOffset, 0);
+            vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth));
+            vertices[vertices.Count - 1] += new Vector3(0, yOffset, 0);
+
+            uvs.Add(new Vector2(0, modifiedF * textureRepeations));
+            uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+        }
+
+        List<int> nearestLeftPoints = new List<int>();
+        List<int> nearestRightPoints = new List<int>();
+        int addedVertices = 0;
+
+        // Create road connections
+        for (int i = 0; i < connections.Count; i++)
+        {
+            float nearestLeftDistance = float.MaxValue;
+            float nearestRightDistance = float.MaxValue;
+
+            Vector3 forward = Misc.CalculateLeft(connections[i].rightPoint - connections[i].leftPoint);
+            Vector3 leftPoint = CalculateNearestIntersectionPoint(connections[i].leftPoint, forward);
+            Vector3 rightPoint = CalculateNearestIntersectionPoint(connections[i].rightPoint, forward);
+
+            nearestLeftPoints.Add(0);
+            nearestRightPoints.Add(0);
+
+            for (int j = 0; j < vertices.Count; j += 2)
+            {
+                float currentDistance = Vector3.Distance(leftPoint, vertices[j] + transform.position);
+
+                if (currentDistance < nearestLeftDistance)
+                {
+                    nearestLeftDistance = currentDistance;
+                    nearestLeftPoints[i] = j;
+                }
+
+                currentDistance = Vector3.Distance(rightPoint, vertices[j] + transform.position);
+
+                if (currentDistance < nearestRightDistance)
+                {
+                    nearestRightDistance = currentDistance;
+                    nearestRightPoints[i] = j;
+                }
+            }
+
+            nearestLeftPoints[i] += 2;
+            nearestRightPoints[i] -= 2;
+
+            if (nearestRightPoints[i] < 0)
+            {
+                nearestRightPoints[i] += vertices.Count;
+            }
+
+            if (nearestRightPoints[i] > vertices.Count - 2)
+            {
+                nearestRightPoints[i] -= vertices.Count - 3;
+            }
+
+            Vector3 centerPoint = (vertices[nearestLeftPoints[i]] + vertices[nearestLeftPoints[i] + 1] + vertices[nearestRightPoints[i]] + vertices[nearestRightPoints[i] + 1] + connections[i].lastPoint - transform.position) / 5;
+            centerPoint.y = yOffset;
+
+            // Set curve points
+            connections[i].defaultCurvePoint = Misc.GetCenter(connections[i].leftPoint, vertices[nearestLeftPoints[i]] + transform.position);
+            connections[i].defaultCurvePoint2 = Misc.GetCenter(connections[i].rightPoint, vertices[nearestRightPoints[i]] + transform.position);
+            connections[i].defaultCurvePoint3 = Misc.GetCenter(vertices[nearestLeftPoints[i] + 1] + transform.position, vertices[nearestRightPoints[i] + 1] + transform.position);
+
+            if (connections[i].curvePoint == null)
+            {
+                connections[i].curvePoint = connections[i].defaultCurvePoint;
+            }
+
+            if (connections[i].curvePoint2 == null)
+            {
+                connections[i].curvePoint2 = connections[i].defaultCurvePoint2;
+            }
+
+            if (connections[i].curvePoint3 == null)
+            {
+                connections[i].curvePoint3 = connections[i].defaultCurvePoint3;
+            }
+
+            // Add new vertices
+            segments = (int)Mathf.Max(3, settings.FindProperty("resolution").floatValue * 20);
+
+            float distancePerSegment = 1f / segments;
+            int actualSegments = 0;
+
+            for (float f = 0; f <= 1 + distancePerSegment; f += distancePerSegment)
+            {
+                float modifiedF = f;
+                actualSegments += 1;
+
+                if (modifiedF > 0.5f && modifiedF < 0.5f + distancePerSegment)
+                {
+                    modifiedF = 0.5f;
+                }
+                else if (modifiedF > 1)
+                {
+                    modifiedF = 1f;
+                }
+
+                // Left, right and inner
+                vertices.Add(Misc.Lerp3CenterHeight(connections[i].leftPoint - transform.position + new Vector3(0, yOffset, 0), connections[i].curvePoint - transform.position, vertices[nearestLeftPoints[i]], modifiedF));
+                vertices.Add(Misc.Lerp3CenterHeight(connections[i].rightPoint - transform.position + new Vector3(0, yOffset, 0), connections[i].curvePoint2 - transform.position, vertices[nearestRightPoints[i]], modifiedF));
+                vertices.Add(Misc.Lerp3CenterHeight(vertices[nearestLeftPoints[i] + 1], connections[i].curvePoint3 - transform.position, vertices[nearestRightPoints[i] + 1], modifiedF));
+
+                if (modifiedF < 0.5f)
+                {
+                    vertices.Add(Vector3.Lerp(connections[i].lastPoint + new Vector3(0, yOffset, 0) - transform.position, centerPoint, modifiedF * 2));
+                    vertices.Add(Vector3.Lerp(connections[i].lastPoint + new Vector3(0, yOffset, 0) - transform.position, centerPoint, modifiedF * 2));
+                    vertices.Add(Vector3.Lerp(Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestLeftPoints[i] + 1]), centerPoint, modifiedF * 2));
+                }
+                else
+                {
+                    vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestLeftPoints[i] + 1]), (modifiedF - 0.5f) * 2));
+                    vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
+                    vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
+                }
+
+                addedVertices += 6;
+
+                if (stretchTexture == true)
+                {
+                    uvs.Add(new Vector2(0, modifiedF));
+                    uvs.Add(new Vector2(0, modifiedF));
+                    uvs.Add(new Vector2(0, modifiedF));
+                    uvs.Add(new Vector2(1, modifiedF));
+                    uvs.Add(new Vector2(1, modifiedF));
+                    uvs.Add(new Vector2(1, modifiedF));
+                }
+                else
+                {
+                    uvs.Add(new Vector2(0, modifiedF));
+                    uvs.Add(new Vector2(0, modifiedF));
+                    uvs.Add(new Vector2(0, modifiedF));
+                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 3], vertices[vertices.Count - 6]), modifiedF));
+                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 2], vertices[vertices.Count - 5]), modifiedF));
+                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 4]), modifiedF));
+                }
+
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
+            }
+
+            // Add new triangles
+            connectionTriangles.AddRange(AddConnectionTriangles(vertices, triangles, actualSegments));
+        }
+
+        // Create road sections
+        for (int i = 0; i < connections.Count + 1; i++)
+        {
+            if (i < connections.Count || connections.Count == 0)
+            {
+                int startIndex;
+                int endIndex;
+
+                if (connections.Count == 0)
+                {
+                    startIndex = 0;
+                    endIndex = vertices.Count - 2 - addedVertices;
+                }
+                else
+                {
+                    startIndex = nearestLeftPoints[i];
+
+                    if (i == connections.Count - 1)
+                    {
+                        endIndex = nearestRightPoints[0];
+                    }
+                    else
+                    {
+                        endIndex = nearestRightPoints[i + 1];
+                    }
+                }
+
+                if (startIndex % 2f == 0 && endIndex % 2f == 0)
+                {
+                    int vertexIndex = startIndex;
+
+                    while (vertexIndex != endIndex && triangles.Count < 2000)
+                    {
+                        if (vertexIndex > vertices.Count - 4 - addedVertices)
+                        {
+                            vertexIndex = 0;
+                        }
+
+                        triangles.Add(vertexIndex);
+                        triangles.Add(vertexIndex + 2);
+                        triangles.Add(vertexIndex + 1);
+
+                        triangles.Add(vertexIndex + 2);
+                        triangles.Add(vertexIndex + 3);
+                        triangles.Add(vertexIndex + 1);
+
+                        vertexIndex += 2;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("For some reason a roundabout connection's start/end index is uneven");
+                }
+            }
+        }
+
+        SetupRoundaboutMesh(vertices, triangles, connectionTriangles, uvs, uvs2);
+    }
+
+    private void SetupRoundaboutMesh(List<Vector3> vertices, List<int> triangles, List<int> connectionTriangles, List<Vector2> uvs, List<Vector2> uvs2)
+    {
+        Mesh mesh = new Mesh();
+        mesh.subMeshCount = 4;
+        mesh.vertices = vertices.ToArray();
+
+        int materialIndex = 0;
+
+        List<Material> materials = new List<Material>();
+        materials.Add(baseMaterial);
+        mesh.SetTriangles(triangles, materialIndex);
+        materialIndex += 1;
+
+        if (overlayMaterial != null)
+        {
+            materials.Add(overlayMaterial);
+            mesh.SetTriangles(triangles, materialIndex);
+            materialIndex += 1;
+        }
+
+        materials.Add(connectionBaseMaterial);
+        mesh.SetTriangles(connectionTriangles, materialIndex);
+        materialIndex += 1;
+
+        if (connectionOverlayMaterial != null)
+        {
+            materials.Add(connectionOverlayMaterial);
+            mesh.SetTriangles(connectionTriangles, materialIndex);
+            materialIndex += 1;
+        }
+
+        mesh.subMeshCount = materialIndex;
+        mesh.uv = uvs.ToArray();
+        mesh.uv2 = uvs2.ToArray();
+        mesh.RecalculateNormals();
+
+        GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
+        GetComponent<MeshFilter>().sharedMesh = mesh;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+        GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+    }
+
+    private List<int> AddConnectionTriangles(List<Vector3> vertices, List<int> inputTriangles, int segments)
+    {
+        List<int> triangles = new List<int>(inputTriangles);
+
+        for (int j = vertices.Count - segments * 6; j < vertices.Count - 7; j += 6)
+        {
+            // Left
+            triangles.Add(j);
+            triangles.Add(j + 6);
+            triangles.Add(j + 3);
+
+            triangles.Add(j + 3);
+            triangles.Add(j + 6);
+            triangles.Add(j + 9);
+
+            // Right
+            triangles.Add(j + 1);
+            triangles.Add(j + 4);
+            triangles.Add(j + 7);
+
+            triangles.Add(j + 10);
+            triangles.Add(j + 7);
+            triangles.Add(j + 4);
+
+            // Inner
+            triangles.Add(j + 2);
+            triangles.Add(j + 11);
+            triangles.Add(j + 5);
+
+            triangles.Add(j + 2);
+            triangles.Add(j + 8);
+            triangles.Add(j + 11);
+        }
+
+        return triangles;
+    }
+
+    private Vector3 CalculateNearestIntersectionPoint(Vector3 originalPoint, Vector3 forward)
+    {
+        Vector3 point = originalPoint;
+
+        for (float d = 0; d < 10; d += 0.1f)
+        {
+            point += forward * d;
+
+            if (Vector3.Distance(point, transform.position) < roundaboutRadius + roundaboutWidth / 2)
+            {
+                return point;
+            }
+        }
+
+        return originalPoint + forward * 2;
     }
 
     private void GenerateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
@@ -391,6 +788,11 @@ public class Intersection : MonoBehaviour
             baseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
         }
 
+        if (connectionBaseMaterial == null)
+        {
+            connectionBaseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
+        }
+
         if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
         {
             Material[] materials = new Material[settings.FindProperty("defaultSimpleBridgeMaterials").arraySize];
@@ -430,24 +832,34 @@ public class Intersection : MonoBehaviour
 
         for (int i = 0; i < connections.Count; i++)
         {
-            GameObject curvePoint = null;
-            curvePoint = new GameObject("Connection Point");
-            curvePoint.transform.SetParent(transform);
-            curvePoint.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
-            curvePoint.AddComponent<BoxCollider>();
-            curvePoint.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
-            curvePoint.transform.position = connections[i].curvePoint.ToNormalVector3();
-            curvePoint.transform.position = new Vector3(curvePoint.transform.position.x, yOffset + transform.position.y, curvePoint.transform.position.z);
+            CreateCurvePoint(new Vector3(connections[i].curvePoint.x, yOffset + transform.position.y, connections[i].curvePoint.z));
 
-            if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+            if (roundaboutMode == true)
             {
-                curvePoint.hideFlags = HideFlags.HideInHierarchy;
+                CreateCurvePoint(new Vector3(connections[i].curvePoint2.x, yOffset + transform.position.y, connections[i].curvePoint2.z));
+                CreateCurvePoint(new Vector3(connections[i].curvePoint3.x, yOffset + transform.position.y, connections[i].curvePoint3.z));
             }
         }
 
         if (transform.Find("Bridge") != null)
         {
             transform.Find("Bridge").SetAsLastSibling();
+        }
+    }
+
+    private void CreateCurvePoint(Vector3 position)
+    {
+        GameObject curvePoint = null;
+        curvePoint = new GameObject("Connection Point");
+        curvePoint.transform.SetParent(transform);
+        curvePoint.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
+        curvePoint.AddComponent<BoxCollider>();
+        curvePoint.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
+        curvePoint.transform.position = position;
+
+        if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+        {
+            curvePoint.hideFlags = HideFlags.HideInHierarchy;
         }
     }
 
@@ -461,8 +873,22 @@ public class Intersection : MonoBehaviour
                 nextIndex = 0;
             }
 
-            connections[i].curvePoint = new SerializedVector3(Misc.GetCenter(connections[i].leftPoint.ToNormalVector3(), connections[nextIndex].rightPoint.ToNormalVector3()));
+            if (roundaboutMode == true)
+            {
+                ResetConnectionCurvePoints(connections[i]);
+            }
+            else
+            {
+                connections[i].curvePoint = Misc.GetCenter(connections[i].leftPoint, connections[nextIndex].rightPoint);
+            }
         }
+    }
+
+    public void ResetConnectionCurvePoints(IntersectionConnection intersectionConnection)
+    {
+        intersectionConnection.curvePoint = intersectionConnection.defaultCurvePoint;
+        intersectionConnection.curvePoint2 = intersectionConnection.defaultCurvePoint2;
+        intersectionConnection.curvePoint3 = intersectionConnection.defaultCurvePoint3;
     }
 
     public void ResetExtraMeshes()
@@ -518,4 +944,5 @@ public class Intersection : MonoBehaviour
             }
         }
     }
+
 }

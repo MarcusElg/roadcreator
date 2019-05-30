@@ -8,6 +8,7 @@ public class RoadSystem : MonoBehaviour
 {
 
     Texture createRoad;
+    Texture createRoundabout;
     Texture createPrefabLine;
     Texture createTrafficLight;
 
@@ -39,6 +40,7 @@ public class RoadSystem : MonoBehaviour
         if (createRoad == null)
         {
             createRoad = Resources.Load("Textures/Ui/createroad") as Texture;
+            createRoundabout = Resources.Load("Textures/Ui/createroundabout") as Texture;
             createPrefabLine = Resources.Load("Textures/Ui/createprefabline") as Texture;
             createTrafficLight = Resources.Load("Textures/Ui/createtrafficlight") as Texture;
 
@@ -84,7 +86,7 @@ public class RoadSystem : MonoBehaviour
             RoadCreatorSettings.UpdateRoadGuidelines();
         }
 
-        if (ClickedButton(1) == true)
+        if (ClickedButton(0) == true)
         {
             GameObject gameObject = new GameObject();
             gameObject.AddComponent<RoadCreator>();
@@ -92,6 +94,26 @@ public class RoadSystem : MonoBehaviour
             gameObject.transform.SetParent(transform);
             Selection.activeGameObject = gameObject;
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Road");
+        }
+        else if (ClickedButton(1) == true)
+        {
+            GameObject gameObject = new GameObject();
+            gameObject.AddComponent<Intersection>();
+            gameObject.GetComponent<Intersection>().roundaboutMode = true;
+            gameObject.GetComponent<Intersection>().Setup();
+            gameObject.GetComponent<Intersection>().generateBridge = false;
+            gameObject.GetComponent<Intersection>().placePillars = false;
+            gameObject.GetComponent<Intersection>().overlayMaterial = (Material)settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue;
+            gameObject.GetComponent<Intersection>().connectionOverlayMaterial = (Material)settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue;
+            gameObject.GetComponent<Intersection>().CreateMesh();
+
+            gameObject.name = "Roundabout";
+            gameObject.transform.SetParent(transform);
+            SetPosition(gameObject);
+            gameObject.transform.localRotation = Quaternion.identity;
+
+            Selection.activeGameObject = gameObject;
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create Roundabout");
         }
         else if (ClickedButton(2) == true)
         {
@@ -140,9 +162,10 @@ public class RoadSystem : MonoBehaviour
             }
         }
 
-        GUI.DrawTexture(new Rect(30, 40, 30, 30), createRoad);
-        GUI.DrawTexture(new Rect(65, 40, 30, 30), createPrefabLine);
-        GUI.DrawTexture(new Rect(100, 40, 30, 30), createTrafficLight);
+        GUI.DrawTexture(new Rect(5, 40, 30, 30), createRoad);
+        GUI.DrawTexture(new Rect(45, 40, 30, 30), createRoundabout);
+        GUI.DrawTexture(new Rect(85, 40, 30, 30), createPrefabLine);
+        GUI.DrawTexture(new Rect(125, 40, 30, 30), createTrafficLight);
 
         GUILayout.EndHorizontal();
     }
@@ -164,7 +187,7 @@ public class RoadSystem : MonoBehaviour
 
     private bool ClickedButton(int i)
     {
-        return ClickedButton((int)(5 + (i - 1) * 35 + SceneView.lastActiveSceneView.position.width - 145), (int)(SceneView.lastActiveSceneView.position.height - 50 - 15));
+        return ClickedButton((int)(5 + (i - 1) * 40 + SceneView.lastActiveSceneView.position.width - 130), (int)(SceneView.lastActiveSceneView.position.height - 50 - 15));
     }
 
     private void SetPosition(GameObject gameObject)

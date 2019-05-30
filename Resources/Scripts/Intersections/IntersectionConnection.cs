@@ -4,13 +4,20 @@ using UnityEngine;
 [System.Serializable]
 public class IntersectionConnection  : IComparable<IntersectionConnection> {
 
-    public SerializedVector3 leftPoint;
-    public SerializedVector3 rightPoint;
-    public SerializedVector3 lastPoint;
-    public SerializedVector3 curvePoint;
+    public Vector3 leftPoint;
+    public Vector3 rightPoint;
+    public Vector3 lastPoint;
+    public Vector3 curvePoint;
     public float YRotation;
     public float length;
     public Point road;
+
+    // Roundabout connection
+    public Vector3 defaultCurvePoint;
+    public Vector3 defaultCurvePoint2;
+    public Vector3 defaultCurvePoint3;
+    public Vector3 curvePoint2;
+    public Vector3 curvePoint3;
 
     public int CompareTo (IntersectionConnection intersectionConnection)
     {

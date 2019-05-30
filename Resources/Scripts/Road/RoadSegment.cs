@@ -348,6 +348,48 @@ public class RoadSegment : MonoBehaviour
             verticeIndex += 2;
         }
 
+        TerrainDeformation(vertices, points, heightOffset, segment);
+
+        // First
+        if (previousVertices != null)
+        {
+            if (vertices.Count > 4 && previousVertices.Length > 3 && name == "Road")
+            {
+                vertices = fixVertices(0, vertices, (vertices[2] - vertices[4]).normalized);
+                vertices = fixVertices(1, vertices, (vertices[3] - vertices[5]).normalized);
+            }
+        }
+
+        Mesh generatedMesh = new Mesh();
+        generatedMesh.vertices = vertices.ToArray();
+        generatedMesh.triangles = triangles.ToArray();
+
+        if (name == "Road")
+        {
+            generatedMesh = GenerateUvs(generatedMesh, flipped);
+        }
+        else
+        {
+            generatedMesh = GenerateUvs(generatedMesh, extraMeshLeft);
+        }
+
+        generatedMesh.RecalculateNormals();
+        mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
+        mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
+        mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+
+        if (overlayMaterial == null)
+        {
+            mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+        }
+        else
+        {
+            mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+        }
+    }
+
+    private void TerrainDeformation(List<Vector3> vertices, Vector3[] points, float heightOffset, Transform segment)
+    {
         // Terrain deformation
         if (terrainOption == TerrainOption.deform)
         {
@@ -401,43 +443,6 @@ public class RoadSegment : MonoBehaviour
                     terrainData.SetHeights(0, 0, modifiedHeights);
                 }
             }
-        }
-
-        // First
-        if (previousVertices != null)
-        {
-            if (vertices.Count > 4 && previousVertices.Length > 3 && name == "Road")
-            {
-                vertices = fixVertices(0, vertices, (vertices[2] - vertices[4]).normalized);
-                vertices = fixVertices(1, vertices, (vertices[3] - vertices[5]).normalized);
-            }
-        }
-
-        Mesh generatedMesh = new Mesh();
-        generatedMesh.vertices = vertices.ToArray();
-        generatedMesh.triangles = triangles.ToArray();
-
-        if (name == "Road")
-        {
-            generatedMesh = GenerateUvs(generatedMesh, flipped);
-        }
-        else
-        {
-            generatedMesh = GenerateUvs(generatedMesh, extraMeshLeft);
-        }
-
-        generatedMesh.RecalculateNormals();
-        mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
-        mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
-        mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-
-        if (overlayMaterial == null)
-        {
-            mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
-        }
-        else
-        {
-            mesh.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
         }
     }
 

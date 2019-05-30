@@ -24,28 +24,66 @@ public class IntersectionEditor : Editor
         lastTool = Tools.current;
         Tools.current = Tool.None;
 
-        intersection.CreateCurvePoints();
         intersection.FixConnectionReferences();
+        intersection.CreateCurvePoints();
     }
 
     public void OnDisable()
     {
-        intersection.RemoveCurvePoints();
+        if (intersection != null)
+        {
+            intersection.RemoveCurvePoints();
+        }
 
         Tools.current = lastTool;
     }
 
     public override void OnInspectorGUI()
     {
-        EditorGUI.BeginChangeCheck();
-        intersection.baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.baseMaterial, typeof(Material), false);
-        intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
-        intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
-        intersection.yOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
-        intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Texture");
-
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
+
+        if (intersection.roundaboutMode == true)
+        {
+            EditorGUI.BeginChangeCheck();
+            GUILayout.Label("Roundabout", guiStyle);
+            intersection.roundaboutRadius = Mathf.Clamp(EditorGUILayout.FloatField("Roundabout Radius", intersection.roundaboutRadius), 2, Mathf.Max(2, intersection.maxRoundaboutRadius - intersection.roundaboutWidth));
+            intersection.roundaboutWidth = Mathf.Clamp(EditorGUILayout.FloatField("Roundabout Width", intersection.roundaboutWidth), 1, Mathf.Min(20, intersection.roundaboutRadius));
+            intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
+            intersection.yOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
+
+            intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Connection Textures");
+            intersection.textureTilingY = Mathf.Clamp(EditorGUILayout.FloatField("Texture Tiling Y Multiplier", intersection.textureTilingY), 0.01f, 10);
+
+            GUILayout.Space(20);
+            GUILayout.Label("Materials", guiStyle);
+
+            intersection.baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.baseMaterial, typeof(Material), false);
+            intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
+            intersection.connectionBaseMaterial = (Material)EditorGUILayout.ObjectField("Connection Base Material", intersection.connectionBaseMaterial, typeof(Material), false);
+            intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);
+
+            if (EditorGUI.EndChangeCheck() == true)
+            {
+                intersection.CreateMesh();
+            }
+        }
+        else
+        {
+            EditorGUI.BeginChangeCheck();
+            intersection.baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.baseMaterial, typeof(Material), false);
+            intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
+            intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
+            intersection.yOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
+            intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Texture");
+
+            if (EditorGUI.EndChangeCheck() == true)
+            {
+                intersection.CreateMesh();
+            }
+        }
+
+        EditorGUI.BeginChangeCheck();
 
         GUILayout.Space(20);
         GUILayout.Label("Bridge", guiStyle);
@@ -113,6 +151,8 @@ public class IntersectionEditor : Editor
             }
         }
 
+        EditorGUI.BeginChangeCheck();
+
         if (GUILayout.Button("Add Extra Mesh"))
         {
             intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)intersection.settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, 0));
@@ -150,26 +190,30 @@ public class IntersectionEditor : Editor
 
     private void OnSceneGUI()
     {
-        Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-        RaycastHit raycastHit;
-
-        if (Physics.Raycast(ray, out raycastHit, 100f))
+        if (intersection != null)
         {
-            Vector3 hitPosition = raycastHit.point;
-            if (Event.current.control == true)
+            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            RaycastHit raycastHit;
+
+            if (Physics.Raycast(ray, out raycastHit))
             {
-                hitPosition = Misc.Round(hitPosition);
+                Vector3 hitPosition = raycastHit.point;
+                if (Event.current.control == true)
+                {
+                    hitPosition = Misc.Round(hitPosition);
+                }
+
+                intersection.MovePoints(raycastHit, hitPosition, Event.current);
+
+                Draw(raycastHit);
             }
 
-            intersection.MovePoints(raycastHit, hitPosition, Event.current);
-            Draw();
+            GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+            SceneView.currentDrawingSceneView.Repaint();
         }
-
-        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
-        SceneView.currentDrawingSceneView.Repaint();
     }
 
-    private void Draw()
+    private void Draw(RaycastHit raycastHit)
     {
         Handles.color = intersection.settings.FindProperty("intersectionColour").colorValue;
         for (int i = 1; i < intersection.transform.childCount; i++)
