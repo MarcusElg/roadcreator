@@ -368,7 +368,7 @@ public class Intersection : MonoBehaviour
 
         int segments = (int)Mathf.Max(6, settings.FindProperty("resolution").floatValue * roundaboutRadius * 30f);
         float degreesPerSegment = 1f / segments;
-        float textureRepeations = Mathf.PI * roundaboutRadius * 2 * textureTilingY * 0.3f;
+        float textureRepeations = Mathf.PI * roundaboutRadius * textureTilingY * 0.5f;
 
         // Create roundabout vertices
         for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
