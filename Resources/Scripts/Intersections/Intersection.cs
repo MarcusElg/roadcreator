@@ -565,14 +565,9 @@ public class Intersection : MonoBehaviour
                 float endOffsetLeft = 0;
                 float yOffsetLeft = 0;
 
-                List<RoundaboutExtraMesh> rightExtraMeshes = new List<RoundaboutExtraMesh>();
-                float startOffsetRight = 0;
-                float endOffsetRight = 0;
-                float yOffsetRight = 0;
-
                 for (int j = 0; j < extraMeshes.Count; j++)
                 {
-                    if ((extraMeshes[j].index - 1) % 2 == 0 && (extraMeshes[j].index - 1) / 2 == i)
+                    if (extraMeshes[j].index > 0 && extraMeshes[j].index - 1 == i)
                     {
                         if (leftExtraMeshes.Count > 0)
                         {
@@ -582,17 +577,6 @@ public class Intersection : MonoBehaviour
                         }
 
                         leftExtraMeshes.Add(new RoundaboutExtraMesh(extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
-                    }
-                    else if ((extraMeshes[j].index - 1) % 2 == 1 && (extraMeshes[j].index - 2) / 2 == i)
-                    {
-                        if (rightExtraMeshes.Count > 0)
-                        {
-                            startOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.startWidth;
-                            endOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.endWidth;
-                            yOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.yOffset;
-                        }
-
-                        rightExtraMeshes.Add(new RoundaboutExtraMesh(extraMeshes[j], j, startOffsetRight, endOffsetRight, yOffsetRight));
                     }
                 }
 
@@ -608,11 +592,11 @@ public class Intersection : MonoBehaviour
                     }
                     else
                     {
-                        verticesToLoop = vertices.Count - 2 - startIndex;
+                        verticesToLoop = vertices.Count - 2 - startIndex - addedVertices;
                         verticesToLoop += endIndex;
                     }
 
-                    while (vertexIndex != endIndex && triangles.Count < 2000)
+                    while (vertexIndex != endIndex && triangles.Count < 10000)
                     {
                         if (vertexIndex > vertices.Count - 4 - addedVertices)
                         {
@@ -629,16 +613,14 @@ public class Intersection : MonoBehaviour
 
                         // Extra meshes
                         float progress = (float)verticesLooped / (float)verticesToLoop;
-                        leftExtraMeshes = AddTrianglesToExtraMeshes(leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, true);
-                        rightExtraMeshes = AddTrianglesToExtraMeshes(rightExtraMeshes, vertices, vertexIndex, progress, verticesLooped, false);
+                        leftExtraMeshes = AddTrianglesToExtraMeshes(leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped);
 
                         verticesLooped += 2;
                         vertexIndex += 2;
                     }
 
-                    // Assign extra meshes
+                    leftExtraMeshes = AddTrianglesToExtraMeshes(leftExtraMeshes, vertices, vertexIndex, 1, verticesLooped);
                     AssignExtraMeshes(leftExtraMeshes);
-                    AssignExtraMeshes(rightExtraMeshes);
                 }
                 else
                 {
@@ -749,26 +731,16 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    private List<RoundaboutExtraMesh> AddTrianglesToExtraMeshes(List<RoundaboutExtraMesh> extraMeshes, List<Vector3> vertices, int vertexIndex, float progress, int verticesLooped, bool leftSide)
+    private List<RoundaboutExtraMesh> AddTrianglesToExtraMeshes(List<RoundaboutExtraMesh> extraMeshes, List<Vector3> vertices, int vertexIndex, float progress, int verticesLooped)
     {
         for (int j = 0; j < extraMeshes.Count; j++)
         {
             Vector3 left = (vertices[vertexIndex] - vertices[vertexIndex + 1]).normalized;
 
-            if (leftSide == true)
-            {
-                extraMeshes[j].vertices.Add(vertices[vertexIndex] + left * Mathf.Lerp(extraMeshes[j].startOffset, extraMeshes[j].endOffset, progress));
-                extraMeshes[j].vertices.Add(vertices[vertexIndex] + left * Mathf.Lerp(extraMeshes[j].extraMesh.startWidth + extraMeshes[j].startOffset, extraMeshes[j].extraMesh.endWidth + extraMeshes[j].endOffset, progress));
-                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 2] += new Vector3(0, extraMeshes[j].yOffset, 0);
-                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 1] += new Vector3(0, extraMeshes[j].extraMesh.yOffset + extraMeshes[j].yOffset, 0);
-            }
-            else
-            {
-                extraMeshes[j].vertices.Add(vertices[vertexIndex + 1] - left * Mathf.Lerp(extraMeshes[j].extraMesh.startWidth + extraMeshes[j].startOffset, extraMeshes[j].extraMesh.endWidth + extraMeshes[j].endOffset, progress));
-                extraMeshes[j].vertices.Add(vertices[vertexIndex + 1] - left * Mathf.Lerp(extraMeshes[j].startOffset, extraMeshes[j].endOffset, progress));
-                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 2] += new Vector3(0, extraMeshes[j].extraMesh.yOffset + extraMeshes[j].yOffset, 0);
-                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 1] += new Vector3(0, extraMeshes[j].yOffset, 0);
-            }
+            extraMeshes[j].vertices.Add(vertices[vertexIndex] + left * Mathf.Lerp(extraMeshes[j].startOffset, extraMeshes[j].endOffset, progress));
+            extraMeshes[j].vertices.Add(vertices[vertexIndex] + left * Mathf.Lerp(extraMeshes[j].extraMesh.startWidth + extraMeshes[j].startOffset, extraMeshes[j].extraMesh.endWidth + extraMeshes[j].endOffset, progress));
+            extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 2] += new Vector3(0, extraMeshes[j].yOffset, 0);
+            extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 1] += new Vector3(0, extraMeshes[j].extraMesh.yOffset + extraMeshes[j].yOffset, 0);
 
             extraMeshes[j].uvs.Add(new Vector3(0, progress));
             extraMeshes[j].uvs.Add(new Vector3(1, progress));

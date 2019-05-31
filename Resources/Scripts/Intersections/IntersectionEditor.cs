@@ -119,7 +119,7 @@ public class IntersectionEditor : Editor
             {
                 if (intersection.roundaboutMode == true)
                 {
-                    intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count * 2);
+                    intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count);
                 }
                 else
                 {
