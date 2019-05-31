@@ -650,8 +650,7 @@ public class Intersection : MonoBehaviour
             }
         }
 
-        float currentStartOffset = 0;
-        float currentEndOffset = 0;
+        float currentOffset = 0;
         float currentYOffset = yOffset;
 
         for (int i = 0; i < centerExtraMeshes.Count; i++)
@@ -672,17 +671,15 @@ public class Intersection : MonoBehaviour
                     modifiedF = 1;
                 }
 
-                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth - Mathf.Lerp(currentStartOffset, currentEndOffset, modifiedF)));
+                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth - currentOffset));
                 vertices[vertices.Count - 1] += new Vector3(0, currentYOffset, 0);
-                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth - Mathf.Lerp(currentStartOffset + centerExtraMeshes[i].startWidth, currentEndOffset + centerExtraMeshes[i].endWidth, modifiedF)));
+                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth - currentOffset - centerExtraMeshes[i].startWidth));
                 vertices[vertices.Count - 1] += new Vector3(0, currentYOffset + centerExtraMeshes[i].yOffset, 0);
 
-                float localWidth = Mathf.Lerp(centerExtraMeshes[i].startWidth, centerExtraMeshes[i].endWidth, modifiedF) / centerExtraMeshes[i].endWidth;
-
                 uvs.Add(new Vector2(0, modifiedF * textureRepeations));
-                uvs.Add(new Vector2(localWidth, modifiedF * textureRepeations));
-                uvs2.Add(new Vector3(localWidth, 1));
-                uvs2.Add(new Vector3(localWidth, 1));
+                uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
 
                 if (vertexIndex > 0)
                 {
@@ -699,8 +696,7 @@ public class Intersection : MonoBehaviour
             }
 
             // Update offsets
-            currentStartOffset += centerExtraMeshes[i].startWidth;
-            currentEndOffset += centerExtraMeshes[i].endWidth;
+            currentOffset += centerExtraMeshes[i].startWidth;
             currentYOffset += centerExtraMeshes[i].yOffset;
 
             // Assign mesh
