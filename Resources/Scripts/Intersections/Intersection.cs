@@ -560,9 +560,57 @@ public class Intersection : MonoBehaviour
                     }
                 }
 
+                List<RoundaboutExtraMesh> leftExtraMeshes = new List<RoundaboutExtraMesh>();
+                float startOffsetLeft = 0;
+                float endOffsetLeft = 0;
+                float yOffsetLeft = 0;
+
+                List<RoundaboutExtraMesh> rightExtraMeshes = new List<RoundaboutExtraMesh>();
+                float startOffsetRight = 0;
+                float endOffsetRight = 0;
+                float yOffsetRight = 0;
+
+                for (int j = 0; j < extraMeshes.Count; j++)
+                {
+                    if ((extraMeshes[j].index - 1) % 2 == 0 && (extraMeshes[j].index - 1) / 2 == i)
+                    {
+                        if (leftExtraMeshes.Count > 0)
+                        {
+                            startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
+                            endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
+                            yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
+                        }
+
+                        leftExtraMeshes.Add(new RoundaboutExtraMesh(extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
+                    }
+                    else if ((extraMeshes[j].index - 1) % 2 == 1 && (extraMeshes[j].index - 2) / 2 == i)
+                    {
+                        if (rightExtraMeshes.Count > 0)
+                        {
+                            startOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.startWidth;
+                            endOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.endWidth;
+                            yOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.yOffset;
+                        }
+
+                        rightExtraMeshes.Add(new RoundaboutExtraMesh(extraMeshes[j], j, startOffsetRight, endOffsetRight, yOffsetRight));
+                    }
+                }
+
                 if (startIndex % 2f == 0 && endIndex % 2f == 0)
                 {
                     int vertexIndex = startIndex;
+                    int verticesLooped = 0;
+                    int verticesToLoop = 0;
+
+                    if (endIndex > startIndex)
+                    {
+                        verticesToLoop = endIndex - startIndex;
+                    }
+                    else
+                    {
+                        verticesToLoop = vertices.Count - 2 - startIndex;
+                        verticesToLoop += endIndex;
+                    }
 
                     while (vertexIndex != endIndex && triangles.Count < 2000)
                     {
@@ -579,8 +627,18 @@ public class Intersection : MonoBehaviour
                         triangles.Add(vertexIndex + 3);
                         triangles.Add(vertexIndex + 1);
 
+                        // Extra meshes
+                        float progress = (float)verticesLooped / (float)verticesToLoop;
+                        leftExtraMeshes = AddTrianglesToExtraMeshes(leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, true);
+                        rightExtraMeshes = AddTrianglesToExtraMeshes(rightExtraMeshes, vertices, vertexIndex, progress, verticesLooped, false);
+
+                        verticesLooped += 2;
                         vertexIndex += 2;
                     }
+
+                    // Assign extra meshes
+                    AssignExtraMeshes(leftExtraMeshes);
+                    AssignExtraMeshes(rightExtraMeshes);
                 }
                 else
                 {
@@ -589,7 +647,170 @@ public class Intersection : MonoBehaviour
             }
         }
 
+        CreateCenterExtraMeshes();
         SetupRoundaboutMesh(vertices, triangles, connectionTriangles, uvs, uvs2);
+    }
+
+    private void CreateCenterExtraMeshes()
+    {
+        List<ExtraMesh> centerExtraMeshes = new List<ExtraMesh>();
+        List<int> indexes = new List<int>();
+        int segments = (int)Mathf.Max(6, settings.FindProperty("resolution").floatValue * roundaboutRadius * 30f);
+        float degreesPerSegment = 1f / segments;
+        float textureRepeations = Mathf.PI * roundaboutRadius * textureTilingY * 0.5f;
+
+        for (int i = 0; i < extraMeshes.Count; i++)
+        {
+            if (extraMeshes[i].index == 0)
+            {
+                centerExtraMeshes.Add(extraMeshes[i]);
+                indexes.Add(i);
+            }
+        }
+
+        float currentStartOffset = 0;
+        float currentEndOffset = 0;
+        float currentYOffset = yOffset;
+
+        for (int i = 0; i < centerExtraMeshes.Count; i++)
+        {
+            List<Vector3> vertices = new List<Vector3>();
+            List<int> triangles = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+            List<Vector2> uvs2 = new List<Vector2>();
+
+            int vertexIndex = 0;
+
+            for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
+            {
+                float modifiedF = f;
+
+                if (f > 1)
+                {
+                    modifiedF = 1;
+                }
+
+                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth - Mathf.Lerp(currentStartOffset, currentEndOffset, modifiedF)));
+                vertices[vertices.Count - 1] += new Vector3(0, currentYOffset, 0);
+                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (roundaboutRadius - roundaboutWidth - Mathf.Lerp(currentStartOffset + centerExtraMeshes[i].startWidth, currentEndOffset + centerExtraMeshes[i].endWidth, modifiedF)));
+                vertices[vertices.Count - 1] += new Vector3(0, currentYOffset + centerExtraMeshes[i].yOffset, 0);
+
+                float localWidth = Mathf.Lerp(centerExtraMeshes[i].startWidth, centerExtraMeshes[i].endWidth, modifiedF) / centerExtraMeshes[i].endWidth;
+
+                uvs.Add(new Vector2(0, modifiedF * textureRepeations));
+                uvs.Add(new Vector2(localWidth, modifiedF * textureRepeations));
+                uvs2.Add(new Vector3(localWidth, 1));
+                uvs2.Add(new Vector3(localWidth, 1));
+
+                if (vertexIndex > 0)
+                {
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex - 1);
+                    triangles.Add(vertexIndex - 2);
+
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex - 1);
+                }
+
+                vertexIndex += 2;
+            }
+
+            // Update offsets
+            currentStartOffset += centerExtraMeshes[i].startWidth;
+            currentEndOffset += centerExtraMeshes[i].endWidth;
+            currentYOffset += centerExtraMeshes[i].yOffset;
+
+            // Assign mesh
+            AssignCenterExtraMesh(vertices, triangles, uvs, uvs2, centerExtraMeshes, i, indexes);
+        }
+    }
+
+    private void AssignCenterExtraMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, List<Vector2> uvs2, List<ExtraMesh> centerExtraMeshes, int i, List<int> indexes)
+    {
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.uv = uvs.ToArray();
+        mesh.uv2 = uvs2.ToArray();
+        mesh.RecalculateNormals();
+
+        transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshFilter>().sharedMesh = mesh;
+        transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshCollider>().sharedMesh = mesh;
+        transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshCollider>().sharedMaterial = centerExtraMeshes[i].physicMaterial;
+
+        if (centerExtraMeshes[i].overlayMaterial == null)
+        {
+            transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { centerExtraMeshes[i].baseMaterial };
+        }
+        else
+        {
+            transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { centerExtraMeshes[i].baseMaterial, centerExtraMeshes[i].overlayMaterial };
+        }
+    }
+
+    private List<RoundaboutExtraMesh> AddTrianglesToExtraMeshes(List<RoundaboutExtraMesh> extraMeshes, List<Vector3> vertices, int vertexIndex, float progress, int verticesLooped, bool leftSide)
+    {
+        for (int j = 0; j < extraMeshes.Count; j++)
+        {
+            Vector3 left = (vertices[vertexIndex] - vertices[vertexIndex + 1]).normalized;
+
+            if (leftSide == true)
+            {
+                extraMeshes[j].vertices.Add(vertices[vertexIndex] + left * Mathf.Lerp(extraMeshes[j].startOffset, extraMeshes[j].endOffset, progress));
+                extraMeshes[j].vertices.Add(vertices[vertexIndex] + left * Mathf.Lerp(extraMeshes[j].extraMesh.startWidth + extraMeshes[j].startOffset, extraMeshes[j].extraMesh.endWidth + extraMeshes[j].endOffset, progress));
+                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 2] += new Vector3(0, extraMeshes[j].yOffset, 0);
+                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 1] += new Vector3(0, extraMeshes[j].extraMesh.yOffset + extraMeshes[j].yOffset, 0);
+            }
+            else
+            {
+                extraMeshes[j].vertices.Add(vertices[vertexIndex + 1] - left * Mathf.Lerp(extraMeshes[j].extraMesh.startWidth + extraMeshes[j].startOffset, extraMeshes[j].extraMesh.endWidth + extraMeshes[j].endOffset, progress));
+                extraMeshes[j].vertices.Add(vertices[vertexIndex + 1] - left * Mathf.Lerp(extraMeshes[j].startOffset, extraMeshes[j].endOffset, progress));
+                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 2] += new Vector3(0, extraMeshes[j].extraMesh.yOffset + extraMeshes[j].yOffset, 0);
+                extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 1] += new Vector3(0, extraMeshes[j].yOffset, 0);
+            }
+
+            extraMeshes[j].uvs.Add(new Vector3(0, progress));
+            extraMeshes[j].uvs.Add(new Vector3(1, progress));
+
+            if (verticesLooped > 0)
+            {
+                extraMeshes[j].triangles.Add(verticesLooped);
+                extraMeshes[j].triangles.Add(verticesLooped - 2);
+                extraMeshes[j].triangles.Add(verticesLooped - 1);
+
+                extraMeshes[j].triangles.Add(verticesLooped);
+                extraMeshes[j].triangles.Add(verticesLooped - 1);
+                extraMeshes[j].triangles.Add(verticesLooped + 1);
+            }
+        }
+
+        return extraMeshes;
+    }
+
+    private void AssignExtraMeshes(List<RoundaboutExtraMesh> extraMeshes)
+    {
+        for (int i = 0; i < extraMeshes.Count; i++)
+        {
+            Mesh mesh = new Mesh();
+            mesh.vertices = extraMeshes[i].vertices.ToArray();
+            mesh.triangles = extraMeshes[i].triangles.ToArray();
+            mesh.uv = extraMeshes[i].uvs.ToArray();
+            mesh.RecalculateNormals();
+
+            transform.GetChild(0).GetChild(extraMeshes[i].listIndex).GetComponent<MeshFilter>().sharedMesh = mesh;
+            transform.GetChild(0).GetChild(extraMeshes[i].listIndex).GetComponent<MeshCollider>().sharedMesh = mesh;
+            transform.GetChild(0).GetChild(extraMeshes[i].listIndex).GetComponent<MeshCollider>().sharedMaterial = extraMeshes[i].extraMesh.physicMaterial;
+
+            if (extraMeshes[i].extraMesh.overlayMaterial == null)
+            {
+                transform.GetChild(0).GetChild(extraMeshes[i].listIndex).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { extraMeshes[i].extraMesh.baseMaterial };
+            }
+            else
+            {
+                transform.GetChild(0).GetChild(extraMeshes[i].listIndex).GetComponent<MeshRenderer>().sharedMaterials = new Material[] { extraMeshes[i].extraMesh.baseMaterial, extraMeshes[i].extraMesh.overlayMaterial };
+            }
+        }
     }
 
     private void SetupRoundaboutMesh(List<Vector3> vertices, List<int> triangles, List<int> connectionTriangles, List<Vector2> uvs, List<Vector2> uvs2)
