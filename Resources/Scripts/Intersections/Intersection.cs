@@ -129,17 +129,13 @@ public class Intersection : MonoBehaviour
                     index -= 1;
                 }
 
-                if (index % 3 == 0)
+                if (index % 2 == 0)
                 {
-                    connections[index / 3].curvePoint = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
+                    connections[index / 2].curvePoint = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
                 }
-                else if (index % 3 == 1)
+                else
                 {
-                    connections[(index - 1) / 3].curvePoint2 = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
-                }
-                else if (index % 3 == 2)
-                {
-                    connections[(index - 2) / 3].curvePoint3 = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
+                    connections[(index - 1) / 2].curvePoint2 = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
                 }
             }
             else
@@ -445,7 +441,6 @@ public class Intersection : MonoBehaviour
             // Set curve points
             connections[i].defaultCurvePoint = Misc.GetCenter(connections[i].leftPoint, vertices[nearestLeftPoints[i]] + transform.position);
             connections[i].defaultCurvePoint2 = Misc.GetCenter(connections[i].rightPoint, vertices[nearestRightPoints[i]] + transform.position);
-            connections[i].defaultCurvePoint3 = Misc.GetCenter(vertices[nearestLeftPoints[i] + 1] + transform.position, vertices[nearestRightPoints[i] + 1] + transform.position);
 
             if (connections[i].curvePoint == null)
             {
@@ -457,16 +452,12 @@ public class Intersection : MonoBehaviour
                 connections[i].curvePoint2 = connections[i].defaultCurvePoint2;
             }
 
-            if (connections[i].curvePoint3 == null)
-            {
-                connections[i].curvePoint3 = connections[i].defaultCurvePoint3;
-            }
-
             // Add new vertices
-            segments = (int)Mathf.Max(3, settings.FindProperty("resolution").floatValue * 20);
-
+            segments = (int)Mathf.Max(3, settings.FindProperty("resolution").floatValue * Vector3.Distance(connections[i].lastPoint, centerPoint + transform.position) * 10);
             float distancePerSegment = 1f / segments;
             int actualSegments = 0;
+            float degreesStartInner = Quaternion.LookRotation(vertices[nearestLeftPoints[i] + 1]).eulerAngles.y;
+            float degreesEndInner = Quaternion.LookRotation(vertices[nearestRightPoints[i] + 1]).eulerAngles.y;
 
             for (float f = 0; f <= 1 + distancePerSegment; f += distancePerSegment)
             {
@@ -485,7 +476,8 @@ public class Intersection : MonoBehaviour
                 // Left, right and inner
                 vertices.Add(Misc.Lerp3CenterHeight(connections[i].leftPoint - transform.position + new Vector3(0, yOffset, 0), connections[i].curvePoint - transform.position, vertices[nearestLeftPoints[i]], modifiedF));
                 vertices.Add(Misc.Lerp3CenterHeight(connections[i].rightPoint - transform.position + new Vector3(0, yOffset, 0), connections[i].curvePoint2 - transform.position, vertices[nearestRightPoints[i]], modifiedF));
-                vertices.Add(Misc.Lerp3CenterHeight(vertices[nearestLeftPoints[i] + 1], connections[i].curvePoint3 - transform.position, vertices[nearestRightPoints[i] + 1], modifiedF));
+                vertices.Add(Quaternion.Euler(new Vector3(0, Mathf.Lerp(degreesStartInner, degreesEndInner, modifiedF), 0)) * Vector3.forward * (roundaboutRadius - roundaboutWidth));
+                vertices[vertices.Count - 1] += new Vector3(0, yOffset, 0);
 
                 if (modifiedF < 0.5f)
                 {
@@ -1026,7 +1018,6 @@ public class Intersection : MonoBehaviour
             if (roundaboutMode == true)
             {
                 CreateCurvePoint(new Vector3(connections[i].curvePoint2.x, yOffset + transform.position.y, connections[i].curvePoint2.z));
-                CreateCurvePoint(new Vector3(connections[i].curvePoint3.x, yOffset + transform.position.y, connections[i].curvePoint3.z));
             }
         }
 
@@ -1077,7 +1068,6 @@ public class Intersection : MonoBehaviour
     {
         intersectionConnection.curvePoint = intersectionConnection.defaultCurvePoint;
         intersectionConnection.curvePoint2 = intersectionConnection.defaultCurvePoint2;
-        intersectionConnection.curvePoint3 = intersectionConnection.defaultCurvePoint3;
     }
 
     public void ResetExtraMeshes()

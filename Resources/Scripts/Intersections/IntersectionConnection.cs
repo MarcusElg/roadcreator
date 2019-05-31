@@ -15,9 +15,7 @@ public class IntersectionConnection  : IComparable<IntersectionConnection> {
     // Roundabout connection
     public Vector3 defaultCurvePoint;
     public Vector3 defaultCurvePoint2;
-    public Vector3 defaultCurvePoint3;
     public Vector3 curvePoint2;
-    public Vector3 curvePoint3;
 
     public int CompareTo (IntersectionConnection intersectionConnection)
     {
