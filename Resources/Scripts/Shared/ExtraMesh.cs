@@ -14,8 +14,8 @@ public class ExtraMesh
     public float startWidth;
     public float endWidth;
     public float yOffset;
-    
-    public ExtraMesh (bool open, bool left, Material baseMaterial, Material overlayMaterial, PhysicMaterial physicMaterial, float startWidth, float endWidth, float yOffset)
+
+    public ExtraMesh(bool open, bool left, Material baseMaterial, Material overlayMaterial, PhysicMaterial physicMaterial, float startWidth, float endWidth, float yOffset)
     {
         this.open = open;
         this.left = left;
@@ -37,6 +37,11 @@ public class ExtraMesh
         this.startWidth = startWidth;
         this.endWidth = endWidth;
         this.yOffset = yOffset;
+    }
+
+    public ExtraMesh Copy()
+    {
+        return new ExtraMesh(open, index, baseMaterial, overlayMaterial, physicMaterial, startWidth, endWidth, yOffset);
     }
 
 }

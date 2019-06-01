@@ -119,7 +119,7 @@ public class IntersectionEditor : Editor
             {
                 if (intersection.roundaboutMode == true)
                 {
-                    intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count);
+                    intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count * 3);
                 }
                 else
                 {
@@ -144,7 +144,7 @@ public class IntersectionEditor : Editor
 
                 if (GUILayout.Button("Duplicate Extra Mesh") == true)
                 {
-                    intersection.extraMeshes.Add(intersection.extraMeshes[intersection.extraMeshes.Count - 1]);
+                    intersection.extraMeshes.Add(intersection.extraMeshes[intersection.extraMeshes.Count - 1].Copy());
 
                     GameObject extraMesh = new GameObject("Extra Mesh");
                     extraMesh.AddComponent<MeshFilter>();
