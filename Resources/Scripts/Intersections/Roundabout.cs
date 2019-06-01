@@ -601,6 +601,11 @@ public class Roundabout
         {
             point += forward * d;
 
+            if (Vector3.Distance(originalPoint, point) > intersection.roundaboutRadius)
+            {
+                return originalPoint + forward * 2;
+            }
+
             if (Vector3.Distance(point, intersection.transform.position) < intersection.roundaboutRadius + intersection.roundaboutWidth / 2)
             {
                 return point;
