@@ -253,7 +253,7 @@ public class PrefabLineCreator : MonoBehaviour
 
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.name = "Prefab";
-                placedPrefab.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
+                placedPrefab.layer = settings.FindProperty("roadLayer").intValue;
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
 
                 if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
