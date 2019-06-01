@@ -85,28 +85,31 @@ public class IntersectionEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
-        GUILayout.Space(20);
-        GUILayout.Label("Bridge", guiStyle);
-        intersection.generateBridge = EditorGUILayout.Toggle("Generate Bridge", intersection.generateBridge);
-
-        if (intersection.generateBridge == true)
+        if (intersection.roundaboutMode == false)
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeSettings").FindPropertyRelative("bridgeMaterials"), true);
-            intersection.bridgeSettings.yOffsetFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", intersection.bridgeSettings.yOffsetFirstStep), 0, 2);
-            intersection.bridgeSettings.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.bridgeSettings.yOffsetSecondStep), 0, 2);
-            intersection.bridgeSettings.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.bridgeSettings.widthPercentageFirstStep), 0, 1);
-            intersection.bridgeSettings.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.bridgeSettings.widthPercentageSecondStep), 0, 1);
-            intersection.bridgeSettings.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.bridgeSettings.extraWidth), 0, 1);
-
             GUILayout.Space(20);
-            GUILayout.Label("Pillar Placement", guiStyle);
+            GUILayout.Label("Bridge", guiStyle);
+            intersection.generateBridge = EditorGUILayout.Toggle("Generate Bridge", intersection.generateBridge);
 
-            intersection.placePillars = EditorGUILayout.Toggle("Place Pillar", intersection.placePillars);
-            if (intersection.placePillars == true)
+            if (intersection.generateBridge == true)
             {
-                intersection.pillarPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", intersection.pillarPrefab, typeof(GameObject), false);
-                intersection.extraPillarHeight = Mathf.Max(0, EditorGUILayout.FloatField("Extra Pillar Height", intersection.extraPillarHeight));
-                intersection.xzPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("bridgeSettings").FindPropertyRelative("bridgeMaterials"), true);
+                intersection.bridgeSettings.yOffsetFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset First Step", intersection.bridgeSettings.yOffsetFirstStep), 0, 2);
+                intersection.bridgeSettings.yOffsetSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Y Offset Second Step", intersection.bridgeSettings.yOffsetSecondStep), 0, 2);
+                intersection.bridgeSettings.widthPercentageFirstStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage First Step", intersection.bridgeSettings.widthPercentageFirstStep), 0, 1);
+                intersection.bridgeSettings.widthPercentageSecondStep = Mathf.Clamp(EditorGUILayout.FloatField("Width Percentage Second Step", intersection.bridgeSettings.widthPercentageSecondStep), 0, 1);
+                intersection.bridgeSettings.extraWidth = Mathf.Clamp(EditorGUILayout.FloatField("Extra Width", intersection.bridgeSettings.extraWidth), 0, 1);
+
+                GUILayout.Space(20);
+                GUILayout.Label("Pillar Placement", guiStyle);
+
+                intersection.placePillars = EditorGUILayout.Toggle("Place Pillar", intersection.placePillars);
+                if (intersection.placePillars == true)
+                {
+                    intersection.pillarPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", intersection.pillarPrefab, typeof(GameObject), false);
+                    intersection.extraPillarHeight = Mathf.Max(0, EditorGUILayout.FloatField("Extra Pillar Height", intersection.extraPillarHeight));
+                    intersection.xzPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale));
+                }
             }
         }
 

@@ -124,11 +124,6 @@ public class Intersection : MonoBehaviour
             {
                 int index = objectToMove.transform.GetSiblingIndex() - 1;
 
-                if (generateBridge == true)
-                {
-                    index -= 1;
-                }
-
                 if (index % 2 == 0)
                 {
                     connections[index / 2].curvePoint = new Vector3(objectToMove.transform.position.x, transform.position.y, objectToMove.transform.position.z);
