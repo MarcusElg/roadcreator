@@ -5,7 +5,7 @@ A free road creation tool for unity.
 ### Road Creation
 - Place, move and delete points to create a series of curves
 - Generate roads with different width, texture and much more.
-- Customizable shoulders, possible to have multiple on each side
+- Customizable shoulders(extra meshes), possible to have multiple on each side
 - Options are changed per-segment which allows for more control like the road having a extra lane before a intersection
 - Terrain deformation to make the terrain adjust to the road
 - Easly make a road into a bridge with automatic pillar placement (see bridge section)
@@ -27,6 +27,8 @@ A free road creation tool for unity.
 - Procedurally generated intersections, easly create them by connecting two roads end/start points
 - Easly customize intersections by moving points and changing how sharp the connections should be (per connection)
 - Move the connected road points when the intersection is selected to have full control over the intersection mesh
+- Customizable shoulders(extra meshes), possible to have multiple on each side
+- Procedural roundabouts with changable radius etc. Has the same smooth connections and customizability as normal intersections, including extra mesh support.
 
 ### Other
 - Includes a bunch of roads and road related assets like turn markings and road signs
