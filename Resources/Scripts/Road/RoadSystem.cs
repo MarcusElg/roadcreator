@@ -101,6 +101,7 @@ public class RoadSystem : MonoBehaviour
             gameObject.AddComponent<Intersection>();
             gameObject.GetComponent<Intersection>().roundaboutMode = true;
             gameObject.GetComponent<Intersection>().Setup();
+            gameObject.transform.hideFlags = HideFlags.None;
             gameObject.GetComponent<Intersection>().generateBridge = false;
             gameObject.GetComponent<Intersection>().placePillars = false;
             gameObject.GetComponent<Intersection>().overlayMaterial = (Material)settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue;
