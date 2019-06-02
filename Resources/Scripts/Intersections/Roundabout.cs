@@ -13,35 +13,120 @@ public class Roundabout
         List<Vector2> uvs = new List<Vector2>();
         List<Vector2> uvs2 = new List<Vector2>();
 
-        int segments = (int)Mathf.Max(6, intersection.settings.FindProperty("resolution").floatValue * intersection.roundaboutRadius * 30f);
-        float degreesPerSegment = 1f / segments;
-        float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
-
-        // Create roundabout vertices
-        for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
-        {
-            float modifiedF = f;
-            if (f > 1)
-            {
-                modifiedF = 1;
-            }
-
-            vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius + intersection.roundaboutWidth));
-            vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
-            vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
-            vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
-
-            uvs.Add(new Vector2(0, modifiedF * textureRepeations));
-            uvs.Add(new Vector2(1, modifiedF * textureRepeations));
-            uvs2.Add(Vector2.one);
-            uvs2.Add(Vector2.one);
-        }
-
         List<int> nearestLeftPoints = new List<int>();
         List<int> nearestRightPoints = new List<int>();
         int addedVertices = 0;
 
-        // Create road connections
+        CreateRoundaboutVertices(intersection, ref vertices, ref uvs, ref uvs2);
+        CreateRoadConnections(intersection, ref vertices, ref triangles, ref uvs, ref uvs, ref connectionTriangles, ref nearestLeftPoints, ref nearestRightPoints, ref addedVertices);
+        CreateRoadSections(intersection, ref vertices, ref triangles, addedVertices, nearestLeftPoints, nearestRightPoints);
+
+        CreateCenterExtraMeshes(intersection);
+        SetupRoundaboutMesh(intersection, vertices, triangles, connectionTriangles, uvs, uvs2);
+    }
+
+    private static void CreateRoadSections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, int addedVertices, List<int> nearestLeftPoints, List<int> nearestRightPoints)
+    {
+        for (int i = 0; i < intersection.connections.Count + 1; i++)
+        {
+            if (i < intersection.connections.Count || intersection.connections.Count == 0)
+            {
+                int startIndex;
+                int endIndex;
+
+                if (intersection.connections.Count == 0)
+                {
+                    startIndex = 0;
+                    endIndex = vertices.Count - 2 - addedVertices;
+                }
+                else
+                {
+                    startIndex = nearestLeftPoints[i];
+
+                    if (i == intersection.connections.Count - 1)
+                    {
+                        endIndex = nearestRightPoints[0];
+                    }
+                    else
+                    {
+                        endIndex = nearestRightPoints[i + 1];
+                    }
+                }
+
+                List<RoundaboutExtraMesh> leftExtraMeshes = new List<RoundaboutExtraMesh>();
+                float startOffsetLeft = 0;
+                float endOffsetLeft = 0;
+                float yOffsetLeft = 0;
+
+                for (int j = 0; j < intersection.extraMeshes.Count; j++)
+                {
+                    if (intersection.extraMeshes[j].index > 0 && (intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
+                    {
+                        if (leftExtraMeshes.Count > 0)
+                        {
+                            startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
+                            endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
+                            yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
+                        }
+
+                        leftExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
+                    }
+                }
+
+                if (startIndex % 2f == 0 && endIndex % 2f == 0)
+                {
+                    int vertexIndex = startIndex;
+                    int verticesLooped = 0;
+                    int verticesToLoop = 0;
+                    float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
+
+                    if (endIndex > startIndex)
+                    {
+                        verticesToLoop = endIndex - startIndex;
+                    }
+                    else
+                    {
+                        verticesToLoop = vertices.Count - 2 - startIndex - addedVertices;
+                        verticesToLoop += endIndex;
+                    }
+
+                    while (vertexIndex != endIndex && triangles.Count < 10000)
+                    {
+                        if (vertexIndex > vertices.Count - 4 - addedVertices)
+                        {
+                            vertexIndex = 0;
+                        }
+
+                        triangles.Add(vertexIndex);
+                        triangles.Add(vertexIndex + 2);
+                        triangles.Add(vertexIndex + 1);
+
+                        triangles.Add(vertexIndex + 2);
+                        triangles.Add(vertexIndex + 3);
+                        triangles.Add(vertexIndex + 1);
+
+                        // Extra meshes
+                        float progress = (float)verticesLooped / (float)verticesToLoop;
+
+                        leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
+
+                        verticesLooped += 2;
+                        vertexIndex += 2;
+                    }
+
+                    leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, 1, verticesLooped, verticesToLoop * distanceBetweenVertices);
+                    AssignExtraMeshes(intersection, leftExtraMeshes);
+                }
+                else
+                {
+                    Debug.LogError("For some reason a roundabout connection's start/end index is uneven");
+                }
+            }
+        }
+    }
+
+    private static void CreateRoadConnections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector2> uvs, ref List<Vector2> uvs2, ref List<int> connectionTriangles, ref List<int> nearestLeftPoints, ref List<int> nearestRightPoints, ref int addedVertices)
+    {
         for (int i = 0; i < intersection.connections.Count; i++)
         {
             float nearestLeftDistance = float.MaxValue;
@@ -142,186 +227,114 @@ public class Roundabout
                 }
             }
 
-            // Add new vertices
-            segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position) * 10);
-            float distancePerSegment = 1f / segments;
             int actualSegments = 0;
-            float degreesStartInner = Quaternion.LookRotation(vertices[nearestLeftPoints[i] + 1]).eulerAngles.y;
-            float degreesEndInner = Quaternion.LookRotation(vertices[nearestRightPoints[i] + 1]).eulerAngles.y;
-
-            for (float f = 0; f <= 1 + distancePerSegment; f += distancePerSegment)
-            {
-                float modifiedF = f;
-                actualSegments += 1;
-
-                if (modifiedF > 0.5f && modifiedF < 0.5f + distancePerSegment)
-                {
-                    modifiedF = 0.5f;
-                }
-                else if (modifiedF > 1)
-                {
-                    modifiedF = 1f;
-                }
-
-                // Left, right and inner
-                vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].leftPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint - intersection.transform.position, vertices[nearestLeftPoints[i]], modifiedF));
-                vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].rightPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint2 - intersection.transform.position, vertices[nearestRightPoints[i]], modifiedF));
-                vertices.Add(Quaternion.Euler(new Vector3(0, Mathf.Lerp(degreesStartInner, degreesEndInner, modifiedF), 0)) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
-                vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
-                vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
-                vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
-
-                if (modifiedF < 0.5f)
-                {
-                    vertices.Add(Vector3.Lerp(intersection.connections[i].lastPoint + new Vector3(0, intersection.yOffset, 0) - intersection.transform.position, centerPoint, modifiedF * 2));
-                    vertices.Add(Vector3.Lerp(intersection.connections[i].lastPoint + new Vector3(0, intersection.yOffset, 0) - intersection.transform.position, centerPoint, modifiedF * 2));
-                    vertices.Add(Vector3.Lerp(Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestLeftPoints[i] + 1]), centerPoint, modifiedF * 2));
-                }
-                else
-                {
-                    vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestLeftPoints[i] + 1]), (modifiedF - 0.5f) * 2));
-                    vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
-                    vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
-                }
-
-                vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
-                vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
-
-                AddTrianglesToConnectionExtraMeshes(leftExtraMeshes, rightExtraMeshes, modifiedF, vertices);
-                addedVertices += 6;
-
-                if (intersection.stretchTexture == true)
-                {
-                    uvs.Add(new Vector2(0, modifiedF));
-                    uvs.Add(new Vector2(0, modifiedF));
-                    uvs.Add(new Vector2(0, modifiedF));
-                    uvs.Add(new Vector2(1, modifiedF));
-                    uvs.Add(new Vector2(1, modifiedF));
-                    uvs.Add(new Vector2(1, modifiedF));
-                }
-                else
-                {
-                    uvs.Add(new Vector2(0, modifiedF));
-                    uvs.Add(new Vector2(0, modifiedF));
-                    uvs.Add(new Vector2(0, modifiedF));
-                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 3], vertices[vertices.Count - 6]), modifiedF));
-                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 2], vertices[vertices.Count - 5]), modifiedF));
-                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 4]), modifiedF));
-                }
-
-                uvs2.Add(Vector2.one);
-                uvs2.Add(Vector2.one);
-                uvs2.Add(Vector2.one);
-                uvs2.Add(Vector2.one);
-                uvs2.Add(Vector2.one);
-                uvs2.Add(Vector2.one);
-            }
-
+            AddNewRoadConnectionVertices(intersection, ref vertices, ref uvs, ref uvs2, i, centerPoint, nearestLeftPoints, nearestRightPoints, ref addedVertices, leftExtraMeshes, rightExtraMeshes, ref actualSegments);
             connectionTriangles.AddRange(AddConnectionTriangles(vertices, triangles, actualSegments));
             AssignExtraMeshes(intersection, leftExtraMeshes);
             AssignExtraMeshes(intersection, rightExtraMeshes);
         }
+    }
 
-        // Create road sections
-        for (int i = 0; i < intersection.connections.Count + 1; i++)
+    private static void AddNewRoadConnectionVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2, int i, Vector3 centerPoint, List<int> nearestLeftPoints, List<int> nearestRightPoints, ref int addedVertices, List<RoundaboutExtraMesh> leftExtraMeshes, List<RoundaboutExtraMesh> rightExtraMeshes, ref int actualSegments)
+    {
+        int segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position) * 10);
+        float distancePerSegment = 1f / segments;
+        float degreesStartInner = Quaternion.LookRotation(vertices[nearestLeftPoints[i] + 1]).eulerAngles.y;
+        float degreesEndInner = Quaternion.LookRotation(vertices[nearestRightPoints[i] + 1]).eulerAngles.y;
+
+        for (float f = 0; f <= 1 + distancePerSegment; f += distancePerSegment)
         {
-            if (i < intersection.connections.Count || intersection.connections.Count == 0)
+            float modifiedF = f;
+            actualSegments += 1;
+
+            if (modifiedF > 0.5f && modifiedF < 0.5f + distancePerSegment)
             {
-                int startIndex;
-                int endIndex;
-
-                if (intersection.connections.Count == 0)
-                {
-                    startIndex = 0;
-                    endIndex = vertices.Count - 2 - addedVertices;
-                }
-                else
-                {
-                    startIndex = nearestLeftPoints[i];
-
-                    if (i == intersection.connections.Count - 1)
-                    {
-                        endIndex = nearestRightPoints[0];
-                    }
-                    else
-                    {
-                        endIndex = nearestRightPoints[i + 1];
-                    }
-                }
-
-                List<RoundaboutExtraMesh> leftExtraMeshes = new List<RoundaboutExtraMesh>();
-                float startOffsetLeft = 0;
-                float endOffsetLeft = 0;
-                float yOffsetLeft = 0;
-
-                for (int j = 0; j < intersection.extraMeshes.Count; j++)
-                {
-                    if (intersection.extraMeshes[j].index > 0 && (intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
-                    {
-                        if (leftExtraMeshes.Count > 0)
-                        {
-                            startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
-                            endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
-                            yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
-                        }
-
-                        leftExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
-                    }
-                }
-
-                if (startIndex % 2f == 0 && endIndex % 2f == 0)
-                {
-                    int vertexIndex = startIndex;
-                    int verticesLooped = 0;
-                    int verticesToLoop = 0;
-                    float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
-
-                    if (endIndex > startIndex)
-                    {
-                        verticesToLoop = endIndex - startIndex;
-                    }
-                    else
-                    {
-                        verticesToLoop = vertices.Count - 2 - startIndex - addedVertices;
-                        verticesToLoop += endIndex;
-                    }
-
-                    while (vertexIndex != endIndex && triangles.Count < 10000)
-                    {
-                        if (vertexIndex > vertices.Count - 4 - addedVertices)
-                        {
-                            vertexIndex = 0;
-                        }
-
-                        triangles.Add(vertexIndex);
-                        triangles.Add(vertexIndex + 2);
-                        triangles.Add(vertexIndex + 1);
-
-                        triangles.Add(vertexIndex + 2);
-                        triangles.Add(vertexIndex + 3);
-                        triangles.Add(vertexIndex + 1);
-
-                        // Extra meshes
-                        float progress = (float)verticesLooped / (float)verticesToLoop;
-
-                        leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
-
-                        verticesLooped += 2;
-                        vertexIndex += 2;
-                    }
-
-                    leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, 1, verticesLooped, verticesToLoop * distanceBetweenVertices);
-                    AssignExtraMeshes(intersection, leftExtraMeshes);
-                }
-                else
-                {
-                    Debug.LogError("For some reason a roundabout connection's start/end index is uneven");
-                }
+                modifiedF = 0.5f;
             }
-        }
+            else if (modifiedF > 1)
+            {
+                modifiedF = 1f;
+            }
 
-        CreateCenterExtraMeshes(intersection);
-        SetupRoundaboutMesh(intersection, vertices, triangles, connectionTriangles, uvs, uvs2);
+            // Left, right and inner
+            vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].leftPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint - intersection.transform.position, vertices[nearestLeftPoints[i]], modifiedF));
+            vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].rightPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint2 - intersection.transform.position, vertices[nearestRightPoints[i]], modifiedF));
+            vertices.Add(Quaternion.Euler(new Vector3(0, Mathf.Lerp(degreesStartInner, degreesEndInner, modifiedF), 0)) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
+            vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
+            vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
+            vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
+
+            if (modifiedF < 0.5f)
+            {
+                vertices.Add(Vector3.Lerp(intersection.connections[i].lastPoint + new Vector3(0, intersection.yOffset, 0) - intersection.transform.position, centerPoint, modifiedF * 2));
+                vertices.Add(Vector3.Lerp(intersection.connections[i].lastPoint + new Vector3(0, intersection.yOffset, 0) - intersection.transform.position, centerPoint, modifiedF * 2));
+                vertices.Add(Vector3.Lerp(Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestLeftPoints[i] + 1]), centerPoint, modifiedF * 2));
+            }
+            else
+            {
+                vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestLeftPoints[i] + 1]), (modifiedF - 0.5f) * 2));
+                vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
+                vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
+            }
+
+            vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
+            vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
+
+            AddTrianglesToConnectionExtraMeshes(leftExtraMeshes, rightExtraMeshes, modifiedF, vertices);
+            addedVertices += 6;
+
+            if (intersection.stretchTexture == true)
+            {
+                uvs.Add(new Vector2(0, modifiedF));
+                uvs.Add(new Vector2(0, modifiedF));
+                uvs.Add(new Vector2(0, modifiedF));
+                uvs.Add(new Vector2(1, modifiedF));
+                uvs.Add(new Vector2(1, modifiedF));
+                uvs.Add(new Vector2(1, modifiedF));
+            }
+            else
+            {
+                uvs.Add(new Vector2(0, modifiedF));
+                uvs.Add(new Vector2(0, modifiedF));
+                uvs.Add(new Vector2(0, modifiedF));
+                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 3], vertices[vertices.Count - 6]), modifiedF));
+                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 2], vertices[vertices.Count - 5]), modifiedF));
+                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 4]), modifiedF));
+            }
+
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+        }
+    }
+
+    private static void CreateRoundaboutVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2)
+    {
+        int segments = (int)Mathf.Max(6, intersection.settings.FindProperty("resolution").floatValue * intersection.roundaboutRadius * 30f);
+        float degreesPerSegment = 1f / segments;
+        float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
+
+        for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
+        {
+            float modifiedF = f;
+            if (f > 1)
+            {
+                modifiedF = 1;
+            }
+
+            vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius + intersection.roundaboutWidth));
+            vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
+            vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
+            vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
+
+            uvs.Add(new Vector2(0, modifiedF * textureRepeations));
+            uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+            uvs2.Add(Vector2.one);
+            uvs2.Add(Vector2.one);
+        }
     }
 
     private static void AddTrianglesToConnectionExtraMeshes(List<RoundaboutExtraMesh> leftExtraMeshes, List<RoundaboutExtraMesh> rightExtraMeshes, float modifiedF, List<Vector3> vertices)

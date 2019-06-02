@@ -306,24 +306,7 @@ public class Intersection : MonoBehaviour
                 vertexIndex += 2;
             }
 
-            Mesh mesh = new Mesh();
-            mesh.vertices = vertices.ToArray();
-            mesh.triangles = triangles.ToArray();
-            mesh.uv = uvs.ToArray();
-            mesh.RecalculateNormals();
-
-            GetComponent<MeshFilter>().sharedMesh = mesh;
-            GetComponent<MeshCollider>().sharedMesh = mesh;
-            GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
-
-            if (overlayMaterial == null)
-            {
-                GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
-            }
-            else
-            {
-                GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
-            }
+            SetupMesh(vertices, triangles, uvs);
         }
 
         float[] startWidths = new float[firstVertexIndexes.Count];
@@ -347,6 +330,28 @@ public class Intersection : MonoBehaviour
         }
 
         CreateCurvePoints();
+    }
+
+    private void SetupMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs)
+    {
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.uv = uvs.ToArray();
+        mesh.RecalculateNormals();
+
+        GetComponent<MeshFilter>().sharedMesh = mesh;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+        GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+
+        if (overlayMaterial == null)
+        {
+            GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+        }
+        else
+        {
+            GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+        }
     }
 
     private void GenerateIntersectionExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
