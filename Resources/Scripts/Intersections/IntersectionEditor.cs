@@ -200,7 +200,14 @@ public class IntersectionEditor : Editor
             intersection.CreateMesh();
         }
 
-        if (GUILayout.Button("Generate Intersection"))
+        if (intersection.roundaboutMode == true)
+        {
+            if (GUILayout.Button("Generate Roundabout"))
+            {
+                intersection.CreateMesh();
+            }
+        }
+        else if (GUILayout.Button("Generate Intersection"))
         {
             intersection.CreateMesh();
         }
