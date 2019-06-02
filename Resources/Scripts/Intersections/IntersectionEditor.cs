@@ -235,6 +235,12 @@ public class IntersectionEditor : Editor
 
             GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
             SceneView.currentDrawingSceneView.Repaint();
+
+            if (intersection.transform.hasChanged == true)
+            {
+                intersection.CreateMesh();
+                intersection.transform.hasChanged = false;
+            }
         }
     }
 

@@ -114,16 +114,28 @@ public class RoadCreator : MonoBehaviour
 
         if (fromIntersection == false)
         {
-            if (startIntersectionConnection != null && startIntersection != null)
+            if (startIntersection != null)
             {
                 UpdateStartConnectionData();
                 startIntersection.CreateMesh(true);
             }
 
-            if (endIntersectionConnection != null && endIntersection != null)
+            if (endIntersection != null)
             {
                 UpdateEndConnectionData();
                 endIntersection.CreateMesh(true);
+            }
+        }
+        else
+        {
+            if (startIntersection != null)
+            {
+                UpdateStartConnectionVariables();
+            }
+
+            if (endIntersection != null)
+            {
+                UpdateEndConnectionVariables();
             }
         }
     }

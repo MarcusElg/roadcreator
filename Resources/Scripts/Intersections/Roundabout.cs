@@ -168,6 +168,8 @@ public class Roundabout
                 vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].rightPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint2 - intersection.transform.position, vertices[nearestRightPoints[i]], modifiedF));
                 vertices.Add(Quaternion.Euler(new Vector3(0, Mathf.Lerp(degreesStartInner, degreesEndInner, modifiedF), 0)) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
                 vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
+                vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
+                vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
 
                 if (modifiedF < 0.5f)
                 {
@@ -181,6 +183,9 @@ public class Roundabout
                     vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
                     vertices.Add(Vector3.Lerp(centerPoint, Misc.GetCenter(vertices[nearestRightPoints[i]], vertices[nearestRightPoints[i] + 1]), (modifiedF - 0.5f) * 2));
                 }
+
+                vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
+                vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
 
                 AddTrianglesToConnectionExtraMeshes(leftExtraMeshes, rightExtraMeshes, modifiedF, vertices);
                 addedVertices += 6;
