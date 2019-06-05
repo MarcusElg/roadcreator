@@ -15,7 +15,7 @@ public class BridgeGeneration
         float totalDistance = 0;
         float currentDistance = 0;
 
-        GameObject bridge = new GameObject("Bridge Base");
+        GameObject bridge = new GameObject("Bridge");
 
         for (int i = 1; i < points.Length; i++)
         {
@@ -70,14 +70,7 @@ public class BridgeGeneration
             vertices.Add((points[i] + left * roadWidthLeft) - segment.transform.position);
             vertices[verticeIndex + 7] = new Vector3(vertices[verticeIndex + 7].x, points[i].y - segment.transform.position.y + heightOffset, vertices[verticeIndex + 7].z);
 
-            uvs.Add(new Vector2(0, currentDistance / totalDistance));
-            uvs.Add(new Vector2(1, currentDistance / totalDistance));
-            uvs.Add(new Vector2(0, currentDistance / totalDistance));
-            uvs.Add(new Vector2(1, currentDistance / totalDistance));
-            uvs.Add(new Vector2(0, currentDistance / totalDistance));
-            uvs.Add(new Vector2(1, currentDistance / totalDistance));
-            uvs.Add(new Vector2(0, currentDistance / totalDistance));
-            uvs.Add(new Vector2(1, currentDistance / totalDistance));
+            uvs = AddBridgeUvs(uvs, currentDistance / totalDistance);
 
             if (i < points.Length - 1)
             {
@@ -164,6 +157,20 @@ public class BridgeGeneration
         }
 
         return BridgeGeneration.CreateBridge(bridge, segment.transform, vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), extraUvs.ToArray(), materials, segment.settings);
+    }
+
+    public static List<Vector2> AddBridgeUvs(List<Vector2> uvs, float progress)
+    {
+        uvs.Add(new Vector2(0, progress));
+        uvs.Add(new Vector2(1, progress));
+        uvs.Add(new Vector2(0, progress));
+        uvs.Add(new Vector2(1, progress));
+        uvs.Add(new Vector2(0, progress));
+        uvs.Add(new Vector2(1, progress));
+        uvs.Add(new Vector2(0, progress));
+        uvs.Add(new Vector2(1, progress));
+
+        return uvs;
     }
 
     public static PrefabLineCreator GenerateCustomBridge(RoadSegment segment, float startWidthLeft, float startWidthRight, float endWidthLeft, float endWidthRight)
@@ -444,6 +451,55 @@ public class BridgeGeneration
         else
         {
             GameObject.DestroyImmediate(pillar);
+        }
+    }
+
+    public static void AddRoadSegmentBridgeVertices(Intersection intersection, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, Vector3 centerPoint, float leftWidth, float rightWidth, Vector3 left, float progress, float textureRepeations)
+    {
+        // |_   _|
+        //   \_/
+        bridgeVertices.Add(centerPoint + left * (intersection.bridgeSettings.extraWidth + leftWidth));
+        bridgeVertices.Add(centerPoint + left * (intersection.bridgeSettings.extraWidth + leftWidth) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(centerPoint + left * (intersection.bridgeSettings.extraWidth + leftWidth * intersection.bridgeSettings.widthPercentageFirstStep) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(centerPoint + left * (intersection.bridgeSettings.extraWidth + leftWidth * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+
+        bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth * intersection.bridgeSettings.widthPercentageFirstStep) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth));
+
+        /*bridgeVertices.Add(vertices[vertexIndex] - left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset, 0));
+        bridgeVertices.Add(vertices[vertexIndex] - left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(vertices[vertexIndex] + left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(vertices[vertexIndex] + left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(vertices[vertexIndex] + left * rightWidth * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep + left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(vertices[vertexIndex + 1] - left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(vertices[vertexIndex + 1] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(vertices[vertexIndex + 1] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset, 0));
+        */
+        bridgeUvs = BridgeGeneration.AddBridgeUvs(bridgeUvs, progress * textureRepeations);
+
+        if (progress > 0)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                bridgeTriangles.Add(bridgeVertices.Count - 8 + j);
+                bridgeTriangles.Add(bridgeVertices.Count - 16 + j);
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + j);
+
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + j);
+                bridgeTriangles.Add(bridgeVertices.Count - 16 + j);
+                bridgeTriangles.Add(bridgeVertices.Count - 15 + j);
+            }
+
+            // Top part
+            bridgeTriangles.Add(bridgeVertices.Count - 8);
+            bridgeTriangles.Add(bridgeVertices.Count - 1);
+            bridgeTriangles.Add(bridgeVertices.Count - 9);
+
+            bridgeTriangles.Add(bridgeVertices.Count - 16);
+            bridgeTriangles.Add(bridgeVertices.Count - 8);
+            bridgeTriangles.Add(bridgeVertices.Count - 9);
         }
     }
 

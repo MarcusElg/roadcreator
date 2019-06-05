@@ -207,7 +207,7 @@ public class RoadSegment : MonoBehaviour
             {
                 if (generateSimpleBridge == true)
                 {
-                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Bridge Base").gameObject, true, customBridge, startExtraWidthLeft, startExtraWidthRight, endExtraWidthLeft, endExtraWidthRight);
+                    BridgeGeneration.GeneratePillars(points, transform.GetChild(0).GetChild(0).transform.position, transform.GetChild(0).GetChild(1).transform.position, transform.GetChild(0).GetChild(2).transform.position, this, transform.Find("Bridge").gameObject, true, customBridge, startExtraWidthLeft, startExtraWidthRight, endExtraWidthLeft, endExtraWidthRight);
                 }
                 else if (generateCustomBridge == true)
                 {
