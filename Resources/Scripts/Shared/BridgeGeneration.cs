@@ -468,15 +468,6 @@ public class BridgeGeneration
         bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
         bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth));
 
-        /*bridgeVertices.Add(vertices[vertexIndex] - left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset, 0));
-        bridgeVertices.Add(vertices[vertexIndex] - left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertexIndex] + left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertexIndex] + left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
-        bridgeVertices.Add(vertices[vertexIndex] + left * rightWidth * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep + left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
-        bridgeVertices.Add(vertices[vertexIndex + 1] - left * (-intersection.bridgeSettings.extraWidth + intersection.roundaboutWidth * (1 - intersection.bridgeSettings.widthPercentageFirstStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertexIndex + 1] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertexIndex + 1] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset, 0));
-        */
         bridgeUvs = BridgeGeneration.AddBridgeUvs(bridgeUvs, progress * textureRepeations);
 
         if (progress > 0)
