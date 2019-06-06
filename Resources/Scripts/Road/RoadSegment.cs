@@ -36,10 +36,6 @@ public class RoadSegment : MonoBehaviour
     public float zPillarScale = 1;
     public PrefabLineCreator.RotationDirection rotationDirection;
 
-    // Connected
-    public GameObject connectedPillarPrefab;
-    public int pillars = 1;
-
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
     public RoadGuideline startGuidelinePoints;
