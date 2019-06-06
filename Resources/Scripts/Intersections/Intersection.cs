@@ -25,6 +25,7 @@ public class Intersection : MonoBehaviour
 
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
+    // Roundabout
     public bool roundaboutMode = false;
     public float roundaboutRadius = 5f;
     public float roundaboutWidth = 2f;
@@ -32,6 +33,12 @@ public class Intersection : MonoBehaviour
     public Material connectionBaseMaterial;
     public Material connectionOverlayMaterial;
     public float textureTilingY = 1;
+
+    public float pillarGap = 5;
+    public float pillarPlacementOffset = 5;
+    public float xPillarScale = 1;
+    public float zPillarScale = 1;
+    public PrefabLineCreator.RotationDirection pillarRotationDirection;
 
     public void Setup()
     {
