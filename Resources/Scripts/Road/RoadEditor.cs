@@ -18,6 +18,8 @@ public class RoadEditor : Editor
     {
         roadCreator = (RoadCreator)target;
         roadCreator.Setup();
+        roadCreator.aDown = false;
+        roadCreator.sDown = false;
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
