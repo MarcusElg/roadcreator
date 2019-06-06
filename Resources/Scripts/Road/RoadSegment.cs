@@ -34,7 +34,7 @@ public class RoadSegment : MonoBehaviour
     public float xPillarScale = 1;
     public float xPillarScaleMultiplier = 1;
     public float zPillarScale = 1;
-    public PrefabLineCreator.RotationDirection rotationDirection;
+    public PrefabLineCreator.RotationDirection pillarRotationDirection;
 
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 

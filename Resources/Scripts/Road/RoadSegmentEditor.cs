@@ -164,7 +164,7 @@ public class RoadSegmentEditor : Editor
                 }
 
                 serializedObject.FindProperty("zPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Pillar Scale", serializedObject.FindProperty("zPillarScale").floatValue));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationDirection"), true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("pillarRotationDirection"), true);
             }
         }
 

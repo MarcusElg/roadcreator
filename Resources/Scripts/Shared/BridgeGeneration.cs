@@ -276,26 +276,25 @@ public class BridgeGeneration
         pillar.hideFlags = HideFlags.NotEditable;
 
         RaycastHit raycastHit;
-        Debug.DrawRay(position, Vector3.down, Color.green, 10);
         if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.settings.FindProperty("roadLayer").intValue | 1 << segment.settings.FindProperty("ignoreMouseRayLayer").intValue)))
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
             pillar.transform.localPosition = centerPosition - segment.transform.position;
 
-            if (segment.rotationDirection == PrefabLineCreator.RotationDirection.forward)
+            if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.forward)
             {
                 pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(forward, Vector3.up).eulerAngles.y, 0);
             }
-            else if (segment.rotationDirection == PrefabLineCreator.RotationDirection.backward)
+            else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.backward)
             {
                 pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-forward, Vector3.up).eulerAngles.y, 0);
             }
-            else if (segment.rotationDirection == PrefabLineCreator.RotationDirection.left)
+            else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.left)
             {
                 pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
             }
-            else if (segment.rotationDirection == PrefabLineCreator.RotationDirection.right)
+            else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.right)
             {
                 pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
             }
@@ -491,6 +490,50 @@ public class BridgeGeneration
             bridgeTriangles.Add(bridgeVertices.Count - 16);
             bridgeTriangles.Add(bridgeVertices.Count - 8);
             bridgeTriangles.Add(bridgeVertices.Count - 9);
+        }
+    }
+
+    public static void PlaceRoundaboutPillars(Intersection intersection)
+    {
+        float distance = Mathf.PI * 2 * intersection.roundaboutRadius;
+        int points = Mathf.RoundToInt(distance / intersection.pillarGap);
+        float degreePerPoint = 1f / points;
+        float degreeOffset = intersection.pillarPlacementOffset / distance;
+
+        for (float d = degreeOffset; d < 1; d += degreePerPoint)
+        {
+            GameObject pillar = GameObject.Instantiate(intersection.pillarPrefab);
+            pillar.name = "Pillar";
+            pillar.transform.SetParent(intersection.transform.GetChild(intersection.transform.childCount - 1));
+
+            Vector3 position = intersection.transform.position + Quaternion.Euler(0, d * 360, 0) * Vector3.forward * intersection.roundaboutRadius - new Vector3(0, 0.01f + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0);
+            Vector3 right = (position - intersection.transform.position).normalized;
+            Vector3 backward = Misc.CalculateLeft(position - intersection.transform.position);
+            right.y = 0;
+
+            if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.forward)
+            {
+                pillar.transform.rotation = Quaternion.LookRotation(-backward);
+            }
+            else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.backward)
+            {
+                pillar.transform.rotation = Quaternion.LookRotation(backward);
+            }
+            else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.left)
+            {
+                pillar.transform.rotation = Quaternion.LookRotation(-right);
+            }
+            else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.right)
+            {
+                pillar.transform.rotation = Quaternion.LookRotation(right);
+            }
+
+            RaycastHit raycastHit;
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.settings.FindProperty("roadLayer").intValue | 1 << intersection.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+            {
+                pillar.transform.position = Misc.GetCenter(position, raycastHit.point);
+                pillar.transform.localScale = new Vector3(intersection.xPillarScale, ((position.y - raycastHit.point.y) / 2) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, intersection.zPillarScale);
+            }
         }
     }
 

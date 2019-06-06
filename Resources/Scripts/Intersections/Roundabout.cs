@@ -28,6 +28,11 @@ public class Roundabout
         CreateCenterExtraMeshes(intersection);
         SetupRoundaboutMesh(intersection, vertices, triangles, connectionTriangles, uvs, uvs2);
         SetupBridgeMesh(intersection, bridgeVertices, bridgeTriangles, bridgeUvs);
+
+        if (intersection.generateBridge == true && intersection.placePillars == true)
+        {
+            BridgeGeneration.PlaceRoundaboutPillars(intersection);
+        }
     }
 
     private static void CreateRoadSections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int addedVertices, List<int> nearestLeftPoints, List<int> nearestRightPoints)
@@ -115,7 +120,7 @@ public class Roundabout
                         verticesToLoop += endIndex;
                     }
 
-                    while (vertexIndex != endIndex && triangles.Count < 10000)
+                    while (vertexIndex - 2 != endIndex && triangles.Count < 10000)
                     {
                         if (vertexIndex > vertices.Count - 4 - addedVertices)
                         {
@@ -158,29 +163,6 @@ public class Roundabout
                         vertexIndex += 2;
                     }
 
-                    // Last bit
-                    /*if (intersection.generateBridge == true)
-                    {
-                        float leftWidth = intersection.roundaboutWidth;
-                        if (leftExtraMesh != null)
-                        {
-                            leftWidth += Mathf.Lerp(leftExtraMesh.startWidth, leftExtraMesh.endWidth, (float)verticesLooped / verticesToLoop);
-                        }
-
-                        float rightWidth = intersection.roundaboutWidth;
-                        if (rightExtraMesh != null)
-                        {
-                            rightWidth += rightExtraMesh.startWidth;
-                        }
-
-                        Vector3 centerPoint = Misc.GetCenter(vertices[vertexIndex], vertices[vertexIndex + 1]);
-                        centerPoint.y -= intersection.yOffset;
-                        BridgeGeneration.AddRoadSegmentBridgeVertices(intersection, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, centerPoint, leftWidth, rightWidth, (vertices[vertexIndex] - vertices[vertexIndex + 1]).normalized, (float)verticesLooped / verticesToLoop, textureRepeations * verticesToLoop / (vertices.Count - addedVertices - 1));
-                    }
-
-                    leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, 1, verticesLooped, verticesToLoop * distanceBetweenVertices);
-                    
-                       */
                     AssignExtraMeshes(intersection, leftExtraMeshes);
                 }
                 else
