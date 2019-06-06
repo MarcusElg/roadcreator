@@ -507,32 +507,37 @@ public class BridgeGeneration
             pillar.transform.SetParent(intersection.transform.GetChild(intersection.transform.childCount - 1));
 
             Vector3 position = intersection.transform.position + Quaternion.Euler(0, d * 360, 0) * Vector3.forward * intersection.roundaboutRadius - new Vector3(0, 0.01f + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0);
-            Vector3 right = (position - intersection.transform.position).normalized;
-            Vector3 backward = Misc.CalculateLeft(position - intersection.transform.position);
-            right.y = 0;
-
-            if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.forward)
-            {
-                pillar.transform.rotation = Quaternion.LookRotation(-backward);
-            }
-            else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.backward)
-            {
-                pillar.transform.rotation = Quaternion.LookRotation(backward);
-            }
-            else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.left)
-            {
-                pillar.transform.rotation = Quaternion.LookRotation(-right);
-            }
-            else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.right)
-            {
-                pillar.transform.rotation = Quaternion.LookRotation(right);
-            }
 
             RaycastHit raycastHit;
             if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.settings.FindProperty("roadLayer").intValue | 1 << intersection.settings.FindProperty("ignoreMouseRayLayer").intValue)))
             {
+                Vector3 right = (position - intersection.transform.position).normalized;
+                Vector3 backward = Misc.CalculateLeft(position - intersection.transform.position);
+                right.y = 0;
+
+                if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.forward)
+                {
+                    pillar.transform.rotation = Quaternion.LookRotation(-backward);
+                }
+                else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.backward)
+                {
+                    pillar.transform.rotation = Quaternion.LookRotation(backward);
+                }
+                else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.left)
+                {
+                    pillar.transform.rotation = Quaternion.LookRotation(-right);
+                }
+                else if (intersection.pillarRotationDirection == PrefabLineCreator.RotationDirection.right)
+                {
+                    pillar.transform.rotation = Quaternion.LookRotation(right);
+                }
+
                 pillar.transform.position = Misc.GetCenter(position, raycastHit.point);
                 pillar.transform.localScale = new Vector3(intersection.xPillarScale, ((position.y - raycastHit.point.y) / 2) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, intersection.zPillarScale);
+            }
+            else
+            {
+                GameObject.DestroyImmediate(pillar);
             }
         }
     }

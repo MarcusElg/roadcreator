@@ -48,9 +48,9 @@ public class RoadSegment : MonoBehaviour
     {
         CheckMaterialsAndPrefabs();
 
-        if (transform.Find("Bridge Base") != null)
+        if (transform.Find("Bridge") != null)
         {
-            DestroyImmediate(transform.Find("Bridge Base").gameObject);
+            DestroyImmediate(transform.Find("Bridge").gameObject);
         }
 
         if (transform.Find("Custom Bridge") != null)
