@@ -256,6 +256,8 @@ public class IntersectionEditor : Editor
             if (intersection.transform.hasChanged == true)
             {
                 intersection.CreateMesh();
+                intersection.transform.rotation = Quaternion.identity;
+                intersection.transform.localScale = Vector3.one;
                 intersection.transform.hasChanged = false;
             }
         }

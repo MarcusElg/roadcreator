@@ -154,83 +154,87 @@ public class PrefabLineEditor : Editor
 
     public void OnSceneGUI()
     {
-        if (prefabCreator.hideFlags != HideFlags.NotEditable)
+        if (prefabCreator.transform.hasChanged == true)
         {
-            Event guiEvent = Event.current;
+            prefabCreator.transform.rotation = Quaternion.identity;
+            prefabCreator.transform.localScale = Vector3.one;
+            prefabCreator.PlacePrefabs();
+            prefabCreator.transform.hasChanged = false;
+        }
 
-            Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
+        Event guiEvent = Event.current;
+        Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
-            RaycastHit raycastHit;
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
+        RaycastHit raycastHit;
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
+        {
+            Vector3 hitPosition = raycastHit.point;
+
+            if (guiEvent.control == true)
             {
-                Vector3 hitPosition = raycastHit.point;
-
-                if (guiEvent.control == true)
+                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                if (nearestGuideline != Misc.MaxVector3)
                 {
-                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
-                    if (nearestGuideline != Misc.MaxVector3)
-                    {
-                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
-                    }
-                    else
-                    {
-                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
-                    }
-                }
-
-                if (guiEvent.type == EventType.MouseDown)
-                {
-                    if (guiEvent.button == 0)
-                    {
-                        if (guiEvent.shift == true)
-                        {
-                            prefabCreator.CreatePoints(hitPosition);
-                        }
-                    }
-                    else if (guiEvent.button == 1 && guiEvent.shift == true)
-                    {
-                        prefabCreator.RemovePoints();
-                    }
-                }
-
-                if (prefabCreator.transform.childCount > 0 && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
-                {
-                    points = CalculateTemporaryPoints(guiEvent, hitPosition);
-                }
-
-                Draw(guiEvent, hitPosition);
-            }
-
-            if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
-            {
-                Vector3 hitPosition = raycastHit.point;
-
-                if (guiEvent.control == true)
-                {
-                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
-                    if (nearestGuideline != Misc.MaxVector3)
-                    {
-                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
-                    }
-                    else
-                    {
-                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
-                    }
-                }
-
-                if (guiEvent.shift == false)
-                {
-                    prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
+                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
                 }
                 else
                 {
-                    prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
+                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
                 }
             }
 
-            GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
-            SceneView.currentDrawingSceneView.Repaint();
+            if (guiEvent.type == EventType.MouseDown)
+            {
+                if (guiEvent.button == 0)
+                {
+                    if (guiEvent.shift == true)
+                    {
+                        prefabCreator.CreatePoints(hitPosition);
+                    }
+                }
+                else if (guiEvent.button == 1 && guiEvent.shift == true)
+                {
+                    prefabCreator.RemovePoints();
+                }
+            }
+
+            if (prefabCreator.transform.childCount > 0 && prefabCreator.transform.GetChild(0).childCount > 1 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
+            {
+                points = CalculateTemporaryPoints(guiEvent, hitPosition);
+            }
+
+            Draw(guiEvent, hitPosition);
         }
+
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
+        {
+            Vector3 hitPosition = raycastHit.point;
+
+            if (guiEvent.control == true)
+            {
+                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                if (nearestGuideline != Misc.MaxVector3)
+                {
+                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                }
+                else
+                {
+                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                }
+            }
+
+            if (guiEvent.shift == false)
+            {
+                prefabCreator.MovePoints(hitPosition, guiEvent, raycastHit);
+            }
+            else
+            {
+                prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
+            }
+        }
+
+        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        SceneView.currentDrawingSceneView.Repaint();
     }
 
     private void Draw(Event guiEvent, Vector3 hitPosition)

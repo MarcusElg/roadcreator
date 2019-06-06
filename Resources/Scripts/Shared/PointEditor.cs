@@ -54,6 +54,9 @@ public class PointEditor : Editor
 
         if (point.transform.hasChanged == true)
         {
+            point.transform.rotation = Quaternion.identity;
+            point.transform.localScale = Vector3.one;
+
             if (point.roadPoint == true)
             {
                 if (roadCreator != null)

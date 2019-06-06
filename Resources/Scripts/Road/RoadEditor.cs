@@ -102,6 +102,8 @@ public class RoadEditor : Editor
 
         if (roadCreator.transform.hasChanged)
         {
+            roadCreator.transform.rotation = Quaternion.identity;
+            roadCreator.transform.localScale = Vector3.one;
             roadCreator.CreateMesh();
             roadCreator.transform.hasChanged = false;
         }
