@@ -464,12 +464,12 @@ public class Roundabout
             if (offset != 1)
             {
                 bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
-                bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
                 bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
 
                 bridgeTriangles.Add(bridgeVertices.Count - 12 + addedVertices);
-                bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
                 bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
             }
             else
             {
@@ -481,7 +481,70 @@ public class Roundabout
                 bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
                 bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
             }
+
+            if (modifiedF == 1)
+            {
+                // End cap
+                if (offset != 1)
+                {
+                    GenerateCapFlipped(ref bridgeVertices, ref bridgeTriangles, addedVertices);
+                }
+                else
+                {
+                    GenerateCap(ref bridgeVertices, ref bridgeTriangles, addedVertices);
+                }
+            }
         }
+        else
+        {
+            // Start cap
+            if (offset != 1)
+            {
+                GenerateCap(ref bridgeVertices, ref bridgeTriangles, addedVertices);
+            }
+            else
+            {
+                GenerateCapFlipped(ref bridgeVertices, ref bridgeTriangles, addedVertices);
+            }
+        }
+    }
+
+    private static void GenerateCap(ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, int addedVertices)
+    {
+        bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 5 + addedVertices);
+
+        bridgeTriangles.Add(bridgeVertices.Count - 5 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 4 + addedVertices);
+
+        bridgeTriangles.Add(bridgeVertices.Count - 4 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 3 + addedVertices);
+
+        bridgeTriangles.Add(bridgeVertices.Count - 2 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 3 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+    }
+
+    private static void GenerateCapFlipped(ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, int addedVertices)
+    {
+        bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 5 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+
+        bridgeTriangles.Add(bridgeVertices.Count - 5 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 4 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+
+        bridgeTriangles.Add(bridgeVertices.Count - 4 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 3 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+
+        bridgeTriangles.Add(bridgeVertices.Count - 2 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+        bridgeTriangles.Add(bridgeVertices.Count - 3 + addedVertices);
     }
 
     private static void CreateRoundaboutVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2)
