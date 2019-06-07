@@ -422,8 +422,8 @@ public class Roundabout
 
         bridgeVertices.Add(vertices[vertices.Count - 6 + offset] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset, 0));
         bridgeVertices.Add(vertices[vertices.Count - 6 + offset] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * distance * (-intersection.bridgeSettings.extraWidth + 1 - intersection.bridgeSettings.widthPercentageFirstStep) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * distance * (-intersection.bridgeSettings.extraWidth + 1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * (-intersection.bridgeSettings.extraWidth + distance * (1 - intersection.bridgeSettings.widthPercentageFirstStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * (-intersection.bridgeSettings.extraWidth + distance * (1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
         bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * distance - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
         bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * distance - new Vector3(0, intersection.yOffset, 0));
 
@@ -464,12 +464,12 @@ public class Roundabout
             if (offset != 1)
             {
                 bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
-                bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
                 bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
 
                 bridgeTriangles.Add(bridgeVertices.Count - 12 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
                 bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
-                bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
             }
             else
             {
