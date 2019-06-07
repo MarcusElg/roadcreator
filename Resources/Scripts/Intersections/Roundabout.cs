@@ -60,7 +60,7 @@ public class Roundabout
                 {
                     if ((intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
                     {
-                        leftExtraMesh = intersection.extraMeshes[i];
+                        leftExtraMesh = intersection.extraMeshes[j];
                     }
                 }
 
@@ -127,13 +127,16 @@ public class Roundabout
                             vertexIndex = 0;
                         }
 
-                        triangles.Add(vertexIndex);
-                        triangles.Add(vertexIndex + 2);
-                        triangles.Add(vertexIndex + 1);
+                        if (vertexIndex != endIndex)
+                        {
+                            triangles.Add(vertexIndex);
+                            triangles.Add(vertexIndex + 2);
+                            triangles.Add(vertexIndex + 1);
 
-                        triangles.Add(vertexIndex + 2);
-                        triangles.Add(vertexIndex + 3);
-                        triangles.Add(vertexIndex + 1);
+                            triangles.Add(vertexIndex + 2);
+                            triangles.Add(vertexIndex + 3);
+                            triangles.Add(vertexIndex + 1);
+                        }
 
                         // Bridge
                         if (intersection.generateBridge == true)
@@ -175,6 +178,8 @@ public class Roundabout
 
     private static void CreateRoadConnections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector2> uvs, ref List<Vector2> uvs2, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, ref List<int> connectionTriangles, ref List<int> nearestLeftPoints, ref List<int> nearestRightPoints, ref int addedVertices)
     {
+        int addedBridgeVertices = 0;
+
         for (int i = 0; i < intersection.connections.Count; i++)
         {
             Vector3 forward = Misc.CalculateLeft(intersection.connections[i].rightPoint - intersection.connections[i].leftPoint);
@@ -217,7 +222,7 @@ public class Roundabout
             AddConnectionExtraMeshes(intersection, ref leftExtraMeshes, ref rightExtraMeshes, i);
 
             int actualSegments = 0;
-            AddNewRoadConnectionVertices(intersection, ref vertices, ref uvs, ref uvs2, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, i, centerPoint, nearestLeftPoints, nearestRightPoints, ref addedVertices, leftExtraMeshes, rightExtraMeshes, ref actualSegments);
+            AddNewRoadConnectionVertices(intersection, ref vertices, ref uvs, ref uvs2, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, i, centerPoint, nearestLeftPoints, nearestRightPoints, ref addedVertices, leftExtraMeshes, rightExtraMeshes, ref actualSegments, ref addedBridgeVertices);
             connectionTriangles.AddRange(AddConnectionTriangles(vertices, triangles, actualSegments));
             AssignExtraMeshes(intersection, leftExtraMeshes);
             AssignExtraMeshes(intersection, rightExtraMeshes);
@@ -292,7 +297,7 @@ public class Roundabout
         }
     }
 
-    private static void AddNewRoadConnectionVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int i, Vector3 centerPoint, List<int> nearestLeftPoints, List<int> nearestRightPoints, ref int addedVertices, List<RoundaboutExtraMesh> leftExtraMeshes, List<RoundaboutExtraMesh> rightExtraMeshes, ref int actualSegments)
+    private static void AddNewRoadConnectionVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int i, Vector3 centerPoint, List<int> nearestLeftPoints, List<int> nearestRightPoints, ref int addedVertices, List<RoundaboutExtraMesh> leftExtraMeshes, List<RoundaboutExtraMesh> rightExtraMeshes, ref int actualSegments, ref int addedBridgeVertices)
     {
         int segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position) * 10);
         float distancePerSegment = 1f / segments;
@@ -310,7 +315,7 @@ public class Roundabout
         List<int> bridgeTrianglesInner = new List<int>();
         List<Vector2> bridgeUvsInner = new List<Vector2>();
 
-        int bridgeVerticesAdded = bridgeVertices.Count;
+        int bridgeVerticesAdded = 0;
 
         for (float f = 0; f <= 1 + distancePerSegment; f += distancePerSegment)
         {
@@ -330,6 +335,7 @@ public class Roundabout
             vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].leftPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint - intersection.transform.position, vertices[nearestLeftPoints[i]], modifiedF));
             vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].rightPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint2 - intersection.transform.position, vertices[nearestRightPoints[i]], modifiedF));
             vertices.Add(Quaternion.Euler(new Vector3(0, Mathf.Lerp(degreesStartInner, degreesEndInner, modifiedF), 0)) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
+
             vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
             vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
             vertices[vertices.Count - 3] = new Vector3(vertices[vertices.Count - 3].x, intersection.yOffset, vertices[vertices.Count - 3].z);
@@ -350,12 +356,11 @@ public class Roundabout
             // Bridges
             if (intersection.generateBridge == true)
             {
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesLeft, ref bridgeTrianglesLeft, ref bridgeUvsLeft, vertices, modifiedF, 0, bridgeVerticesAdded);
-                bridgeVerticesAdded += 6;
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesRight, ref bridgeTrianglesRight, ref bridgeUvsRight, vertices, modifiedF, 1, bridgeVerticesAdded);
-                bridgeVerticesAdded += 6;
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesInner, ref bridgeTrianglesInner, ref bridgeUvsInner, vertices, modifiedF, 2, bridgeVerticesAdded);
-                bridgeVerticesAdded += 6;
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesLeft, ref bridgeTrianglesLeft, ref bridgeUvsLeft, vertices, modifiedF, 0, addedBridgeVertices);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesRight, ref bridgeTrianglesRight, ref bridgeUvsRight, vertices, modifiedF, 1, (segments + 1) * 6 + addedBridgeVertices);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesInner, ref bridgeTrianglesInner, ref bridgeUvsInner, vertices, modifiedF, 2, (segments + 1) * 12 + addedBridgeVertices);
+
+                bridgeVerticesAdded += 18;
             }
 
             vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
@@ -390,6 +395,8 @@ public class Roundabout
             uvs2.Add(Vector2.one);
             uvs2.Add(Vector2.one);
         }
+
+        addedBridgeVertices += bridgeVerticesAdded;
 
         // Combine bridge meshes
         if (intersection.generateBridge == true)
@@ -431,23 +438,49 @@ public class Roundabout
         {
             for (int j = 0; j < 4; j++)
             {
-                bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
-                bridgeTriangles.Add(bridgeVertices.Count - 5 - 6 * 3 + j + addedVertices);
-                bridgeTriangles.Add(bridgeVertices.Count - 5 + j + addedVertices);
+                if (offset != 1)
+                {
+                    bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 11 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 5 + j + addedVertices);
 
-                //bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
-                //bridgeTriangles.Add(bridgeVertices.Count - 12 + j + addedVertices);
-                //bridgeTriangles.Add(bridgeVertices.Count - 11 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 12 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 11 + j + addedVertices);
+                }
+                else
+                {
+                    bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 5 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 11 + j + addedVertices);
+
+                    bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 11 + j + addedVertices);
+                    bridgeTriangles.Add(bridgeVertices.Count - 12 + j + addedVertices);
+                }
             }
 
             // Top part
-            bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
-            bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
-            bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+            if (offset != 1)
+            {
+                bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
 
-            bridgeTriangles.Add(bridgeVertices.Count - 12 + addedVertices);
-            bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
-            bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 12 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+            }
+            else
+            {
+                bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
+
+                bridgeTriangles.Add(bridgeVertices.Count - 12 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 7 + addedVertices);
+                bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
+            }
         }
     }
 

@@ -464,7 +464,7 @@ public class BridgeGeneration
 
         bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
         bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth * intersection.bridgeSettings.widthPercentageFirstStep) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth) - new Vector3(0, intersection.bridgeSettings.yOffsetFirstStep, 0));
         bridgeVertices.Add(centerPoint - left * (intersection.bridgeSettings.extraWidth + rightWidth));
 
         bridgeUvs = BridgeGeneration.AddBridgeUvs(bridgeUvs, progress * textureRepeations);
