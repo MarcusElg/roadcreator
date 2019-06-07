@@ -66,6 +66,24 @@ public class RoadCreatorProjectSettings
                     UpdateSettings();
                 }
 
+                EditorGUI.BeginChangeCheck();
+                settings.FindProperty("roundaboutConnectionIndexOffset").intValue = Mathf.Clamp(EditorGUILayout.IntField("Roundabout Connection Index Offset", settings.FindProperty("roundaboutConnectionIndexOffset").intValue), 0, 10);
+
+                if (EditorGUI.EndChangeCheck() == true)
+                {
+                    settings.ApplyModifiedPropertiesWithoutUndo();
+                    UpdateSettings();
+
+                    Intersection[] intersections = GameObject.FindObjectsOfType<Intersection>();
+                    for (int i = 0; i < intersections.Length; i++)
+                    {
+                        if (intersections[i].roundaboutMode == true)
+                        {
+                            intersections[i].CreateMesh();
+                        }
+                    }
+                }
+
                 GUIStyle guiStyle = new GUIStyle();
                 guiStyle.fontStyle = FontStyle.Bold;
 

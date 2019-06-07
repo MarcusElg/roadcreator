@@ -248,8 +248,8 @@ public class Roundabout
             }
         }
 
-        nearestLeftPoints[i] += 2;
-        nearestRightPoints[i] -= 2;
+        nearestLeftPoints[i] += 2 * intersection.settings.FindProperty("roundaboutConnectionIndexOffset").intValue;
+        nearestRightPoints[i] -= 2 * intersection.settings.FindProperty("roundaboutConnectionIndexOffset").intValue;
     }
 
     private static void AddConnectionExtraMeshes(Intersection intersection, ref List<RoundaboutExtraMesh> leftExtraMeshes, ref List<RoundaboutExtraMesh> rightExtraMeshes, int i)

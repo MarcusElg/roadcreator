@@ -12,6 +12,7 @@ public class RoadCreatorSettings : ScriptableObject
     public int ignoreMouseRayLayer = 9;
     public int roadLayer = 10;
     public bool hideNonEditableChildren = true;
+    public int roundaboutConnectionIndexOffset = 1;
 
     public float oldRoadGuidelinesLength = 5;
     public float roadGuidelinesLength = 5;
