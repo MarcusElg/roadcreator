@@ -134,7 +134,7 @@ public class RoadSegmentEditor : Editor
 
             if (serializedObject.FindProperty("placePillars").boolValue == true)
             {
-                serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Pillar Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
+                serializedObject.FindProperty("pillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Prefab", serializedObject.FindProperty("pillarPrefab").objectReferenceValue, typeof(GameObject), false);
 
                 if (serializedObject.FindProperty("generateCustomBridge").boolValue == true)
                 {
@@ -156,15 +156,15 @@ public class RoadSegmentEditor : Editor
 
                 if (serializedObject.FindProperty("adaptGapToCustomBridge").boolValue == false)
                 {
-                    serializedObject.FindProperty("xPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale", serializedObject.FindProperty("xPillarScale").floatValue));
+                    serializedObject.FindProperty("xPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Scale", serializedObject.FindProperty("xPillarScale").floatValue));
                 }
                 else
                 {
-                    serializedObject.FindProperty("xPillarScaleMultiplier").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale Multiplier", serializedObject.FindProperty("xPillarScaleMultiplier").floatValue));
+                    serializedObject.FindProperty("xPillarScaleMultiplier").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Scale Multiplier", serializedObject.FindProperty("xPillarScaleMultiplier").floatValue));
                 }
 
-                serializedObject.FindProperty("zPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Pillar Scale", serializedObject.FindProperty("zPillarScale").floatValue));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("pillarRotationDirection"), true);
+                serializedObject.FindProperty("zPillarScale").floatValue = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Scale", serializedObject.FindProperty("zPillarScale").floatValue));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("pillarRotationDirection"), new GUIContent("Rotation Direction"), true);
             }
         }
 

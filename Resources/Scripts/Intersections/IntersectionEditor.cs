@@ -116,16 +116,16 @@ public class IntersectionEditor : Editor
 
                 if (intersection.roundaboutMode == true)
                 {
-                    intersection.pillarGap = Mathf.Max(0, EditorGUILayout.FloatField("Pillar Gap", intersection.pillarGap));
-                    intersection.pillarPlacementOffset = Mathf.Max(0, EditorGUILayout.FloatField("Pillar Placement Offset", intersection.pillarPlacementOffset));
-                    intersection.xPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Pillar Scale", intersection.xPillarScale));
-                    intersection.zPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Pillar Scale", intersection.zPillarScale));
-                    intersection.pillarRotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Pillar Rotation Direction", intersection.pillarRotationDirection);
+                    intersection.pillarGap = Mathf.Max(0, EditorGUILayout.FloatField("Gap", intersection.pillarGap));
+                    intersection.pillarPlacementOffset = Mathf.Max(0, EditorGUILayout.FloatField("Placement Offset", intersection.pillarPlacementOffset));
+                    intersection.xPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("X Scale", intersection.xPillarScale));
+                    intersection.zPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("Z Scale", intersection.zPillarScale));
+                    intersection.pillarRotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", intersection.pillarRotationDirection);
                 }
                 else
                 {
-                    intersection.extraPillarHeight = Mathf.Max(0, EditorGUILayout.FloatField("Extra Pillar Height", intersection.extraPillarHeight));
-                    intersection.xzPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("XZ Pillar Scale", intersection.xzPillarScale));
+                    intersection.extraPillarHeight = Mathf.Max(0, EditorGUILayout.FloatField("Extra Height", intersection.extraPillarHeight));
+                    intersection.xzPillarScale = Mathf.Max(0.1f, EditorGUILayout.FloatField("XZ Scale", intersection.xzPillarScale));
                 }
             }
         }
