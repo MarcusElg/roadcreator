@@ -182,7 +182,7 @@ public class RoadSegmentEditor : Editor
                 PhysicMaterial physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", inspectedSegment.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
                 float startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", inspectedSegment.extraMeshes[i].startWidth), 0);
                 float endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", inspectedSegment.extraMeshes[i].endWidth), 0);
-                float yOffset = EditorGUILayout.FloatField("Y Offset", inspectedSegment.extraMeshes[i].yOffset);
+                float yOffset = Mathf.Max(0.01f, EditorGUILayout.FloatField("Y Offset", inspectedSegment.extraMeshes[i].yOffset));
 
                 for (int j = 0; j < targets.Length; j++)
                 {
