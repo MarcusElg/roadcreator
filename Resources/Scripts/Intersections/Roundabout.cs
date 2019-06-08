@@ -340,7 +340,9 @@ public class Roundabout
             // Left, right and inner
             vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].leftPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint - intersection.transform.position, vertices[nearestLeftPoints[i]], modifiedF));
             vertices.Add(Misc.Lerp3CenterHeight(intersection.connections[i].rightPoint - intersection.transform.position + new Vector3(0, intersection.yOffset, 0), intersection.connections[i].curvePoint2 - intersection.transform.position, vertices[nearestRightPoints[i]], modifiedF));
-            vertices.Add(Quaternion.Euler(new Vector3(0, Mathf.Lerp(degreesStartInner, degreesEndInner, modifiedF), 0)) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
+
+            Vector3 lerpedPoint = Vector3.Lerp(vertices[nearestLeftPoints[i] + 1], vertices[nearestRightPoints[i] + 1], modifiedF);
+            vertices.Add(Quaternion.Euler(new Vector3(0, Quaternion.LookRotation(lerpedPoint).eulerAngles.y, 0)) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth));
 
             vertices[vertices.Count - 1] += new Vector3(0, intersection.yOffset, 0);
             vertices[vertices.Count - 2] = new Vector3(vertices[vertices.Count - 2].x, intersection.yOffset, vertices[vertices.Count - 2].z);
