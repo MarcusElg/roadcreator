@@ -106,6 +106,7 @@ public class RoadSystem : MonoBehaviour
             gameObject.GetComponent<Intersection>().placePillars = false;
             gameObject.GetComponent<Intersection>().overlayMaterial = (Material)settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue;
             gameObject.GetComponent<Intersection>().connectionOverlayMaterial = (Material)settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue;
+            gameObject.GetComponent<Intersection>().placePillars = true;
             gameObject.GetComponent<Intersection>().CreateMesh();
 
             gameObject.name = "Roundabout";
