@@ -299,7 +299,7 @@ public class Roundabout
 
     private static void AddNewRoadConnectionVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int i, Vector3 centerPoint, List<int> nearestLeftPoints, List<int> nearestRightPoints, ref int addedVertices, List<RoundaboutExtraMesh> leftExtraMeshes, List<RoundaboutExtraMesh> rightExtraMeshes, ref int actualSegments, ref int addedBridgeVertices)
     {
-        int segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position) * 10);
+        int segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position - new Vector3(0, intersection.yOffset, 0)) * 10);
         float distancePerSegment = 1f / segments;
         float degreesStartInner = Quaternion.LookRotation(vertices[nearestLeftPoints[i] + 1]).eulerAngles.y;
         float degreesEndInner = Quaternion.LookRotation(vertices[nearestRightPoints[i] + 1]).eulerAngles.y;
@@ -316,8 +316,14 @@ public class Roundabout
         List<Vector2> bridgeUvsInner = new List<Vector2>();
 
         int bridgeVerticesAdded = 0;
+        int segmentsAdded = 0;
 
-        for (float f = 0; f <= 1 + distancePerSegment; f += distancePerSegment)
+        for (float f = 0; f < 1 + distancePerSegment; f += distancePerSegment)
+        {
+            segmentsAdded += 1;
+        }
+
+        for (float f = 0; f < 1 + distancePerSegment; f += distancePerSegment)
         {
             float modifiedF = f;
             actualSegments += 1;
@@ -326,7 +332,7 @@ public class Roundabout
             {
                 modifiedF = 0.5f;
             }
-            else if (modifiedF > 1)
+            else if (modifiedF > 1f)
             {
                 modifiedF = 1f;
             }
@@ -357,8 +363,8 @@ public class Roundabout
             if (intersection.generateBridge == true)
             {
                 AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesLeft, ref bridgeTrianglesLeft, ref bridgeUvsLeft, vertices, modifiedF, 0, addedBridgeVertices);
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesRight, ref bridgeTrianglesRight, ref bridgeUvsRight, vertices, modifiedF, 1, (segments + 1) * 6 + addedBridgeVertices);
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesInner, ref bridgeTrianglesInner, ref bridgeUvsInner, vertices, modifiedF, 2, (segments + 1) * 12 + addedBridgeVertices);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesRight, ref bridgeTrianglesRight, ref bridgeUvsRight, vertices, modifiedF, 1, segmentsAdded * 6 + addedBridgeVertices);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesInner, ref bridgeTrianglesInner, ref bridgeUvsInner, vertices, modifiedF, 2, segmentsAdded * 12 + addedBridgeVertices);
 
                 bridgeVerticesAdded += 18;
             }
