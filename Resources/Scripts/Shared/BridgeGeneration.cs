@@ -492,22 +492,26 @@ public class BridgeGeneration
             bridgeTriangles.Add(bridgeVertices.Count - 9);
 
             // End cap
-            bridgeTriangles.Add(bridgeVertices.Count - 7);
-            bridgeTriangles.Add(bridgeVertices.Count - 2);
-            bridgeTriangles.Add(bridgeVertices.Count - 1);
+            if (progress == 1)
+            {
+                bridgeTriangles.Add(bridgeVertices.Count - 7);
+                bridgeTriangles.Add(bridgeVertices.Count - 2);
+                bridgeTriangles.Add(bridgeVertices.Count - 1);
 
-            bridgeTriangles.Add(bridgeVertices.Count - 8);
-            bridgeTriangles.Add(bridgeVertices.Count - 7);
-            bridgeTriangles.Add(bridgeVertices.Count - 1);
+                bridgeTriangles.Add(bridgeVertices.Count - 8);
+                bridgeTriangles.Add(bridgeVertices.Count - 7);
+                bridgeTriangles.Add(bridgeVertices.Count - 1);
 
-            bridgeTriangles.Add(bridgeVertices.Count - 5);
-            bridgeTriangles.Add(bridgeVertices.Count - 4);
-            bridgeTriangles.Add(bridgeVertices.Count - 3);
+                bridgeTriangles.Add(bridgeVertices.Count - 5);
+                bridgeTriangles.Add(bridgeVertices.Count - 4);
+                bridgeTriangles.Add(bridgeVertices.Count - 3);
 
-            bridgeTriangles.Add(bridgeVertices.Count - 3);
-            bridgeTriangles.Add(bridgeVertices.Count - 6);
-            bridgeTriangles.Add(bridgeVertices.Count - 5);
-        } else
+                bridgeTriangles.Add(bridgeVertices.Count - 3);
+                bridgeTriangles.Add(bridgeVertices.Count - 6);
+                bridgeTriangles.Add(bridgeVertices.Count - 5);
+            }
+        }
+        else
         {
             // Start cap
             bridgeTriangles.Add(bridgeVertices.Count - 7);

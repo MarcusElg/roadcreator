@@ -38,13 +38,15 @@ public class Roundabout
     private static void CreateRoadSections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int addedVertices, List<int> nearestLeftPoints, List<int> nearestRightPoints)
     {
         float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
-        ExtraMesh rightExtraMesh = null;
+        float rightStartWidth = 0;
+        float rightEndWidth = 0;
 
         for (int j = 0; j < intersection.extraMeshes.Count; j++)
         {
             if (intersection.extraMeshes[j].index == 0)
             {
-                rightExtraMesh = intersection.extraMeshes[j];
+                rightStartWidth += intersection.extraMeshes[j].startWidth;
+                rightEndWidth += intersection.extraMeshes[j].endWidth;
             }
         }
 
@@ -54,13 +56,15 @@ public class Roundabout
             {
                 int startIndex;
                 int endIndex;
-                ExtraMesh leftExtraMesh = null;
+                float leftStartWidth = 0;
+                float leftEndWidth = 0;
 
                 for (int j = 0; j < intersection.extraMeshes.Count; j++)
                 {
                     if ((intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
                     {
-                        leftExtraMesh = intersection.extraMeshes[j];
+                        leftStartWidth += intersection.extraMeshes[j].startWidth;
+                        leftEndWidth += intersection.extraMeshes[j].endWidth;
                     }
                 }
 
@@ -141,17 +145,8 @@ public class Roundabout
                         // Bridge
                         if (intersection.generateBridge == true)
                         {
-                            float leftWidth = intersection.roundaboutWidth;
-                            if (leftExtraMesh != null)
-                            {
-                                leftWidth += Mathf.Lerp(leftExtraMesh.startWidth, leftExtraMesh.endWidth, (float)verticesLooped / verticesToLoop);
-                            }
-
-                            float rightWidth = intersection.roundaboutWidth;
-                            if (rightExtraMesh != null)
-                            {
-                                rightWidth += rightExtraMesh.startWidth;
-                            }
+                            float leftWidth = intersection.roundaboutWidth + Mathf.Lerp(leftStartWidth, leftEndWidth, (float)verticesLooped / verticesToLoop);
+                            float rightWidth = intersection.roundaboutWidth + Mathf.Lerp(rightStartWidth, rightEndWidth, (float)verticesLooped / verticesToLoop);
 
                             Vector3 centerPoint = Misc.GetCenter(vertices[vertexIndex], vertices[vertexIndex + 1]);
                             centerPoint.y -= intersection.yOffset;
@@ -159,7 +154,7 @@ public class Roundabout
                         }
 
                         // Extra meshes
-                        float progress = (float)verticesLooped / (float)verticesToLoop;
+                        float progress = (float)verticesLooped / verticesToLoop;
                         leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
 
                         verticesLooped += 2;
@@ -304,6 +299,32 @@ public class Roundabout
         float degreesStartInner = Quaternion.LookRotation(vertices[nearestLeftPoints[i] + 1]).eulerAngles.y;
         float degreesEndInner = Quaternion.LookRotation(vertices[nearestRightPoints[i] + 1]).eulerAngles.y;
 
+        float leftStartWidth = 0;
+        float leftEndWidth = 0;
+        float rightStartWidth = 0;
+        float rightEndWidth = 0;
+        float innerStartWidth = 0;
+        float innerEndWidth = 0;
+
+        for (int j = 0; j < intersection.extraMeshes.Count; j++)
+        {
+            if (intersection.extraMeshes[j].index == 0)
+            {
+                innerStartWidth += intersection.extraMeshes[j].startWidth;
+                innerEndWidth += intersection.extraMeshes[j].endWidth;
+            }
+            else if ((intersection.extraMeshes[j].index - 1) % 3 == 1 && (intersection.extraMeshes[j].index - 2) / 3 == i)
+            {
+                leftStartWidth += intersection.extraMeshes[j].startWidth;
+                leftEndWidth += intersection.extraMeshes[j].endWidth;
+            }
+            else if ((intersection.extraMeshes[j].index - 1) % 3 == 2 && (intersection.extraMeshes[j].index - 3) / 3 == i)
+            {
+                rightStartWidth = intersection.extraMeshes[j].startWidth;
+                rightEndWidth = intersection.extraMeshes[j].endWidth;
+            }
+        }
+
         // Bridges
         List<Vector3> bridgeVerticesLeft = new List<Vector3>();
         List<int> bridgeTrianglesLeft = new List<int>();
@@ -364,9 +385,14 @@ public class Roundabout
             // Bridges
             if (intersection.generateBridge == true)
             {
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesLeft, ref bridgeTrianglesLeft, ref bridgeUvsLeft, vertices, modifiedF, 0, addedBridgeVertices);
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesRight, ref bridgeTrianglesRight, ref bridgeUvsRight, vertices, modifiedF, 1, segmentsAdded * 6 + addedBridgeVertices);
-                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesInner, ref bridgeTrianglesInner, ref bridgeUvsInner, vertices, modifiedF, 2, segmentsAdded * 12 + addedBridgeVertices);
+                float width = Vector3.Distance(vertices[vertices.Count - 6], vertices[vertices.Count - 3]) + Mathf.Lerp(leftStartWidth, leftEndWidth, modifiedF);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesLeft, ref bridgeTrianglesLeft, ref bridgeUvsLeft, vertices[vertices.Count - 3], (vertices[vertices.Count - 6] - vertices[vertices.Count - 3]).normalized, width, modifiedF, addedBridgeVertices);
+
+                width = Vector3.Distance(vertices[vertices.Count - 5], vertices[vertices.Count - 2]) + Mathf.Lerp(rightStartWidth, rightEndWidth, modifiedF);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesRight, ref bridgeTrianglesRight, ref bridgeUvsRight, vertices[vertices.Count - 2], (vertices[vertices.Count - 5] - vertices[vertices.Count - 2]).normalized, width, modifiedF, segmentsAdded * 6 + addedBridgeVertices, true);
+
+                width = Vector3.Distance(vertices[vertices.Count - 4], vertices[vertices.Count - 1]) + Mathf.Lerp(innerStartWidth, innerEndWidth, modifiedF);
+                AddRoadConnectionBridgeVertices(intersection, ref bridgeVerticesInner, ref bridgeTrianglesInner, ref bridgeUvsInner, vertices[vertices.Count - 1], (vertices[vertices.Count - 4] - vertices[vertices.Count - 1]).normalized, width, modifiedF, segmentsAdded * 12 + addedBridgeVertices);
 
                 bridgeVerticesAdded += 18;
             }
@@ -421,19 +447,17 @@ public class Roundabout
         }
     }
 
-    private static void AddRoadConnectionBridgeVertices(Intersection intersection, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, List<Vector3> vertices, float modifiedF, int offset, int addedVertices)
+    private static void AddRoadConnectionBridgeVertices(Intersection intersection, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, Vector3 innerPoint, Vector3 outwards, float width, float modifiedF, int addedVertices, bool flipNormals = false)
     {
         // |_   
         //   \_
-        Vector3 left = (vertices[vertices.Count - 6 + offset] - vertices[vertices.Count - 3 + offset]).normalized;
-        float distance = Vector3.Distance(vertices[vertices.Count - 6 + offset], vertices[vertices.Count - 3 + offset]);
 
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] + left * intersection.bridgeSettings.extraWidth - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * (-intersection.bridgeSettings.extraWidth + distance * (1 - intersection.bridgeSettings.widthPercentageFirstStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * (-intersection.bridgeSettings.extraWidth + distance * (1 - intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep)) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * distance - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
-        bridgeVertices.Add(vertices[vertices.Count - 6 + offset] - left * distance - new Vector3(0, intersection.yOffset, 0));
+        bridgeVertices.Add(innerPoint + outwards * (intersection.bridgeSettings.extraWidth + width) - new Vector3(0, intersection.yOffset, 0));
+        bridgeVertices.Add(innerPoint + outwards * (intersection.bridgeSettings.extraWidth + width) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(innerPoint + outwards * (intersection.bridgeSettings.extraWidth + width * intersection.bridgeSettings.widthPercentageFirstStep) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep, 0));
+        bridgeVertices.Add(innerPoint + outwards * (intersection.bridgeSettings.extraWidth + width * intersection.bridgeSettings.widthPercentageFirstStep * intersection.bridgeSettings.widthPercentageSecondStep) - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(innerPoint - new Vector3(0, intersection.yOffset + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0));
+        bridgeVertices.Add(innerPoint - new Vector3(0, intersection.yOffset, 0));
 
         bridgeUvs.Add(new Vector2(0, modifiedF));
         bridgeUvs.Add(new Vector2(1, modifiedF));
@@ -446,7 +470,7 @@ public class Roundabout
         {
             for (int j = 0; j < 4; j++)
             {
-                if (offset != 1)
+                if (flipNormals == false)
                 {
                     bridgeTriangles.Add(bridgeVertices.Count - 6 + j + addedVertices);
                     bridgeTriangles.Add(bridgeVertices.Count - 11 + j + addedVertices);
@@ -469,7 +493,7 @@ public class Roundabout
             }
 
             // Top part
-            if (offset != 1)
+            if (flipNormals == false)
             {
                 bridgeTriangles.Add(bridgeVertices.Count - 6 + addedVertices);
                 bridgeTriangles.Add(bridgeVertices.Count - 1 + addedVertices);
@@ -493,7 +517,7 @@ public class Roundabout
             if (modifiedF == 1)
             {
                 // End cap
-                if (offset != 1)
+                if (flipNormals == false)
                 {
                     GenerateCapFlipped(ref bridgeVertices, ref bridgeTriangles, addedVertices);
                 }
@@ -506,7 +530,7 @@ public class Roundabout
         else
         {
             // Start cap
-            if (offset != 1)
+            if (flipNormals == false)
             {
                 GenerateCap(ref bridgeVertices, ref bridgeTriangles, addedVertices);
             }
