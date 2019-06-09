@@ -28,7 +28,7 @@ A free road creation tool for unity.
 - Easly customize intersections by moving points and changing how sharp the connections should be (per connection)
 - Move the connected road points when the intersection is selected to have full control over the intersection mesh
 - Customizable shoulders(extra meshes), possible to have multiple on each side
-- Procedural roundabouts with changable radius etc. Has the same smooth connections and customizability as normal intersections, including extra mesh support.
+- Procedural roundabouts with changable radius etc. Has the same smooth connections and customizability as normal intersections, including extra mesh and bridge support.
 
 ### Other
 - Includes a bunch of roads and road related assets like turn markings and road signs
