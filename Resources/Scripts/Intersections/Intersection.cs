@@ -562,15 +562,6 @@ public class Intersection : MonoBehaviour
         intersectionConnection.curvePoint2 = intersectionConnection.defaultCurvePoint2;
     }
 
-    public void ResetExtraMeshes()
-    {
-        for (int i = transform.GetChild(0).childCount - 1; i >= 0; i--)
-        {
-            DestroyImmediate(transform.GetChild(0).GetChild(i).gameObject);
-            extraMeshes.Clear();
-        }
-    }
-
     public void RemoveCurvePoints()
     {
         if (gameObject != null)

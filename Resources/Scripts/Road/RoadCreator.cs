@@ -557,7 +557,6 @@ public class RoadCreator : MonoBehaviour
                 }
 
                 intersection.GetComponent<Intersection>().ResetCurvePointPositions();
-                intersection.GetComponent<Intersection>().ResetExtraMeshes();
                 intersection.GetComponent<Intersection>().CreateMesh();
             }
             else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, LayerMask.NameToLayer("Ignore Mouse Ray")) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
@@ -584,7 +583,6 @@ public class RoadCreator : MonoBehaviour
                     if (startIntersection.roundaboutMode == false)
                     {
                         startIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
-                        startIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                     }
                     else
                     {
@@ -612,7 +610,6 @@ public class RoadCreator : MonoBehaviour
                     if (endIntersection.roundaboutMode == false)
                     {
                         endIntersection.GetComponent<Intersection>().ResetCurvePointPositions();
-                        endIntersection.GetComponent<Intersection>().ResetExtraMeshes();
                     }
                     else
                     {
@@ -646,7 +643,6 @@ public class RoadCreator : MonoBehaviour
                             intersection.ResetCurvePointPositions();
                         }
 
-                        intersection.ResetExtraMeshes();
                         intersection.CreateMesh();
                     }
                     else if (point.transform.GetSiblingIndex() == 2 && endIntersectionConnection != null && endIntersection != null)
@@ -666,7 +662,6 @@ public class RoadCreator : MonoBehaviour
                             intersection.ResetCurvePointPositions();
                         }
 
-                        intersection.ResetExtraMeshes();
                         intersection.CreateMesh();
                     }
                 }
@@ -714,6 +709,27 @@ public class RoadCreator : MonoBehaviour
         intersection.GetComponent<Intersection>().xzPillarScale = segment.xPillarScale;
         intersection.GetComponent<Intersection>().overlayMaterial = (Material)settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue;
         intersection.GetComponent<Intersection>().Setup();
+
+        for (int i = 0; i < segment.extraMeshes.Count; i++)
+        {
+            if (segment.extraMeshes[i].left == true)
+            {
+                intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 0, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].yOffset));
+            }
+            else
+            {
+                intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 1, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].yOffset));
+            }
+
+            GameObject extraMesh = new GameObject("Extra Mesh");
+            extraMesh.AddComponent<MeshFilter>();
+            extraMesh.AddComponent<MeshRenderer>();
+            extraMesh.AddComponent<MeshCollider>();
+            extraMesh.transform.SetParent(intersection.transform.GetChild(0));
+            extraMesh.transform.localPosition = Vector3.zero;
+            extraMesh.layer = LayerMask.NameToLayer("Road");
+            extraMesh.hideFlags = HideFlags.NotEditable;
+        }
 
         return intersection;
     }
