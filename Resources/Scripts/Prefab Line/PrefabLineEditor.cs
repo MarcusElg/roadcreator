@@ -166,7 +166,7 @@ public class PrefabLineEditor : Editor
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -206,7 +206,7 @@ public class PrefabLineEditor : Editor
             Draw(guiEvent, hitPosition);
         }
 
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Road"))))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -316,7 +316,7 @@ public class PrefabLineEditor : Editor
             Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(lastIndex - 1).position, prefabCreator.transform.GetChild(0).GetChild(lastIndex).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << prefabCreator.settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << prefabCreator.settings.FindProperty("roadLayer").intValue)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
             {
                 position.y = raycastHit.point.y;
             }

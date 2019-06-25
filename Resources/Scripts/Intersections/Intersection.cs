@@ -524,7 +524,7 @@ public class Intersection : MonoBehaviour
         GameObject curvePoint = null;
         curvePoint = new GameObject("Connection Point");
         curvePoint.transform.SetParent(transform);
-        curvePoint.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
+        curvePoint.layer = LayerMask.NameToLayer("Ignore Mouse Ray");
         curvePoint.AddComponent<BoxCollider>();
         curvePoint.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
         curvePoint.transform.position = position;

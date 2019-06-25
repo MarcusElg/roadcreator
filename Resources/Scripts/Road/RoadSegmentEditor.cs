@@ -206,7 +206,7 @@ public class RoadSegmentEditor : Editor
                         extraMesh.AddComponent<MeshCollider>();
                         extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
                         extraMesh.transform.localPosition = Vector3.zero;
-                        extraMesh.layer = ((RoadSegment)targets[i]).settings.FindProperty("roadLayer").intValue;
+                        extraMesh.layer = LayerMask.NameToLayer("Road");
                         extraMesh.hideFlags = HideFlags.NotEditable;
                     }
                 }
@@ -249,7 +249,7 @@ public class RoadSegmentEditor : Editor
                 extraMesh.AddComponent<MeshCollider>();
                 extraMesh.transform.SetParent(((RoadSegment)targets[i]).transform.GetChild(1));
                 extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = ((RoadSegment)targets[i]).settings.FindProperty("roadLayer").intValue;
+                extraMesh.layer = LayerMask.NameToLayer("Road");
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }

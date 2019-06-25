@@ -272,7 +272,7 @@ public class RoadCreator : MonoBehaviour
         point.transform.SetParent(parent);
         point.transform.position = position;
         point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
-        point.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
+        point.layer = LayerMask.NameToLayer("Ignore Mouse Ray");
         point.AddComponent<Point>();
         point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
 
@@ -311,7 +311,7 @@ public class RoadCreator : MonoBehaviour
         mainMesh.AddComponent<MeshRenderer>();
         mainMesh.AddComponent<MeshFilter>();
         mainMesh.AddComponent<MeshCollider>();
-        mainMesh.layer = settings.FindProperty("roadLayer").intValue;
+        mainMesh.layer = LayerMask.NameToLayer("Road");
 
         CopySegmentData(segment);
 
@@ -343,7 +343,7 @@ public class RoadCreator : MonoBehaviour
                 extraMesh.AddComponent<MeshCollider>();
                 extraMesh.transform.SetParent(segment.transform.GetChild(1));
                 extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = settings.FindProperty("roadLayer").intValue;
+                extraMesh.layer = LayerMask.NameToLayer("Road");
                 extraMesh.hideFlags = HideFlags.NotEditable;
             }
         }
@@ -379,7 +379,7 @@ public class RoadCreator : MonoBehaviour
             extraMesh.AddComponent<MeshCollider>();
             extraMesh.transform.SetParent(segment.transform.GetChild(1));
             extraMesh.transform.localPosition = Vector3.zero;
-            extraMesh.layer = settings.FindProperty("roadLayer").intValue;
+            extraMesh.layer = LayerMask.NameToLayer("Road");
             extraMesh.hideFlags = HideFlags.NotEditable;
 
             segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
@@ -516,7 +516,7 @@ public class RoadCreator : MonoBehaviour
             RaycastHit raycastHitPoint;
             RaycastHit raycastHitRoad;
 
-            if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << settings.FindProperty("ignoreMouseRayLayer").intValue) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
+            if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << LayerMask.NameToLayer("Ignore Mouse Ray")) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
             {
                 // Found Point
                 if (point.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.GetSiblingIndex() == 1 || raycastHitPoint.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().createIntersections == false)
@@ -560,7 +560,7 @@ public class RoadCreator : MonoBehaviour
                 intersection.GetComponent<Intersection>().ResetExtraMeshes();
                 intersection.GetComponent<Intersection>().CreateMesh();
             }
-            else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, settings.FindProperty("ignoreMouseRayLayer").intValue) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
+            else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, LayerMask.NameToLayer("Ignore Mouse Ray")) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
             {
                 //Found intersection
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
@@ -1085,7 +1085,7 @@ public class RoadCreator : MonoBehaviour
         if (segment.terrainOption == RoadSegment.TerrainOption.adapt)
         {
             RaycastHit raycastHit;
-            if (Physics.Raycast(originalPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << settings.FindProperty("ignoreMouseRayLayer").intValue) | (1 << settings.FindProperty("roadLayer").intValue))))
+            if (Physics.Raycast(originalPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100f, ~((1 << LayerMask.NameToLayer("Ignore Mouse Ray")) | (1 << LayerMask.NameToLayer("Road")))))
             {
                 return raycastHit.point;
             }

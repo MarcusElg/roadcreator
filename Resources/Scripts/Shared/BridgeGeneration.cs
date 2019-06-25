@@ -276,7 +276,7 @@ public class BridgeGeneration
         pillar.hideFlags = HideFlags.NotEditable;
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << segment.settings.FindProperty("roadLayer").intValue | 1 << segment.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
@@ -438,7 +438,7 @@ public class BridgeGeneration
         pillar.hideFlags = HideFlags.NotEditable;
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.settings.FindProperty("roadLayer").intValue | 1 << intersection.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
         {
             Vector3 groundPosition = raycastHit.point;
             Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
@@ -548,7 +548,7 @@ public class BridgeGeneration
             Vector3 position = intersection.transform.position + Quaternion.Euler(0, d * 360, 0) * Vector3.forward * intersection.roundaboutRadius - new Vector3(0, 0.01f + intersection.bridgeSettings.yOffsetFirstStep + intersection.bridgeSettings.yOffsetSecondStep, 0);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << intersection.settings.FindProperty("roadLayer").intValue | 1 << intersection.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
             {
                 Vector3 right = (position - intersection.transform.position).normalized;
                 Vector3 backward = Misc.CalculateLeft(position - intersection.transform.position);

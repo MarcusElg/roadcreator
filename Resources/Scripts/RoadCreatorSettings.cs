@@ -9,8 +9,6 @@ public class RoadCreatorSettings : ScriptableObject
 
     public float pointSize = 0.5f;
     public float resolution = 0.25f;
-    public int ignoreMouseRayLayer = 9;
-    public int roadLayer = 10;
     public bool hideNonEditableChildren = true;
     public int roundaboutConnectionIndexOffset = 1;
 

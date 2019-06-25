@@ -114,7 +114,7 @@ public class RoadEditor : Editor
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
         {
             hitPosition = raycastHit.point;
 
@@ -173,7 +173,7 @@ public class RoadEditor : Editor
             }
         }
 
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("roadLayer").intValue)))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Road"))))
         {
             hitPosition = raycastHit.point;
 
@@ -201,7 +201,7 @@ public class RoadEditor : Editor
             }
         }
 
-        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && Physics.Raycast(ray, out raycastHit, 100f, (1 << roadCreator.settings.FindProperty("roadLayer").intValue)))
+        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && Physics.Raycast(ray, out raycastHit, 100f, (1 << LayerMask.NameToLayer("Road"))))
         {
             hitPosition = raycastHit.point;
 
@@ -332,7 +332,7 @@ public class RoadEditor : Editor
             Vector3 position = Misc.Lerp3(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition, t);
 
             RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << roadCreator.settings.FindProperty("ignoreMouseRayLayer").intValue)))
+            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
             {
                 position.y = raycastHit.point.y;
             }

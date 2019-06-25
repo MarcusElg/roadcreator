@@ -110,7 +110,7 @@ public class PrefabLineCreator : MonoBehaviour
         point.GetComponent<BoxCollider>().hideFlags = HideFlags.NotEditable;
         point.transform.SetParent(transform.GetChild(0));
         point.transform.position = raycastHit;
-        point.layer = settings.FindProperty("ignoreMouseRayLayer").intValue;
+        point.layer = LayerMask.NameToLayer("Ignore Mouse Ray");
         point.AddComponent<Point>();
         point.GetComponent<Point>().roadPoint = false;
         point.GetComponent<Point>().hideFlags = HideFlags.NotEditable;
@@ -253,7 +253,7 @@ public class PrefabLineCreator : MonoBehaviour
 
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.name = "Prefab";
-                placedPrefab.layer = settings.FindProperty("roadLayer").intValue;
+                placedPrefab.layer = LayerMask.NameToLayer("Road");
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
 
                 if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
@@ -381,7 +381,7 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     RaycastHit raycastHit;
                     Vector3 vertexPosition = placedPrefab.transform.rotation * vertices[i];
-                    if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
+                    if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
                     {
                         vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / yScale;
                     }
@@ -418,7 +418,7 @@ public class PrefabLineCreator : MonoBehaviour
             RaycastHit raycastHit;
             Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
 
-            if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << settings.FindProperty("ignoreMouseRayLayer").intValue | 1 << settings.FindProperty("roadLayer").intValue)))
+            if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
             {
                 for (int i = 0; i < vertices.Length; i++)
                 {

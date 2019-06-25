@@ -172,7 +172,7 @@ public class IntersectionEditor : Editor
                     extraMesh.AddComponent<MeshCollider>();
                     extraMesh.transform.SetParent(intersection.transform.GetChild(0));
                     extraMesh.transform.localPosition = Vector3.zero;
-                    extraMesh.layer = intersection.settings.FindProperty("roadLayer").intValue;
+                    extraMesh.layer = LayerMask.NameToLayer("Road");
                     extraMesh.hideFlags = HideFlags.NotEditable;
                 }
 
@@ -198,7 +198,7 @@ public class IntersectionEditor : Editor
             extraMesh.AddComponent<MeshCollider>();
             extraMesh.transform.SetParent(intersection.transform.GetChild(0));
             extraMesh.transform.localPosition = Vector3.zero;
-            extraMesh.layer = intersection.settings.FindProperty("roadLayer").intValue;
+            extraMesh.layer = LayerMask.NameToLayer("Road");
             extraMesh.hideFlags = HideFlags.NotEditable;
         }
 

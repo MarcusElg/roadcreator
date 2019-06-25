@@ -391,7 +391,7 @@ public class RoadSegment : MonoBehaviour
         {
             float[,] modifiedHeights;
             RaycastHit raycastHit;
-            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << settings.FindProperty("roadLayer").intValue | 1 << settings.FindProperty("ignoreMouseRayLayer").intValue)))
+            if (Physics.Raycast(points[0] + new Vector3(0, 100, 0), Vector3.down, out raycastHit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
             {
                 Terrain terrain = raycastHit.collider.GetComponent<Terrain>();
                 if (terrain != null)
