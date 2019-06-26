@@ -21,6 +21,12 @@ public class Roundabout
         List<int> nearestRightPoints = new List<int>();
         int addedVertices = 0;
 
+        if (intersection.outerExtraMeshesAsRoads == true)
+        {
+            ResetNonCenterExtraMeshes(intersection);
+            CreateExtraMeshesFromRoads(intersection);
+        }
+
         CreateRoundaboutVertices(intersection, ref vertices, ref uvs, ref uvs2);
         CreateRoadConnections(intersection, ref vertices, ref triangles, ref uvs, ref uvs2, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, ref connectionTriangles, ref nearestLeftPoints, ref nearestRightPoints, ref addedVertices);
         CreateRoadSections(intersection, ref vertices, ref triangles, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, addedVertices, nearestLeftPoints, nearestRightPoints);
@@ -113,6 +119,7 @@ public class Roundabout
                     int verticesLooped = 0;
                     int verticesToLoop = 0;
                     float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
+                    int extraMeshIndexOffset = 0;
 
                     if (endIndex > startIndex)
                     {
@@ -124,11 +131,12 @@ public class Roundabout
                         verticesToLoop += endIndex;
                     }
 
-                    while (vertexIndex - 2 != endIndex && triangles.Count < 10000)
+                    while ((vertexIndex - 2 != endIndex) && triangles.Count < 10000)
                     {
                         if (vertexIndex > vertices.Count - 4 - addedVertices)
                         {
                             vertexIndex = 0;
+                            extraMeshIndexOffset = 1;
                         }
 
                         if (vertexIndex != endIndex)
@@ -154,8 +162,11 @@ public class Roundabout
                         }
 
                         // Extra meshes
-                        float progress = (float)verticesLooped / verticesToLoop;
-                        leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
+                        if (vertexIndex > 0)
+                        {
+                            float progress = (float)(verticesLooped - extraMeshIndexOffset) / (verticesToLoop - extraMeshIndexOffset);
+                            leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
+                        }
 
                         verticesLooped += 2;
                         vertexIndex += 2;
@@ -681,48 +692,50 @@ public class Roundabout
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
             List<Vector2> uvs2 = new List<Vector2>();
-
             int vertexIndex = 0;
 
-            for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
+            if (centerExtraMeshes[i].startWidth > 0)
             {
-                float modifiedF = f;
-
-                if (f > 1)
+                for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
                 {
-                    modifiedF = 1;
+                    float modifiedF = f;
+
+                    if (f > 1)
+                    {
+                        modifiedF = 1;
+                    }
+
+                    vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth - currentOffset));
+                    vertices[vertices.Count - 1] += new Vector3(0, currentYOffset, 0);
+                    vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth - currentOffset - centerExtraMeshes[i].startWidth));
+                    vertices[vertices.Count - 1] += new Vector3(0, currentYOffset + centerExtraMeshes[i].yOffset, 0);
+
+                    uvs.Add(new Vector2(0, modifiedF * textureRepeations));
+                    uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+                    uvs2.Add(Vector2.one);
+                    uvs2.Add(Vector2.one);
+
+                    if (vertexIndex > 0)
+                    {
+                        triangles.Add(vertexIndex);
+                        triangles.Add(vertexIndex - 1);
+                        triangles.Add(vertexIndex - 2);
+
+                        triangles.Add(vertexIndex);
+                        triangles.Add(vertexIndex + 1);
+                        triangles.Add(vertexIndex - 1);
+                    }
+
+                    vertexIndex += 2;
                 }
 
-                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth - currentOffset));
-                vertices[vertices.Count - 1] += new Vector3(0, currentYOffset, 0);
-                vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth - currentOffset - centerExtraMeshes[i].startWidth));
-                vertices[vertices.Count - 1] += new Vector3(0, currentYOffset + centerExtraMeshes[i].yOffset, 0);
+                // Update offsets
+                currentOffset += centerExtraMeshes[i].startWidth;
+                currentYOffset += centerExtraMeshes[i].yOffset;
 
-                uvs.Add(new Vector2(0, modifiedF * textureRepeations));
-                uvs.Add(new Vector2(1, modifiedF * textureRepeations));
-                uvs2.Add(Vector2.one);
-                uvs2.Add(Vector2.one);
-
-                if (vertexIndex > 0)
-                {
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex - 1);
-                    triangles.Add(vertexIndex - 2);
-
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 1);
-                    triangles.Add(vertexIndex - 1);
-                }
-
-                vertexIndex += 2;
+                // Assign mesh
+                AssignCenterExtraMesh(intersection, vertices, triangles, uvs, uvs2, centerExtraMeshes, i, indexes);
             }
-
-            // Update offsets
-            currentOffset += centerExtraMeshes[i].startWidth;
-            currentYOffset += centerExtraMeshes[i].yOffset;
-
-            // Assign mesh
-            AssignCenterExtraMesh(intersection, vertices, triangles, uvs, uvs2, centerExtraMeshes, i, indexes);
         }
     }
 
@@ -765,7 +778,7 @@ public class Roundabout
             extraMeshes[j].uvs2.Add(new Vector3(progress, 1));
             extraMeshes[j].uvs2.Add(new Vector3(progress, 1));
 
-            if (verticesLooped > 0)
+            if (progress > 0)
             {
                 AddTrianglesToConnectionExtraMesh(extraMeshes[j]);
             }
@@ -914,6 +927,69 @@ public class Roundabout
         {
             GameObject bridgeObject = new GameObject("Bridge");
             BridgeGeneration.CreateBridge(bridgeObject, intersection.transform, bridgeVertices.ToArray(), bridgeTriangles.ToArray(), bridgeUvs.ToArray(), null, intersection.bridgeSettings.bridgeMaterials, intersection.settings);
+        }
+    }
+
+    private static void ResetNonCenterExtraMeshes(Intersection intersection)
+    {
+        for (int i = intersection.extraMeshes.Count - 1; i >= 0; i--)
+        {
+            if (intersection.extraMeshes[i].index != 0)
+            {
+                intersection.extraMeshes.RemoveAt(i);
+                GameObject.DestroyImmediate(intersection.transform.GetChild(0).GetChild(i).gameObject);
+            }
+        }
+    }
+
+    private static void CreateExtraMeshesFromRoads(Intersection intersection)
+    {
+        List<float> currentEndWidths = new List<float>();
+        List<float> lastEndWidths = new List<float>();
+
+        // Generate first widths
+        RoadSegment roadSegment = intersection.connections[0].road.transform.parent.parent.GetComponent<RoadSegment>();
+        for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+        {
+            if (roadSegment.extraMeshes[j].left == false)
+            {
+                lastEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
+            }
+        }
+
+        for (int i = intersection.connections.Count - 1; i >= 0; i--)
+        {
+            roadSegment = intersection.connections[i].road.transform.parent.parent.GetComponent<RoadSegment>();
+            currentEndWidths.Clear();
+            int addedLeftExtraMeshes = 0;
+
+            for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+            {
+                if (roadSegment.extraMeshes[j].left == true)
+                {
+                    if (lastEndWidths.Count > 0)
+                    {
+                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastEndWidths[Mathf.Min(addedLeftExtraMeshes, lastEndWidths.Count - 1)], roadSegment.extraMeshes[j].yOffset));
+                    }
+                    else
+                    {
+                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                    }
+
+                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                    intersection.CreateExtraMesh();
+                    addedLeftExtraMeshes += 1;
+                }
+                else
+                {
+                    currentEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
+                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                }
+
+                intersection.CreateExtraMesh();
+            }
+
+            lastEndWidths = new List<float>(currentEndWidths);
         }
     }
 

@@ -721,14 +721,7 @@ public class RoadCreator : MonoBehaviour
                 intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 1, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].yOffset));
             }
 
-            GameObject extraMesh = new GameObject("Extra Mesh");
-            extraMesh.AddComponent<MeshFilter>();
-            extraMesh.AddComponent<MeshRenderer>();
-            extraMesh.AddComponent<MeshCollider>();
-            extraMesh.transform.SetParent(intersection.transform.GetChild(0));
-            extraMesh.transform.localPosition = Vector3.zero;
-            extraMesh.layer = LayerMask.NameToLayer("Road");
-            extraMesh.hideFlags = HideFlags.NotEditable;
+            intersection.GetComponent<Intersection>().CreateExtraMesh();
         }
 
         return intersection;

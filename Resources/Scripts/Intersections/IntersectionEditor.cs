@@ -130,59 +130,86 @@ public class IntersectionEditor : Editor
             }
         }
 
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            intersection.CreateMesh();
+        }
+
         GUILayout.Space(20);
         GUILayout.Label("Extra Meshes", guiStyle);
+        if (intersection.roundaboutMode == true)
+        {
+            bool oldOuterExtraMeshesAsRoads = intersection.outerExtraMeshesAsRoads;
+            EditorGUI.BeginChangeCheck();
+
+            intersection.outerExtraMeshesAsRoads = EditorGUILayout.Toggle("Outer Extra Meshes Controlled By Roads", intersection.outerExtraMeshesAsRoads);
+
+            if (EditorGUI.EndChangeCheck() == true)
+            {
+                serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                intersection.CreateMesh();
+            }
+        }
+
+        EditorGUI.BeginChangeCheck();
         for (int i = 0; i < intersection.extraMeshes.Count; i++)
         {
-            intersection.extraMeshes[i].open = EditorGUILayout.Foldout(intersection.extraMeshes[i].open, "Extra Mesh " + i);
-            if (intersection.extraMeshes[i].open == true)
+            if ((intersection.outerExtraMeshesAsRoads == false && intersection.roundaboutMode == false) || intersection.extraMeshes[i].index == 0)
             {
-                if (intersection.roundaboutMode == true)
+                intersection.extraMeshes[i].open = EditorGUILayout.Foldout(intersection.extraMeshes[i].open, "Extra Mesh " + i);
+                if (intersection.extraMeshes[i].open == true)
                 {
-                    intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count * 3);
-                }
-                else
-                {
-                    intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count - 1);
-                }
-
-                intersection.extraMeshes[i].baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.extraMeshes[i].baseMaterial, typeof(Material), false);
-                intersection.extraMeshes[i].overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.extraMeshes[i].overlayMaterial, typeof(Material), false);
-                intersection.extraMeshes[i].physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", intersection.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
-
-                if (intersection.roundaboutMode == true && intersection.extraMeshes[i].index == 0)
-                {
-                    intersection.extraMeshes[i].startWidth = Mathf.Max(EditorGUILayout.FloatField("Width", intersection.extraMeshes[i].startWidth), 0);
-                }
-                else
-                {
-                    intersection.extraMeshes[i].startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", intersection.extraMeshes[i].startWidth), 0);
-                    intersection.extraMeshes[i].endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshes[i].endWidth), 0);
-                }
-
-                intersection.extraMeshes[i].yOffset = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshes[i].yOffset);
-
-                if (GUILayout.Button("Duplicate Extra Mesh") == true)
-                {
-                    intersection.extraMeshes.Add(intersection.extraMeshes[intersection.extraMeshes.Count - 1].Copy());
-
-                    GameObject extraMesh = new GameObject("Extra Mesh");
-                    extraMesh.AddComponent<MeshFilter>();
-                    extraMesh.AddComponent<MeshRenderer>();
-                    extraMesh.AddComponent<MeshCollider>();
-                    extraMesh.transform.SetParent(intersection.transform.GetChild(0));
-                    extraMesh.transform.localPosition = Vector3.zero;
-                    extraMesh.layer = LayerMask.NameToLayer("Road");
-                    extraMesh.hideFlags = HideFlags.NotEditable;
-                }
-
-                if (GUILayout.Button("Remove Extra Mesh") == true && intersection.transform.GetChild(0).childCount > 0)
-                {
-                    intersection.extraMeshes.RemoveAt(i);
-
-                    for (int j = 0; j < targets.Length; j++)
+                    if (intersection.roundaboutMode == true)
                     {
-                        DestroyImmediate(intersection.transform.GetChild(0).GetChild(i).gameObject);
+                        if (intersection.outerExtraMeshesAsRoads == false)
+                        {
+                            intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count * 3);
+                        }
+                    }
+                    else
+                    {
+                        intersection.extraMeshes[i].index = Mathf.Clamp(EditorGUILayout.IntField("Index", intersection.extraMeshes[i].index), 0, intersection.connections.Count - 1);
+                    }
+
+                    intersection.extraMeshes[i].baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.extraMeshes[i].baseMaterial, typeof(Material), false);
+                    intersection.extraMeshes[i].overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.extraMeshes[i].overlayMaterial, typeof(Material), false);
+                    intersection.extraMeshes[i].physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physic Material", intersection.extraMeshes[i].physicMaterial, typeof(PhysicMaterial), false);
+
+                    if (intersection.roundaboutMode == true && intersection.extraMeshes[i].index == 0)
+                    {
+                        intersection.extraMeshes[i].startWidth = Mathf.Max(EditorGUILayout.FloatField("Width", intersection.extraMeshes[i].startWidth), 0);
+                    }
+                    else
+                    {
+                        intersection.extraMeshes[i].startWidth = Mathf.Max(EditorGUILayout.FloatField("Start Width", intersection.extraMeshes[i].startWidth), 0);
+                        intersection.extraMeshes[i].endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshes[i].endWidth), 0);
+                    }
+
+                    intersection.extraMeshes[i].yOffset = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshes[i].yOffset);
+
+                    if (GUILayout.Button("Duplicate Extra Mesh") == true)
+                    {
+                        intersection.extraMeshes.Add(intersection.extraMeshes[intersection.extraMeshes.Count - 1].Copy());
+
+                        GameObject extraMesh = new GameObject("Extra Mesh");
+                        extraMesh.AddComponent<MeshFilter>();
+                        extraMesh.AddComponent<MeshRenderer>();
+                        extraMesh.AddComponent<MeshCollider>();
+                        extraMesh.transform.SetParent(intersection.transform.GetChild(0));
+                        extraMesh.transform.localPosition = Vector3.zero;
+                        extraMesh.layer = LayerMask.NameToLayer("Road");
+                        extraMesh.hideFlags = HideFlags.NotEditable;
+                    }
+
+                    if (GUILayout.Button("Remove Extra Mesh") == true && intersection.transform.GetChild(0).childCount > 0)
+                    {
+                        intersection.extraMeshes.RemoveAt(i);
+
+                        for (int j = 0; j < targets.Length; j++)
+                        {
+                            DestroyImmediate(intersection.transform.GetChild(0).GetChild(i).gameObject);
+                        }
                     }
                 }
             }

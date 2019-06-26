@@ -23,6 +23,7 @@ public class Intersection : MonoBehaviour
     public float extraPillarHeight = 0.2f;
     public float xzPillarScale = 3;
 
+    public bool outerExtraMeshesAsRoads = false;
     public List<ExtraMesh> extraMeshes = new List<ExtraMesh>();
 
     // Roundabout
@@ -605,6 +606,18 @@ public class Intersection : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void CreateExtraMesh ()
+    {
+        GameObject extraMesh = new GameObject("Extra Mesh");
+        extraMesh.AddComponent<MeshFilter>();
+        extraMesh.AddComponent<MeshRenderer>();
+        extraMesh.AddComponent<MeshCollider>();
+        extraMesh.transform.SetParent(transform.GetChild(0));
+        extraMesh.transform.localPosition = Vector3.zero;
+        extraMesh.layer = LayerMask.NameToLayer("Road");
+        extraMesh.hideFlags = HideFlags.NotEditable;
     }
 
 }
