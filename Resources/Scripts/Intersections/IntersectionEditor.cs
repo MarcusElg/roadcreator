@@ -54,6 +54,7 @@ public class IntersectionEditor : Editor
 
             intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Connection Textures");
             intersection.textureTilingY = Mathf.Clamp(EditorGUILayout.FloatField("Texture Tiling Y Multiplier", intersection.textureTilingY), 0.01f, 10);
+            intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
 
             GUILayout.Space(20);
             GUILayout.Label("Materials", guiStyle);
@@ -61,8 +62,7 @@ public class IntersectionEditor : Editor
             intersection.baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.baseMaterial, typeof(Material), false);
             intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
             intersection.connectionBaseMaterial = (Material)EditorGUILayout.ObjectField("Connection Base Material", intersection.connectionBaseMaterial, typeof(Material), false);
-            intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);
-            intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
+            intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);          
 
             if (EditorGUI.EndChangeCheck() == true)
             {
