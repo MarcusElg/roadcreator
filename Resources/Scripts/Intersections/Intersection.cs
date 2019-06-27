@@ -152,6 +152,11 @@ public class Intersection : MonoBehaviour
         }
         else
         {
+            if (objectToMove.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
+            {
+                objectToMove.transform.parent.GetChild(1).position = Misc.GetCenter(objectToMove.transform.parent.GetChild(0).position, objectToMove.transform.parent.GetChild(2).position);
+            }
+
             CreateMesh();
             objectToMove.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh();
 
@@ -608,7 +613,7 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    public void CreateExtraMesh ()
+    public void CreateExtraMesh()
     {
         GameObject extraMesh = new GameObject("Extra Mesh");
         extraMesh.AddComponent<MeshFilter>();
