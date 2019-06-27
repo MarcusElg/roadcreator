@@ -515,7 +515,7 @@ public class RoadCreator : MonoBehaviour
         {
             RaycastHit raycastHitPoint;
             RaycastHit raycastHitRoad;
-
+            
             if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << LayerMask.NameToLayer("Ignore Mouse Ray")) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
             {
                 // Found Point
