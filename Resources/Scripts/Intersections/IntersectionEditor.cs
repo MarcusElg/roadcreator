@@ -62,6 +62,7 @@ public class IntersectionEditor : Editor
             intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
             intersection.connectionBaseMaterial = (Material)EditorGUILayout.ObjectField("Connection Base Material", intersection.connectionBaseMaterial, typeof(Material), false);
             intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);
+            intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
 
             if (EditorGUI.EndChangeCheck() == true)
             {
@@ -76,6 +77,7 @@ public class IntersectionEditor : Editor
             intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
             intersection.yOffset = Mathf.Max(0.01f, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
             intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Texture");
+            intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
 
             if (EditorGUI.EndChangeCheck() == true)
             {

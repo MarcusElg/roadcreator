@@ -14,6 +14,7 @@ public class Intersection : MonoBehaviour
     public SerializedObject settings;
     public GameObject objectToMove;
     public bool stretchTexture = false;
+    public float resolutionMultiplier = 1;
 
     public bool generateBridge = true;
     public BridgeSettings bridgeSettings = new BridgeSettings();
@@ -253,7 +254,7 @@ public class Intersection : MonoBehaviour
                 return;
             }
 
-            float segments = totalLengths[i] * settings.FindProperty("resolution").floatValue * 5;
+            float segments = totalLengths[i] * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
             segments = Mathf.Max(3, segments);
             float distancePerSegment = 1f / segments;
 

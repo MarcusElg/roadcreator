@@ -48,6 +48,7 @@ public class RoadEditor : Editor
         EditorGUI.BeginChangeCheck();
         roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadCreator.heightOffset));
         roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", roadCreator.segmentPreset, typeof(Preset), false);
+        roadCreator.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", roadCreator.resolutionMultiplier), 0.01f, 10f);
         roadCreator.createIntersections = EditorGUILayout.Toggle("Create Intersections", roadCreator.createIntersections);
 
         if (EditorGUI.EndChangeCheck() == true)

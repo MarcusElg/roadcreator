@@ -13,6 +13,7 @@ public class RoadCreator : MonoBehaviour
 
     public SerializedObject settings;
     public Preset segmentPreset;
+    public float resolutionMultiplier = 1;
     public GameObject objectToMove = null;
     public GameObject extraObjectToMove = null;
     private bool mouseDown;
@@ -1062,7 +1063,7 @@ public class RoadCreator : MonoBehaviour
         }
 
         float distance = Misc.CalculateDistance(segment.GetChild(0).GetChild(0).position, segment.GetChild(0).GetChild(1).position, segment.GetChild(0).GetChild(2).position);
-        float divisions = settings.FindProperty("resolution").floatValue * 4 * distance;
+        float divisions = settings.FindProperty("resolution").floatValue * resolutionMultiplier * 4 * distance;
         divisions = Mathf.Max(3, divisions);
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;

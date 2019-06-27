@@ -305,7 +305,7 @@ public class Roundabout
 
     private static void AddNewRoadConnectionVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int i, Vector3 centerPoint, List<int> nearestLeftPoints, List<int> nearestRightPoints, ref int addedVertices, List<RoundaboutExtraMesh> leftExtraMeshes, List<RoundaboutExtraMesh> rightExtraMeshes, ref int actualSegments, ref int addedBridgeVertices)
     {
-        int segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position - new Vector3(0, intersection.yOffset, 0)) * 10);
+        int segments = (int)Mathf.Max(3, intersection.settings.FindProperty("resolution").floatValue * intersection.resolutionMultiplier * Vector3.Distance(intersection.connections[i].lastPoint, centerPoint + intersection.transform.position - new Vector3(0, intersection.yOffset, 0)) * 10);
         float distancePerSegment = 1f / segments;
         float degreesStartInner = Quaternion.LookRotation(vertices[nearestLeftPoints[i] + 1]).eulerAngles.y;
         float degreesEndInner = Quaternion.LookRotation(vertices[nearestRightPoints[i] + 1]).eulerAngles.y;
@@ -592,7 +592,7 @@ public class Roundabout
 
     private static void CreateRoundaboutVertices(Intersection intersection, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<Vector2> uvs2)
     {
-        int segments = (int)Mathf.Max(6, intersection.settings.FindProperty("resolution").floatValue * intersection.roundaboutRadius * 30f);
+        int segments = (int)Mathf.Max(6, intersection.settings.FindProperty("resolution").floatValue * intersection.resolutionMultiplier * intersection.roundaboutRadius * 30f);
         float degreesPerSegment = 1f / segments;
         float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
 
@@ -670,7 +670,8 @@ public class Roundabout
     {
         List<ExtraMesh> centerExtraMeshes = new List<ExtraMesh>();
         List<int> indexes = new List<int>();
-        int segments = (int)Mathf.Max(6, intersection.settings.FindProperty("resolution").floatValue * intersection.roundaboutRadius * 30f);
+        int segments = (int)Mathf.Max(6, intersection.settings.FindProperty("resolution").floatValue * intersection.resolutionMultiplier * intersection.roundaboutRadius * 30f);
+
         float degreesPerSegment = 1f / segments;
         float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
 
