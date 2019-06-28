@@ -76,32 +76,68 @@ public class Intersection : MonoBehaviour
 
     public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
     {
-        if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
+        if (currentEvent.type == EventType.MouseDown)
         {
-            if (objectToMove == null)
+            if (currentEvent.button == 0)
             {
-                bool isConnectedPoint = false;
-                if ((raycastHit.transform.name == "Start Point" || raycastHit.transform.name == "End Point") && raycastHit.transform.GetComponent<Point>().roadPoint == true)
+                if (objectToMove == null)
                 {
-                    for (int i = 0; i < connections.Count; i++)
+                    bool isConnectedPoint = false;
+                    if ((raycastHit.transform.name == "Start Point" || raycastHit.transform.name == "End Point") && raycastHit.transform.GetComponent<Point>().roadPoint == true)
                     {
-                        if (connections[i].road == raycastHit.transform.GetComponent<Point>())
+                        for (int i = 0; i < connections.Count; i++)
                         {
-                            isConnectedPoint = true;
-                            break;
+                            if (connections[i].road == raycastHit.transform.GetComponent<Point>())
+                            {
+                                isConnectedPoint = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if ((raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject) || isConnectedPoint == true)
-                {
-                    if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
+                    if ((raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject) || isConnectedPoint == true)
                     {
-                        return;
+                        if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
+                        {
+                            return;
+                        }
+
+                        objectToMove = raycastHit.transform.gameObject;
+                        objectToMove.GetComponent<BoxCollider>().enabled = false;
+                    }
+                }
+            }
+            else if (currentEvent.button == 1)
+            {
+                // Reset Point
+                if (raycastHit.transform.name == "Connection Point")
+                {
+                    int currentIndex = raycastHit.transform.GetSiblingIndex() - 1;
+                    int nextIndex = raycastHit.transform.GetSiblingIndex();
+
+                    if (nextIndex >= connections.Count)
+                    {
+                        nextIndex = 0;
                     }
 
-                    objectToMove = raycastHit.transform.gameObject;
-                    objectToMove.GetComponent<BoxCollider>().enabled = false;
+                    if (roundaboutMode == true)
+                    {
+                        if (currentIndex % 2 == 0)
+                        {
+                            connections[currentIndex / 2].curvePoint = connections[currentIndex / 2].defaultCurvePoint;
+                        }
+                        else
+                        {
+                            connections[(currentIndex - 1) / 2].curvePoint2 = connections[(currentIndex - 1) / 2].defaultCurvePoint2;
+                        }
+                    }
+                    else
+                    {
+                        connections[currentIndex].curvePoint = Misc.GetCenter(connections[currentIndex].leftPoint, connections[nextIndex].rightPoint);
+                    }
+
+                    CreateCurvePoints();
+                    CreateMesh();
                 }
             }
         }

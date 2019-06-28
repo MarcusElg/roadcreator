@@ -311,7 +311,7 @@ public class IntersectionEditor : Editor
 
         Handles.color = intersection.settings.FindProperty("cursorColour").colorValue;
 
-        if (raycastHit.transform.name.Contains("Point"))
+        if (raycastHit.transform != null && raycastHit.transform.name.Contains("Point"))
         {
             Handles.CylinderHandleCap(0, new Vector3(raycastHit.point.x, raycastHit.transform.position.y, raycastHit.point.z), Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
         }
