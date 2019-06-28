@@ -10,6 +10,7 @@ public class RoadCreator : MonoBehaviour
 
     public float heightOffset = 0.02f;
     public bool createIntersections = true;
+    public bool generateCollider = true;
 
     public SerializedObject settings;
     public Preset segmentPreset;

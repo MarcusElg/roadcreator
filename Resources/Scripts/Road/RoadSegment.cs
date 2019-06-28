@@ -371,8 +371,15 @@ public class RoadSegment : MonoBehaviour
 
         generatedMesh.RecalculateNormals();
         mesh.GetComponent<MeshFilter>().sharedMesh = generatedMesh;
-        mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
         mesh.GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
+
+        if (segment.parent.parent.GetComponent<RoadCreator>().generateCollider == true)
+        {
+            mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
+        } else
+        {
+            mesh.GetComponent<MeshCollider>().sharedMesh = null;
+        }
 
         if (overlayMaterial == null)
         {
