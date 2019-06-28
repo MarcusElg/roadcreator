@@ -52,7 +52,6 @@ public class Intersection : MonoBehaviour
         gameObject.AddComponent<MeshFilter>();
         gameObject.AddComponent<MeshRenderer>();
         gameObject.AddComponent<MeshCollider>();
-        gameObject.GetComponent<Transform>().hideFlags = HideFlags.NotEditable;
         gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.NotEditable;
         gameObject.GetComponent<MeshCollider>().hideFlags = HideFlags.NotEditable;
         gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.NotEditable;
