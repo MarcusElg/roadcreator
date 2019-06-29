@@ -133,7 +133,7 @@ public class Intersection : MonoBehaviour
                     }
                     else
                     {
-                        connections[currentIndex].curvePoint = Misc.GetCenter(connections[currentIndex].leftPoint, connections[nextIndex].rightPoint);
+                        ResetCurvePointPosition(currentIndex);
                     }
 
                     CreateCurvePoints();
@@ -582,20 +582,60 @@ public class Intersection : MonoBehaviour
     {
         for (int i = 0; i < connections.Count; i++)
         {
-            int nextIndex = i + 1;
-            if (nextIndex >= connections.Count)
-            {
-                nextIndex = 0;
-            }
+            ResetCurvePointPosition(i);
+        }
+    }
 
-            if (roundaboutMode == true)
+    private void ResetCurvePointPosition(int i)
+    {
+        int nextIndex = i + 1;
+        if (nextIndex >= connections.Count)
+        {
+            nextIndex = 0;
+        }
+
+        if (roundaboutMode == true)
+        {
+            ResetConnectionCurvePoints(connections[i]);
+        }
+        else
+        {
+            Vector3 forwardCurrentConnection = Misc.CalculateLeft(connections[i].rightPoint - connections[i].leftPoint);
+            Vector3 forwardNextConnection = Misc.CalculateLeft(connections[nextIndex].rightPoint - connections[nextIndex].leftPoint);
+            Vector3 lineIntersection = Misc.GetLineIntersection(connections[i].leftPoint, forwardCurrentConnection, connections[nextIndex].rightPoint, forwardNextConnection);
+
+            if (lineIntersection != Misc.MaxVector3)
             {
-                ResetConnectionCurvePoints(connections[i]);
+                connections[i].curvePoint = lineIntersection;
             }
             else
             {
-                connections[i].curvePoint = Misc.GetCenter(connections[i].leftPoint, connections[nextIndex].rightPoint);
+                float angleDifference = Vector3.Angle(forwardCurrentConnection, forwardNextConnection);
+
+                if (angleDifference < 90f)
+                {
+                    // When the connections are nearly pararell
+                    connections[i].curvePoint = Misc.GetCenter(connections[i].leftPoint, connections[nextIndex].rightPoint) + forwardCurrentConnection * Vector3.Distance(connections[i].leftPoint, connections[nextIndex].rightPoint);
+                }
+                else
+                {
+                    connections[i].curvePoint = Misc.GetCenter(connections[i].leftPoint, connections[nextIndex].rightPoint);
+                }
             }
+        }
+    }
+
+    public Vector3 RecalculateDefaultRoundaboutCurvePoints(Vector3 point1, Vector3 direction1, Vector3 point2, Vector3 direction2)
+    {
+        Vector3 lineIntersection = Misc.GetLineIntersection(point1, direction1, point2, direction2);
+
+        if (lineIntersection != Misc.MaxVector3)
+        {
+            return lineIntersection;
+        }
+        else
+        {
+            return Misc.GetCenter(point1, point2);
         }
     }
 

@@ -315,4 +315,42 @@ public static class Misc
         dotProduct = Mathf.Clamp(dotProduct, 0f, magnitudeMax);
         return start + heading * dotProduct;
     }
+
+    public static Vector3 GetLineIntersection(Vector3 point1, Vector3 direction1, Vector3 point2, Vector3 direction2)
+    {
+        float originalY = point1.y;
+        point1.y = 0;
+        direction1.y = 0;
+        point2.y = 0;
+        direction2.y = 0;
+
+        Vector3 lineDirection = point2 - point1;
+        Vector3 crossVector1and2 = Vector3.Cross(direction1, direction2);
+        Vector3 crossVector3and2 = Vector3.Cross(lineDirection, direction2);
+
+        float planarFactor = Vector3.Dot(lineDirection, crossVector1and2);
+
+        //is coplanar, and not parrallel
+        if (Mathf.Abs(planarFactor) < 0.01f && crossVector1and2.sqrMagnitude > 0.01f)
+        {
+            float s = Vector3.Dot(crossVector3and2, crossVector1and2) / crossVector1and2.sqrMagnitude;
+            Vector3 point = point1 + (direction1 * s);
+
+            // Check if they intersection in front of the points and not behind
+            float dotProduct = Vector3.Dot(direction2, (point - point2).normalized);
+
+            if (dotProduct > 0)
+            {
+                return new Vector3(point.x, originalY, point.z);
+            }
+            else
+            {
+                return MaxVector3;
+            }
+        }
+        else
+        {
+            return MaxVector3;
+        }
+    }
 }
