@@ -59,10 +59,16 @@ public class PointEditor : Editor
 
             if (point.roadPoint == true)
             {
-                if (roadCreator != null)
+                if (point.name == "Control Point")
                 {
-                    roadCreator.CreateMesh();
+                    point.transform.parent.parent.GetComponent<RoadSegment>().curved = true;
                 }
+                else
+                {
+                    point.transform.parent.GetChild(1).position = Misc.GetCenter(point.transform.parent.GetChild(0).position, point.transform.parent.GetChild(2).position);
+                }
+
+                roadCreator.CreateMesh();
             }
             else if (prefabLine != null)
             {
