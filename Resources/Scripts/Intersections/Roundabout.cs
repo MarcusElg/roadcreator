@@ -994,4 +994,21 @@ public class Roundabout
         }
     }
 
+    public static void UpdateMaxRadius(Intersection intersection)
+    {
+        float nearest = float.MaxValue;
+
+        for (int i = 0; i < intersection.connections.Count; i++)
+        {
+            float distance = Vector3.Distance(intersection.transform.position, intersection.connections[i].lastPoint);
+
+            if (distance < nearest)
+            {
+                nearest = distance;
+            }
+        }
+
+        intersection.maxRoundaboutRadius = nearest * 0.9f;
+    }
+
 }

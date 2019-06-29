@@ -206,6 +206,7 @@ public class Intersection : MonoBehaviour
             }
 
             objectToMove = null;
+            Roundabout.UpdateMaxRadius(this);
         }
     }
 

@@ -517,7 +517,7 @@ public class RoadCreator : MonoBehaviour
         {
             RaycastHit raycastHitPoint;
             RaycastHit raycastHitRoad;
-            
+
             if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitPoint, 100, 1 << LayerMask.NameToLayer("Ignore Mouse Ray")) && raycastHitPoint.transform.GetComponent<Point>() != null && raycastHitPoint.transform.parent.parent.parent.parent.gameObject != point.transform.parent.parent.parent.parent.gameObject)
             {
                 // Found Point
@@ -575,9 +575,9 @@ public class RoadCreator : MonoBehaviour
                     startIntersectionConnection = CreateIntersectionConnectionFirst(raycastHitRoad.transform.GetComponent<Intersection>(), point);
                     startIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
 
-                    if (startIntersection.roundaboutMode == true && startIntersection.connections.Count == 1)
+                    if (startIntersection.roundaboutMode == true)
                     {
-                        startIntersection.maxRoundaboutRadius = startIntersection.roundaboutRadius + 2;
+                        Roundabout.UpdateMaxRadius(startIntersection);
                     }
 
                     UpdateStartConnectionData();
@@ -602,9 +602,9 @@ public class RoadCreator : MonoBehaviour
                     endIntersectionConnection = CreateIntersectionConnectionLast(raycastHitRoad.transform.GetComponent<Intersection>(), point);
                     endIntersection = raycastHitRoad.transform.GetComponent<Intersection>();
 
-                    if (endIntersection.roundaboutMode == true && endIntersection.connections.Count == 1)
+                    if (endIntersection.roundaboutMode == true)
                     {
-                        endIntersection.maxRoundaboutRadius = endIntersection.roundaboutRadius + 2;
+                        Roundabout.UpdateMaxRadius(endIntersection);
                     }
 
                     UpdateEndConnectionData();
@@ -640,6 +640,11 @@ public class RoadCreator : MonoBehaviour
 
                         RemoveIntersectionConnection(intersection, index, true);
 
+                        if (intersection.roundaboutMode == true && intersection.connections.Count > 0)
+                        {
+                            Roundabout.UpdateMaxRadius(intersection);
+                        }
+
                         if (intersection.roundaboutMode == false)
                         {
                             intersection.ResetCurvePointPositions();
@@ -658,6 +663,11 @@ public class RoadCreator : MonoBehaviour
                         }
 
                         RemoveIntersectionConnection(intersection, index, false);
+
+                        if (intersection.roundaboutMode == true && intersection.connections.Count > 0)
+                        {
+                            Roundabout.UpdateMaxRadius(intersection);
+                        }
 
                         if (intersection.roundaboutMode == false)
                         {
@@ -1041,11 +1051,13 @@ public class RoadCreator : MonoBehaviour
 
         if (startIntersection != null)
         {
+            Roundabout.UpdateMaxRadius(startIntersection);
             startIntersection.CreateMesh();
         }
 
         if (endIntersection != null)
         {
+            Roundabout.UpdateMaxRadius(endIntersection);
             endIntersection.CreateMesh();
         }
 
