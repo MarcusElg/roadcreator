@@ -210,11 +210,20 @@ public class Roundabout
             centerPoint.y = intersection.yOffset;
 
             // Set curve points
-            Vector3 outerRoundaboutPoint = intersection.transform.position + (Misc.GetCenter(vertices[nearestLeftPoints[i]], vertices[nearestRightPoints[i]])).normalized * (intersection.roundaboutWidth + intersection.roundaboutRadius);
-            Vector3 verticesForward = (outerRoundaboutPoint - (vertices[nearestLeftPoints[i]] + intersection.transform.position)).normalized;
-            intersection.connections[i].defaultCurvePoint = intersection.RecalculateDefaultRoundaboutCurvePoints(intersection.connections[i].leftPoint, Misc.CalculateLeft(intersection.connections[i].rightPoint - intersection.connections[i].leftPoint), vertices[nearestLeftPoints[i]] + intersection.transform.position, verticesForward);
-            verticesForward = (outerRoundaboutPoint - (vertices[nearestRightPoints[i]] + intersection.transform.position)).normalized;
-            intersection.connections[i].defaultCurvePoint2 = intersection.RecalculateDefaultRoundaboutCurvePoints(intersection.connections[i].rightPoint, Misc.CalculateLeft(intersection.connections[i].rightPoint - intersection.connections[i].leftPoint), vertices[nearestRightPoints[i]] + intersection.transform.position, verticesForward);
+            int previousIndex = nearestLeftPoints[i] - 2;
+            if (previousIndex < 0)
+            {
+                previousIndex = vertices.Count - addedVertices - 1;
+            }
+
+            int nextIndex = nearestRightPoints[i] + 2;
+            if (nextIndex > vertices.Count - addedVertices - 1)
+            {
+                nextIndex = 2;
+            }
+
+            intersection.connections[i].defaultCurvePoint = intersection.RecalculateDefaultRoundaboutCurvePoints(intersection.connections[i].leftPoint, Misc.CalculateLeft(intersection.connections[i].rightPoint - intersection.connections[i].leftPoint), vertices[nearestLeftPoints[i]] + intersection.transform.position, (vertices[previousIndex] - vertices[nearestLeftPoints[i]]).normalized);
+            intersection.connections[i].defaultCurvePoint2 = intersection.RecalculateDefaultRoundaboutCurvePoints(intersection.connections[i].rightPoint, Misc.CalculateLeft(intersection.connections[i].rightPoint - intersection.connections[i].leftPoint), vertices[nearestRightPoints[i]] + intersection.transform.position, (vertices[nextIndex] - vertices[nearestRightPoints[i]]).normalized);
 
             if (intersection.connections[i].curvePoint == null)
             {
