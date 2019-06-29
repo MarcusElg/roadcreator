@@ -66,6 +66,15 @@ public class PointEditor : Editor
                 else
                 {
                     point.transform.parent.GetChild(1).position = Misc.GetCenter(point.transform.parent.GetChild(0).position, point.transform.parent.GetChild(2).position);
+
+                    if (point.name == "Start Point" && point.transform.parent.parent.GetSiblingIndex() > 0)
+                    {
+                        point.transform.parent.parent.parent.GetChild(point.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).position = point.transform.position;
+                    }
+                    else if (point.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() < point.transform.parent.parent.parent.childCount + 1)
+                    {
+                        point.transform.parent.parent.parent.GetChild(point.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).position = point.transform.position;
+                    }
                 }
 
                 roadCreator.CreateMesh();
