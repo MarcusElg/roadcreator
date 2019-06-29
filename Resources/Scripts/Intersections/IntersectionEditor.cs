@@ -55,6 +55,7 @@ public class IntersectionEditor : Editor
             intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Connection Textures");
             intersection.textureTilingY = Mathf.Clamp(EditorGUILayout.FloatField("Texture Tiling Y Multiplier", intersection.textureTilingY), 0.01f, 10);
             intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
+            intersection.resetCurvePointsOnUpdate = EditorGUILayout.Toggle("Reset Curve Points On Update", intersection.resetCurvePointsOnUpdate);
 
             GUILayout.Space(20);
             GUILayout.Label("Materials", guiStyle);
@@ -62,12 +63,7 @@ public class IntersectionEditor : Editor
             intersection.baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", intersection.baseMaterial, typeof(Material), false);
             intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
             intersection.connectionBaseMaterial = (Material)EditorGUILayout.ObjectField("Connection Base Material", intersection.connectionBaseMaterial, typeof(Material), false);
-            intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);          
-
-            if (EditorGUI.EndChangeCheck() == true)
-            {
-                intersection.CreateMesh();
-            }
+            intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);
         }
         else
         {
@@ -78,11 +74,12 @@ public class IntersectionEditor : Editor
             intersection.yOffset = Mathf.Max(0.01f, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
             intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Texture");
             intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
+            intersection.resetCurvePointsOnUpdate = EditorGUILayout.Toggle("Reset Curve Points On Update", intersection.resetCurvePointsOnUpdate);
+        }
 
-            if (EditorGUI.EndChangeCheck() == true)
-            {
-                intersection.CreateMesh();
-            }
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            intersection.CreateMesh();
         }
 
         EditorGUI.BeginChangeCheck();
@@ -239,7 +236,7 @@ public class IntersectionEditor : Editor
 
         GUILayout.Space(20);
 
-        if (GUILayout.Button("Reset Curve Points"))
+        if (intersection.resetCurvePointsOnUpdate == false && GUILayout.Button("Reset Curve Points"))
         {
             intersection.ResetCurvePointPositions();
             intersection.CreateCurvePoints();
@@ -294,12 +291,15 @@ public class IntersectionEditor : Editor
 
     private void Draw(RaycastHit raycastHit)
     {
-        Handles.color = intersection.settings.FindProperty("intersectionColour").colorValue;
-        for (int i = 1; i < intersection.transform.childCount; i++)
+        if (intersection.resetCurvePointsOnUpdate == false)
         {
-            if (intersection.transform.GetChild(i).name != "Bridge")
+            Handles.color = intersection.settings.FindProperty("intersectionColour").colorValue;
+            for (int i = 1; i < intersection.transform.childCount; i++)
             {
-                Handles.CylinderHandleCap(0, intersection.transform.GetChild(i).position, Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+                if (intersection.transform.GetChild(i).name != "Bridge")
+                {
+                    Handles.CylinderHandleCap(0, intersection.transform.GetChild(i).position, Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+                }
             }
         }
 

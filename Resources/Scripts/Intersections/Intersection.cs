@@ -15,6 +15,7 @@ public class Intersection : MonoBehaviour
     public GameObject objectToMove;
     public bool stretchTexture = false;
     public float resolutionMultiplier = 1;
+    public bool resetCurvePointsOnUpdate = true;
 
     public bool generateBridge = true;
     public BridgeSettings bridgeSettings = new BridgeSettings();
@@ -95,7 +96,7 @@ public class Intersection : MonoBehaviour
                         }
                     }
 
-                    if ((raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject) || isConnectedPoint == true)
+                    if ((raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject && resetCurvePointsOnUpdate == false) || isConnectedPoint == true)
                     {
                         if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
                         {
@@ -232,6 +233,11 @@ public class Intersection : MonoBehaviour
         else
         {
             CheckMaterialsAndPrefabs();
+
+            if (resetCurvePointsOnUpdate == true)
+            {
+                ResetCurvePointPositions();
+            }
 
             if (roundaboutMode == true)
             {
