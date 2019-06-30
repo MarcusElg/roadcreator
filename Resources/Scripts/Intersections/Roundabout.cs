@@ -980,13 +980,13 @@ public class Roundabout
             {
                 if (roadSegment.extraMeshes[j].left == true)
                 {
-                    if (lastEndWidths.Count > 0)
+                    if (addedLeftExtraMeshes < lastEndWidths.Count)
                     {
-                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastEndWidths[Mathf.Min(addedLeftExtraMeshes, lastEndWidths.Count - 1)], roadSegment.extraMeshes[j].yOffset));
+                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastEndWidths[addedLeftExtraMeshes], roadSegment.extraMeshes[j].yOffset));
                     }
                     else
                     {
-                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, 0, roadSegment.extraMeshes[j].yOffset));
                     }
 
                     intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
