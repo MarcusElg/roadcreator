@@ -71,7 +71,7 @@ public class PointEditor : Editor
                     {
                         point.transform.parent.parent.parent.GetChild(point.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2).position = point.transform.position;
                     }
-                    else if (point.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() < point.transform.parent.parent.parent.childCount + 1)
+                    else if (point.name == "End Point" && point.transform.parent.parent.GetSiblingIndex() < point.transform.parent.parent.parent.childCount - 1)
                     {
                         point.transform.parent.parent.parent.GetChild(point.transform.parent.parent.GetSiblingIndex() + 1).GetChild(0).GetChild(0).position = point.transform.position;
                     }
