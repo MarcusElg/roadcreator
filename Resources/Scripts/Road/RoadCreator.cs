@@ -26,89 +26,102 @@ public class RoadCreator : MonoBehaviour
     public IntersectionConnection startIntersectionConnection = null;
     public IntersectionConnection endIntersectionConnection = null;
 
+    public int startLanes = 2;
+    public float startMarkersScale = 1f;
+    public int startMarkersRepeations = 1;
+    public float startMarkersStartIntersectionOffset = 1.7f;
+    public float startMarkersContinuousIntersectionOffset = 4.2f;
+    public float startMarkersYOffset = 0.02f;
+    public List<Vector3Bool> startLaneMarkers = new List<Vector3Bool>();
+
+    public int endLanes = 2;
+    public float endMarkersScale = 1;
+    public int endMarkersRepeations = 1;
+    public float endMarkersStartIntersectionOffset = 1.7f;
+    public float endMarkersContinuousIntersectionOffset = 4.2f;
+    public float endMarkersYOffset = 0.02f;
+    public List<Vector3Bool> endLaneMarkers = new List<Vector3Bool>();
+
     public void CreateMesh(bool fromIntersection = false)
     {
-        if (this != null)
+        Vector3[] currentPoints = null;
+
+        for (int i = 0; i < transform.GetChild(0).childCount; i++)
         {
-            Vector3[] currentPoints = null;
-
-            for (int i = 0; i < transform.GetChild(0).childCount; i++)
+            if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().terrainOption != RoadSegment.TerrainOption.ignore && (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateSimpleBridge == true || transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateCustomBridge == true))
             {
-                if (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().terrainOption != RoadSegment.TerrainOption.ignore && (transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateSimpleBridge == true || transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().generateCustomBridge == true))
-                {
-                    transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().terrainOption = RoadSegment.TerrainOption.ignore;
-                    Debug.Log("Terrain option has to be set to ignore to generate bridges");
-                }
+                transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().terrainOption = RoadSegment.TerrainOption.ignore;
+                Debug.Log("Terrain option has to be set to ignore to generate bridges");
             }
+        }
 
-            for (int i = 0; i < transform.GetChild(0).childCount; i++)
+        for (int i = 0; i < transform.GetChild(0).childCount; i++)
+        {
+            if (transform.GetChild(0).GetChild(i).GetChild(0).childCount == 3)
             {
-                if (transform.GetChild(0).GetChild(i).GetChild(0).childCount == 3)
+                Vector3 previousPoint = Misc.MaxVector3;
+
+                if (i == 0)
                 {
-                    Vector3 previousPoint = Misc.MaxVector3;
+                    currentPoints = CalculatePoints(transform.GetChild(0).GetChild(i));
+
+                    if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == 0 && startIntersection != null && startIntersectionConnection != null)
+                    {
+                        previousPoint = startIntersectionConnection.lastPoint + (currentPoints[0] - currentPoints[1]).normalized;
+                        previousPoint.y = startIntersection.yOffset + startIntersectionConnection.lastPoint.y;
+                    }
+                }
+
+                if (i < transform.GetChild(0).childCount - 1 && transform.GetChild(0).GetChild(i + 1).GetChild(0).childCount == 3)
+                {
+                    Vector3[] nextPoints = CalculatePoints(transform.GetChild(0).GetChild(i + 1));
+                    nextPoints[0] = currentPoints[currentPoints.Length - 1];
 
                     if (i == 0)
                     {
-                        currentPoints = CalculatePoints(transform.GetChild(0).GetChild(i));
-
-                        if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == 0 && startIntersection != null && startIntersectionConnection != null)
-                        {
-                            previousPoint = startIntersectionConnection.lastPoint + (currentPoints[0] - currentPoints[1]).normalized;
-                            previousPoint.y = startIntersection.yOffset + startIntersectionConnection.lastPoint.y;
-                        }
-                    }
-
-                    if (i < transform.GetChild(0).childCount - 1 && transform.GetChild(0).GetChild(i + 1).GetChild(0).childCount == 3)
-                    {
-                        Vector3[] nextPoints = CalculatePoints(transform.GetChild(0).GetChild(i + 1));
-                        nextPoints[0] = currentPoints[currentPoints.Length - 1];
-
-                        if (i == 0)
-                        {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, this);
-                        }
-                        else
-                        {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), this);
-                        }
-
-                        StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
-                        currentPoints = nextPoints;
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, this);
                     }
                     else
                     {
-                        Vector3[] nextPoints = null;
-
-                        if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == transform.GetChild(0).childCount - 1 && endIntersection != null && endIntersectionConnection != null)
-                        {
-                            nextPoints = new Vector3[1];
-                            nextPoints[0] = endIntersectionConnection.lastPoint + (currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2]).normalized;
-                            nextPoints[0].y = endIntersection.yOffset + endIntersectionConnection.lastPoint.y;
-                        }
-
-                        if (i - 1 >= 0)
-                        {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), this);
-                            StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
-                        }
-                        else
-                        {
-                            transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, this);
-                            StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
-                        }
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), this);
                     }
+
+                    StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
+                    currentPoints = nextPoints;
                 }
                 else
                 {
-                    for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
-                    {
-                        transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
-                        transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
+                    Vector3[] nextPoints = null;
 
-                        if (transform.GetChild(0).GetChild(i).childCount == 3)
-                        {
-                            DestroyImmediate(transform.GetChild(0).GetChild(i).GetChild(2).gameObject);
-                        }
+                    if (transform.GetChild(0).GetChild(i).GetSiblingIndex() == transform.GetChild(0).childCount - 1 && endIntersection != null && endIntersectionConnection != null)
+                    {
+                        nextPoints = new Vector3[1];
+                        nextPoints[0] = endIntersectionConnection.lastPoint + (currentPoints[currentPoints.Length - 1] - currentPoints[currentPoints.Length - 2]).normalized;
+                        nextPoints[0].y = endIntersection.yOffset + endIntersectionConnection.lastPoint.y;
+                    }
+
+                    if (i - 1 >= 0)
+                    {
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, transform.GetChild(0).GetChild(i - 1).GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices, heightOffset, transform.GetChild(0).GetChild(i), transform.GetChild(0).GetChild(i - 1), this);
+                        StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
+                    }
+                    else
+                    {
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().CreateRoadMesh(currentPoints, nextPoints, previousPoint, null, heightOffset, transform.GetChild(0).GetChild(i), null, this);
+                        StartCoroutine(FixTextureStretch(Misc.CalculateDistance(transform.GetChild(0).GetChild(i).GetChild(0).GetChild(0).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(1).position, transform.GetChild(0).GetChild(i).GetChild(0).GetChild(2).position), i));
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < transform.GetChild(0).GetChild(i).GetChild(1).childCount; j++)
+                {
+                    transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
+                    transform.GetChild(0).GetChild(i).GetChild(1).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
+
+                    if (transform.GetChild(0).GetChild(i).childCount == 3)
+                    {
+                        DestroyImmediate(transform.GetChild(0).GetChild(i).GetChild(2).gameObject);
                     }
                 }
             }
@@ -140,6 +153,8 @@ public class RoadCreator : MonoBehaviour
                 UpdateEndConnectionVariables();
             }
         }
+
+        GenerateLaneMarkings();
     }
 
     IEnumerator FixTextureStretch(float length, int i)
@@ -772,7 +787,6 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-
     public IntersectionConnection CreateIntersectionConnectionFirst(Intersection intersection, GameObject point)
     {
         return CreateIntersectionConnection(intersection, point, 1, 0);
@@ -1129,6 +1143,205 @@ public class RoadCreator : MonoBehaviour
         if (settings == null)
         {
             settings = RoadCreatorSettings.GetSerializedSettings();
+        }
+    }
+
+    public void GenerateLaneMarkings()
+    {
+        RemoveLaneMarkings();
+
+        // Start Lane Markings
+        if (startIntersection != null)
+        {
+            RoadSegment roadSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
+            Vector3 left = Misc.CalculateLeft(startIntersectionConnection.leftPoint - startIntersectionConnection.rightPoint);
+
+            // Find position
+            Vector3 lastPosition = roadSegment.transform.GetChild(0).GetChild(0).position;
+            Vector3 secondLastPosition = startIntersectionConnection.lastPoint;
+            int currentIndex = 0;
+
+            float currentDistance = 0;
+            float currentRoadWidth = 0;
+
+            for (float j = 0; j <= 1; j += 1f / Mathf.Max(3, settings.FindProperty("resolution").floatValue * resolutionMultiplier * 40 * Misc.CalculateDistance(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position)))
+            {
+                Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
+                currentDistance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
+                secondLastPosition = lastPosition;
+                lastPosition = currentPosition;
+
+                // Prevent markers from being outside the road segment
+                if (Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(roadSegment.transform.GetChild(0).GetChild(2).position.x, 0, roadSegment.transform.GetChild(0).GetChild(2).position.z)) < startMarkersScale * 0.7f)
+                {
+                    break;
+                }
+
+                if ((currentIndex == 0 && currentDistance >= startMarkersStartIntersectionOffset) || (currentIndex > 0 && currentDistance >= startMarkersContinuousIntersectionOffset))
+                {
+                    currentRoadWidth = Mathf.Lerp(roadSegment.startRoadWidth, roadSegment.endRoadWidth, j);
+                    currentIndex += 1;
+                    currentDistance = 0;
+                    left = Misc.CalculateLeft(secondLastPosition - lastPosition);
+
+                    // Create the lane markings
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(lastPosition + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, 1 << LayerMask.NameToLayer("Road")))
+                    {
+                        lastPosition = raycastHit.point;
+
+                        for (int i = 0; i < startLanes; i++)
+                        {
+                            if (i < startLaneMarkers.Count)
+                            {
+                                GameObject laneMarking = GetLaneMarking(startLaneMarkers[i]);
+
+                                if (laneMarking != null)
+                                {
+                                    laneMarking.transform.SetParent(transform.GetChild(1));
+                                    laneMarking.transform.position = raycastHit.point + new Vector3(0, startMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (startLanes));
+                                    Vector3 laneForward = new Vector3((secondLastPosition - lastPosition).normalized.x, 0, (secondLastPosition - lastPosition).normalized.z);
+                                    laneMarking.transform.up = raycastHit.normal;
+                                    laneMarking.transform.localScale = new Vector3(startMarkersScale, 1, startMarkersScale);
+                                    laneMarking.transform.localRotation = Quaternion.Euler(laneMarking.transform.rotation.eulerAngles.x, Quaternion.LookRotation(laneForward).eulerAngles.y, 0);
+                                    laneMarking.hideFlags = HideFlags.NotEditable;
+                                }
+                            }
+                        }
+                    }
+
+                    if (currentIndex > startMarkersRepeations - 1)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // End Lane Markings
+        if (endIntersection != null)
+        {
+            RoadSegment roadSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
+            Vector3 left = Misc.CalculateLeft(endIntersectionConnection.leftPoint - endIntersectionConnection.rightPoint);
+
+            // Find position
+            Vector3 lastPosition = roadSegment.transform.GetChild(0).GetChild(2).position;
+            Vector3 secondLastPosition = endIntersectionConnection.lastPoint;
+            int currentIndex = 0;
+
+            float currentDistance = 0;
+            float currentRoadWidth = 0;
+
+            for (float j = 1; j >= 0; j -= 1f / Mathf.Max(3, settings.FindProperty("resolution").floatValue * resolutionMultiplier * 40 * Misc.CalculateDistance(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position)))
+            {
+                Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
+                currentDistance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
+                secondLastPosition = lastPosition;
+                lastPosition = currentPosition;
+
+                // Prevent markers from being outside the road segment
+                if (Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(roadSegment.transform.GetChild(0).GetChild(0).position.x, 0, roadSegment.transform.GetChild(0).GetChild(0).position.z)) < endMarkersScale * 0.7f)
+                {
+                    break;
+                }
+
+                if ((currentIndex == 0 && currentDistance >= endMarkersStartIntersectionOffset) || (currentIndex > 0 && currentDistance >= endMarkersContinuousIntersectionOffset))
+                {
+                    currentRoadWidth = Mathf.Lerp(roadSegment.startRoadWidth, roadSegment.endRoadWidth, j);
+                    currentIndex += 1;
+                    currentDistance = 0;
+                    left = Misc.CalculateLeft(secondLastPosition - lastPosition);
+
+                    // Create the lane markings
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(lastPosition + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, 1 << LayerMask.NameToLayer("Road")))
+                    {
+                        lastPosition = raycastHit.point;
+
+                        for (int i = 0; i < endLanes; i++)
+                        {
+                            if (i < endLaneMarkers.Count)
+                            {
+                                GameObject laneMarking = GetLaneMarking(endLaneMarkers[i]);
+
+                                if (laneMarking != null)
+                                {
+                                    laneMarking.transform.SetParent(transform.GetChild(2));
+                                    laneMarking.transform.position = raycastHit.point + new Vector3(0, endMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
+                                    Vector3 laneForward = new Vector3((secondLastPosition - lastPosition).normalized.x, 0, (secondLastPosition - lastPosition).normalized.z);
+                                    laneMarking.transform.up = raycastHit.normal;
+                                    laneMarking.transform.localScale = new Vector3(endMarkersScale, 1, endMarkersScale);
+                                    laneMarking.transform.localRotation = Quaternion.Euler(laneMarking.transform.rotation.eulerAngles.x, Quaternion.LookRotation(laneForward).eulerAngles.y, 0);
+                                    laneMarking.hideFlags = HideFlags.NotEditable;
+                                }
+                            }
+                        }
+                    }
+
+                    if (currentIndex > endMarkersRepeations - 1)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public GameObject GetLaneMarking(Vector3Bool laneData)
+    {
+        if (laneData.one == true)
+        {
+            if (laneData.two == true)
+            {
+                if (laneData.three == true)
+                {
+                    return Instantiate((GameObject)settings.FindProperty("leftRightForwardTurnMarking").objectReferenceValue);
+                }
+                else
+                {
+                    return Instantiate((GameObject)settings.FindProperty("leftForwardTurnMarking").objectReferenceValue);
+                }
+            }
+            else if (laneData.three == true)
+            {
+                return Instantiate((GameObject)settings.FindProperty("leftRightTurnMarking").objectReferenceValue);
+            }
+            else
+            {
+                return Instantiate((GameObject)settings.FindProperty("leftTurnMarking").objectReferenceValue);
+            }
+        }
+        else if (laneData.two == true)
+        {
+            if (laneData.three == true)
+            {
+                return Instantiate((GameObject)settings.FindProperty("rightForwardTurnMarking").objectReferenceValue);
+            }
+            else
+            {
+                return Instantiate((GameObject)settings.FindProperty("forwardTurnMarking").objectReferenceValue);
+            }
+        }
+        else if (laneData.three == true)
+        {
+            return Instantiate((GameObject)settings.FindProperty("rightTurnMarking").objectReferenceValue);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void RemoveLaneMarkings()
+    {
+        for (int i = transform.GetChild(1).childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(1).GetChild(i).gameObject);
+        }
+
+        for (int i = transform.GetChild(2).childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(2).GetChild(i).gameObject);
         }
     }
 

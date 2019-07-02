@@ -29,6 +29,14 @@ public class RoadCreatorSettings : ScriptableObject
     public GameObject defaultPrefabLineStartPrefab;
     public GameObject defaultPrefabLineEndPrefab;
 
+    public GameObject leftTurnMarking;
+    public GameObject forwardTurnMarking;
+    public GameObject rightTurnMarking;
+    public GameObject leftForwardTurnMarking;
+    public GameObject rightForwardTurnMarking;
+    public GameObject leftRightTurnMarking;
+    public GameObject leftRightForwardTurnMarking;
+
     public Color pointColour = Color.red;
     public Color controlPointColour = Color.yellow;
     public Color intersectionColour = Color.green;
@@ -115,6 +123,41 @@ public class RoadCreatorSettings : ScriptableObject
         if (defaultPrefabLinePrefab == null)
         {
             defaultPrefabLinePrefab = Resources.Load("Prefabs/Concrete Barrier") as GameObject;
+        }
+
+        if (leftTurnMarking == null)
+        {
+            leftTurnMarking = Resources.Load("Prefabs/Turn Markings/Left Arrow") as GameObject;
+        }
+
+        if (forwardTurnMarking == null)
+        {
+            forwardTurnMarking = Resources.Load("Prefabs/Turn Markings/Forward Arrow") as GameObject;
+        }
+
+        if (rightTurnMarking == null)
+        {
+            rightTurnMarking = Resources.Load("Prefabs/Turn Markings/Right Arrow") as GameObject;
+        }
+
+        if (leftForwardTurnMarking == null)
+        {
+            leftForwardTurnMarking = Resources.Load("Prefabs/Turn Markings/Forward And Left Arrow") as GameObject;
+        }
+
+        if (rightForwardTurnMarking == null)
+        {
+            rightForwardTurnMarking = Resources.Load("Prefabs/Turn Markings/Forward And Right Arrow") as GameObject;
+        }
+
+        if (leftRightTurnMarking == null)
+        {
+            leftRightTurnMarking = Resources.Load("Prefabs/Turn Markings/Left And Right Arrow") as GameObject;
+        }
+
+        if (leftRightForwardTurnMarking == null)
+        {
+            leftRightForwardTurnMarking = Resources.Load("Prefabs/Turn Markings/Forward, Left And Right Arrow") as GameObject;
         }
     }
 
