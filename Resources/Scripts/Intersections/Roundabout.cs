@@ -961,48 +961,51 @@ public class Roundabout
         List<float> lastEndWidths = new List<float>();
 
         // Generate first widths
-        RoadSegment roadSegment = intersection.connections[0].road.transform.parent.parent.GetComponent<RoadSegment>();
-        for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+        if (intersection.connections.Count > 0)
         {
-            if (roadSegment.extraMeshes[j].left == false)
-            {
-                lastEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
-            }
-        }
-
-        for (int i = intersection.connections.Count - 1; i >= 0; i--)
-        {
-            roadSegment = intersection.connections[i].road.transform.parent.parent.GetComponent<RoadSegment>();
-            currentEndWidths.Clear();
-            int addedLeftExtraMeshes = 0;
-
+            RoadSegment roadSegment = intersection.connections[0].road.transform.parent.parent.GetComponent<RoadSegment>();
             for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
             {
-                if (roadSegment.extraMeshes[j].left == true)
+                if (roadSegment.extraMeshes[j].left == false)
                 {
-                    if (addedLeftExtraMeshes < lastEndWidths.Count)
+                    lastEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
+                }
+            }
+
+            for (int i = intersection.connections.Count - 1; i >= 0; i--)
+            {
+                roadSegment = intersection.connections[i].road.transform.parent.parent.GetComponent<RoadSegment>();
+                currentEndWidths.Clear();
+                int addedLeftExtraMeshes = 0;
+
+                for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+                {
+                    if (roadSegment.extraMeshes[j].left == true)
                     {
-                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastEndWidths[addedLeftExtraMeshes], roadSegment.extraMeshes[j].yOffset));
+                        if (addedLeftExtraMeshes < lastEndWidths.Count)
+                        {
+                            intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastEndWidths[addedLeftExtraMeshes], roadSegment.extraMeshes[j].yOffset));
+                        }
+                        else
+                        {
+                            intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, 0, roadSegment.extraMeshes[j].yOffset));
+                        }
+
+                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                        intersection.CreateExtraMesh();
+                        addedLeftExtraMeshes += 1;
                     }
                     else
                     {
-                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, 0, roadSegment.extraMeshes[j].yOffset));
+                        currentEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
+                        intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
                     }
 
-                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
                     intersection.CreateExtraMesh();
-                    addedLeftExtraMeshes += 1;
-                }
-                else
-                {
-                    currentEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
-                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
                 }
 
-                intersection.CreateExtraMesh();
+                lastEndWidths = new List<float>(currentEndWidths);
             }
-
-            lastEndWidths = new List<float>(currentEndWidths);
         }
     }
 
