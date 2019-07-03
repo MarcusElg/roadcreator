@@ -245,6 +245,12 @@ public class Intersection : MonoBehaviour
             }
             else
             {
+                if (outerExtraMeshesAsRoads == true)
+                {
+                    ResetExtraMeshes();
+                    CreateExtraMeshesFromRoads();
+                }
+
                 GenerateNormalMesh();
             }
         }
@@ -708,4 +714,88 @@ public class Intersection : MonoBehaviour
         extraMesh.hideFlags = HideFlags.NotEditable;
     }
 
+    private void ResetExtraMeshes()
+    {
+        for (int i = extraMeshes.Count - 1; i >= 0; i--)
+        {
+            extraMeshes.RemoveAt(i);
+            GameObject.DestroyImmediate(transform.GetChild(0).GetChild(i).gameObject);
+        }
+    }
+
+    private void CreateExtraMeshesFromRoads()
+    {
+        List<float> currentEndWidths = new List<float>();
+        List<float> lastStartWidths = new List<float>();
+
+        // Generate first widths
+        RoadSegment lastRoadSegment = connections[connections.Count - 1].road.transform.parent.parent.GetComponent<RoadSegment>();
+        RoadSegment roadSegment = connections[0].road.transform.parent.parent.GetComponent<RoadSegment>();
+        for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+        {
+            if (roadSegment.extraMeshes[j].left == false)
+            {
+                lastStartWidths.Add(roadSegment.extraMeshes[j].startWidth);
+            }
+        }
+
+        for (int i = connections.Count - 1; i >= 0; i--)
+        {
+            roadSegment = connections[i].road.transform.parent.parent.GetComponent<RoadSegment>();
+            currentEndWidths.Clear();
+            int addedExtraMeshes = 0;
+
+            for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+            {
+                if (roadSegment.extraMeshes[j].left == true && connections[i].road.name == "End Point")
+                {
+                    if (addedExtraMeshes < lastStartWidths.Count)
+                    {
+                        extraMeshes.Add(new ExtraMesh(true, i, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastStartWidths[addedExtraMeshes], roadSegment.extraMeshes[j].yOffset));
+                    }
+                    else
+                    {
+                        extraMeshes.Add(new ExtraMesh(true, i, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, 0, roadSegment.extraMeshes[j].yOffset));
+                    }
+
+                    addedExtraMeshes += 1;
+                    CreateExtraMesh();
+                }
+                else if (roadSegment.extraMeshes[j].left == false && connections[i].road.name == "Start Point")
+                {
+                    if (addedExtraMeshes < lastStartWidths.Count)
+                    {
+                        extraMeshes.Add(new ExtraMesh(true, i, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, lastStartWidths[addedExtraMeshes], roadSegment.extraMeshes[j].yOffset));
+                    }
+                    else
+                    {
+                        extraMeshes.Add(new ExtraMesh(true, i, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, 0, roadSegment.extraMeshes[j].yOffset));
+                    }
+
+                    addedExtraMeshes += 1;
+                    CreateExtraMesh();
+                }
+                else
+                {
+                    if (connections[i].road.name == "Start Point")
+                    {
+                        currentEndWidths.Add(roadSegment.extraMeshes[j].startWidth);
+                    }
+                    else
+                    {
+                        currentEndWidths.Add(roadSegment.extraMeshes[j].endWidth);
+                    }
+                }
+            }
+
+            for (int j = addedExtraMeshes; j < lastStartWidths.Count; j++)
+            {
+                extraMeshes.Add(new ExtraMesh(true, i, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastStartWidths[j], lastRoadSegment.extraMeshes[j].yOffset));
+                CreateExtraMesh();
+            }
+
+            lastRoadSegment = roadSegment;
+            lastStartWidths = new List<float>(currentEndWidths);
+        }
+    }
 }

@@ -93,7 +93,7 @@ public class RoadEditor : Editor
 
             if (roadCreator.startMarkersRepeations > 1)
             {
-                roadCreator.startMarkersContinuousIntersectionOffset = Mathf.Clamp(EditorGUILayout.FloatField("Continuous Intersection Offset", roadCreator.startMarkersContinuousIntersectionOffset), 1.4f * roadCreator.startMarkersScale, 25);
+                roadCreator.startMarkersContinuousIntersectionOffset = Mathf.Clamp(EditorGUILayout.FloatField("Continuous Offset", roadCreator.startMarkersContinuousIntersectionOffset), 1.4f * roadCreator.startMarkersScale, 25);
             }
 
             roadCreator.startMarkersYOffset = Mathf.Max(EditorGUILayout.FloatField("Y Offset", roadCreator.startMarkersYOffset), 0f);
@@ -151,7 +151,7 @@ public class RoadEditor : Editor
 
             if (roadCreator.endMarkersRepeations > 1)
             {
-                roadCreator.endMarkersContinuousIntersectionOffset = Mathf.Clamp(EditorGUILayout.FloatField("Continuous Intersection Offset", roadCreator.endMarkersContinuousIntersectionOffset), 1.4f * roadCreator.endMarkersScale, 25);
+                roadCreator.endMarkersContinuousIntersectionOffset = Mathf.Clamp(EditorGUILayout.FloatField("Continuous Offset", roadCreator.endMarkersContinuousIntersectionOffset), 1.4f * roadCreator.endMarkersScale, 25);
             }
 
             roadCreator.endMarkersYOffset = Mathf.Max(EditorGUILayout.FloatField("Y Offset", roadCreator.endMarkersYOffset), 0f);

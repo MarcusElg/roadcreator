@@ -137,24 +137,21 @@ public class IntersectionEditor : Editor
 
         GUILayout.Space(20);
         GUILayout.Label("Extra Meshes", guiStyle);
-        if (intersection.roundaboutMode == true)
+        bool oldOuterExtraMeshesAsRoads = intersection.outerExtraMeshesAsRoads;
+        EditorGUI.BeginChangeCheck();
+
+        intersection.outerExtraMeshesAsRoads = EditorGUILayout.Toggle("Outer Extra Meshes Controlled By Roads", intersection.outerExtraMeshesAsRoads);
+
+        if (EditorGUI.EndChangeCheck() == true)
         {
-            bool oldOuterExtraMeshesAsRoads = intersection.outerExtraMeshesAsRoads;
-            EditorGUI.BeginChangeCheck();
-
-            intersection.outerExtraMeshesAsRoads = EditorGUILayout.Toggle("Outer Extra Meshes Controlled By Roads", intersection.outerExtraMeshesAsRoads);
-
-            if (EditorGUI.EndChangeCheck() == true)
-            {
-                serializedObject.ApplyModifiedPropertiesWithoutUndo();
-                intersection.CreateMesh();
-            }
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            intersection.CreateMesh();
         }
 
         EditorGUI.BeginChangeCheck();
         for (int i = 0; i < intersection.extraMeshes.Count; i++)
         {
-            if ((intersection.outerExtraMeshesAsRoads == false && intersection.roundaboutMode == false) || intersection.extraMeshes[i].index == 0)
+            if (intersection.outerExtraMeshesAsRoads == false || (intersection.extraMeshes[i].index == 0 && intersection.roundaboutMode == true))
             {
                 intersection.extraMeshes[i].open = EditorGUILayout.Foldout(intersection.extraMeshes[i].open, "Extra Mesh " + i);
                 if (intersection.extraMeshes[i].open == true)
@@ -190,15 +187,7 @@ public class IntersectionEditor : Editor
                     if (GUILayout.Button("Duplicate Extra Mesh") == true)
                     {
                         intersection.extraMeshes.Add(intersection.extraMeshes[intersection.extraMeshes.Count - 1].Copy());
-
-                        GameObject extraMesh = new GameObject("Extra Mesh");
-                        extraMesh.AddComponent<MeshFilter>();
-                        extraMesh.AddComponent<MeshRenderer>();
-                        extraMesh.AddComponent<MeshCollider>();
-                        extraMesh.transform.SetParent(intersection.transform.GetChild(0));
-                        extraMesh.transform.localPosition = Vector3.zero;
-                        extraMesh.layer = LayerMask.NameToLayer("Road");
-                        extraMesh.hideFlags = HideFlags.NotEditable;
+                        intersection.CreateExtraMesh();
                     }
 
                     if (GUILayout.Button("Remove Extra Mesh") == true && intersection.transform.GetChild(0).childCount > 0)
@@ -214,18 +203,13 @@ public class IntersectionEditor : Editor
             }
         }
 
-        if (GUILayout.Button("Add Extra Mesh"))
+        if (intersection.roundaboutMode == true || intersection.outerExtraMeshesAsRoads == false)
         {
-            intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)intersection.settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, 0));
-
-            GameObject extraMesh = new GameObject("Extra Mesh");
-            extraMesh.AddComponent<MeshFilter>();
-            extraMesh.AddComponent<MeshRenderer>();
-            extraMesh.AddComponent<MeshCollider>();
-            extraMesh.transform.SetParent(intersection.transform.GetChild(0));
-            extraMesh.transform.localPosition = Vector3.zero;
-            extraMesh.layer = LayerMask.NameToLayer("Road");
-            extraMesh.hideFlags = HideFlags.NotEditable;
+            if (GUILayout.Button("Add Extra Mesh"))
+            {
+                intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)intersection.settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, 0));
+                intersection.CreateExtraMesh();
+            }
         }
 
         if (EditorGUI.EndChangeCheck() == true)
