@@ -230,6 +230,7 @@ public class RoadEditor : Editor
         roadCreator.endIntersection = null;
         roadCreator.startIntersectionConnection = null;
         roadCreator.endIntersectionConnection = null;
+        roadCreator.RemoveLaneMarkings();
     }
 
     public void UndoUpdate()
