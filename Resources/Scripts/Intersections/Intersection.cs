@@ -729,7 +729,7 @@ public class Intersection : MonoBehaviour
         List<float> lastWidths = new List<float>();
 
         // Generate first widths
-        RoadSegment lastRoadSegment = connections[connections.Count - 1].road.transform.parent.parent.GetComponent<RoadSegment>();
+        RoadSegment lastRoadSegment = connections[connections.Count - 2].road.transform.parent.parent.GetComponent<RoadSegment>();
         RoadSegment currentRoadSegment = connections[0].road.transform.parent.parent.GetComponent<RoadSegment>();
 
         for (int j = 0; j < currentRoadSegment.extraMeshes.Count; j++)
