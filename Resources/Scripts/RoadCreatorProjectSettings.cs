@@ -114,16 +114,6 @@ public class RoadCreatorProjectSettings
                 settings.FindProperty("defaultPrefabLineStartPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Prefab Line Start Prefab", settings.FindProperty("defaultPrefabLineStartPrefab").objectReferenceValue, typeof(GameObject), false);
                 settings.FindProperty("defaultPrefabLineEndPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Prefab Line End Prefab", settings.FindProperty("defaultPrefabLineEndPrefab").objectReferenceValue, typeof(GameObject), false);
 
-                GUILayout.Space(20);
-                GUILayout.Label("Turn Markings", guiStyle);
-                settings.FindProperty("leftTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left Turn Marking", settings.FindProperty("leftTurnMarking").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("forwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Forward Turn Marking", settings.FindProperty("forwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("rightTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Right Turn Marking", settings.FindProperty("rightTurnMarking").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("leftForwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left And Forward Turn Marking", settings.FindProperty("leftForwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("rightForwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Right And Forward Turn Marking", settings.FindProperty("rightForwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("leftRightTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left And Right Turn Marking", settings.FindProperty("leftRightTurnMarking").objectReferenceValue, typeof(GameObject), false);
-                settings.FindProperty("leftRightForwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left, Right And Forward Turn Marking", settings.FindProperty("leftRightForwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
-
                 if (GUILayout.Button("Reset Default Values"))
                 {
                     settings.FindProperty("defaultBaseMaterial").objectReferenceValue = null;
@@ -137,6 +127,27 @@ public class RoadCreatorProjectSettings
                     settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue = null;
                     settings.FindProperty("defaultPrefabLineStartPrefab").objectReferenceValue = null;
                     settings.FindProperty("defaultPrefabLineEndPrefab").objectReferenceValue = null;
+                }
+
+                GUILayout.Space(20);
+                GUILayout.Label("Turn Markings", guiStyle);
+                settings.FindProperty("leftTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left Turn Marking", settings.FindProperty("leftTurnMarking").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("forwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Forward Turn Marking", settings.FindProperty("forwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("rightTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Right Turn Marking", settings.FindProperty("rightTurnMarking").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("leftForwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left And Forward Turn Marking", settings.FindProperty("leftForwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("rightForwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Right And Forward Turn Marking", settings.FindProperty("rightForwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("leftRightTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left And Right Turn Marking", settings.FindProperty("leftRightTurnMarking").objectReferenceValue, typeof(GameObject), false);
+                settings.FindProperty("leftRightForwardTurnMarking").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Left, Right And Forward Turn Marking", settings.FindProperty("leftRightForwardTurnMarking").objectReferenceValue, typeof(GameObject), false);
+
+                if (GUILayout.Button("Reset Turn Markings"))
+                {
+                    settings.FindProperty("leftTurnMarking").objectReferenceValue = null;
+                    settings.FindProperty("forwardTurnMarking").objectReferenceValue = null;
+                    settings.FindProperty("rightTurnMarking").objectReferenceValue = null;
+                    settings.FindProperty("leftForwardTurnMarking").objectReferenceValue = null;
+                    settings.FindProperty("rightForwardTurnMarking").objectReferenceValue = null;
+                    settings.FindProperty("leftRightTurnMarking").objectReferenceValue = null;
+                    settings.FindProperty("leftRightForwardTurnMarking").objectReferenceValue = null;
                 }
 
                 if (EditorGUI.EndChangeCheck() == true)
