@@ -397,8 +397,8 @@ public class RoadCreator : MonoBehaviour
         {
             CreateExtraMesh(segment.transform.GetChild(1));
 
-            segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
-            segment.extraMeshes[segment.extraMeshes.Count - 1].startWidth = oldLastSegment.extraMeshes[i].endWidth;
+            segment.extraMeshes.Add(oldLastSegment.extraMeshes[i].Copy());
+            segment.extraMeshes[i].startWidth = oldLastSegment.extraMeshes[i].endWidth;
         }
     }
 

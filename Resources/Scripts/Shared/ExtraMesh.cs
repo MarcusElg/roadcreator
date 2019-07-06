@@ -41,7 +41,9 @@ public class ExtraMesh
 
     public ExtraMesh Copy()
     {
-        return new ExtraMesh(open, index, baseMaterial, overlayMaterial, physicMaterial, startWidth, endWidth, yOffset);
+        ExtraMesh extraMesh = new ExtraMesh(open, index, baseMaterial, overlayMaterial, physicMaterial, startWidth, endWidth, yOffset); ;
+        extraMesh.left = left;
+        return extraMesh;
     }
 
 }
