@@ -65,7 +65,10 @@ public class PointEditor : Editor
                 }
                 else
                 {
-                    point.transform.parent.GetChild(1).position = Misc.GetCenter(point.transform.parent.GetChild(0).position, point.transform.parent.GetChild(2).position);
+                    if (point.transform.parent.parent.GetComponent<RoadSegment>().curved == false)
+                    {
+                        point.transform.parent.GetChild(1).position = Misc.GetCenter(point.transform.parent.GetChild(0).position, point.transform.parent.GetChild(2).position);
+                    }
 
                     if (point.name == "Start Point" && point.transform.parent.parent.GetSiblingIndex() > 0)
                     {
