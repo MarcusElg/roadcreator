@@ -150,8 +150,12 @@ public class PrefabLineEditor : Editor
         }
 
         GUILayout.Space(20);
+        if (GUILayout.Button("Flip Prefab Line"))
+        {
+            prefabCreator.Flip();
+        }
 
-        if (GUILayout.Button("Reset"))
+        if (GUILayout.Button("Reset Prefab Line"))
         {
             for (int i = 1; i >= 0; i--)
             {

@@ -639,4 +639,44 @@ public class PrefabLineCreator : MonoBehaviour
         endWidthLeft = prefabLineToCopy.endWidthLeft;
         endWidthRight = prefabLineToCopy.endWidthRight;
     }
+
+    public void Flip()
+    {
+        if (transform.GetChild(0).childCount > 0)
+        {
+            if (transform.GetChild(0).childCount % 2 == 1)
+            {
+                Undo.RegisterFullObjectHierarchyUndo(gameObject, "Flip Prefab Line");
+
+                // Points
+                for (int i = 0; i < transform.GetChild(0).childCount; i++)
+                {
+                    transform.GetChild(0).GetChild(i).SetAsFirstSibling();
+                }
+
+                if (rotationDirection == RotationDirection.left)
+                {
+                    rotationDirection = RotationDirection.right;
+                }
+                else if (rotationDirection == RotationDirection.right)
+                {
+                    rotationDirection = RotationDirection.left;
+                }
+                else if (rotationDirection == RotationDirection.forward)
+                {
+                    rotationDirection = RotationDirection.backward;
+                }
+                else if (rotationDirection == RotationDirection.backward)
+                {
+                    rotationDirection = RotationDirection.forward;
+                }
+
+                PlacePrefabs();
+            }
+            else
+            {
+                Debug.Log("Can't flip the prefab line when it ends with a control point");
+            }
+        }
+    }
 }
