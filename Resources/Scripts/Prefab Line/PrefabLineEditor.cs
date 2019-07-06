@@ -28,14 +28,12 @@ public class PrefabLineEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (prefabCreator.spacing == -1)
-        {
-            if (prefabCreator.prefab == null)
-            {
-                prefabCreator.prefab = (GameObject)prefabCreator.settings.FindProperty("defaultPrefabLinePrefab").objectReferenceValue;
-            }
+        EditorGUI.BeginChangeCheck();
+        prefabCreator.prefabLineToCopy = (PrefabLineCreator)EditorGUILayout.ObjectField("Prefab Line To Copy", prefabCreator.prefabLineToCopy, typeof(PrefabLineCreator), true);
 
-            prefabCreator.spacing = prefabCreator.prefab.GetComponent<MeshFilter>().sharedMesh.bounds.extents.x * 2 * prefabCreator.xScale;
+        if (EditorGUI.EndChangeCheck() == true)
+        {
+            prefabCreator.CopyPrefabLine();
         }
 
         EditorGUI.BeginChangeCheck();
@@ -230,6 +228,18 @@ public class PrefabLineEditor : Editor
             else
             {
                 prefabCreator.MovePoints(Misc.MaxVector3, guiEvent, raycastHit);
+            }
+        }
+
+        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 2)
+        {
+            if (Physics.Raycast(ray, out raycastHit, 100f, 1 << LayerMask.NameToLayer("Road")))
+            {
+                if (raycastHit.transform.parent.parent.GetComponent<PrefabLineCreator>() != null)
+                {
+                    prefabCreator.prefabLineToCopy = raycastHit.transform.parent.parent.GetComponent<PrefabLineCreator>();
+                    prefabCreator.CopyPrefabLine();
+                }
             }
         }
 

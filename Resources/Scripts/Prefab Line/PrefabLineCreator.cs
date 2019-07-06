@@ -7,6 +7,8 @@ using UnityEngine;
 public class PrefabLineCreator : MonoBehaviour
 {
 
+    public PrefabLineCreator prefabLineToCopy;
+
     public GameObject prefab;
     public GameObject startPrefab;
     public GameObject endPrefab;
@@ -602,5 +604,33 @@ public class PrefabLineCreator : MonoBehaviour
         }
 
         return new PointPackage(prefabPoints.ToArray(), lerpPoints.ToArray(), startTimes.ToArray(), endTimes.ToArray());
+    }
+
+    public void CopyPrefabLine()
+    {
+        prefab = prefabLineToCopy.prefab;
+        startPrefab = prefabLineToCopy.startPrefab;
+        endPrefab = prefabLineToCopy.endPrefab;
+        yModification = prefabLineToCopy.yModification;
+        terrainCheckHeight = prefabLineToCopy.terrainCheckHeight;
+
+        xScale = prefabLineToCopy.xScale;
+        yScale = prefabLineToCopy.yScale;
+        zScale = prefabLineToCopy.zScale;
+
+        bendObjects = prefabLineToCopy.bendObjects;
+        fillGap = prefabLineToCopy.fillGap;
+        spacing = prefabLineToCopy.spacing;
+        rotateAlongCurve = prefabLineToCopy.rotateAlongCurve;
+        rotationDirection = prefabLineToCopy.rotationDirection;
+        yRotationRandomization = prefabLineToCopy.yRotationRandomization;
+        pointCalculationDivisions = prefabLineToCopy.pointCalculationDivisions;
+
+        bridgeMode = prefabLineToCopy.bridgeMode;
+        bridgeSettings = prefabLineToCopy.bridgeSettings;
+        startWidthLeft = prefabLineToCopy.startWidthLeft;
+        startWidthRight = prefabLineToCopy.startWidthRight;
+        endWidthLeft = prefabLineToCopy.endWidthLeft;
+        endWidthRight = prefabLineToCopy.endWidthRight;
     }
 }
