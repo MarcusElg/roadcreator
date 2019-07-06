@@ -1355,4 +1355,99 @@ public class RoadCreator : MonoBehaviour
         extraMesh.hideFlags = HideFlags.NotEditable;
     }
 
+    public void Flip()
+    {
+        if (transform.GetChild(0).childCount > 0)
+        {
+            if (transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetChild(0).childCount == 3)
+            {
+                Undo.RegisterFullObjectHierarchyUndo(gameObject, "Flip Road");
+
+                // Intersections
+                Intersection oldStartIntersection = startIntersection;
+                IntersectionConnection oldStartIntersectionConnection = startIntersectionConnection;
+                startIntersection = endIntersection;
+                startIntersectionConnection = endIntersectionConnection;
+                endIntersection = oldStartIntersection;
+                endIntersectionConnection = oldStartIntersectionConnection;
+
+                // Road
+                int oldStartLanes = startLanes;
+                float oldStartMarkersScale = startMarkersScale;
+                int oldStartMarkersRepeations = startMarkersRepeations;
+                float oldStartMarkersStartIntersectionOffset = startMarkersStartIntersectionOffset;
+                float oldStartMarkersContinuousIntersectionOffset = startMarkersContinuousIntersectionOffset;
+                float oldStartMarkersYOffset = startMarkersYOffset;
+                List<Vector3Bool> oldStartLaneMarkers = startLaneMarkers;
+
+                startLanes = endLanes;
+                startMarkersScale = endMarkersScale;
+                startMarkersRepeations = endMarkersRepeations;
+                startMarkersStartIntersectionOffset = endMarkersStartIntersectionOffset;
+                startMarkersContinuousIntersectionOffset = endMarkersContinuousIntersectionOffset;
+                startMarkersYOffset = endMarkersYOffset;
+                startLaneMarkers = endLaneMarkers;
+
+                endLanes = oldStartLanes;
+                endMarkersScale = oldStartMarkersScale;
+                endMarkersRepeations = oldStartMarkersRepeations;
+                endMarkersStartIntersectionOffset = oldStartMarkersStartIntersectionOffset;
+                endMarkersContinuousIntersectionOffset = oldStartMarkersContinuousIntersectionOffset;
+                endMarkersYOffset = oldStartMarkersYOffset;
+                endLaneMarkers = oldStartLaneMarkers;
+
+                // Segments
+                for (int i = 0; i < transform.GetChild(0).childCount; i++)
+                {
+                    transform.GetChild(0).GetChild(i).SetAsFirstSibling();
+
+                    for (int j = 0; j < transform.GetChild(0).GetChild(0).GetChild(0).childCount; j++)
+                    {
+                        Transform point = transform.GetChild(0).GetChild(0).GetChild(0).GetChild(j);
+                        point.SetAsFirstSibling();
+
+                        if (point.transform.name.Equals("Start Point"))
+                        {
+                            point.transform.name = "End Point";
+                            continue;
+                        }
+                        else if (point.transform.name.Equals("End Point"))
+                        {
+                            point.transform.name = "Start Point";
+                            continue;
+                        }
+                    }
+
+                    RoadSegment roadSegment = transform.GetChild(0).GetChild(0).GetComponent<RoadSegment>();
+                    float oldStartWidth = roadSegment.startRoadWidth;
+                    roadSegment.startRoadWidth = roadSegment.endRoadWidth;
+                    roadSegment.endRoadWidth = oldStartWidth;
+                    roadSegment.flipped = !roadSegment.flipped;
+
+                    for (int j = 0; j < roadSegment.extraMeshes.Count; j++)
+                    {
+                        oldStartWidth = roadSegment.extraMeshes[j].startWidth;
+                        roadSegment.extraMeshes[j].startWidth = roadSegment.extraMeshes[j].endWidth;
+                        roadSegment.extraMeshes[j].endWidth = oldStartWidth;
+
+                        if (roadSegment.extraMeshes[j].left == true)
+                        {
+                            roadSegment.extraMeshes[j].left = false;
+                        }
+                        else
+                        {
+                            roadSegment.extraMeshes[j].left = true;
+                        }
+                    }
+                }
+
+                CreateMesh();
+            }
+            else
+            {
+                Debug.Log("Can't flip the road when it ends with a control point");
+            }
+        }
+    }
+
 }

@@ -219,6 +219,11 @@ public class RoadEditor : Editor
             roadCreator.CreateMesh();
         }
 
+        if (GUILayout.Button("Flip Road"))
+        {
+            roadCreator.Flip();
+        }
+
         if (GUILayout.Button("Reset Road"))
         {
             ResetObject();
