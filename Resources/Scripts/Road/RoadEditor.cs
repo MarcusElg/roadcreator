@@ -75,6 +75,12 @@ public class RoadEditor : Editor
         EditorGUI.BeginChangeCheck();
         roadCreator.heightOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", roadCreator.heightOffset));
         roadCreator.segmentPreset = (Preset)EditorGUILayout.ObjectField("Segment Preset", roadCreator.segmentPreset, typeof(Preset), false);
+
+        if (roadCreator.segmentPreset == null)
+        {
+            roadCreator.segmentToCopy = (RoadSegment)EditorGUILayout.ObjectField("Segment To Copy", roadCreator.segmentToCopy, typeof(RoadSegment), true);
+        }
+
         roadCreator.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", roadCreator.resolutionMultiplier), 0.01f, 10f);
         roadCreator.createIntersections = EditorGUILayout.Toggle("Create Intersections", roadCreator.createIntersections);
         roadCreator.generateCollider = EditorGUILayout.Toggle("Generate Collider", roadCreator.generateCollider);
@@ -357,24 +363,34 @@ public class RoadEditor : Editor
             }
         }
 
-        if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && Physics.Raycast(ray, out raycastHit, 100f, (1 << LayerMask.NameToLayer("Road"))))
+        if (guiEvent.type == EventType.MouseDown && Physics.Raycast(ray, out raycastHit, 100f, (1 << LayerMask.NameToLayer("Road"))))
         {
             hitPosition = raycastHit.point;
 
-            if (guiEvent.control == true)
+            if (guiEvent.button == 2)
             {
-                Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
-                if (nearestGuideline != Misc.MaxVector3)
+                if (raycastHit.transform.parent.parent.GetComponent<RoadSegment>() != null)
                 {
-                    hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
-                }
-                else
-                {
-                    hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                    roadCreator.segmentToCopy = raycastHit.transform.parent.parent.GetComponent<RoadSegment>();
                 }
             }
+            else if (guiEvent.button == 0)
+            {
+                if (guiEvent.control == true)
+                {
+                    Vector3 nearestGuideline = Misc.GetNearestGuidelinePoint(hitPosition);
+                    if (nearestGuideline != Misc.MaxVector3)
+                    {
+                        hitPosition = new Vector3(nearestGuideline.x, hitPosition.y, nearestGuideline.z);
+                    }
+                    else
+                    {
+                        hitPosition = new Vector3(Mathf.Round(hitPosition.x), hitPosition.y, Mathf.Round(hitPosition.z));
+                    }
+                }
 
-            roadCreator.SplitSegment(hitPosition, raycastHit);
+                roadCreator.SplitSegment(hitPosition, raycastHit);
+            }
         }
 
         GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();

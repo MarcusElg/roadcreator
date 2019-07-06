@@ -14,6 +14,7 @@ public class RoadCreator : MonoBehaviour
 
     public SerializedObject settings;
     public Preset segmentPreset;
+    public RoadSegment segmentToCopy;
     public float resolutionMultiplier = 1;
     public GameObject objectToMove = null;
     public GameObject extraObjectToMove = null;
@@ -341,11 +342,18 @@ public class RoadCreator : MonoBehaviour
         {
             if (transform.GetChild(0).childCount > 1)
             {
-                DuplicateSegmentData(segment);
+                DuplicateSegmentData(segment, transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>());
             }
             else
             {
-                segment.overlayRoadMaterial = (Material)settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue;
+                if (segmentToCopy != null)
+                {
+                    DuplicateSegmentData(segment, segmentToCopy);
+                }
+                else
+                {
+                    segment.overlayRoadMaterial = (Material)settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue;
+                }
             }
         }
         else
@@ -354,27 +362,20 @@ public class RoadCreator : MonoBehaviour
 
             for (int i = 0; i < segment.extraMeshes.Count; i++)
             {
-                GameObject extraMesh = new GameObject("Extra Mesh");
-                extraMesh.AddComponent<MeshFilter>();
-                extraMesh.AddComponent<MeshRenderer>();
-                extraMesh.AddComponent<MeshCollider>();
-                extraMesh.transform.SetParent(segment.transform.GetChild(1));
-                extraMesh.transform.localPosition = Vector3.zero;
-                extraMesh.layer = LayerMask.NameToLayer("Road");
-                extraMesh.hideFlags = HideFlags.NotEditable;
+                CreateExtraMesh(segment.transform.GetChild(1));
             }
         }
     }
 
-    private void DuplicateSegmentData(RoadSegment segment)
+    private void DuplicateSegmentData(RoadSegment segment, RoadSegment oldLastSegment)
     {
-        RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
         segment.baseRoadMaterial = oldLastSegment.baseRoadMaterial;
         segment.overlayRoadMaterial = oldLastSegment.overlayRoadMaterial;
         segment.roadPhysicsMaterial = oldLastSegment.roadPhysicsMaterial;
         segment.startRoadWidth = oldLastSegment.endRoadWidth;
         segment.endRoadWidth = oldLastSegment.endRoadWidth;
         segment.flipped = oldLastSegment.flipped;
+        segment.textureTilingY = oldLastSegment.textureTilingY;
         segment.terrainOption = oldLastSegment.terrainOption;
 
         segment.generateSimpleBridge = oldLastSegment.generateSimpleBridge;
@@ -383,22 +384,18 @@ public class RoadCreator : MonoBehaviour
 
         segment.placePillars = oldLastSegment.placePillars;
         segment.pillarPrefab = oldLastSegment.pillarPrefab;
+        segment.adaptGapToCustomBridge = oldLastSegment.adaptGapToCustomBridge;
         segment.pillarGap = oldLastSegment.pillarGap;
         segment.pillarPlacementOffset = oldLastSegment.pillarPlacementOffset;
         segment.extraPillarHeight = oldLastSegment.extraPillarHeight;
         segment.xPillarScale = oldLastSegment.xPillarScale;
+        segment.xPillarScaleMultiplier = oldLastSegment.xPillarScaleMultiplier;
         segment.zPillarScale = oldLastSegment.zPillarScale;
+        segment.pillarRotationDirection = oldLastSegment.pillarRotationDirection;
 
         for (int i = 0; i < oldLastSegment.extraMeshes.Count; i++)
         {
-            GameObject extraMesh = new GameObject("Extra Mesh");
-            extraMesh.AddComponent<MeshFilter>();
-            extraMesh.AddComponent<MeshRenderer>();
-            extraMesh.AddComponent<MeshCollider>();
-            extraMesh.transform.SetParent(segment.transform.GetChild(1));
-            extraMesh.transform.localPosition = Vector3.zero;
-            extraMesh.layer = LayerMask.NameToLayer("Road");
-            extraMesh.hideFlags = HideFlags.NotEditable;
+            CreateExtraMesh(segment.transform.GetChild(1));
 
             segment.extraMeshes.Add(oldLastSegment.extraMeshes[i]);
             segment.extraMeshes[segment.extraMeshes.Count - 1].startWidth = oldLastSegment.extraMeshes[i].endWidth;
@@ -1344,6 +1341,18 @@ public class RoadCreator : MonoBehaviour
         {
             DestroyImmediate(transform.GetChild(2).GetChild(i).gameObject);
         }
+    }
+
+    public void CreateExtraMesh(Transform parent)
+    {
+        GameObject extraMesh = new GameObject("Extra Mesh");
+        extraMesh.AddComponent<MeshFilter>();
+        extraMesh.AddComponent<MeshRenderer>();
+        extraMesh.AddComponent<MeshCollider>();
+        extraMesh.transform.SetParent(parent);
+        extraMesh.transform.localPosition = Vector3.zero;
+        extraMesh.layer = LayerMask.NameToLayer("Road");
+        extraMesh.hideFlags = HideFlags.NotEditable;
     }
 
 }
