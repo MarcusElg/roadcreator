@@ -315,6 +315,12 @@ public class PrefabLineCreator : MonoBehaviour
             {
                 float distance = Mathf.Abs(vertices[i].x - mesh.bounds.min.x);
                 float distanceCovered = (distance / mesh.bounds.size.x);
+
+                if (rotationDirection == RotationDirection.right)
+                {
+                    distanceCovered = 1 - distanceCovered;
+                }
+
                 float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], distanceCovered);
                 int pointIndex = Mathf.FloorToInt(currentTime);
 

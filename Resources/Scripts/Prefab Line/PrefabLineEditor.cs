@@ -37,8 +37,8 @@ public class PrefabLineEditor : Editor
         }
 
         EditorGUI.BeginChangeCheck();
-        prefabCreator.pointCalculationDivisions = Mathf.Clamp(EditorGUILayout.FloatField("Point Calculation Divisions", prefabCreator.pointCalculationDivisions), 1, 1000);
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
+
         if (prefabCreator.rotateAlongCurve == true)
         {
             prefabCreator.rotationDirection = (PrefabLineCreator.RotationDirection)EditorGUILayout.EnumPopup("Rotation Direction", prefabCreator.rotationDirection);
@@ -52,11 +52,11 @@ public class PrefabLineEditor : Editor
                 prefabCreator.yRotationRandomization = 0;
             }
 
-            prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Objects");
+            prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Prefabs");
         }
         else if (prefabCreator.bendObjects == true)
         {
-            Debug.Log("Rotate alongst curve has to be true to be able to use bend objects");
+            Debug.Log("Rotate alongst curve has to be true to be able to use bend prefabs");
             prefabCreator.bendObjects = false;
         }
 
@@ -94,6 +94,8 @@ public class PrefabLineEditor : Editor
         {
             prefabCreator.terrainCheckHeight = Mathf.Max(0, EditorGUILayout.FloatField("Check Terrain Height", prefabCreator.terrainCheckHeight));
         }
+
+        prefabCreator.pointCalculationDivisions = Mathf.Clamp(EditorGUILayout.FloatField("Point Calculation Divisions", prefabCreator.pointCalculationDivisions), 1, 1000);
 
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontStyle = FontStyle.Bold;
