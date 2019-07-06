@@ -52,7 +52,15 @@ public class PrefabLineEditor : Editor
                 prefabCreator.yRotationRandomization = 0;
             }
 
-            prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Prefabs");
+            if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left || prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
+            {
+                prefabCreator.bendObjects = GUILayout.Toggle(prefabCreator.bendObjects, "Bend Prefabs");
+            }
+            else if (prefabCreator.bendObjects == true)
+            {
+                Debug.Log("Rotation Direction either has to be left or right to be able to use bend prefabs");
+                prefabCreator.bendObjects = false;
+            }
         }
         else if (prefabCreator.bendObjects == true)
         {
@@ -62,7 +70,15 @@ public class PrefabLineEditor : Editor
 
         if (prefabCreator.rotateAlongCurve == true)
         {
-            prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
+            if (prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.left || prefabCreator.rotationDirection == PrefabLineCreator.RotationDirection.right)
+            {
+                prefabCreator.fillGap = GUILayout.Toggle(prefabCreator.fillGap, "Fill Gap");
+            }
+            else if (prefabCreator.fillGap == true)
+            {
+                Debug.Log("Rotation Direction either has to be left or right to be able to use fill gap");
+                prefabCreator.fillGap = false;
+            }
         }
         else if (prefabCreator.fillGap == true)
         {
