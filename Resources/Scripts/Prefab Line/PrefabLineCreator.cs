@@ -7,8 +7,6 @@ using UnityEngine;
 public class PrefabLineCreator : MonoBehaviour
 {
 
-    public PrefabLineCreator prefabLineToCopy;
-
     public GameObject prefab;
     public GameObject startPrefab;
     public GameObject endPrefab;
@@ -612,7 +610,7 @@ public class PrefabLineCreator : MonoBehaviour
         return new PointPackage(prefabPoints.ToArray(), lerpPoints.ToArray(), startTimes.ToArray(), endTimes.ToArray());
     }
 
-    public void CopyPrefabLine()
+    public void CopyPrefabLine(PrefabLineCreator prefabLineToCopy)
     {
         prefab = prefabLineToCopy.prefab;
         startPrefab = prefabLineToCopy.startPrefab;

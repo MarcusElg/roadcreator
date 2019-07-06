@@ -29,14 +29,6 @@ public class PrefabLineEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
-        prefabCreator.prefabLineToCopy = (PrefabLineCreator)EditorGUILayout.ObjectField("Prefab Line To Copy", prefabCreator.prefabLineToCopy, typeof(PrefabLineCreator), true);
-
-        if (EditorGUI.EndChangeCheck() == true)
-        {
-            prefabCreator.CopyPrefabLine();
-        }
-
-        EditorGUI.BeginChangeCheck();
         prefabCreator.rotateAlongCurve = EditorGUILayout.Toggle("Rotate Alongst Curve", prefabCreator.rotateAlongCurve);
 
         if (prefabCreator.rotateAlongCurve == true)
@@ -259,8 +251,7 @@ public class PrefabLineEditor : Editor
             {
                 if (raycastHit.transform.parent.parent.GetComponent<PrefabLineCreator>() != null)
                 {
-                    prefabCreator.prefabLineToCopy = raycastHit.transform.parent.parent.GetComponent<PrefabLineCreator>();
-                    prefabCreator.CopyPrefabLine();
+                    prefabCreator.CopyPrefabLine(raycastHit.transform.parent.parent.GetComponent<PrefabLineCreator>());
                 }
             }
         }
