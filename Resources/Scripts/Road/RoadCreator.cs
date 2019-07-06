@@ -371,6 +371,7 @@ public class RoadCreator : MonoBehaviour
         RoadSegment oldLastSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 2).GetComponent<RoadSegment>();
         segment.baseRoadMaterial = oldLastSegment.baseRoadMaterial;
         segment.overlayRoadMaterial = oldLastSegment.overlayRoadMaterial;
+        segment.roadPhysicsMaterial = oldLastSegment.roadPhysicsMaterial;
         segment.startRoadWidth = oldLastSegment.endRoadWidth;
         segment.endRoadWidth = oldLastSegment.endRoadWidth;
         segment.flipped = oldLastSegment.flipped;
