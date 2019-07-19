@@ -1151,7 +1151,7 @@ public class RoadCreator : MonoBehaviour
         // Start Lane Markings
         if (startIntersection != null)
         {
-            RoadSegment roadSegment = transform.GetChild(0).GetChild(transform.GetChild(0).childCount - 1).GetComponent<RoadSegment>();
+            RoadSegment roadSegment = transform.GetChild(0).GetChild(0).GetComponent<RoadSegment>();
             Vector3 left = Misc.CalculateLeft(startIntersectionConnection.leftPoint - startIntersectionConnection.rightPoint);
 
             // Find position
