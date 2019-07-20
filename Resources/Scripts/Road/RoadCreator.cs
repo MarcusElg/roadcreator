@@ -409,6 +409,7 @@ public class RoadCreator : MonoBehaviour
             RoadSegment hitSegment = raycastHit.transform.parent.parent.GetComponent<RoadSegment>();
             RoadSegment segment = CreateSegment(raycastHit.point);
             segment.transform.SetSiblingIndex(hitSegment.transform.GetSiblingIndex() + 1);
+            segment.curved = false;
 
             // Create new points
             Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), raycastHit.point), "Created Point");
