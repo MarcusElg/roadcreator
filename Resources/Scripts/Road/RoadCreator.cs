@@ -408,13 +408,14 @@ public class RoadCreator : MonoBehaviour
         {
             RoadSegment hitSegment = raycastHit.transform.parent.parent.GetComponent<RoadSegment>();
             RoadSegment segment = CreateSegment(raycastHit.point);
+            Undo.RegisterCreatedObjectUndo(segment.gameObject, "Create Segment");
             segment.transform.SetSiblingIndex(hitSegment.transform.GetSiblingIndex() + 1);
             segment.curved = false;
 
             // Create new points
-            Undo.RegisterCreatedObjectUndo(CreatePoint("Start Point", segment.transform.GetChild(0), raycastHit.point), "Created Point");
-            Undo.RegisterCreatedObjectUndo(CreatePoint("Control Point", segment.transform.GetChild(0), Misc.GetCenter(raycastHit.point, hitSegment.transform.GetChild(0).GetChild(2).position)), "Created Point");
-            Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", segment.transform.GetChild(0), hitSegment.transform.GetChild(0).GetChild(2).position), "Created Point");
+            CreatePoint("Start Point", segment.transform.GetChild(0), raycastHit.point);
+            CreatePoint("Control Point", segment.transform.GetChild(0), Misc.GetCenter(raycastHit.point, hitSegment.transform.GetChild(0).GetChild(2).position));
+            CreatePoint("End Point", segment.transform.GetChild(0), hitSegment.transform.GetChild(0).GetChild(2).position);
 
             // Move old points
             Undo.RegisterCompleteObjectUndo(hitSegment.transform.GetChild(0).GetChild(2), "Split Segment");
@@ -423,7 +424,7 @@ public class RoadCreator : MonoBehaviour
             hitSegment.transform.GetChild(0).GetChild(1).transform.position = Misc.GetCenter(hitSegment.transform.GetChild(0).GetChild(0).transform.position, hitSegment.transform.GetChild(0).GetChild(2).transform.position);
             hitSegment.curved = false;
 
-            CreateMesh();
+            //CreateMesh();
             RoadCreatorSettings.UpdateRoadGuidelines();
         }
     }
