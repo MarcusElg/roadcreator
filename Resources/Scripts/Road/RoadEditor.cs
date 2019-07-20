@@ -36,33 +36,6 @@ public class RoadEditor : Editor
         {
             roadCreator.endIntersection.FixConnectionReferences();
         }
-
-        if (roadCreator.transform.childCount == 1)
-        {
-            GameObject laneMarkers = new GameObject("Start Intersection Lane Markers");
-            laneMarkers.transform.SetParent(roadCreator.transform);
-
-            if (roadCreator.settings.FindProperty("hideNonEditableChildren").boolValue == true)
-            {
-                laneMarkers.transform.hideFlags = HideFlags.HideInHierarchy;
-            }
-            else
-            {
-                laneMarkers.transform.hideFlags = HideFlags.NotEditable;
-            }
-
-            laneMarkers = new GameObject("End Intersection Lane Markers");
-            laneMarkers.transform.SetParent(roadCreator.transform);
-
-            if (roadCreator.settings.FindProperty("hideNonEditableChildren").boolValue == true)
-            {
-                laneMarkers.transform.hideFlags = HideFlags.HideInHierarchy;
-            }
-            else
-            {
-                laneMarkers.transform.hideFlags = HideFlags.NotEditable;
-            }
-        }
     }
 
     private void OnDisable()

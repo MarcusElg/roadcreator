@@ -1146,6 +1146,7 @@ public class RoadCreator : MonoBehaviour
 
     public void GenerateLaneMarkings()
     {
+        AddLaneMarkingObjects();
         RemoveLaneMarkings();
 
         // Start Lane Markings
@@ -1340,6 +1341,36 @@ public class RoadCreator : MonoBehaviour
         for (int i = transform.GetChild(2).childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(transform.GetChild(2).GetChild(i).gameObject);
+        }
+    }
+
+    public void AddLaneMarkingObjects()
+    {
+        if (transform.childCount == 1)
+        {
+            GameObject laneMarkers = new GameObject("Start Intersection Lane Markers");
+            laneMarkers.transform.SetParent(transform);
+
+            if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+            {
+                laneMarkers.transform.hideFlags = HideFlags.HideInHierarchy;
+            }
+            else
+            {
+                laneMarkers.transform.hideFlags = HideFlags.NotEditable;
+            }
+
+            laneMarkers = new GameObject("End Intersection Lane Markers");
+            laneMarkers.transform.SetParent(transform);
+
+            if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
+            {
+                laneMarkers.transform.hideFlags = HideFlags.HideInHierarchy;
+            }
+            else
+            {
+                laneMarkers.transform.hideFlags = HideFlags.NotEditable;
+            }
         }
     }
 
