@@ -416,7 +416,9 @@ public class RoadCreator : MonoBehaviour
             Undo.RegisterCreatedObjectUndo(CreatePoint("End Point", segment.transform.GetChild(0), hitSegment.transform.GetChild(0).GetChild(2).position), "Created Point");
 
             // Move old points
+            Undo.RegisterCompleteObjectUndo(hitSegment.transform.GetChild(0).GetChild(2), "Split Segment");
             hitSegment.transform.GetChild(0).GetChild(2).transform.position = raycastHit.point;
+            Undo.RegisterCompleteObjectUndo(hitSegment.transform.GetChild(0).GetChild(1), "Split Segment");
             hitSegment.transform.GetChild(0).GetChild(1).transform.position = Misc.GetCenter(hitSegment.transform.GetChild(0).GetChild(0).transform.position, hitSegment.transform.GetChild(0).GetChild(2).transform.position);
 
             CreateMesh();
@@ -1156,14 +1158,15 @@ public class RoadCreator : MonoBehaviour
             Vector3 left = Misc.CalculateLeft(startIntersectionConnection.leftPoint - startIntersectionConnection.rightPoint);
 
             // Find position
-            Vector3 lastPosition = roadSegment.transform.GetChild(0).GetChild(0).position;
-            Vector3 secondLastPosition = startIntersectionConnection.lastPoint;
+            Vector3 lastPosition = startIntersectionConnection.lastPoint;
+            Vector3 secondLastPosition = Vector3.zero;
             int currentIndex = 0;
 
             float currentDistance = 0;
             float currentRoadWidth = 0;
+            float change = 1f / Mathf.Max(3, settings.FindProperty("resolution").floatValue * resolutionMultiplier * 40 * Misc.CalculateDistance(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position));
 
-            for (float j = 0; j <= 1; j += 1f / Mathf.Max(3, settings.FindProperty("resolution").floatValue * resolutionMultiplier * 40 * Misc.CalculateDistance(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position)))
+            for (float j = 0; j <= 1; j += change)
             {
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
                 currentDistance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
@@ -1184,27 +1187,19 @@ public class RoadCreator : MonoBehaviour
                     left = Misc.CalculateLeft(secondLastPosition - lastPosition);
 
                     // Create the lane markings
-                    RaycastHit raycastHit;
-                    if (Physics.Raycast(lastPosition + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, 1 << LayerMask.NameToLayer("Road")))
+                    for (int i = 0; i < startLanes; i++)
                     {
-                        lastPosition = raycastHit.point;
-
-                        for (int i = 0; i < startLanes; i++)
+                        if (i < startLaneMarkers.Count)
                         {
-                            if (i < startLaneMarkers.Count)
-                            {
-                                GameObject laneMarking = GetLaneMarking(startLaneMarkers[i]);
+                            GameObject laneMarking = GetLaneMarking(startLaneMarkers[i]);
 
-                                if (laneMarking != null)
-                                {
-                                    laneMarking.transform.SetParent(transform.GetChild(1));
-                                    laneMarking.transform.position = raycastHit.point + new Vector3(0, startMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (startLanes));
-                                    Vector3 laneForward = new Vector3((secondLastPosition - lastPosition).normalized.x, 0, (secondLastPosition - lastPosition).normalized.z);
-                                    laneMarking.transform.up = raycastHit.normal;
-                                    laneMarking.transform.localScale = new Vector3(startMarkersScale, 1, startMarkersScale);
-                                    laneMarking.transform.localRotation = Quaternion.Euler(laneMarking.transform.rotation.eulerAngles.x, Quaternion.LookRotation(laneForward).eulerAngles.y, 0);
-                                    laneMarking.hideFlags = HideFlags.NotEditable;
-                                }
+                            if (laneMarking != null)
+                            {
+                                laneMarking.transform.SetParent(transform.GetChild(1));
+                                laneMarking.transform.position = lastPosition + new Vector3(0, startMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (startLanes));
+                                laneMarking.transform.localRotation = Quaternion.LookRotation((secondLastPosition - lastPosition).normalized);
+                                laneMarking.transform.localScale = new Vector3(startMarkersScale, 1, startMarkersScale);
+                                laneMarking.hideFlags = HideFlags.NotEditable;
                             }
                         }
                     }
@@ -1230,8 +1225,9 @@ public class RoadCreator : MonoBehaviour
 
             float currentDistance = 0;
             float currentRoadWidth = 0;
+            float change = 1f / Mathf.Max(3, settings.FindProperty("resolution").floatValue * resolutionMultiplier * 40 * Misc.CalculateDistance(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position));
 
-            for (float j = 1; j >= 0; j -= 1f / Mathf.Max(3, settings.FindProperty("resolution").floatValue * resolutionMultiplier * 40 * Misc.CalculateDistance(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position)))
+            for (float j = 1; j >= 0; j -= change)
             {
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
                 currentDistance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
@@ -1252,27 +1248,19 @@ public class RoadCreator : MonoBehaviour
                     left = Misc.CalculateLeft(secondLastPosition - lastPosition);
 
                     // Create the lane markings
-                    RaycastHit raycastHit;
-                    if (Physics.Raycast(lastPosition + new Vector3(0, 1, 0), Vector3.down, out raycastHit, 100, 1 << LayerMask.NameToLayer("Road")))
+                    for (int i = 0; i < endLanes; i++)
                     {
-                        lastPosition = raycastHit.point;
-
-                        for (int i = 0; i < endLanes; i++)
+                        if (i < endLaneMarkers.Count)
                         {
-                            if (i < endLaneMarkers.Count)
-                            {
-                                GameObject laneMarking = GetLaneMarking(endLaneMarkers[i]);
+                            GameObject laneMarking = GetLaneMarking(endLaneMarkers[i]);
 
-                                if (laneMarking != null)
-                                {
-                                    laneMarking.transform.SetParent(transform.GetChild(2));
-                                    laneMarking.transform.position = raycastHit.point + new Vector3(0, endMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
-                                    Vector3 laneForward = new Vector3((secondLastPosition - lastPosition).normalized.x, 0, (secondLastPosition - lastPosition).normalized.z);
-                                    laneMarking.transform.up = raycastHit.normal;
-                                    laneMarking.transform.localScale = new Vector3(endMarkersScale, 1, endMarkersScale);
-                                    laneMarking.transform.localRotation = Quaternion.Euler(laneMarking.transform.rotation.eulerAngles.x, Quaternion.LookRotation(laneForward).eulerAngles.y, 0);
-                                    laneMarking.hideFlags = HideFlags.NotEditable;
-                                }
+                            if (laneMarking != null)
+                            {
+                                laneMarking.transform.SetParent(transform.GetChild(2));
+                                laneMarking.transform.position = lastPosition + new Vector3(0, endMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
+                                laneMarking.transform.localRotation = Quaternion.LookRotation((secondLastPosition - lastPosition).normalized);
+                                laneMarking.transform.localScale = new Vector3(endMarkersScale, 1, endMarkersScale);
+                                laneMarking.hideFlags = HideFlags.NotEditable;
                             }
                         }
                     }
