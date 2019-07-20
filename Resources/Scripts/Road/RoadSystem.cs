@@ -92,6 +92,8 @@ public class RoadSystem : MonoBehaviour
             gameObject.AddComponent<RoadCreator>();
             gameObject.name = "Road";
             gameObject.transform.SetParent(transform);
+            gameObject.GetComponent<RoadCreator>().startLanes = settings.FindProperty("defaultLanes").intValue;
+            gameObject.GetComponent<RoadCreator>().endLanes = settings.FindProperty("defaultLanes").intValue;
             Selection.activeGameObject = gameObject;
             Undo.RegisterCreatedObjectUndo(gameObject, "Create Road");
         }

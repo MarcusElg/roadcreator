@@ -11,12 +11,13 @@ public class RoadCreatorSettings : ScriptableObject
     public float resolution = 0.25f;
     public bool hideNonEditableChildren = true;
     public int roundaboutConnectionIndexOffset = 1;
-
+    
     public float oldRoadGuidelinesLength = 5;
     public float roadGuidelinesLength = 5;
     public float roadGuidelinesDistance = 10;
     public float roadGuidelinesSnapDistance = 1;
 
+    public int defaultLanes = 2;
     public Material defaultBaseMaterial;
     public Material defaultRoadOverlayMaterial;
     public Material defaultExtraMeshOverlayMaterial;

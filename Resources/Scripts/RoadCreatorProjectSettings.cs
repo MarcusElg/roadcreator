@@ -102,6 +102,7 @@ public class RoadCreatorProjectSettings
                 EditorGUI.BeginChangeCheck();
                 GUILayout.Space(20);
                 GUILayout.Label("Defaults", guiStyle);
+                settings.FindProperty("defaultLanes").intValue = Mathf.Clamp(EditorGUILayout.IntField("Default Lanes", settings.FindProperty("defaultLanes").intValue), 0, 10);
                 settings.FindProperty("defaultBaseMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Base Material", settings.FindProperty("defaultBaseMaterial").objectReferenceValue, typeof(Material), false);
                 settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Road Overlay Material", settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue, typeof(Material), false);
                 settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Extra Mesh Overlay Material", settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, typeof(Material), false);
@@ -116,6 +117,7 @@ public class RoadCreatorProjectSettings
 
                 if (GUILayout.Button("Reset Default Values"))
                 {
+                    settings.FindProperty("defaultLanes").intValue = 2;
                     settings.FindProperty("defaultBaseMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue = null;
