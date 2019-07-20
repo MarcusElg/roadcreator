@@ -420,6 +420,7 @@ public class RoadCreator : MonoBehaviour
             hitSegment.transform.GetChild(0).GetChild(2).transform.position = raycastHit.point;
             Undo.RegisterCompleteObjectUndo(hitSegment.transform.GetChild(0).GetChild(1), "Split Segment");
             hitSegment.transform.GetChild(0).GetChild(1).transform.position = Misc.GetCenter(hitSegment.transform.GetChild(0).GetChild(0).transform.position, hitSegment.transform.GetChild(0).GetChild(2).transform.position);
+            hitSegment.curved = false;
 
             CreateMesh();
             RoadCreatorSettings.UpdateRoadGuidelines();
