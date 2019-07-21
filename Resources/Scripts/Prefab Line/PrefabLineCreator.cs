@@ -636,6 +636,8 @@ public class PrefabLineCreator : MonoBehaviour
         startWidthRight = prefabLineToCopy.startWidthRight;
         endWidthLeft = prefabLineToCopy.endWidthLeft;
         endWidthRight = prefabLineToCopy.endWidthRight;
+
+        PlacePrefabs();
     }
 
     public void Flip()
