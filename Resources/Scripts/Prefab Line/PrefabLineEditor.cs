@@ -256,7 +256,7 @@ public class PrefabLineEditor : Editor
             }
         }
 
-        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        prefabCreator.transform.parent.GetComponent<RoadSystem>().ShowCreationButtons();
         SceneView.currentDrawingSceneView.Repaint();
     }
 

@@ -260,7 +260,7 @@ public class IntersectionEditor : Editor
                 Draw(raycastHit);
             }
 
-            GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+            intersection.transform.parent.GetComponent<RoadSystem>().ShowCreationButtons();
             SceneView.currentDrawingSceneView.Repaint();
 
             if (intersection.transform.hasChanged == true)

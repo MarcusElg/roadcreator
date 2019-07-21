@@ -371,7 +371,7 @@ public class RoadEditor : Editor
             }
         }
 
-        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        roadCreator.transform.parent.GetComponent<RoadSystem>().ShowCreationButtons();
         SceneView.currentDrawingSceneView.Repaint();
     }
 

@@ -289,7 +289,7 @@ public class RoadSegmentEditor : Editor
 
     private void OnSceneGUI()
     {
-        GameObject.FindObjectOfType<RoadSystem>().ShowCreationButtons();
+        ((RoadSegment)target).transform.parent.parent.parent.GetComponent<RoadSystem>().ShowCreationButtons();
     }
 
 }
