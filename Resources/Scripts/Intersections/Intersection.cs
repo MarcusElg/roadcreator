@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -11,7 +12,9 @@ public class Intersection : MonoBehaviour
     public PhysicMaterial physicMaterial;
     public List<IntersectionConnection> connections = new List<IntersectionConnection>();
     public float yOffset = 0.02f;
+
     public SerializedObject settings;
+
     public GameObject objectToMove;
     public bool stretchTexture = false;
     public float resolutionMultiplier = 1;
@@ -809,3 +812,4 @@ public class Intersection : MonoBehaviour
         }
     }
 }
+#endif

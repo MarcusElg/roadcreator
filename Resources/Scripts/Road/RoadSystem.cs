@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -18,7 +17,10 @@ public class RoadSystem : MonoBehaviour
     Texture roadGuidelinesOn;
     Texture roadGuidelinesOff;
 
+    #if UNITY_EDITOR
     public SerializedObject settings;
+    #endif
+
     public GUIStyle largeBoldText;
 
     public void ShowCreationButtons()
@@ -208,3 +210,4 @@ public class RoadSystem : MonoBehaviour
     }
 
 }
+#endif

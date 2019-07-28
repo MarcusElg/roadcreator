@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.Presets;
 using UnityEditor;
+using UnityEditor.Presets;
 
 [HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Roads")]
 public class RoadCreator : MonoBehaviour
@@ -12,8 +13,11 @@ public class RoadCreator : MonoBehaviour
     public bool createIntersections = true;
     public bool generateCollider = true;
 
+    #if UNITY_EDITOR
     public SerializedObject settings;
     public Preset segmentPreset;
+    #endif
+
     public RoadSegment segmentToCopy;
     public float resolutionMultiplier = 1;
     public GameObject objectToMove = null;
@@ -1473,3 +1477,4 @@ public class RoadCreator : MonoBehaviour
     }
 
 }
+#endif

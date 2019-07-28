@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System;
 using UnityEngine;
 using UnityEditor;
 
@@ -293,3 +292,4 @@ public class RoadSegmentEditor : Editor
     }
 
 }
+#endif

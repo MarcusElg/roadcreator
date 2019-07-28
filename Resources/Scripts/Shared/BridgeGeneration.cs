@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -581,6 +582,7 @@ public class BridgeGeneration
         }
     }
 
+    #if UNITY_EDITOR
     public static GameObject CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector2[] extraUvs, Material[] materials, SerializedObject settings)
     {
         bridge.transform.SetParent(parent);
@@ -628,5 +630,7 @@ public class BridgeGeneration
 
         return bridge;
     }
+    #endif
 
 }
+#endif

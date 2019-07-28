@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using UnityEngine;
 using UnityEditor;
 
@@ -306,3 +307,4 @@ public class IntersectionEditor : Editor
     }
 
 }
+#endif

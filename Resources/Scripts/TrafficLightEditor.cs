@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -48,3 +47,4 @@ public class TrafficLightEditor : Editor
         ((TrafficLight)target).transform.parent.GetComponent<RoadSystem>().ShowCreationButtons();
     }
 }
+#endif

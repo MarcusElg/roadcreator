@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -39,7 +39,10 @@ public class PrefabLineCreator : MonoBehaviour
 
     public GameObject objectToMove;
     private bool mouseDown;
+
+    #if UNITY_EDITOR
     public SerializedObject settings;
+    #endif
 
     public void UndoUpdate()
     {
@@ -680,3 +683,4 @@ public class PrefabLineCreator : MonoBehaviour
         }
     }
 }
+#endif
