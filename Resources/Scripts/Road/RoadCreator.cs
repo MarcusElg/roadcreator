@@ -1176,6 +1176,13 @@ public class RoadCreator : MonoBehaviour
             for (float j = 0; j <= 1; j += change)
             {
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
+
+                RaycastHit raycastHit;
+                if (Physics.Raycast(currentPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 1 << LayerMask.NameToLayer("Road")))
+                {
+                    currentPosition = raycastHit.point;
+                }
+
                 currentDistance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
                 secondLastPosition = lastPosition;
                 lastPosition = currentPosition;
@@ -1203,17 +1210,7 @@ public class RoadCreator : MonoBehaviour
                             if (laneMarking != null)
                             {
                                 laneMarking.transform.SetParent(transform.GetChild(1));
-
-                                RaycastHit raycastHit;
-                                if (Physics.Raycast(lastPosition + new Vector3(0, 10, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (startLanes)), Vector3.down, out raycastHit, 1 << LayerMask.NameToLayer("Road")))
-                                {
-                                    laneMarking.transform.position = raycastHit.point + new Vector3(0, startMarkersYOffset);
-                                }
-                                else
-                                {
-                                    laneMarking.transform.position = lastPosition + new Vector3(0, startMarkersYOffset + heightOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (startLanes));
-                                }
-
+                                laneMarking.transform.position = lastPosition + new Vector3(0, startMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (startLanes));
                                 laneMarking.transform.localRotation = Quaternion.LookRotation((secondLastPosition - lastPosition).normalized);
                                 laneMarking.transform.localScale = new Vector3(startMarkersScale, 1, startMarkersScale);
                                 laneMarking.hideFlags = HideFlags.NotEditable;
@@ -1247,6 +1244,13 @@ public class RoadCreator : MonoBehaviour
             for (float j = 1; j >= 0; j -= change)
             {
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
+
+                RaycastHit raycastHit;
+                if (Physics.Raycast(currentPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 1 << LayerMask.NameToLayer("Road")))
+                {
+                    currentPosition = raycastHit.point;
+                }
+
                 currentDistance += Vector3.Distance(new Vector3(lastPosition.x, 0, lastPosition.z), new Vector3(currentPosition.x, 0, currentPosition.z));
                 secondLastPosition = lastPosition;
                 lastPosition = currentPosition;
@@ -1274,17 +1278,7 @@ public class RoadCreator : MonoBehaviour
                             if (laneMarking != null)
                             {
                                 laneMarking.transform.SetParent(transform.GetChild(2));
-
-                                RaycastHit raycastHit;
-                                if (Physics.Raycast(lastPosition + new Vector3(0, 10, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes)), Vector3.down, out raycastHit, 1 << LayerMask.NameToLayer("Road")))
-                                {
-                                    laneMarking.transform.position = raycastHit.point + new Vector3(0, endMarkersYOffset);
-                                }
-                                else
-                                {
-                                    laneMarking.transform.position = lastPosition + new Vector3(0, endMarkersYOffset + heightOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
-                                }
-
+                                laneMarking.transform.position = lastPosition + new Vector3(0, endMarkersYOffset + heightOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
                                 laneMarking.transform.localRotation = Quaternion.LookRotation((secondLastPosition - lastPosition).normalized);
                                 laneMarking.transform.localScale = new Vector3(endMarkersScale, 1, endMarkersScale);
                                 laneMarking.hideFlags = HideFlags.NotEditable;
