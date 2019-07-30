@@ -78,7 +78,7 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent)
+    public void MovePoints(RaycastHit raycastHit, Vector3 position, Event currentEvent, bool curvePoint)
     {
         if (currentEvent.type == EventType.MouseDown)
         {
@@ -87,7 +87,7 @@ public class Intersection : MonoBehaviour
                 if (objectToMove == null)
                 {
                     bool isConnectedPoint = false;
-                    if ((raycastHit.transform.name == "Start Point" || raycastHit.transform.name == "End Point") && raycastHit.transform.GetComponent<Point>().roadPoint == true)
+                    if (curvePoint == false && (raycastHit.transform.name == "Start Point" || raycastHit.transform.name == "End Point") && raycastHit.transform.GetComponent<Point>().roadPoint == true)
                     {
                         for (int i = 0; i < connections.Count; i++)
                         {
@@ -99,7 +99,7 @@ public class Intersection : MonoBehaviour
                         }
                     }
 
-                    if ((raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject && resetCurvePointsOnUpdate == false) || isConnectedPoint == true)
+                    if (curvePoint == true && (raycastHit.transform.name == "Connection Point" && raycastHit.transform.parent.gameObject == Selection.activeGameObject && resetCurvePointsOnUpdate == false) || isConnectedPoint == true)
                     {
                         if (raycastHit.transform.GetComponent<BoxCollider>().enabled == false)
                         {
@@ -114,7 +114,7 @@ public class Intersection : MonoBehaviour
             else if (currentEvent.button == 1)
             {
                 // Reset Point
-                if (raycastHit.transform.name == "Connection Point")
+                if (raycastHit.transform.name == "Connection Point" && curvePoint == true)
                 {
                     int currentIndex = raycastHit.transform.GetSiblingIndex() - 1;
                     int nextIndex = raycastHit.transform.GetSiblingIndex();
@@ -145,7 +145,7 @@ public class Intersection : MonoBehaviour
                 }
             }
         }
-        else if (currentEvent.type == EventType.MouseDrag && objectToMove != null)
+        else if (currentEvent.type == EventType.MouseDrag && objectToMove != null && ((curvePoint == true && objectToMove.name == "Connection Point") || curvePoint == false))
         {
             Undo.RecordObject(objectToMove.transform, "Moved Point");
             objectToMove.transform.position = position;
@@ -582,7 +582,7 @@ public class Intersection : MonoBehaviour
         GameObject curvePoint = null;
         curvePoint = new GameObject("Connection Point");
         curvePoint.transform.SetParent(transform);
-        curvePoint.layer = LayerMask.NameToLayer("Ignore Mouse Ray");
+        curvePoint.layer = LayerMask.NameToLayer("Intersection");
         curvePoint.AddComponent<BoxCollider>();
         curvePoint.GetComponent<BoxCollider>().size = new Vector3(settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue, settings.FindProperty("pointSize").floatValue);
         curvePoint.transform.position = position;

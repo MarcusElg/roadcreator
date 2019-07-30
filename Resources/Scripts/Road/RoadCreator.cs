@@ -730,6 +730,7 @@ public class RoadCreator : MonoBehaviour
         Undo.RegisterCreatedObjectUndo(intersection, "Create Intersection");
         intersection.transform.SetParent(transform.parent);
         intersection.transform.position = position;
+        intersection.layer = LayerMask.NameToLayer("Intersection");
 
         intersection.AddComponent<Intersection>();
         intersection.GetComponent<Intersection>().yOffset = heightOffset;
@@ -1175,7 +1176,7 @@ public class RoadCreator : MonoBehaviour
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
 
                 RaycastHit raycastHit;
-                if (Physics.Raycast(currentPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 1 << LayerMask.NameToLayer("Road")))
+                if (Physics.Raycast(currentPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100, 1 << LayerMask.NameToLayer("Road")))
                 {
                     currentPosition = raycastHit.point;
                 }
@@ -1243,7 +1244,7 @@ public class RoadCreator : MonoBehaviour
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(roadSegment.transform.GetChild(0).GetChild(0).position, roadSegment.transform.GetChild(0).GetChild(1).position, roadSegment.transform.GetChild(0).GetChild(2).position, j);
 
                 RaycastHit raycastHit;
-                if (Physics.Raycast(currentPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 1 << LayerMask.NameToLayer("Road")))
+                if (Physics.Raycast(currentPosition + new Vector3(0, 10, 0), Vector3.down, out raycastHit, 100, 1 << LayerMask.NameToLayer("Road")))
                 {
                     currentPosition = raycastHit.point;
                 }

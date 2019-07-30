@@ -248,7 +248,8 @@ public class IntersectionEditor : Editor
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
             RaycastHit raycastHit;
 
-            if (Physics.Raycast(ray, out raycastHit))
+            // Connection Points
+            if (Physics.Raycast(ray, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Intersection") | 1 << LayerMask.NameToLayer("Road"))))
             {
                 Vector3 hitPosition = raycastHit.point;
                 if (Event.current.control == true)
@@ -256,8 +257,19 @@ public class IntersectionEditor : Editor
                     hitPosition = Misc.Round(hitPosition);
                 }
 
-                intersection.MovePoints(raycastHit, hitPosition, Event.current);
+                intersection.MovePoints(raycastHit, hitPosition, Event.current, false);
+            }
 
+            // Curve points
+            if (Physics.Raycast(ray, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
+            {
+                Vector3 hitPosition = raycastHit.point;
+                if (Event.current.control == true)
+                {
+                    hitPosition = Misc.Round(hitPosition);
+                }
+
+                intersection.MovePoints(raycastHit, hitPosition, Event.current, true);
                 Draw(raycastHit);
             }
 
