@@ -338,13 +338,6 @@ public class PrefabLineEditor : Editor
             }
 
             Vector3 position = Misc.Lerp3(prefabCreator.transform.GetChild(0).GetChild(lastIndex - 1).position, prefabCreator.transform.GetChild(0).GetChild(lastIndex).position, hitPosition, t);
-
-            RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
-            {
-                position.y = raycastHit.point.y;
-            }
-
             points.Add(position);
         }
 

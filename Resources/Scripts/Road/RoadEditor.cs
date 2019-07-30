@@ -179,6 +179,7 @@ public class RoadEditor : Editor
                     }
                 }
             }
+
             GUILayout.Space(20);
         }
 
@@ -462,8 +463,9 @@ public class RoadEditor : Editor
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)
     {
-        float divisions = Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition);
-        divisions = Mathf.Max(2, divisions);
+        float distance = Misc.CalculateDistance(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition);
+        float divisions = roadCreator.settings.FindProperty("resolution").floatValue * roadCreator.resolutionMultiplier * 4 * distance;
+        divisions = Mathf.Max(3, divisions);
         List<Vector3> points = new List<Vector3>();
         float distancePerDivision = 1 / divisions;
 
@@ -474,14 +476,7 @@ public class RoadEditor : Editor
                 t = 1;
             }
 
-            Vector3 position = Misc.Lerp3(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition, t);
-
-            RaycastHit raycastHit;
-            if (Physics.Raycast(position, Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
-            {
-                position.y = raycastHit.point.y;
-            }
-
+            Vector3 position = Misc.Lerp3CenterHeight(roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(0).position, roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).transform.GetChild(0).GetChild(1).position, hitPosition, t);
             points.Add(position);
         }
 
