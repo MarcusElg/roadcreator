@@ -256,7 +256,7 @@ public class PrefabLineCreator : MonoBehaviour
 
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.name = "Prefab";
-                placedPrefab.layer = LayerMask.NameToLayer("Road");
+                placedPrefab.layer = LayerMask.NameToLayer("Prefab Line");
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
 
                 if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
@@ -390,7 +390,7 @@ public class PrefabLineCreator : MonoBehaviour
                 {
                     RaycastHit raycastHit;
                     Vector3 vertexPosition = placedPrefab.transform.rotation * vertices[i];
-                    if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
+                    if (Physics.Raycast(placedPrefab.transform.position + (new Vector3(vertexPosition.x * xScale, vertexPosition.y * yScale, vertexPosition.z * zScale)) + new Vector3(0, terrainCheckHeight, 0), Vector3.down, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Prefab Line"))))
                     {
                         vertices[i].y += (raycastHit.point.y - placedPrefab.transform.position.y) / yScale;
                     }
@@ -427,7 +427,7 @@ public class PrefabLineCreator : MonoBehaviour
             RaycastHit raycastHit;
             Vector3[] vertices = placedPrefab.GetComponent<MeshFilter>().sharedMesh.vertices;
 
-            if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
+            if (Physics.Raycast(placedPrefab.transform.position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Prefab Line"))))
             {
                 for (int i = 0; i < vertices.Length; i++)
                 {

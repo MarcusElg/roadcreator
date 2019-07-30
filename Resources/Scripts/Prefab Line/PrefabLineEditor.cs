@@ -179,7 +179,7 @@ public class PrefabLineEditor : Editor
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Road"))))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray") | 1 << LayerMask.NameToLayer("Prefab Line"))))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -219,7 +219,7 @@ public class PrefabLineEditor : Editor
             Draw(guiEvent, hitPosition);
         }
 
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Road"))))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Prefab Line"))))
         {
             Vector3 hitPosition = raycastHit.point;
 
@@ -248,7 +248,7 @@ public class PrefabLineEditor : Editor
 
         if (guiEvent.type == EventType.MouseDown && guiEvent.button == 2)
         {
-            if (Physics.Raycast(ray, out raycastHit, 100f, 1 << LayerMask.NameToLayer("Road")))
+            if (Physics.Raycast(ray, out raycastHit, 100f, 1 << LayerMask.NameToLayer("Prefab Line")))
             {
                 if (raycastHit.transform.parent.parent.GetComponent<PrefabLineCreator>() != null)
                 {

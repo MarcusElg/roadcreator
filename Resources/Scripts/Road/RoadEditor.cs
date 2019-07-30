@@ -309,7 +309,7 @@ public class RoadEditor : Editor
             }
         }
 
-        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Road"))))
+        if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Prefab Line"))))
         {
             hitPosition = raycastHit.point;
 
