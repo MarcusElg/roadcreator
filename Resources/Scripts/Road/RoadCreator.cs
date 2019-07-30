@@ -13,11 +13,8 @@ public class RoadCreator : MonoBehaviour
     public bool createIntersections = true;
     public bool generateCollider = true;
 
-#if UNITY_EDITOR
     public SerializedObject settings;
     public Preset segmentPreset;
-#endif
-
     public RoadSegment segmentToCopy;
     public float resolutionMultiplier = 1;
     public GameObject objectToMove = null;
@@ -36,7 +33,7 @@ public class RoadCreator : MonoBehaviour
     public int startMarkersRepeations = 1;
     public float startMarkersStartIntersectionOffset = 1.7f;
     public float startMarkersContinuousIntersectionOffset = 4.2f;
-    public float startMarkersYOffset = 0.02f;
+    public float startMarkersYOffset = 0f;
     public List<Vector3Bool> startLaneMarkers = new List<Vector3Bool>();
 
     public int endLanes = 2;
@@ -44,7 +41,7 @@ public class RoadCreator : MonoBehaviour
     public int endMarkersRepeations = 1;
     public float endMarkersStartIntersectionOffset = 1.7f;
     public float endMarkersContinuousIntersectionOffset = 4.2f;
-    public float endMarkersYOffset = 0.02f;
+    public float endMarkersYOffset = 0f;
     public List<Vector3Bool> endLaneMarkers = new List<Vector3Bool>();
 
     public void CreateMesh(bool fromIntersection = false)
@@ -1278,7 +1275,7 @@ public class RoadCreator : MonoBehaviour
                             if (laneMarking != null)
                             {
                                 laneMarking.transform.SetParent(transform.GetChild(2));
-                                laneMarking.transform.position = lastPosition + new Vector3(0, endMarkersYOffset + heightOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
+                                laneMarking.transform.position = lastPosition + new Vector3(0, endMarkersYOffset, 0) + left * Mathf.Lerp(currentRoadWidth, -currentRoadWidth, ((float)i + 0.5f) / (endLanes));
                                 laneMarking.transform.localRotation = Quaternion.LookRotation((secondLastPosition - lastPosition).normalized);
                                 laneMarking.transform.localScale = new Vector3(endMarkersScale, 1, endMarkersScale);
                                 laneMarking.hideFlags = HideFlags.NotEditable;
