@@ -17,9 +17,9 @@ public class RoadSystem : MonoBehaviour
     Texture roadGuidelinesOn;
     Texture roadGuidelinesOff;
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     public SerializedObject settings;
-    #endif
+#endif
 
     public GUIStyle largeBoldText;
 
@@ -102,6 +102,7 @@ public class RoadSystem : MonoBehaviour
         else if (ClickedButton(1) == true)
         {
             GameObject gameObject = new GameObject();
+            gameObject.layer = LayerMask.NameToLayer("Intersection");
             gameObject.AddComponent<Intersection>();
             gameObject.GetComponent<Intersection>().roundaboutMode = true;
             gameObject.GetComponent<Intersection>().Setup();

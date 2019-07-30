@@ -580,7 +580,7 @@ public class RoadCreator : MonoBehaviour
                 intersection.GetComponent<Intersection>().ResetCurvePointPositions();
                 intersection.GetComponent<Intersection>().CreateMesh();
             }
-            else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, LayerMask.NameToLayer("Ignore Mouse Ray")) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
+            else if (Physics.Raycast(point.transform.position + new Vector3(0, 1, 0), Vector3.down, out raycastHitRoad, 100, 1 << LayerMask.NameToLayer("Intersection")) && raycastHitRoad.transform.GetComponent<Intersection>() != null && sDown == false)
             {
                 //Found intersection
                 if (point.transform.GetSiblingIndex() == 0 && startIntersection == null)
