@@ -170,10 +170,22 @@ public class RoadCreatorProjectSettings
 
                 if (GUILayout.Button("Reset Colours"))
                 {
-                    settings.FindProperty("pointColour").colorValue = Color.red;
-                    settings.FindProperty("controlPointColour").colorValue = Color.yellow;
-                    settings.FindProperty("intersectionColour").colorValue = Color.green;
-                    settings.FindProperty("cursorColour").colorValue = Color.blue;
+                    Color color = Color.red;
+                    color.a = 0.75f;
+                    settings.FindProperty("pointColour").colorValue = color;
+
+                    color = Color.yellow;
+                    color.a = 0.75f;
+                    settings.FindProperty("controlPointColour").colorValue = color;
+
+                    color = Color.green;
+                    color.a = 0.75f;
+                    settings.FindProperty("intersectionColour").colorValue = color;
+
+                    color = Color.blue;
+                    color.a = 0.75f;
+                    settings.FindProperty("cursorColour").colorValue = color;
+
                     settings.FindProperty("roadGuidelinesColour").colorValue = Misc.lightGreen;
                     settings.FindProperty("roadControlGuidelinesColour").colorValue = Misc.darkGreen;
                 }
