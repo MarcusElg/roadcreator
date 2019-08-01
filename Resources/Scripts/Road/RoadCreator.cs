@@ -21,7 +21,9 @@ public class RoadCreator : MonoBehaviour
     public GameObject extraObjectToMove = null;
     private bool mouseDown;
     public bool sDown;
+    public bool pDown;
     public bool aDown;
+    public Vector3 previousPosition;
 
     public Intersection startIntersection = null;
     public Intersection endIntersection = null;
@@ -587,8 +589,17 @@ public class RoadCreator : MonoBehaviour
                 {
                     CreateMesh();
                     Vector3[] vertices = point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
-                    Vector3 forward = Misc.GetCenter(vertices[0], vertices[1]) - Misc.GetCenter(vertices[2], vertices[3]);
-                    point.transform.position += (-forward).normalized * 2;
+
+                    if (pDown == true)
+                    {
+                        point.transform.position = previousPosition;
+                    }
+                    else
+                    {
+                        Vector3 forward = Misc.GetCenter(vertices[0], vertices[1]) - Misc.GetCenter(vertices[2], vertices[3]);
+                        point.transform.position += (-forward).normalized * 2;
+                    }
+
                     CreateMesh();
                     Undo.RegisterCompleteObjectUndo(this, "Modify Intersection");
                     startIntersectionConnection = CreateIntersectionConnectionFirst(raycastHitRoad.transform.GetComponent<Intersection>(), point);
@@ -614,8 +625,17 @@ public class RoadCreator : MonoBehaviour
                 {
                     CreateMesh();
                     Vector3[] vertices = point.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshFilter>().sharedMesh.vertices;
-                    Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
-                    point.transform.position += (-forward).normalized * 2;
+
+                    if (pDown == true)
+                    {
+                        point.transform.position = previousPosition;
+                    }
+                    else
+                    {
+                        Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
+                        point.transform.position += (-forward).normalized * 2;
+                    }
+
                     CreateMesh();
                     Undo.RegisterCompleteObjectUndo(this, "Modify Intersection");
                     endIntersectionConnection = CreateIntersectionConnectionLast(raycastHitRoad.transform.GetComponent<Intersection>(), point);
@@ -1008,6 +1028,10 @@ public class RoadCreator : MonoBehaviour
                             }
                         }
 
+                        if (objectToMove != null)
+                        {
+                            previousPosition = objectToMove.transform.position;
+                        }
                     }
                 }
             }

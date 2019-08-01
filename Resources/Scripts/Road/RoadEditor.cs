@@ -19,6 +19,7 @@ public class RoadEditor : Editor
         roadCreator = (RoadCreator)target;
         roadCreator.Setup();
         roadCreator.aDown = false;
+        roadCreator.pDown = false;
         roadCreator.sDown = false;
 
         lastTool = Tools.current;
@@ -281,21 +282,35 @@ public class RoadEditor : Editor
                     RemovePoints();
                 }
             }
-            else if (guiEvent.type == EventType.KeyDown && guiEvent.keyCode == KeyCode.S)
+            else if (guiEvent.type == EventType.KeyDown)
             {
-                roadCreator.sDown = true;
+                if (guiEvent.keyCode == KeyCode.S)
+                {
+                    roadCreator.sDown = true;
+                }
+                else if (guiEvent.keyCode == KeyCode.P)
+                {
+                    roadCreator.pDown = true;
+                }
+                else if (guiEvent.keyCode == KeyCode.A)
+                {
+                    roadCreator.aDown = true;
+                }
             }
-            else if (guiEvent.type == EventType.KeyUp && guiEvent.keyCode == KeyCode.S)
+            else if (guiEvent.type == EventType.KeyUp)
             {
-                roadCreator.sDown = false;
-            }
-            else if (guiEvent.type == EventType.KeyDown && guiEvent.keyCode == KeyCode.A)
-            {
-                roadCreator.aDown = true;
-            }
-            else if (guiEvent.type == EventType.KeyUp && guiEvent.keyCode == KeyCode.A)
-            {
-                roadCreator.aDown = false;
+                if (guiEvent.keyCode == KeyCode.S)
+                {
+                    roadCreator.sDown = false;
+                }
+                else if (guiEvent.keyCode == KeyCode.P)
+                {
+                    roadCreator.pDown = false;
+                }
+                else if (guiEvent.keyCode == KeyCode.A)
+                {
+                    roadCreator.aDown = false;
+                }
             }
 
             if (roadCreator.transform.GetChild(0).childCount > 0 && roadCreator.transform.GetChild(0).GetChild(roadCreator.transform.GetChild(0).childCount - 1).GetChild(0).childCount == 2 && (guiEvent.type == EventType.MouseDrag || guiEvent.type == EventType.MouseMove || guiEvent.type == EventType.MouseDown))
