@@ -42,9 +42,9 @@ public class RoadSegment : MonoBehaviour
     public RoadGuideline centerGuidelinePoints;
     public RoadGuideline endGuidelinePoints;
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     public SerializedObject settings;
-    #endif
+#endif
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {
@@ -268,6 +268,13 @@ public class RoadSegment : MonoBehaviour
 
     private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
     {
+        if (name != "Road" && startWidth == 0 && endWidth == 0)
+        {
+            mesh.GetComponent<MeshFilter>().sharedMesh = null;
+            mesh.GetComponent<MeshCollider>().sharedMesh = null;
+            return;
+        }
+
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
         int verticeIndex = 0;
@@ -378,7 +385,8 @@ public class RoadSegment : MonoBehaviour
         if (segment.parent.parent.GetComponent<RoadCreator>().generateCollider == true)
         {
             mesh.GetComponent<MeshCollider>().sharedMesh = generatedMesh;
-        } else
+        }
+        else
         {
             mesh.GetComponent<MeshCollider>().sharedMesh = null;
         }

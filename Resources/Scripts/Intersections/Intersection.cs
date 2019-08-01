@@ -254,7 +254,7 @@ public class Intersection : MonoBehaviour
                     CreateExtraMeshesFromRoads();
                 }
 
-                GenerateNormalMesh();
+                GenerateMesh();
             }
         }
 
@@ -267,7 +267,7 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    private void GenerateNormalMesh()
+    private void GenerateMesh()
     {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
@@ -378,7 +378,7 @@ public class Intersection : MonoBehaviour
         float[] endWidths = new float[firstVertexIndexes.Count];
         float[] heights = new float[firstVertexIndexes.Count];
 
-        GenerateIntersectionExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
+        GenerateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
 
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
@@ -419,10 +419,17 @@ public class Intersection : MonoBehaviour
         }
     }
 
-    private void GenerateIntersectionExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
+    private void GenerateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
     {
         for (int i = 0; i < extraMeshes.Count; i++)
         {
+            if (extraMeshes[i].startWidth == 0 && extraMeshes[i].endWidth == 0)
+            {
+                transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = null;
+                transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = null;
+                return;
+            }
+
             int endVertexIndex;
             float currentLength = 0f;
             Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index] + 1];

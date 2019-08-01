@@ -68,8 +68,16 @@ public class Roundabout
                 {
                     if ((intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
                     {
-                        leftStartWidth += intersection.extraMeshes[j].startWidth;
-                        leftEndWidth += intersection.extraMeshes[j].endWidth;
+                        if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
+                        {
+                            intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
+                            intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
+                        }
+                        else
+                        {
+                            leftStartWidth += intersection.extraMeshes[j].startWidth;
+                            leftEndWidth += intersection.extraMeshes[j].endWidth;
+                        }
                     }
                 }
 
@@ -101,14 +109,22 @@ public class Roundabout
                 {
                     if (intersection.extraMeshes[j].index > 0 && (intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
                     {
-                        if (leftExtraMeshes.Count > 0)
+                        if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
                         {
-                            startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
-                            endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
-                            yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
+                            intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
+                            intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
                         }
+                        else
+                        {
+                            if (leftExtraMeshes.Count > 0)
+                            {
+                                startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
+                                endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
+                                yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
+                            }
 
-                        leftExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
+                            leftExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
+                        }
                     }
                 }
 
@@ -290,25 +306,41 @@ public class Roundabout
             {
                 if ((intersection.extraMeshes[j].index - 1) % 3 == 1 && (intersection.extraMeshes[j].index - 2) / 3 == i)
                 {
-                    if (leftExtraMeshes.Count > 0)
+                    if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
                     {
-                        startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
-                        endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
-                        yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
+                        intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
+                        intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
                     }
+                    else
+                    {
+                        if (leftExtraMeshes.Count > 0)
+                        {
+                            startOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.startWidth;
+                            endOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.endWidth;
+                            yOffsetLeft += leftExtraMeshes[leftExtraMeshes.Count - 1].extraMesh.yOffset;
+                        }
 
-                    leftExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
+                        leftExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetLeft, endOffsetLeft, yOffsetLeft));
+                    }
                 }
                 else if ((intersection.extraMeshes[j].index - 1) % 3 == 2 && (intersection.extraMeshes[j].index - 3) / 3 == i)
                 {
-                    if (rightExtraMeshes.Count > 0)
+                    if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
                     {
-                        startOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.startWidth;
-                        endOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.endWidth;
-                        yOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.yOffset;
+                        intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
+                        intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
                     }
+                    else
+                    {
+                        if (rightExtraMeshes.Count > 0)
+                        {
+                            startOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.startWidth;
+                            endOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.endWidth;
+                            yOffsetRight += rightExtraMeshes[rightExtraMeshes.Count - 1].extraMesh.yOffset;
+                        }
 
-                    rightExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetRight, endOffsetRight, yOffsetRight));
+                        rightExtraMeshes.Add(new RoundaboutExtraMesh(intersection.extraMeshes[j], j, startOffsetRight, endOffsetRight, yOffsetRight));
+                    }
                 }
             }
         }
@@ -747,6 +779,11 @@ public class Roundabout
 
                 // Assign mesh
                 AssignCenterExtraMesh(intersection, vertices, triangles, uvs, uvs2, centerExtraMeshes, i, indexes);
+            }
+            else
+            {
+                intersection.transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshFilter>().sharedMesh = null;
+                intersection.transform.GetChild(0).GetChild(indexes[i]).GetComponent<MeshCollider>().sharedMesh = null;
             }
         }
     }
