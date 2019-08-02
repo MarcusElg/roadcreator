@@ -424,7 +424,7 @@ public class RoadEditor : Editor
                     Handles.color = roadCreator.settings.FindProperty("controlPointColour").colorValue;
                 }
 
-                Handles.CylinderHandleCap(0, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).transform.position, Quaternion.Euler(90, 0, 0), roadCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+                Misc.DrawPoint((RoadCreatorSettings.PointShape)roadCreator.settings.FindProperty("pointShape").intValue, roadCreator.transform.GetChild(0).GetChild(i).GetChild(0).GetChild(j).transform.position, roadCreator.settings.FindProperty("pointSize").floatValue);
             }
         }
 
@@ -473,7 +473,7 @@ public class RoadEditor : Editor
 
         // Mouse position
         Handles.color = roadCreator.settings.FindProperty("cursorColour").colorValue;
-        Handles.CylinderHandleCap(0, mousePosition, Quaternion.Euler(90, 0, 0), roadCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+        Misc.DrawPoint((RoadCreatorSettings.PointShape)roadCreator.settings.FindProperty("pointShape").intValue, mousePosition, roadCreator.settings.FindProperty("pointSize").floatValue);
     }
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)

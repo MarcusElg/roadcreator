@@ -81,6 +81,15 @@ public class RoadCreatorProjectSettings
                     }
                 }
 
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(settings.FindProperty("pointShape"));
+
+                if (EditorGUI.EndChangeCheck() == true)
+                {
+                    settings.ApplyModifiedPropertiesWithoutUndo();
+                    UpdateSettings();
+                }
+
                 GUIStyle guiStyle = new GUIStyle();
                 guiStyle.fontStyle = FontStyle.Bold;
 

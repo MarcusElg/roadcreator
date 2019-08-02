@@ -10,7 +10,9 @@ public class RoadCreatorSettings : ScriptableObject
     public float resolution = 0.25f;
     public bool hideNonEditableChildren = true;
     public int roundaboutConnectionIndexOffset = 1;
-    
+    public enum PointShape { Cylinder, Sphere, Cube, Cone };
+    public PointShape pointShape;
+
     public float oldRoadGuidelinesLength = 5;
     public float roadGuidelinesLength = 5;
     public float roadGuidelinesDistance = 10;

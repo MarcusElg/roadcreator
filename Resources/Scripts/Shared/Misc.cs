@@ -158,7 +158,7 @@ public static class Misc
         return nearest;
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     private static Vector3 CheckGuideline(float nearestDistance, Vector3 mousePosition, RoadGuideline roadGuideline, SerializedObject settings)
     {
         Vector3 nearestLinePoint = Misc.FindNearestPointOnLine(new Vector2(roadGuideline.startPoint.x, roadGuideline.startPoint.z), new Vector2(roadGuideline.endPoint.x, roadGuideline.endPoint.z), mousePosition);
@@ -172,7 +172,7 @@ public static class Misc
 
         return MaxVector3;
     }
-    #endif
+#endif
 
     public static void DrawRoadGuidelines(Vector3 mousePosition, GameObject objectToMove, GameObject extraObjectToMove)
     {
@@ -353,6 +353,26 @@ public static class Misc
         else
         {
             return MaxVector3;
+        }
+    }
+
+    public static void DrawPoint(RoadCreatorSettings.PointShape pointShape, Vector3 position, float size)
+    {
+        if (pointShape == RoadCreatorSettings.PointShape.Cube)
+        {
+            Handles.CubeHandleCap(0, position, Quaternion.Euler(-90, 0, 0), size, EventType.Repaint);
+        }
+        else if (pointShape == RoadCreatorSettings.PointShape.Cylinder)
+        {
+            Handles.CylinderHandleCap(0, position, Quaternion.Euler(-90, 0, 0), size, EventType.Repaint);
+        }
+        else if (pointShape == RoadCreatorSettings.PointShape.Sphere)
+        {
+            Handles.SphereHandleCap(0, position, Quaternion.Euler(-90, 0, 0), size, EventType.Repaint);
+        }
+        else if (pointShape == RoadCreatorSettings.PointShape.Cone)
+        {
+            Handles.ConeHandleCap(0, position, Quaternion.Euler(-90, 0, 0), size, EventType.Repaint);
         }
     }
 }

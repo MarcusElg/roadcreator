@@ -270,12 +270,12 @@ public class PrefabLineEditor : Editor
             if (prefabCreator.transform.GetChild(0).GetChild(i).name == "Point")
             {
                 Handles.color = prefabCreator.settings.FindProperty("pointColour").colorValue;
-                Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+                Misc.DrawPoint((RoadCreatorSettings.PointShape)prefabCreator.settings.FindProperty("pointShape").intValue, prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.settings.FindProperty("pointSize").floatValue);
             }
             else
             {
                 Handles.color = prefabCreator.settings.FindProperty("controlPointColour").colorValue;
-                Handles.CylinderHandleCap(0, prefabCreator.transform.GetChild(0).GetChild(i).position, Quaternion.Euler(90, 0, 0), prefabCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+                Misc.DrawPoint((RoadCreatorSettings.PointShape)prefabCreator.settings.FindProperty("pointShape").intValue, prefabCreator.transform.GetChild(0).GetChild(i).position, prefabCreator.settings.FindProperty("pointSize").floatValue);
             }
         }
 
@@ -312,7 +312,7 @@ public class PrefabLineEditor : Editor
 
         // Mouse position
         Handles.color = prefabCreator.settings.FindProperty("cursorColour").colorValue;
-        Handles.CylinderHandleCap(0, hitPosition, Quaternion.Euler(90, 0, 0), prefabCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+        Misc.DrawPoint((RoadCreatorSettings.PointShape)prefabCreator.settings.FindProperty("pointShape").intValue, hitPosition, prefabCreator.settings.FindProperty("pointSize").floatValue);
     }
 
     private Vector3[] CalculateTemporaryPoints(Event guiEvent, Vector3 hitPosition)

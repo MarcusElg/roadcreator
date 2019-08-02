@@ -93,7 +93,7 @@ public class PointEditor : Editor
                 Handles.color = roadCreator.settings.FindProperty("pointColour").colorValue;
             }
 
-            Handles.CylinderHandleCap(0, point.transform.position, Quaternion.Euler(90, 0, 0), roadCreator.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)roadCreator.settings.FindProperty("pointShape").intValue, point.transform.position, roadCreator.settings.FindProperty("pointSize").floatValue);
         }
         else
         {
@@ -106,7 +106,7 @@ public class PointEditor : Editor
                 Handles.color = prefabLine.settings.FindProperty("pointColour").colorValue;
             }
 
-            Handles.CylinderHandleCap(0, point.transform.position, Quaternion.Euler(90, 0, 0), prefabLine.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)prefabLine.settings.FindProperty("pointShape").intValue, point.transform.position, prefabLine.settings.FindProperty("pointSize").floatValue);
         }
     }
 }

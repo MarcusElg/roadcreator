@@ -295,7 +295,7 @@ public class IntersectionEditor : Editor
             {
                 if (intersection.transform.GetChild(i).name != "Bridge")
                 {
-                    Handles.CylinderHandleCap(0, intersection.transform.GetChild(i).position, Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+                    Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, intersection.transform.GetChild(i).position, intersection.settings.FindProperty("pointSize").floatValue);
                 }
             }
         }
@@ -303,18 +303,18 @@ public class IntersectionEditor : Editor
         Handles.color = intersection.settings.FindProperty("pointColour").colorValue;
         for (int i = 0; i < intersection.connections.Count; i++)
         {
-            Handles.CylinderHandleCap(0, intersection.connections[i].road.transform.position, Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, intersection.connections[i].road.transform.position, intersection.settings.FindProperty("pointSize").floatValue);
         }
 
         Handles.color = intersection.settings.FindProperty("cursorColour").colorValue;
 
         if (raycastHit.transform != null && raycastHit.transform.name.Contains("Point"))
         {
-            Handles.CylinderHandleCap(0, new Vector3(raycastHit.point.x, raycastHit.transform.position.y, raycastHit.point.z), Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, new Vector3(raycastHit.point.x, raycastHit.transform.position.y, raycastHit.point.z), intersection.settings.FindProperty("pointSize").floatValue);
         }
         else
         {
-            Handles.CylinderHandleCap(0, raycastHit.point, Quaternion.Euler(90, 0, 0), intersection.settings.FindProperty("pointSize").floatValue, EventType.Repaint);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, raycastHit.point, intersection.settings.FindProperty("pointSize").floatValue);
         }
     }
 
