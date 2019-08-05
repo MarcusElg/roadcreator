@@ -473,7 +473,7 @@ public class RoadEditor : Editor
 
         // Mouse position
         Handles.color = roadCreator.settings.FindProperty("cursorColour").colorValue;
-        Misc.DrawPoint((RoadCreatorSettings.PointShape)roadCreator.settings.FindProperty("pointShape").intValue, mousePosition, roadCreator.settings.FindProperty("pointSize").floatValue);
+        Misc.DrawPoint((RoadCreatorSettings.PointShape)roadCreator.settings.FindProperty("pointShape").intValue, mousePosition, roadCreator.settings.FindProperty("pointSize").floatValue, false);
     }
 
     public Vector3[] CalculateTemporaryPoints(Vector3 hitPosition)

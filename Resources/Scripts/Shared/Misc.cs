@@ -356,7 +356,7 @@ public static class Misc
         }
     }
 
-    public static void DrawPoint(RoadCreatorSettings.PointShape pointShape, Vector3 position, float size)
+    public static void DrawPoint(RoadCreatorSettings.PointShape pointShape, Vector3 position, float size, bool showMoveHandle = true)
     {
         if (pointShape == RoadCreatorSettings.PointShape.Cube)
         {
@@ -374,6 +374,17 @@ public static class Misc
         {
             Handles.ConeHandleCap(0, position, Quaternion.Euler(-90, 0, 0), size, EventType.Repaint);
         }
+
+        /*if (showMoveHandle == true)
+        {
+            Handles.Slider(15, position, Vector3.forward, size * 3, Handles.ArrowHandleCap, 1);
+            return position;// Handles.FreeMoveHandle(position, Quaternion.Euler(0, 90, 0), size * 10, Vector3.one, Handles.ArrowHandleCap);
+            //return Handles.PositionHandle(position + new Vector3(0, size, 0), Quaternion.identity) - new Vector3(0, size, 0);
+        }
+        else
+        {
+            return position;
+        }*/
     }
 }
 #endif

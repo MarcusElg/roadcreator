@@ -162,7 +162,7 @@ public class RoadSegment : MonoBehaviour
                 }
             }
 
-            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].baseMaterial, extraMeshes[i].overlayMaterial, extraMeshes[i].physicMaterial, startXOffset, endXOffset, extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i].left);
+            GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(i + 1), "Extra Mesh", extraMeshes[i].baseMaterial, extraMeshes[i].overlayMaterial, extraMeshes[i].physicMaterial, startXOffset, endXOffset, currentHeight + extraMeshes[i].yOffset, currentHeight, extraMeshes[i]);
         }
     }
 
@@ -266,9 +266,9 @@ public class RoadSegment : MonoBehaviour
         }
     }
 
-    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float startWidth = 0, float endWidth = 0, float yOffset = 0, float leftYOffset = 0, bool extraMeshLeft = true)
+    private void GenerateMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, Transform mesh, string name, Material baseMaterial, Material overlayMaterial, PhysicMaterial physicMaterial, float startXOffset = 0, float endXOffset = 0, float yOffset = 0, float leftYOffset = 0, ExtraMesh extraMesh = null)
     {
-        if (name != "Road" && startWidth == 0 && endWidth == 0)
+        if (name != "Road" && extraMesh.startWidth == 0 && extraMesh.endWidth == 0 && extraMesh.yOffset == 0)
         {
             mesh.GetComponent<MeshFilter>().sharedMesh = null;
             mesh.GetComponent<MeshCollider>().sharedMesh = null;
@@ -321,9 +321,9 @@ public class RoadSegment : MonoBehaviour
             else
             {
                 float modifiedXOffset = Mathf.Lerp(startXOffset, endXOffset, currentDistance / totalDistance) + roadWidth;
-                float width = Mathf.Lerp(startWidth, endWidth, currentDistance / totalDistance);
+                float width = Mathf.Lerp(extraMesh.startWidth, extraMesh.endWidth, currentDistance / totalDistance);
 
-                if (extraMeshLeft == false)
+                if (extraMesh.left == false)
                 {
                     vertices.Add((points[i] + left * -modifiedXOffset) - segment.position);
                     vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, correctedHeightOffset + leftYOffset + points[i].y - segment.position.y - heightOffset, vertices[verticeIndex].z);
@@ -375,7 +375,7 @@ public class RoadSegment : MonoBehaviour
         }
         else
         {
-            generatedMesh = GenerateUvs(generatedMesh, extraMeshLeft);
+            generatedMesh = GenerateUvs(generatedMesh, extraMesh.left);
         }
 
         generatedMesh.RecalculateNormals();

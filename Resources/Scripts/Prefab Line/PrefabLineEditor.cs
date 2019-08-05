@@ -312,7 +312,7 @@ public class PrefabLineEditor : Editor
 
         // Mouse position
         Handles.color = prefabCreator.settings.FindProperty("cursorColour").colorValue;
-        Misc.DrawPoint((RoadCreatorSettings.PointShape)prefabCreator.settings.FindProperty("pointShape").intValue, hitPosition, prefabCreator.settings.FindProperty("pointSize").floatValue);
+        Misc.DrawPoint((RoadCreatorSettings.PointShape)prefabCreator.settings.FindProperty("pointShape").intValue, hitPosition, prefabCreator.settings.FindProperty("pointSize").floatValue, false);
     }
 
     private Vector3[] CalculateTemporaryPoints(Event guiEvent, Vector3 hitPosition)

@@ -423,11 +423,11 @@ public class Intersection : MonoBehaviour
     {
         for (int i = 0; i < extraMeshes.Count; i++)
         {
-            if (extraMeshes[i].startWidth == 0 && extraMeshes[i].endWidth == 0)
+            if (extraMeshes[i].startWidth == 0 && extraMeshes[i].endWidth == 0 && extraMeshes[i].yOffset == 0)
             {
                 transform.GetChild(0).GetChild(i).GetComponent<MeshFilter>().sharedMesh = null;
                 transform.GetChild(0).GetChild(i).GetComponent<MeshCollider>().sharedMesh = null;
-                return;
+                continue;
             }
 
             int endVertexIndex;

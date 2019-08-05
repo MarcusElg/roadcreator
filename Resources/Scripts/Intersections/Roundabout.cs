@@ -68,7 +68,7 @@ public class Roundabout
                 {
                     if ((intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
                     {
-                        if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
+                        if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0 && intersection.extraMeshes[j].yOffset == 0)
                         {
                             intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                             intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
@@ -109,7 +109,7 @@ public class Roundabout
                 {
                     if (intersection.extraMeshes[j].index > 0 && (intersection.extraMeshes[j].index - 1) % 3 == 0 && (intersection.extraMeshes[j].index - 1) / 3 == i)
                     {
-                        if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
+                        if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0 && intersection.extraMeshes[j].yOffset == 0)
                         {
                             intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                             intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
@@ -306,7 +306,7 @@ public class Roundabout
             {
                 if ((intersection.extraMeshes[j].index - 1) % 3 == 1 && (intersection.extraMeshes[j].index - 2) / 3 == i)
                 {
-                    if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
+                    if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0 && intersection.extraMeshes[j].yOffset == 0)
                     {
                         intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                         intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
@@ -325,7 +325,7 @@ public class Roundabout
                 }
                 else if ((intersection.extraMeshes[j].index - 1) % 3 == 2 && (intersection.extraMeshes[j].index - 3) / 3 == i)
                 {
-                    if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0)
+                    if (intersection.extraMeshes[j].startWidth == 0 && intersection.extraMeshes[j].endWidth == 0 && intersection.extraMeshes[j].yOffset == 0)
                     {
                         intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshFilter>().sharedMesh = null;
                         intersection.transform.GetChild(0).GetChild(j).GetComponent<MeshCollider>().sharedMesh = null;
@@ -738,7 +738,7 @@ public class Roundabout
             List<Vector2> uvs2 = new List<Vector2>();
             int vertexIndex = 0;
 
-            if (centerExtraMeshes[i].startWidth > 0)
+            if (centerExtraMeshes[i].startWidth > 0 || centerExtraMeshes[i].yOffset > 0)
             {
                 for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
                 {

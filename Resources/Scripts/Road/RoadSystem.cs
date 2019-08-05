@@ -17,15 +17,12 @@ public class RoadSystem : MonoBehaviour
     Texture roadGuidelinesOn;
     Texture roadGuidelinesOff;
 
-#if UNITY_EDITOR
     public SerializedObject settings;
-#endif
-
     public GUIStyle largeBoldText;
 
     public void ShowCreationButtons()
     {
-        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
+        //HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
 
         if (settings == null)
         {

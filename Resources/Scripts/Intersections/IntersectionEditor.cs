@@ -310,11 +310,11 @@ public class IntersectionEditor : Editor
 
         if (raycastHit.transform != null && raycastHit.transform.name.Contains("Point"))
         {
-            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, new Vector3(raycastHit.point.x, raycastHit.transform.position.y, raycastHit.point.z), intersection.settings.FindProperty("pointSize").floatValue);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, new Vector3(raycastHit.point.x, raycastHit.transform.position.y, raycastHit.point.z), intersection.settings.FindProperty("pointSize").floatValue, false);
         }
         else
         {
-            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, raycastHit.point, intersection.settings.FindProperty("pointSize").floatValue);
+            Misc.DrawPoint((RoadCreatorSettings.PointShape)intersection.settings.FindProperty("pointShape").intValue, raycastHit.point, intersection.settings.FindProperty("pointSize").floatValue, false);
         }
     }
 
