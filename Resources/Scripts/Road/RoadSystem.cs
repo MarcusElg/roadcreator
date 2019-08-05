@@ -22,7 +22,7 @@ public class RoadSystem : MonoBehaviour
 
     public void ShowCreationButtons()
     {
-        //HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
+        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
 
         if (settings == null)
         {

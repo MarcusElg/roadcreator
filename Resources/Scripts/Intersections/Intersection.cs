@@ -736,7 +736,9 @@ public class Intersection : MonoBehaviour
     private void CreateExtraMeshesFromRoads()
     {
         List<float> currentWidths = new List<float>();
+        List<float> currentYOffsets = new List<float>();
         List<float> lastWidths = new List<float>();
+        List<float> lastYOffsets = new List<float>();
 
         // Generate first widths
         RoadSegment lastRoadSegment = connections[connections.Count - 2].road.transform.parent.parent.GetComponent<RoadSegment>();
@@ -744,9 +746,15 @@ public class Intersection : MonoBehaviour
 
         for (int j = 0; j < currentRoadSegment.extraMeshes.Count; j++)
         {
-            if (currentRoadSegment.extraMeshes[j].left == false)
+            if (currentRoadSegment.extraMeshes[j].left == true && connections[0].road.name == "Start Point")
             {
+                lastYOffsets.Add(currentRoadSegment.extraMeshes[j].yOffset);
                 lastWidths.Add(currentRoadSegment.extraMeshes[j].startWidth);
+            }
+            else if (currentRoadSegment.extraMeshes[j].left == false && connections[0].road.name == "End Point")
+            {
+                lastYOffsets.Add(currentRoadSegment.extraMeshes[j].yOffset);
+                lastWidths.Add(currentRoadSegment.extraMeshes[j].endWidth);
             }
         }
 
@@ -754,6 +762,7 @@ public class Intersection : MonoBehaviour
         {
             currentRoadSegment = connections[i].road.transform.parent.parent.GetComponent<RoadSegment>();
             currentWidths.Clear();
+            currentYOffsets.Clear();
             int addedExtraMeshes = 0;
 
             for (int j = 0; j < currentRoadSegment.extraMeshes.Count; j++)
@@ -762,12 +771,12 @@ public class Intersection : MonoBehaviour
                 {
                     if (addedExtraMeshes < lastWidths.Count)
                     {
-                        if (currentRoadSegment.extraMeshes[j].endWidth != 0 || lastWidths[addedExtraMeshes] != 0)
+                        if (currentRoadSegment.extraMeshes[j].endWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0 || lastWidths[addedExtraMeshes] != 0 || lastYOffsets[addedExtraMeshes] != 0)
                         {
                             extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].endWidth, lastWidths[addedExtraMeshes], currentRoadSegment.extraMeshes[j].yOffset));
                         }
                     }
-                    else if (currentRoadSegment.extraMeshes[j].endWidth != 0)
+                    else if (currentRoadSegment.extraMeshes[j].endWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0)
                     {
                         extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].endWidth, 0, currentRoadSegment.extraMeshes[j].yOffset));
                     }
@@ -779,12 +788,12 @@ public class Intersection : MonoBehaviour
                 {
                     if (addedExtraMeshes < lastWidths.Count)
                     {
-                        if (currentRoadSegment.extraMeshes[j].startWidth != 0 || lastWidths[addedExtraMeshes] != 0)
+                        if (currentRoadSegment.extraMeshes[j].startWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0 || lastWidths[addedExtraMeshes] != 0 || lastYOffsets[addedExtraMeshes] != 0)
                         {
                             extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].startWidth, lastWidths[addedExtraMeshes], currentRoadSegment.extraMeshes[j].yOffset));
                         }
                     }
-                    else if (currentRoadSegment.extraMeshes[j].startWidth != 0)
+                    else if (currentRoadSegment.extraMeshes[j].startWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0)
                     {
                         extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].startWidth, 0, currentRoadSegment.extraMeshes[j].yOffset));
                     }
@@ -802,20 +811,23 @@ public class Intersection : MonoBehaviour
                     {
                         currentWidths.Add(currentRoadSegment.extraMeshes[j].endWidth);
                     }
+
+                    currentYOffsets.Add(currentRoadSegment.extraMeshes[j].yOffset);
                 }
             }
 
             for (int j = addedExtraMeshes; j < lastWidths.Count; j++)
             {
-                if (lastWidths[j] != 0)
+                if (lastWidths[j] != 0 || lastYOffsets[j] != 0)
                 {
-                    extraMeshes.Add(new ExtraMesh(true, i, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastWidths[j], lastRoadSegment.extraMeshes[j].yOffset));
+                    extraMeshes.Add(new ExtraMesh(true, i, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastWidths[j], lastYOffsets[j]));
                     CreateExtraMesh();
                 }
             }
 
             lastRoadSegment = currentRoadSegment;
             lastWidths = new List<float>(currentWidths);
+            lastYOffsets = new List<float>(currentYOffsets);
         }
     }
 }

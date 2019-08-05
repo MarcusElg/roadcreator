@@ -233,21 +233,30 @@ public static class Misc
 
     public static void ConvertToMesh(GameObject gameObject, string name)
     {
-        MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
+        List<MeshFilter> meshFilters = new List<MeshFilter>(gameObject.GetComponentsInChildren<MeshFilter>());
         List<Material> materials = new List<Material>();
 
-        if (meshFilters.Length > 0 && meshFilters[0].sharedMesh != null)
+        if (meshFilters.Count > 0 && meshFilters[0].sharedMesh != null)
         {
-            for (int i = 0; i < meshFilters.Length; i++)
+            for (int i = 0; i < meshFilters.Count; i++)
             {
-                if (!materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[0]))
+                if (meshFilters[i].sharedMesh != null)
                 {
-                    materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[0]);
-                }
+                    for (int j = 0; j < meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials.Length; j++)
+                    {
+                        if (!materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[j]))
+                        {
+                            materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[j]);
 
-                if (meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials.Length > 1 && !materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[1]))
+                            if (j > meshFilters[i].sharedMesh.subMeshCount)
+                            {
+                                meshFilters.Insert(i + 1, GameObject.Instantiate(meshFilters[i]));
+                            }
+                        }
+                    }
+                } else
                 {
-                    materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[1]);
+                    meshFilters.RemoveAt(i);
                 }
             }
 
@@ -255,7 +264,7 @@ public static class Misc
             foreach (Material material in materials)
             {
                 List<CombineInstance> combinerInstances = new List<CombineInstance>();
-                for (int i = 0; i < meshFilters.Length; i++)
+                for (int i = 0; i < meshFilters.Count; i++)
                 {
                     Material localMaterial = meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial;
                     if (localMaterial != material)
