@@ -231,86 +231,97 @@ public static class Misc
         return new Vector3(-vector.x, vector.y, vector.z);
     }
 
+    // Source: http://projectperko.blogspot.com/2016/08/multi-material-mesh-merge-snippet.html, with changes
     public static void ConvertToMesh(GameObject gameObject, string name)
     {
         List<MeshFilter> meshFilters = new List<MeshFilter>(gameObject.GetComponentsInChildren<MeshFilter>());
         List<Material> materials = new List<Material>();
+        MeshRenderer[] meshRenderers = gameObject.GetComponentsInChildren<MeshRenderer>();
 
-        if (meshFilters.Count > 0 && meshFilters[0].sharedMesh != null)
+        // Support objects with more materials than meshes
+        for (int i = 0; i < meshFilters.Count; i++)
         {
-            for (int i = 0; i < meshFilters.Count; i++)
+            if (meshFilters[i].sharedMesh != null)
             {
-                if (meshFilters[i].sharedMesh != null)
+                if (meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials.Length > meshFilters[i].sharedMesh.subMeshCount)
                 {
-                    for (int j = 0; j < meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials.Length; j++)
-                    {
-                        if (!materials.Contains(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[j]))
-                        {
-                            materials.Add(meshFilters[i].GetComponent<MeshRenderer>().sharedMaterials[j]);
-
-                            if (j > meshFilters[i].sharedMesh.subMeshCount)
-                            {
-                                meshFilters.Insert(i + 1, GameObject.Instantiate(meshFilters[i]));
-                            }
-                        }
-                    }
-                } else
-                {
-                    meshFilters.RemoveAt(i);
+                    meshFilters[i].sharedMesh.subMeshCount += 1;
+                    meshFilters[i].sharedMesh.SetTriangles(meshFilters[i].sharedMesh.triangles, 1);
                 }
             }
-
-            List<Mesh> subMeshes = new List<Mesh>();
-            foreach (Material material in materials)
+            else
             {
-                List<CombineInstance> combinerInstances = new List<CombineInstance>();
-                for (int i = 0; i < meshFilters.Count; i++)
+                meshFilters.RemoveAt(i);
+            }
+        }
+
+        foreach (MeshRenderer meshRenderer in meshRenderers)
+        {
+            Material[] localMaterials = meshRenderer.sharedMaterials;
+
+            foreach (Material localMaterial in localMaterials)
+            {
+                if (!materials.Contains(localMaterial))
                 {
-                    Material localMaterial = meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial;
-                    if (localMaterial != material)
+                    materials.Add(localMaterial);
+                }
+            }
+        }
+
+        List<Mesh> subMeshes = new List<Mesh>();
+        foreach (Material material in materials)
+        {
+            List<CombineInstance> combineInstances = new List<CombineInstance>();
+            foreach (MeshFilter meshFilter in meshFilters)
+            {
+                MeshRenderer meshRenderer = meshFilter.GetComponent<MeshRenderer>();
+                Material[] localMaterials = meshRenderer.sharedMaterials;
+
+                for (int materialIndex = 0; materialIndex < localMaterials.Length; materialIndex++)
+                {
+                    if (localMaterials[materialIndex] != material)
                     {
                         continue;
                     }
 
                     CombineInstance combineInstance = new CombineInstance();
-                    combineInstance.mesh = meshFilters[i].sharedMesh;
+                    combineInstance.mesh = meshFilter.sharedMesh;
+                    combineInstance.subMeshIndex = materialIndex;
                     Matrix4x4 matrix = Matrix4x4.identity;
-                    matrix.SetTRS(meshFilters[i].transform.position, meshFilters[i].transform.rotation, Vector3.one);
+                    matrix.SetTRS(meshFilter.transform.position, meshFilter.transform.rotation, meshFilter.transform.lossyScale);
                     combineInstance.transform = matrix;
-                    combinerInstances.Add(combineInstance);
+                    combineInstances.Add(combineInstance);
                 }
-
-                Mesh mesh = new Mesh();
-                mesh.CombineMeshes(combinerInstances.ToArray(), true);
-                subMeshes.Add(mesh);
             }
 
-            List<CombineInstance> finalCombineInstances = new List<CombineInstance>();
-            for (int i = 0; i < subMeshes.Count; i++)
-            {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = subMeshes[i];
-                combineInstance.transform = Matrix4x4.identity;
-                finalCombineInstances.Add(combineInstance);
-            }
-            Mesh finalMesh = new Mesh();
-            finalMesh.CombineMeshes(finalCombineInstances.ToArray(), false);
-
-            GameObject newMesh = new GameObject(name);
-            Undo.RegisterCreatedObjectUndo(newMesh, "Create Combined Mesh");
-            newMesh.AddComponent<MeshFilter>();
-            newMesh.AddComponent<MeshRenderer>();
-            newMesh.AddComponent<MeshCollider>();
-            newMesh.GetComponent<MeshFilter>().sharedMesh = finalMesh;
-            newMesh.GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
-            newMesh.GetComponent<MeshCollider>().sharedMesh = finalMesh;
-            Selection.activeGameObject = newMesh;
-            Undo.DestroyObjectImmediate(gameObject.gameObject);
+            Mesh mesh = new Mesh();
+            mesh.CombineMeshes(combineInstances.ToArray(), true);
+            subMeshes.Add(mesh);
         }
-        else
+
+        List<CombineInstance> finalCombiners = new List<CombineInstance>();
+        foreach (Mesh mesh in subMeshes)
         {
-            Debug.Log("There are no meshes to combine");
+            CombineInstance combineInstance = new CombineInstance();
+            combineInstance.mesh = mesh;
+            combineInstance.subMeshIndex = 0;
+            combineInstance.transform = Matrix4x4.identity;
+            finalCombiners.Add(combineInstance);
         }
+
+        Mesh finalMesh = new Mesh();
+        finalMesh.CombineMeshes(finalCombiners.ToArray(), false);
+
+        GameObject newMesh = new GameObject(name);
+        Undo.RegisterCreatedObjectUndo(newMesh, "Create Combined Mesh");
+        newMesh.AddComponent<MeshFilter>();
+        newMesh.AddComponent<MeshRenderer>();
+        newMesh.AddComponent<MeshCollider>();
+        newMesh.GetComponent<MeshFilter>().sharedMesh = finalMesh;
+        newMesh.GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
+        newMesh.GetComponent<MeshCollider>().sharedMesh = finalMesh;
+        Selection.activeGameObject = newMesh;
+        Undo.DestroyObjectImmediate(gameObject.gameObject);
     }
 
     public static Vector2 FindNearestPointOnLine(Vector2 start, Vector2 end, Vector2 point)
