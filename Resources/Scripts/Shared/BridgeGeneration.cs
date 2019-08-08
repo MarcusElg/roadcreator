@@ -234,12 +234,17 @@ public class BridgeGeneration
                 float difference = Mathf.Lerp(startWidthLeft, endWidthLeft, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i])) - Mathf.Lerp(startWidthRight, endWidthRight, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
                 currentPosition += difference * customBridge.transform.GetChild(1).GetChild(i).transform.forward / 2;
                 float width = Mathf.Lerp(startWidthLeft + startWidthRight + segment.startRoadWidth * 2, endWidthLeft + endWidthRight + segment.endRoadWidth * 2, Misc.GetCenter(prefabPoints.startTimes[i], prefabPoints.endTimes[i]));
-                CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, Mathf.Abs(segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) * segment.bridgeSettings.yScale, 0), segment, -customBridge.transform.GetChild(1).GetChild(i).transform.right, simple, width);
+
+                RaycastHit raycastHit;
+                if (Physics.Raycast(currentPosition, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Prefab Line") | 1 << LayerMask.NameToLayer("Intersection") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))) && Physics.Raycast(currentPosition, Vector3.down, 100, 1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Intersection")) == false)
+                {
+                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, Mathf.Abs(segment.bridgeSettings.bridgeMesh.GetComponent<MeshFilter>().sharedMesh.bounds.min.y) * segment.bridgeSettings.yScale, 0), raycastHit.point, segment, -customBridge.transform.GetChild(1).GetChild(i).transform.right, simple, width);
+                }
             }
         }
         else
         {
-            for (float t = 0; t <= 1; t += 0.01f)
+            for (float t = 0; t <= 1; t += (1 / Misc.CalculateDistance(startPoint, controlPoint, endPoint)) * 0.1f)
             {
                 Vector3 currentPosition = Misc.Lerp3CenterHeight(startPoint, controlPoint, endPoint, t);
                 currentDistance = Vector3.Distance(lastPosition, currentPosition);
@@ -256,64 +261,63 @@ public class BridgeGeneration
 
                 if (placedFirstPillar == false && currentDistance >= segment.pillarPlacementOffset)
                 {
-                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple, 0);
-                    lastPosition = currentPosition;
-                    placedFirstPillar = true;
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(currentPosition, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Prefab Line") | 1 << LayerMask.NameToLayer("Intersection") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))) && Physics.Raycast(currentPosition, Vector3.down, 100, 1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Intersection")) == false)
+                    {
+                        CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), raycastHit.point, segment, forward, simple, 0);
+                        lastPosition = currentPosition;
+                        placedFirstPillar = true;
+                    }
                 }
                 else if (placedFirstPillar == true && currentDistance >= segment.pillarGap)
                 {
-                    CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), segment, forward, simple, 0);
-                    lastPosition = currentPosition;
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(currentPosition, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Prefab Line") | 1 << LayerMask.NameToLayer("Intersection") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))) && Physics.Raycast(currentPosition, Vector3.down, 100, 1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Intersection")) == false)
+                    {
+                        CreatePillar(bridge.transform, segment.pillarPrefab, currentPosition - new Vector3(0, segment.bridgeSettings.yOffsetFirstStep + segment.bridgeSettings.yOffsetSecondStep, 0), raycastHit.point, segment, forward, simple, 0);
+                        lastPosition = currentPosition;
+                    }
                 }
             }
         }
     }
 
-    public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, RoadSegment segment, Vector3 forward, bool simple, float width)
+    public static void CreatePillar(Transform parent, GameObject prefab, Vector3 position, Vector3 groundPosition, RoadSegment segment, Vector3 forward, bool simple, float width)
     {
         GameObject pillar = GameObject.Instantiate(prefab);
         pillar.name = "Pillar";
         pillar.transform.SetParent(parent);
         pillar.hideFlags = HideFlags.NotEditable;
 
-        RaycastHit raycastHit;
-        if (Physics.Raycast(position, Vector3.down, out raycastHit, 100, ~(1 << LayerMask.NameToLayer("Road") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
+        Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
+        pillar.transform.localPosition = centerPosition - segment.transform.position;
+
+        if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.forward)
         {
-            Vector3 groundPosition = raycastHit.point;
-            Vector3 centerPosition = Misc.GetCenter(position, groundPosition);
-            pillar.transform.localPosition = centerPosition - segment.transform.position;
-
-            if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.forward)
-            {
-                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(forward, Vector3.up).eulerAngles.y, 0);
-            }
-            else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.backward)
-            {
-                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-forward, Vector3.up).eulerAngles.y, 0);
-            }
-            else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.left)
-            {
-                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
-            }
-            else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.right)
-            {
-                pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
-            }
-
-            float x = segment.xPillarScale;
-
-            if (segment.adaptGapToCustomBridge == true && segment.generateCustomBridge == true)
-            {
-                x = width / segment.pillarPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * segment.xPillarScaleMultiplier;
-            }
-
-            float heightDifference = groundPosition.y - centerPosition.y;
-            pillar.transform.localScale = new Vector3(x, (-heightDifference + segment.extraPillarHeight) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, segment.zPillarScale);
+            pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(forward, Vector3.up).eulerAngles.y, 0);
         }
-        else
+        else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.backward)
         {
-            GameObject.DestroyImmediate(pillar);
+            pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-forward, Vector3.up).eulerAngles.y, 0);
         }
+        else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.left)
+        {
+            pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
+        }
+        else if (segment.pillarRotationDirection == PrefabLineCreator.RotationDirection.right)
+        {
+            pillar.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(-Misc.CalculateLeft(forward), Vector3.up).eulerAngles.y, 0);
+        }
+
+        float x = segment.xPillarScale;
+
+        if (segment.adaptGapToCustomBridge == true && segment.generateCustomBridge == true)
+        {
+            x = width / segment.pillarPrefab.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * segment.xPillarScaleMultiplier;
+        }
+
+        float heightDifference = groundPosition.y - centerPosition.y;
+        pillar.transform.localScale = new Vector3(x, (-heightDifference + segment.extraPillarHeight) / pillar.GetComponent<MeshFilter>().sharedMesh.bounds.max.y, segment.zPillarScale);
     }
 
     public static void GenerateSimpleBridgeIntersection(Vector3[] inputVertices, Intersection intersection, Material[] materials, float[] startWidths, float[] endWidths, int[] startVertices)
@@ -582,7 +586,7 @@ public class BridgeGeneration
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     public static GameObject CreateBridge(GameObject bridge, Transform parent, Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector2[] extraUvs, Material[] materials, SerializedObject settings)
     {
         bridge.transform.SetParent(parent);
@@ -630,7 +634,7 @@ public class BridgeGeneration
 
         return bridge;
     }
-    #endif
+#endif
 
 }
 #endif
