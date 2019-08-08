@@ -668,8 +668,17 @@ public class Roundabout
             leftExtraMeshes[j].vertices[leftExtraMeshes[j].vertices.Count - 1] += new Vector3(0, leftExtraMeshes[j].extraMesh.yOffset + leftExtraMeshes[j].yOffset, 0);
             leftExtraMeshes[j].vertices[leftExtraMeshes[j].vertices.Count - 2] += new Vector3(0, leftExtraMeshes[j].yOffset, 0);
 
-            leftExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
-            leftExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
+            if (leftExtraMeshes[j].extraMesh.flipped == true)
+            {
+                leftExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+                leftExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
+            }
+            else
+            {
+                leftExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
+                leftExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+            }
+
             leftExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
             leftExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
 
@@ -686,8 +695,17 @@ public class Roundabout
             rightExtraMeshes[j].vertices[rightExtraMeshes[j].vertices.Count - 2] += new Vector3(0, rightExtraMeshes[j].yOffset + rightExtraMeshes[j].extraMesh.yOffset, 0);
             rightExtraMeshes[j].vertices[rightExtraMeshes[j].vertices.Count - 1] += new Vector3(0, rightExtraMeshes[j].yOffset, 0);
 
-            rightExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
-            rightExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+            if (rightExtraMeshes[j].extraMesh.flipped == true)
+            {
+                rightExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
+                rightExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+            }
+            else
+            {
+                rightExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+                rightExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
+            }
+
             rightExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
             rightExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
 
@@ -754,8 +772,17 @@ public class Roundabout
                     vertices.Add(Quaternion.Euler(0, modifiedF * 360, 0) * Vector3.forward * (intersection.roundaboutRadius - intersection.roundaboutWidth - currentOffset - centerExtraMeshes[i].startWidth));
                     vertices[vertices.Count - 1] += new Vector3(0, currentYOffset + centerExtraMeshes[i].yOffset, 0);
 
-                    uvs.Add(new Vector2(0, modifiedF * textureRepeations));
-                    uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+                    if (centerExtraMeshes[i].flipped == false)
+                    {
+                        uvs.Add(new Vector2(0, modifiedF * textureRepeations));
+                        uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+                    }
+                    else
+                    {
+                        uvs.Add(new Vector2(1, modifiedF * textureRepeations));
+                        uvs.Add(new Vector2(0, modifiedF * textureRepeations));
+                    }
+
                     uvs2.Add(Vector2.one);
                     uvs2.Add(Vector2.one);
 
@@ -822,8 +849,17 @@ public class Roundabout
             extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 2] += new Vector3(0, extraMeshes[j].yOffset, 0);
             extraMeshes[j].vertices[extraMeshes[j].vertices.Count - 1] += new Vector3(0, extraMeshes[j].extraMesh.yOffset + extraMeshes[j].yOffset, 0);
 
-            extraMeshes[j].uvs.Add(new Vector3(0, progress * intersection.textureTilingY * totalDistance * 0.13f));
-            extraMeshes[j].uvs.Add(new Vector3(progress, progress * intersection.textureTilingY * totalDistance * 0.13f));
+            if (extraMeshes[j].extraMesh.flipped == false)
+            {
+                extraMeshes[j].uvs.Add(new Vector3(0, progress * intersection.textureTilingY * totalDistance * 0.13f));
+                extraMeshes[j].uvs.Add(new Vector3(progress, progress * intersection.textureTilingY * totalDistance * 0.13f));
+            }
+            else
+            {
+                extraMeshes[j].uvs.Add(new Vector3(progress, progress * intersection.textureTilingY * totalDistance * 0.13f));
+                extraMeshes[j].uvs.Add(new Vector3(0, progress * intersection.textureTilingY * totalDistance * 0.13f));
+            }
+
             extraMeshes[j].uvs2.Add(new Vector3(progress, 1));
             extraMeshes[j].uvs2.Add(new Vector3(progress, 1));
 
@@ -1044,21 +1080,21 @@ public class Roundabout
                             {
                                 if (roadSegment.extraMeshes[j].startWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0 || lastWidths[addedExtraMeshes] != 0 || lastYOffsets[addedExtraMeshes] != 0)
                                 {
-                                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, lastWidths[addedExtraMeshes], roadSegment.extraMeshes[j].yOffset));
+                                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, lastWidths[addedExtraMeshes], roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                     intersection.CreateExtraMesh();
                                     addedExtraMeshes += 1;
                                 }
                             }
                             else if (roadSegment.extraMeshes[j].startWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0)
                             {
-                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, 0, roadSegment.extraMeshes[j].yOffset));
+                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, 0, roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                 intersection.CreateExtraMesh();
                                 addedExtraMeshes += 1;
                             }
 
                             if (roadSegment.extraMeshes[j].startWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0)
                             {
-                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].yOffset));
+                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                 intersection.CreateExtraMesh();
                             }
                         }
@@ -1068,21 +1104,21 @@ public class Roundabout
                             {
                                 if (roadSegment.extraMeshes[j].endWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0 || lastWidths[addedExtraMeshes] != 0 || lastYOffsets[addedExtraMeshes] != 0)
                                 {
-                                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastWidths[addedExtraMeshes], roadSegment.extraMeshes[j].yOffset));
+                                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, lastWidths[addedExtraMeshes], roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                     intersection.CreateExtraMesh();
                                     addedExtraMeshes += 1;
                                 }
                             }
                             else if (roadSegment.extraMeshes[j].endWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0)
                             {
-                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, 0, roadSegment.extraMeshes[j].yOffset));
+                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, 0, roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                 intersection.CreateExtraMesh();
                                 addedExtraMeshes += 1;
                             }
 
                             if (roadSegment.extraMeshes[j].endWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0)
                             {
-                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 2, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                 intersection.CreateExtraMesh();
                             }
                         }
@@ -1093,7 +1129,7 @@ public class Roundabout
                         {
                             if (roadSegment.extraMeshes[j].startWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0)
                             {
-                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].yOffset));
+                                intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].startWidth, roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                                 intersection.CreateExtraMesh();
                                 currentWidths.Add(roadSegment.extraMeshes[j].startWidth);
                                 currentYOffsets.Add(roadSegment.extraMeshes[j].yOffset);
@@ -1101,7 +1137,7 @@ public class Roundabout
                         }
                         else if (roadSegment.extraMeshes[j].endWidth != 0 || roadSegment.extraMeshes[j].yOffset != 0)
                         {
-                            intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].yOffset));
+                            intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 3, roadSegment.extraMeshes[j].baseMaterial, roadSegment.extraMeshes[j].overlayMaterial, roadSegment.extraMeshes[j].physicMaterial, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].endWidth, roadSegment.extraMeshes[j].flipped, roadSegment.extraMeshes[j].yOffset));
                             intersection.CreateExtraMesh();
                             currentWidths.Add(roadSegment.extraMeshes[j].endWidth);
                             currentYOffsets.Add(roadSegment.extraMeshes[j].yOffset);
@@ -1111,7 +1147,7 @@ public class Roundabout
 
                 for (int j = addedExtraMeshes; j < lastWidths.Count; j++)
                 {
-                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastWidths[j], lastRoadSegment.extraMeshes[j].yOffset));
+                    intersection.extraMeshes.Add(new ExtraMesh(true, i * 3 + 1, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastWidths[j], roadSegment.extraMeshes[j].flipped, lastRoadSegment.extraMeshes[j].yOffset));
                     intersection.CreateExtraMesh();
                 }
 

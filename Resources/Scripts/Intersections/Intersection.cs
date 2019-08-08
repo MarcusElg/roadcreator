@@ -446,6 +446,7 @@ public class Intersection : MonoBehaviour
             List<Vector3> extraMeshVertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
+            List<Vector2> uvs2 = new List<Vector2>();
             int vertexIndex = 0;
 
             for (int j = firstVertexIndexes[extraMeshes[i].index]; j < endVertexIndex; j += 2)
@@ -458,8 +459,19 @@ public class Intersection : MonoBehaviour
                 extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index]));
                 extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshes[i].index], 0);
 
-                uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
-                uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
+                if (extraMeshes[i].flipped == false)
+                {
+                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
+                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
+                }
+                else
+                {
+                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
+                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
+                }
+
+                uvs2.Add(Vector2.one);
+                uvs2.Add(Vector2.one);
 
                 if (j < endVertexIndex - 2)
                 {
@@ -474,6 +486,7 @@ public class Intersection : MonoBehaviour
             mesh.vertices = extraMeshVertices.ToArray();
             mesh.triangles = triangles.ToArray();
             mesh.uv = uvs.ToArray();
+            mesh.uv2 = uvs2.ToArray();
             mesh.RecalculateNormals();
             vertexIndex = 0;
 
@@ -773,12 +786,12 @@ public class Intersection : MonoBehaviour
                     {
                         if (currentRoadSegment.extraMeshes[j].endWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0 || lastWidths[addedExtraMeshes] != 0 || lastYOffsets[addedExtraMeshes] != 0)
                         {
-                            extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].endWidth, lastWidths[addedExtraMeshes], currentRoadSegment.extraMeshes[j].yOffset));
+                            extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].endWidth, lastWidths[addedExtraMeshes], currentRoadSegment.extraMeshes[j].flipped, currentRoadSegment.extraMeshes[j].yOffset));
                         }
                     }
                     else if (currentRoadSegment.extraMeshes[j].endWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0)
                     {
-                        extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].endWidth, 0, currentRoadSegment.extraMeshes[j].yOffset));
+                        extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].endWidth, 0, currentRoadSegment.extraMeshes[j].flipped, currentRoadSegment.extraMeshes[j].yOffset));
                     }
 
                     addedExtraMeshes += 1;
@@ -790,12 +803,12 @@ public class Intersection : MonoBehaviour
                     {
                         if (currentRoadSegment.extraMeshes[j].startWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0 || lastWidths[addedExtraMeshes] != 0 || lastYOffsets[addedExtraMeshes] != 0)
                         {
-                            extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].startWidth, lastWidths[addedExtraMeshes], currentRoadSegment.extraMeshes[j].yOffset));
+                            extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].startWidth, lastWidths[addedExtraMeshes], currentRoadSegment.extraMeshes[j].flipped, currentRoadSegment.extraMeshes[j].yOffset));
                         }
                     }
                     else if (currentRoadSegment.extraMeshes[j].startWidth != 0 || currentRoadSegment.extraMeshes[j].yOffset != 0)
                     {
-                        extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].startWidth, 0, currentRoadSegment.extraMeshes[j].yOffset));
+                        extraMeshes.Add(new ExtraMesh(true, i, currentRoadSegment.extraMeshes[j].baseMaterial, currentRoadSegment.extraMeshes[j].overlayMaterial, currentRoadSegment.extraMeshes[j].physicMaterial, currentRoadSegment.extraMeshes[j].startWidth, 0, currentRoadSegment.extraMeshes[j].flipped, currentRoadSegment.extraMeshes[j].yOffset));
                     }
 
                     addedExtraMeshes += 1;
@@ -820,7 +833,7 @@ public class Intersection : MonoBehaviour
             {
                 if (lastWidths[j] != 0 || lastYOffsets[j] != 0)
                 {
-                    extraMeshes.Add(new ExtraMesh(true, i, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastWidths[j], lastYOffsets[j]));
+                    extraMeshes.Add(new ExtraMesh(true, i, lastRoadSegment.extraMeshes[j].baseMaterial, lastRoadSegment.extraMeshes[j].overlayMaterial, lastRoadSegment.extraMeshes[j].physicMaterial, 0, lastWidths[j], lastRoadSegment.extraMeshes[j].flipped, lastYOffsets[j]));
                     CreateExtraMesh();
                 }
             }

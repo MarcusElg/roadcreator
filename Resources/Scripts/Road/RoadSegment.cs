@@ -375,7 +375,14 @@ public class RoadSegment : MonoBehaviour
         }
         else
         {
-            generatedMesh = GenerateUvs(generatedMesh, extraMesh.left);
+            if ((extraMesh.left == true && extraMesh.flipped == false) || (extraMesh.left == false && extraMesh.flipped == true))
+            {
+                generatedMesh = GenerateUvs(generatedMesh, false);
+            }
+            else
+            {
+                generatedMesh = GenerateUvs(generatedMesh, true);
+            }
         }
 
         generatedMesh.RecalculateNormals();

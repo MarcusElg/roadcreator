@@ -766,11 +766,11 @@ public class RoadCreator : MonoBehaviour
         {
             if (segment.extraMeshes[i].left == true)
             {
-                intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 0, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].yOffset));
+                intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 0, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].flipped, segment.extraMeshes[i].yOffset));
             }
             else
             {
-                intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 1, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].yOffset));
+                intersection.GetComponent<Intersection>().extraMeshes.Add(new ExtraMesh(true, 1, segment.extraMeshes[i].baseMaterial, segment.extraMeshes[i].overlayMaterial, segment.extraMeshes[i].physicMaterial, segment.extraMeshes[i].startWidth, segment.extraMeshes[i].endWidth, segment.extraMeshes[i].flipped, segment.extraMeshes[i].yOffset));
             }
 
             intersection.GetComponent<Intersection>().CreateExtraMesh();

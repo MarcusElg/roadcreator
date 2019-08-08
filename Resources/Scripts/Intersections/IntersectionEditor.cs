@@ -183,6 +183,7 @@ public class IntersectionEditor : Editor
                         intersection.extraMeshes[i].endWidth = Mathf.Max(EditorGUILayout.FloatField("End Width", intersection.extraMeshes[i].endWidth), 0);
                     }
 
+                    intersection.extraMeshes[i].flipped = EditorGUILayout.Toggle("Flipped", intersection.extraMeshes[i].flipped);
                     intersection.extraMeshes[i].yOffset = EditorGUILayout.FloatField("Y Offset", intersection.extraMeshes[i].yOffset);
 
                     if (GUILayout.Button("Duplicate Extra Mesh") == true)
@@ -208,7 +209,7 @@ public class IntersectionEditor : Editor
         {
             if (GUILayout.Button("Add Extra Mesh"))
             {
-                intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)intersection.settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, 0));
+                intersection.extraMeshes.Add(new ExtraMesh(true, 0, (Material)intersection.settings.FindProperty("defaultBaseMaterial").objectReferenceValue, (Material)intersection.settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, null, 1, 1, false, 0));
                 intersection.CreateExtraMesh();
             }
         }
