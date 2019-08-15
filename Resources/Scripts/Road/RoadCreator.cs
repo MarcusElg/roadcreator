@@ -23,6 +23,7 @@ public class RoadCreator : MonoBehaviour
     public bool sDown;
     public bool pDown;
     public bool aDown;
+    public bool dDown;
     public Vector3 previousPosition;
 
     public Intersection startIntersection = null;
@@ -405,7 +406,7 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
-    public void SplitSegment(Vector3 hitPosition, RaycastHit raycastHit)
+    public void InsertSegment(Vector3 hitPosition, RaycastHit raycastHit)
     {
         if (raycastHit.transform.parent.parent.parent.parent != null && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() != null && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() == this && raycastHit.transform.parent.parent.GetChild(0).childCount == 3 && aDown == true)
         {
@@ -429,6 +430,75 @@ public class RoadCreator : MonoBehaviour
 
             //CreateMesh();
             RoadCreatorSettings.UpdateRoadGuidelines();
+        }
+    }
+
+    public void DivideRoad(RaycastHit raycastHit)
+    {
+        if (raycastHit.transform.parent.parent.parent.parent != null && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() != null && raycastHit.transform.parent.parent.parent.parent.GetComponent<RoadCreator>() == this && raycastHit.transform.parent.childCount == 3 && dDown == true)
+        {
+            if (raycastHit.transform.GetSiblingIndex() == 0 && raycastHit.transform.parent.parent.GetSiblingIndex() == 0)
+            {
+                Debug.Log("You can't divide a road on the it's first point");
+                return;
+            }
+
+            if (raycastHit.transform.GetSiblingIndex() == 2 && raycastHit.transform.parent.parent.GetSiblingIndex() == raycastHit.transform.parent.parent.parent.childCount - 1)
+            {
+                Debug.Log("You can't divide a road on the it's last point");
+                return;
+            }
+
+            if (raycastHit.transform.GetSiblingIndex() == 1)
+            {
+                Debug.Log("You can't divide a road on it's control point");
+                return;
+            }
+
+            Transform point = raycastHit.transform;
+            if (point.name == "Start Point")
+            {
+                point = point.transform.parent.parent.parent.GetChild(point.transform.parent.parent.GetSiblingIndex() - 1).GetChild(0).GetChild(2);
+            }
+
+            Undo.RegisterFullObjectHierarchyUndo(transform, "Divide Road");
+            point.transform.position += (point.transform.parent.GetChild(0).position - point.transform.position).normalized * 2;
+            Transform nextSegment = point.transform.parent.parent.parent.GetChild(point.transform.parent.parent.GetSiblingIndex() + 1);
+            nextSegment.GetChild(0).GetChild(0).transform.position += (nextSegment.GetChild(0).GetChild(2).transform.position - nextSegment.GetChild(0).GetChild(0).transform.position).normalized * 2;
+
+            GameObject newRoad = new GameObject("Road");
+            Undo.RegisterCreatedObjectUndo(newRoad, "Divide Road");
+
+            newRoad.transform.SetParent(transform.parent, false);
+            newRoad.AddComponent<RoadCreator>();
+            newRoad.GetComponent<RoadCreator>().startLanes = settings.FindProperty("defaultLanes").intValue;
+            newRoad.GetComponent<RoadCreator>().endLanes = settings.FindProperty("defaultLanes").intValue;
+            newRoad.GetComponent<RoadCreator>().Setup();
+
+            Debug.Log(point.transform.parent.parent.GetSiblingIndex());
+            for (int i = 0; i <= point.transform.parent.parent.GetSiblingIndex(); i++)
+            {
+                transform.GetChild(0).GetChild(0).SetParent(newRoad.transform.GetChild(0));
+            }
+
+            // Intersections
+            newRoad.GetComponent<RoadCreator>().startIntersection = startIntersection;
+            newRoad.GetComponent<RoadCreator>().startIntersectionConnection = startIntersectionConnection;
+            newRoad.GetComponent<RoadCreator>().startLanes = startLanes;
+            newRoad.GetComponent<RoadCreator>().startLaneMarkers = startLaneMarkers;
+            startLanes = 2;
+            startLaneMarkers.Clear();
+
+            for (int i = 0; i < 2; i++)
+            {
+                startLaneMarkers.Add(new Vector3Bool(false, true, false));
+            }
+
+            startIntersection = null;
+            startIntersectionConnection = null;
+
+            CreateMesh();
+            newRoad.GetComponent<RoadCreator>().CreateMesh();
         }
     }
 

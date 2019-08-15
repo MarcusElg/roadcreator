@@ -21,6 +21,7 @@ public class RoadEditor : Editor
         roadCreator.aDown = false;
         roadCreator.pDown = false;
         roadCreator.sDown = false;
+        roadCreator.dDown = false;
 
         lastTool = Tools.current;
         Tools.current = Tool.None;
@@ -251,6 +252,15 @@ public class RoadEditor : Editor
 
         Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
         RaycastHit raycastHit;
+
+        if (Physics.Raycast(ray, out raycastHit, 100f, 1 << LayerMask.NameToLayer("Ignore Mouse Ray")))
+        {
+            if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0)
+            {
+                roadCreator.DivideRoad(raycastHit);
+            }
+        }
+
         if (Physics.Raycast(ray, out raycastHit, 100f, ~(1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
         {
             hitPosition = raycastHit.point;
@@ -296,6 +306,10 @@ public class RoadEditor : Editor
                 {
                     roadCreator.aDown = true;
                 }
+                else if (guiEvent.keyCode == KeyCode.D)
+                {
+                    roadCreator.dDown = true;
+                }
             }
             else if (guiEvent.type == EventType.KeyUp)
             {
@@ -310,6 +324,10 @@ public class RoadEditor : Editor
                 else if (guiEvent.keyCode == KeyCode.A)
                 {
                     roadCreator.aDown = false;
+                }
+                else if (guiEvent.keyCode == KeyCode.D)
+                {
+                    roadCreator.dDown = false;
                 }
             }
 
@@ -378,7 +396,7 @@ public class RoadEditor : Editor
                     }
                 }
 
-                roadCreator.SplitSegment(hitPosition, raycastHit);
+                roadCreator.InsertSegment(hitPosition, raycastHit);
             }
         }
 
