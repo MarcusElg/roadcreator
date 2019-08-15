@@ -20,9 +20,12 @@ public class RoadSystem : MonoBehaviour
     public SerializedObject settings;
     public GUIStyle largeBoldText;
 
-    public void ShowCreationButtons()
+    public void ShowCreationButtons(bool passiveControl = true)
     {
-        HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
+        if (passiveControl == true)
+        {
+            HandleUtility.nearestControl = GUIUtility.GetControlID(FocusType.Passive);
+        }
 
         if (settings == null)
         {

@@ -44,7 +44,7 @@ public class TrafficLightEditor : Editor
 
     public void OnSceneGUI()
     {
-        ((TrafficLight)target).transform.parent.GetComponent<RoadSystem>().ShowCreationButtons();
+        ((TrafficLight)target).transform.parent.GetComponent<RoadSystem>().ShowCreationButtons(false);
     }
 }
 #endif
