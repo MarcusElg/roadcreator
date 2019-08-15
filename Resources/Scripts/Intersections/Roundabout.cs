@@ -670,17 +670,17 @@ public class Roundabout
 
             if (leftExtraMeshes[j].extraMesh.flipped == true)
             {
-                leftExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+                leftExtraMeshes[j].uvs.Add(new Vector2(1, modifiedF));
                 leftExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
             }
             else
             {
                 leftExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
-                leftExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+                leftExtraMeshes[j].uvs.Add(new Vector2(1, modifiedF));
             }
 
-            leftExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
-            leftExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
+            leftExtraMeshes[j].uvs2.Add(Vector2.one);
+            leftExtraMeshes[j].uvs2.Add(Vector2.one);
 
             if (modifiedF > 0)
             {
@@ -698,16 +698,16 @@ public class Roundabout
             if (rightExtraMeshes[j].extraMesh.flipped == true)
             {
                 rightExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
-                rightExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+                rightExtraMeshes[j].uvs.Add(new Vector2(1, modifiedF));
             }
             else
             {
-                rightExtraMeshes[j].uvs.Add(new Vector2(modifiedF, modifiedF));
+                rightExtraMeshes[j].uvs.Add(new Vector2(1, modifiedF));
                 rightExtraMeshes[j].uvs.Add(new Vector2(0, modifiedF));
             }
 
-            rightExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
-            rightExtraMeshes[j].uvs2.Add(new Vector2(modifiedF, 1));
+            rightExtraMeshes[j].uvs2.Add(Vector2.one);
+            rightExtraMeshes[j].uvs2.Add(Vector2.one);
 
             if (modifiedF > 0)
             {
@@ -852,16 +852,16 @@ public class Roundabout
             if (extraMeshes[j].extraMesh.flipped == false)
             {
                 extraMeshes[j].uvs.Add(new Vector3(0, progress * intersection.textureTilingY * totalDistance * 0.13f));
-                extraMeshes[j].uvs.Add(new Vector3(progress, progress * intersection.textureTilingY * totalDistance * 0.13f));
+                extraMeshes[j].uvs.Add(new Vector3(1, progress * intersection.textureTilingY * totalDistance * 0.13f));
             }
             else
             {
-                extraMeshes[j].uvs.Add(new Vector3(progress, progress * intersection.textureTilingY * totalDistance * 0.13f));
+                extraMeshes[j].uvs.Add(new Vector3(1, progress * intersection.textureTilingY * totalDistance * 0.13f));
                 extraMeshes[j].uvs.Add(new Vector3(0, progress * intersection.textureTilingY * totalDistance * 0.13f));
             }
 
-            extraMeshes[j].uvs2.Add(new Vector3(progress, 1));
-            extraMeshes[j].uvs2.Add(new Vector3(progress, 1));
+            extraMeshes[j].uvs2.Add(Vector2.one);
+            extraMeshes[j].uvs2.Add(Vector2.one);
 
             if (progress > 0)
             {
