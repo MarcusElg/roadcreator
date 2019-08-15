@@ -29,6 +29,7 @@ public class TrafficLightEditor : Editor
         serializedObject.FindProperty("redTime").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Red Time", serializedObject.FindProperty("redTime").floatValue));
         serializedObject.FindProperty("yellowBeforeGreenTime").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Yellow Before Green Time", serializedObject.FindProperty("yellowBeforeGreenTime").floatValue));
         serializedObject.FindProperty("startColour").enumValueIndex = (int)(TrafficLight.TrafficColour)EditorGUILayout.EnumPopup("Start Colour", (TrafficLight.TrafficColour)System.Enum.GetValues(typeof(TrafficLight.TrafficColour)).GetValue(serializedObject.FindProperty("startColour").enumValueIndex));
+        serializedObject.FindProperty("timeSinceLast").floatValue = Mathf.Max(0, EditorGUILayout.FloatField("Time Since Last Transition", serializedObject.FindProperty("timeSinceLast").floatValue));
 
         if (EditorGUI.EndChangeCheck() == true)
         {
