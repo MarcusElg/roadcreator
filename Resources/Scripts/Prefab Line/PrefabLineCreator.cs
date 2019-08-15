@@ -40,9 +40,9 @@ public class PrefabLineCreator : MonoBehaviour
     public GameObject objectToMove;
     private bool mouseDown;
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     public SerializedObject settings;
-    #endif
+#endif
 
     public void UndoUpdate()
     {
@@ -270,7 +270,16 @@ public class PrefabLineCreator : MonoBehaviour
 
                 Vector3 startPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.startTimes[j]) * 3 + 2], currentPoints.startTimes[j] - Mathf.FloorToInt(currentPoints.startTimes[j]));
                 Vector3 endPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 1], currentPoints.lerpPoints[Mathf.FloorToInt(currentPoints.endTimes[j]) * 3 + 2], currentPoints.endTimes[j] - Mathf.FloorToInt(currentPoints.endTimes[j]));
-                placedPrefab.transform.position = Misc.GetCenter(startPoint, endPoint);
+
+                if (bendObjects == true)
+                {
+                    placedPrefab.transform.position = Misc.GetCenter(startPoint, endPoint);
+                }
+                else
+                {
+                    placedPrefab.transform.position = currentPoints.prefabPoints[j];
+                }
+
                 Vector3 left = Misc.CalculateLeft(startPoint, endPoint);
                 Vector3 forward = new Vector3(left.z, 0, -left.x);
 
