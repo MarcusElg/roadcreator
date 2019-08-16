@@ -1251,6 +1251,7 @@ public class RoadCreator : MonoBehaviour
 
     public void GenerateLaneMarkings()
     {
+        CreateLaneMarkingsData();
         AddLaneMarkingObjects();
         RemoveLaneMarkings();
 
@@ -1479,6 +1480,25 @@ public class RoadCreator : MonoBehaviour
         }
     }
 
+    public void CreateLaneMarkingsData()
+    {
+        for (int i = 0; i < startLanes; i++)
+        {
+            if (i > startLaneMarkers.Count - 1)
+            {
+                startLaneMarkers.Add(new Vector3Bool(false, true, false));
+            }
+        }
+
+        for (int i = 0; i < endLanes; i++)
+        {
+            if (i > endLaneMarkers.Count - 1)
+            {
+                endLaneMarkers.Add(new Vector3Bool(false, true, false));
+            }
+        }
+    }
+
     public void CreateExtraMesh(Transform parent)
     {
         GameObject extraMesh = new GameObject("Extra Mesh");
@@ -1585,6 +1605,5 @@ public class RoadCreator : MonoBehaviour
             }
         }
     }
-
 }
 #endif

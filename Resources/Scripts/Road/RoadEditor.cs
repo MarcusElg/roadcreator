@@ -93,16 +93,6 @@ public class RoadEditor : Editor
 
                 for (int i = 0; i < roadCreator.startLanes; i++)
                 {
-                    if (i > roadCreator.startLaneMarkers.Count - 1)
-                    {
-                        roadCreator.startLaneMarkers.Add(new Vector3Bool(false, true, false));
-
-                        if (i == roadCreator.startLanes - 1)
-                        {
-                            roadCreator.GenerateLaneMarkings();
-                        }
-                    }
-
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.Label("#" + i);
                     GUILayout.Space(Screen.width / 4 - 20);
@@ -154,16 +144,6 @@ public class RoadEditor : Editor
 
                 for (int i = 0; i < roadCreator.endLanes; i++)
                 {
-                    if (i > roadCreator.endLaneMarkers.Count - 1)
-                    {
-                        roadCreator.endLaneMarkers.Add(new Vector3Bool(false, true, false));
-
-                        if (i == roadCreator.endLanes - 1)
-                        {
-                            roadCreator.GenerateLaneMarkings();
-                        }
-                    }
-
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.Label("#" + i);
                     GUILayout.Space(Screen.width / 4 - 20);

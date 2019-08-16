@@ -262,7 +262,8 @@ public class Intersection : MonoBehaviour
         {
             for (int i = 0; i < connections.Count; i++)
             {
-                connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().CreateMesh(true);
+                RoadCreator roadCreator = connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>();
+                roadCreator.CreateMesh(true);
             }
         }
     }
