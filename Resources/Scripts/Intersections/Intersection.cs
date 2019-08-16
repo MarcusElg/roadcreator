@@ -713,11 +713,11 @@ public class Intersection : MonoBehaviour
         {
             if (connections[i].road != null)
             {
-                if (connections[i].road.Equals(connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection.road))
+                if (connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection != null && connections[i].road.Equals(connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection.road))
                 {
                     connections[i] = connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().endIntersectionConnection;
                 }
-                else
+                else if (connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnection != null)
                 {
                     connections[i] = connections[i].road.transform.parent.parent.parent.parent.GetComponent<RoadCreator>().startIntersectionConnection;
                 }
