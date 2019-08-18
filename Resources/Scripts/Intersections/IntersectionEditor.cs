@@ -71,6 +71,7 @@ public class IntersectionEditor : Editor
             intersection.overlayMaterial = (Material)EditorGUILayout.ObjectField("Overlay Material", intersection.overlayMaterial, typeof(Material), false);
             intersection.connectionBaseMaterial = (Material)EditorGUILayout.ObjectField("Connection Base Material", intersection.connectionBaseMaterial, typeof(Material), false);
             intersection.connectionOverlayMaterial = (Material)EditorGUILayout.ObjectField("Connection Overlay Material", intersection.connectionOverlayMaterial, typeof(Material), false);
+            intersection.connectionSectionMaterial = (Material)EditorGUILayout.ObjectField("Connection Section Material", intersection.connectionSectionMaterial, typeof(Material), false);
         }
         else
         {

@@ -39,6 +39,7 @@ public class Intersection : MonoBehaviour
     public float maxRoundaboutRadius = 100;
     public Material connectionBaseMaterial;
     public Material connectionOverlayMaterial;
+    public Material connectionSectionMaterial;
     public float textureTilingY = 1;
 
     public float pillarGap = 5;
@@ -544,6 +545,11 @@ public class Intersection : MonoBehaviour
         if (connectionBaseMaterial == null)
         {
             connectionBaseMaterial = (Material)settings.FindProperty("defaultBaseMaterial").objectReferenceValue;
+        }
+
+        if (connectionSectionMaterial == null)
+        {
+            connectionSectionMaterial = (Material)settings.FindProperty("defaultRoundaboutConnectionSectionsMaterial").objectReferenceValue;
         }
 
         if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)
