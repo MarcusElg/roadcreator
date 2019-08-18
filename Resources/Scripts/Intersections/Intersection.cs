@@ -17,6 +17,7 @@ public class Intersection : MonoBehaviour
 
     public GameObject objectToMove;
     public bool stretchTexture = false;
+    public float textureScale = 1;
     public float resolutionMultiplier = 1;
     public bool resetCurvePointsOnUpdate = true;
 
@@ -361,7 +362,7 @@ public class Intersection : MonoBehaviour
                 }
                 else
                 {
-                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 2]), modifiedT));
+                    uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 2]) / textureScale, modifiedT));
                 }
 
                 if (t < 1)

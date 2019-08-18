@@ -471,9 +471,9 @@ public class Roundabout
                 uvs.Add(new Vector2(0, modifiedF));
                 uvs.Add(new Vector2(0, modifiedF));
                 uvs.Add(new Vector2(0, modifiedF));
-                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 3], vertices[vertices.Count - 6]), modifiedF));
-                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 2], vertices[vertices.Count - 5]), modifiedF));
-                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 4]), modifiedF));
+                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 3], vertices[vertices.Count - 6]) / intersection.textureScale, modifiedF));
+                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 2], vertices[vertices.Count - 5]) / intersection.textureScale, modifiedF));
+                uvs.Add(new Vector2(Vector3.Distance(vertices[vertices.Count - 1], vertices[vertices.Count - 4]) / intersection.textureScale, modifiedF));
             }
 
             uvs2.Add(Vector2.one);

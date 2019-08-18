@@ -54,6 +54,12 @@ public class IntersectionEditor : Editor
             intersection.yOffset = Mathf.Max(0, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
 
             intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Connection Textures");
+
+            if (intersection.stretchTexture == false)
+            {
+                intersection.textureScale = Mathf.Clamp(EditorGUILayout.FloatField("Texture Scale", intersection.textureScale), 0.1f, 5);
+            }
+
             intersection.textureTilingY = Mathf.Clamp(EditorGUILayout.FloatField("Texture Tiling Y Multiplier", intersection.textureTilingY), 0.01f, 10);
             intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
             intersection.resetCurvePointsOnUpdate = EditorGUILayout.Toggle("Reset Curve Points On Update", intersection.resetCurvePointsOnUpdate);
@@ -74,6 +80,12 @@ public class IntersectionEditor : Editor
             intersection.physicMaterial = (PhysicMaterial)EditorGUILayout.ObjectField("Physics Material", intersection.physicMaterial, typeof(PhysicMaterial), false);
             intersection.yOffset = Mathf.Max(0.01f, EditorGUILayout.FloatField("Y Offset", intersection.yOffset));
             intersection.stretchTexture = GUILayout.Toggle(intersection.stretchTexture, "Stretch Texture");
+
+            if (intersection.stretchTexture == false)
+            {
+                intersection.textureScale = Mathf.Clamp(EditorGUILayout.FloatField("Texture Scale", intersection.textureScale), 0.1f, 5);
+            }
+
             intersection.resolutionMultiplier = Mathf.Clamp(EditorGUILayout.FloatField("Resoltion Multiplier", intersection.resolutionMultiplier), 0.01f, 10f);
             intersection.resetCurvePointsOnUpdate = EditorGUILayout.Toggle("Reset Curve Points On Update", intersection.resetCurvePointsOnUpdate);
         }
