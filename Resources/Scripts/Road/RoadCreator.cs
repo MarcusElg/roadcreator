@@ -670,8 +670,8 @@ public class RoadCreator : MonoBehaviour
                     }
                     else
                     {
-                        Vector3 forward = Misc.GetCenter(vertices[0], vertices[1]) - Misc.GetCenter(vertices[2], vertices[3]);
-                        point.transform.position += (-forward).normalized * 2;
+                        Vector3 forward = (point.transform.position - previousPosition).normalized;
+                        point.transform.position = FindIntersectionEndPoint(point.transform.position, -forward);
                     }
 
                     CreateMesh();
@@ -706,8 +706,8 @@ public class RoadCreator : MonoBehaviour
                     }
                     else
                     {
-                        Vector3 forward = Misc.GetCenter(vertices[vertices.Length - 1], vertices[vertices.Length - 2]) - Misc.GetCenter(vertices[vertices.Length - 3], vertices[vertices.Length - 4]);
-                        point.transform.position += (-forward).normalized * 2;
+                        Vector3 forward = (point.transform.position - previousPosition).normalized;
+                        point.transform.position = FindIntersectionEndPoint(point.transform.position, -forward);
                     }
 
                     CreateMesh();
@@ -797,6 +797,19 @@ public class RoadCreator : MonoBehaviour
         {
             point.GetComponent<BoxCollider>().enabled = true;
         }
+    }
+
+    public Vector3 FindIntersectionEndPoint(Vector3 position, Vector3 direction)
+    {
+        for (float f = 0.01f; f < 10; f += 0.01f)
+        {
+            if (!Physics.Raycast(position + Vector3.up + direction * f, Vector3.down, 100, (1 << LayerMask.NameToLayer("Intersection") | 1 << LayerMask.NameToLayer("Ignore Mouse Ray"))))
+            {
+                return position + direction * (f + 1f);
+            }
+        }
+
+        return position + direction * 10;
     }
 
     public void RemoveIntersectionConnection(Intersection intersection, int connectionIndex, bool start)
