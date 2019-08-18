@@ -23,6 +23,7 @@ public class RoadCreatorSettings : ScriptableObject
     public Material defaultRoadOverlayMaterial;
     public Material defaultExtraMeshOverlayMaterial;
     public Material defaultIntersectionOverlayMaterial;
+    public Material defaultRoundaboutConnectionSectionsMaterial;
     public Material[] defaultSimpleBridgeMaterials;
     public GameObject defaultPillarPrefab;
     public GameObject defaultBridgePillarPrefab;
@@ -100,6 +101,11 @@ public class RoadCreatorSettings : ScriptableObject
         if (defaultIntersectionOverlayMaterial == null)
         {
             defaultIntersectionOverlayMaterial = Resources.Load("Materials/Intersections/Asphalt Intersection") as Material;
+        }
+
+        if (defaultRoundaboutConnectionSectionsMaterial == null)
+        {
+            defaultRoundaboutConnectionSectionsMaterial = Resources.Load("Materials/Roundabouts/2L Roundabout") as Material;
         }
 
         if (defaultSimpleBridgeMaterials == null || defaultSimpleBridgeMaterials.Length == 0)

@@ -9,12 +9,18 @@ public class Roundabout
     {
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> bridgeVertices = new List<Vector3>();
+        List<Vector3> connectionSectionsVertices = new List<Vector3>();
+
         List<int> triangles = new List<int>();
         List<int> bridgeTriangles = new List<int>();
         List<int> connectionTriangles = new List<int>();
+        List<int> connectionSectionsTriangles = new List<int>();
+
         List<Vector2> uvs = new List<Vector2>();
         List<Vector2> uvs2 = new List<Vector2>();
         List<Vector2> bridgeUvs = new List<Vector2>();
+        List<Vector2> connectionSectionsUvs = new List<Vector2>();
+        List<Vector2> connectionSectionsUvs2 = new List<Vector2>();
 
         List<int> nearestLeftPoints = new List<int>();
         List<int> nearestRightPoints = new List<int>();
@@ -28,10 +34,10 @@ public class Roundabout
 
         CreateRoundaboutVertices(intersection, ref vertices, ref uvs, ref uvs2);
         CreateRoadConnections(intersection, ref vertices, ref triangles, ref uvs, ref uvs2, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, ref connectionTriangles, ref nearestLeftPoints, ref nearestRightPoints, ref addedVertices);
-        CreateRoadSections(intersection, ref vertices, ref triangles, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, addedVertices, nearestLeftPoints, nearestRightPoints);
+        CreateRoadSections(intersection, ref vertices, ref triangles, ref connectionSectionsVertices, ref connectionSectionsTriangles, ref connectionSectionsUvs, ref connectionSectionsUvs2, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, addedVertices, nearestLeftPoints, nearestRightPoints);
 
         CreateCenterExtraMeshes(intersection);
-        SetupRoundaboutMesh(intersection, vertices, triangles, connectionTriangles, uvs, uvs2);
+        SetupRoundaboutMesh(intersection, vertices, triangles, connectionTriangles, connectionSectionsVertices, connectionSectionsTriangles, connectionSectionsUvs, connectionSectionsUvs2, uvs, uvs2);
         SetupBridgeMesh(intersection, bridgeVertices, bridgeTriangles, bridgeUvs);
 
         if (intersection.generateBridge == true && intersection.placePillars == true)
@@ -40,7 +46,7 @@ public class Roundabout
         }
     }
 
-    private static void CreateRoadSections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int addedVertices, List<int> nearestLeftPoints, List<int> nearestRightPoints)
+    private static void CreateRoadSections(Intersection intersection, ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector3> connectionSectionsVertices, ref List<int> connectionSectionsTriangles, ref List<Vector2> connectionSectionsUvs, ref List<Vector2> connectionSectionsUvs2, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, int addedVertices, List<int> nearestLeftPoints, List<int> nearestRightPoints)
     {
         float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
         float rightStartWidth = 0;
@@ -130,70 +136,142 @@ public class Roundabout
 
                 if (startIndex % 2f == 0 && endIndex % 2f == 0)
                 {
-                    int vertexIndex = startIndex;
-                    int verticesLooped = 0;
-                    int verticesToLoop = 0;
-                    float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
-                    int extraMeshIndexOffset = 0;
+                    CreateRoadSectionsTriangles(intersection, startIndex, endIndex, addedVertices, vertices, ref triangles, leftStartWidth, leftEndWidth, rightStartWidth, rightEndWidth, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, ref leftExtraMeshes, textureRepeations);
 
-                    if (endIndex > startIndex)
+                    if (intersection.connections.Count > 0)
                     {
-                        verticesToLoop = endIndex - startIndex;
+                        int nextSegmentIndex = i + 1;
+                        if (nextSegmentIndex > intersection.connections.Count - 1)
+                        {
+                            nextSegmentIndex = 0;
+                        }
+
+                        CreateConnectionSectionsTriangles(intersection, vertices, ref connectionSectionsVertices, ref connectionSectionsTriangles, ref connectionSectionsUvs, ref connectionSectionsUvs2, nearestLeftPoints[nextSegmentIndex], endIndex, addedVertices);
                     }
-                    else
-                    {
-                        verticesToLoop = vertices.Count - 2 - startIndex - addedVertices;
-                        verticesToLoop += endIndex;
-                    }
-
-                    while ((vertexIndex - 2 != endIndex) && triangles.Count < 10000)
-                    {
-                        if (vertexIndex > vertices.Count - 4 - addedVertices)
-                        {
-                            vertexIndex = 0;
-                            extraMeshIndexOffset = 1;
-                        }
-
-                        if (vertexIndex != endIndex)
-                        {
-                            triangles.Add(vertexIndex);
-                            triangles.Add(vertexIndex + 2);
-                            triangles.Add(vertexIndex + 1);
-
-                            triangles.Add(vertexIndex + 2);
-                            triangles.Add(vertexIndex + 3);
-                            triangles.Add(vertexIndex + 1);
-                        }
-
-                        // Bridge
-                        if (intersection.generateBridge == true)
-                        {
-                            float leftWidth = intersection.roundaboutWidth + Mathf.Lerp(leftStartWidth, leftEndWidth, (float)verticesLooped / verticesToLoop);
-                            float rightWidth = intersection.roundaboutWidth + Mathf.Lerp(rightStartWidth, rightEndWidth, (float)verticesLooped / verticesToLoop);
-
-                            Vector3 centerPoint = Misc.GetCenter(vertices[vertexIndex], vertices[vertexIndex + 1]);
-                            centerPoint.y -= intersection.yOffset;
-                            BridgeGeneration.AddRoadSegmentBridgeVertices(intersection, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, centerPoint, leftWidth, rightWidth, (vertices[vertexIndex] - vertices[vertexIndex + 1]).normalized, (float)verticesLooped / verticesToLoop, textureRepeations * verticesToLoop / (vertices.Count - addedVertices - 1));
-                        }
-
-                        // Extra meshes
-                        if (vertexIndex > 0)
-                        {
-                            float progress = (float)(verticesLooped - extraMeshIndexOffset) / (verticesToLoop - extraMeshIndexOffset);
-                            leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
-                        }
-
-                        verticesLooped += 2;
-                        vertexIndex += 2;
-                    }
-
-                    AssignExtraMeshes(intersection, leftExtraMeshes);
                 }
                 else
                 {
                     Debug.LogError("For some reason a roundabout connection's start/end index is uneven");
                 }
             }
+        }
+    }
+
+    private static void CreateRoadSectionsTriangles(Intersection intersection, int startIndex, int endIndex, int addedVertices, List<Vector3> vertices, ref List<int> triangles, float leftStartWidth, float leftEndWidth, float rightStartWidth, float rightEndWidth, ref List<Vector3> bridgeVertices, ref List<int> bridgeTriangles, ref List<Vector2> bridgeUvs, ref List<RoundaboutExtraMesh> leftExtraMeshes, float textureRepeations)
+    {
+        int vertexIndex = startIndex;
+        int verticesLooped = 0;
+        int verticesToLoop = 0;
+        float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
+        int extraMeshIndexOffset = 0;
+
+        if (endIndex > startIndex)
+        {
+            verticesToLoop = endIndex - startIndex;
+        }
+        else
+        {
+            verticesToLoop = vertices.Count - 2 - startIndex - addedVertices;
+            verticesToLoop += endIndex;
+        }
+
+        while ((vertexIndex - 2 != endIndex) && triangles.Count < 10000)
+        {
+            if (vertexIndex > vertices.Count - 4 - addedVertices)
+            {
+                vertexIndex = 0;
+                extraMeshIndexOffset = 1;
+            }
+
+            if (vertexIndex != endIndex)
+            {
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 1);
+
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 3);
+                triangles.Add(vertexIndex + 1);
+            }
+
+            // Bridge
+            if (intersection.generateBridge == true)
+            {
+                float leftWidth = intersection.roundaboutWidth + Mathf.Lerp(leftStartWidth, leftEndWidth, (float)verticesLooped / verticesToLoop);
+                float rightWidth = intersection.roundaboutWidth + Mathf.Lerp(rightStartWidth, rightEndWidth, (float)verticesLooped / verticesToLoop);
+
+                Vector3 centerPoint = Misc.GetCenter(vertices[vertexIndex], vertices[vertexIndex + 1]);
+                centerPoint.y -= intersection.yOffset;
+                BridgeGeneration.AddRoadSegmentBridgeVertices(intersection, ref bridgeVertices, ref bridgeTriangles, ref bridgeUvs, centerPoint, leftWidth, rightWidth, (vertices[vertexIndex] - vertices[vertexIndex + 1]).normalized, (float)verticesLooped / verticesToLoop, textureRepeations * verticesToLoop / (vertices.Count - addedVertices - 1));
+            }
+
+            // Extra meshes
+            if (vertexIndex > 0)
+            {
+                float progress = (float)(verticesLooped - extraMeshIndexOffset) / (verticesToLoop - extraMeshIndexOffset);
+                leftExtraMeshes = AddTrianglesToSegmentExtraMeshes(intersection, leftExtraMeshes, vertices, vertexIndex, progress, verticesLooped, verticesToLoop * distanceBetweenVertices);
+            }
+
+            verticesLooped += 2;
+            vertexIndex += 2;
+        }
+
+        AssignExtraMeshes(intersection, leftExtraMeshes);
+    }
+
+    private static void CreateConnectionSectionsTriangles(Intersection intersection, List<Vector3> vertices, ref List<Vector3> connectionSectionsVertices, ref List<int> connectionSectionsTriangles, ref List<Vector2> connectionSectionsUvs, ref List<Vector2> connectionSectionsUvs2, int startIndex, int endIndex, int addedVertices)
+    {
+        float textureRepeations = Mathf.PI * intersection.roundaboutRadius * intersection.textureTilingY * 0.5f;
+        float indexProgress = (float)endIndex / (vertices.Count - 2 - addedVertices);
+        float uvOffset = (indexProgress * textureRepeations) % 1;
+
+        int vertexIndex = endIndex;
+        int verticesLooped = 0;
+        int verticesToLoop = 0;
+
+        if (startIndex > endIndex)
+        {
+            verticesToLoop = startIndex - endIndex;
+        }
+        else
+        {
+            verticesToLoop += vertices.Count - 2 - endIndex - addedVertices;
+            verticesToLoop += startIndex;
+        }
+
+        textureRepeations *= ((float)verticesToLoop / (vertices.Count - 2 - addedVertices));
+        startIndex += 2;
+
+        while (vertexIndex != startIndex && connectionSectionsTriangles.Count < 10000)
+        {
+            if (vertexIndex > vertices.Count - 4 - addedVertices)
+            {
+                vertexIndex = 0;
+            }
+
+            // Vertices
+            connectionSectionsVertices.Add(vertices[vertexIndex]);
+            connectionSectionsVertices.Add(vertices[vertexIndex + 1] + new Vector3(0, 0.01f, 0));
+
+            connectionSectionsUvs.Add(new Vector2(0, (verticesLooped / (float)verticesToLoop) * textureRepeations + uvOffset));
+            connectionSectionsUvs.Add(new Vector2(1, (verticesLooped / (float)verticesToLoop) * textureRepeations + uvOffset));
+            connectionSectionsUvs2.Add(Vector2.one);
+            connectionSectionsUvs2.Add(Vector2.one);
+
+            // Triangles
+            if (vertexIndex != endIndex)
+            {
+                connectionSectionsTriangles.Add(connectionSectionsVertices.Count - 2);
+                connectionSectionsTriangles.Add(connectionSectionsVertices.Count);
+                connectionSectionsTriangles.Add(connectionSectionsVertices.Count - 1);
+
+                connectionSectionsTriangles.Add(connectionSectionsVertices.Count);
+                connectionSectionsTriangles.Add(connectionSectionsVertices.Count + 1);
+                connectionSectionsTriangles.Add(connectionSectionsVertices.Count - 1);
+            }
+
+            verticesLooped += 2;
+            vertexIndex += 2;
         }
     }
 
@@ -898,12 +976,20 @@ public class Roundabout
         }
     }
 
-    private static void SetupRoundaboutMesh(Intersection intersection, List<Vector3> vertices, List<int> triangles, List<int> connectionTriangles, List<Vector2> uvs, List<Vector2> uvs2)
+    private static void SetupRoundaboutMesh(Intersection intersection, List<Vector3> vertices, List<int> triangles, List<int> connectionTriangles, List<Vector3> connectionSectionVertices, List<int> connectionSectionsTriangles, List<Vector2> connectionSectionsUvs, List<Vector2> connectionSectionsUvs2, List<Vector2> uvs, List<Vector2> uvs2)
     {
-        Mesh mesh = new Mesh();
-        mesh.subMeshCount = 4;
-        mesh.vertices = vertices.ToArray();
+        // Combine data
+        for (int i = 0; i < connectionSectionsTriangles.Count; i++)
+        {
+            connectionSectionsTriangles[i] += vertices.Count - 2;
+        }
 
+        vertices.AddRange(connectionSectionVertices);
+        uvs.AddRange(connectionSectionsUvs);
+        uvs2.AddRange(connectionSectionsUvs2);
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
         int materialIndex = 0;
 
         List<Material> materials = new List<Material>();
@@ -914,22 +1000,32 @@ public class Roundabout
         if (intersection.overlayMaterial != null)
         {
             materials.Add(intersection.overlayMaterial);
+            mesh.subMeshCount += 1;
             mesh.SetTriangles(triangles, materialIndex);
             materialIndex += 1;
         }
 
         materials.Add(intersection.connectionBaseMaterial);
+        mesh.subMeshCount += 1;
         mesh.SetTriangles(connectionTriangles, materialIndex);
         materialIndex += 1;
 
         if (intersection.connectionOverlayMaterial != null)
         {
             materials.Add(intersection.connectionOverlayMaterial);
+            mesh.subMeshCount += 1;
             mesh.SetTriangles(connectionTriangles, materialIndex);
             materialIndex += 1;
         }
 
-        mesh.subMeshCount = materialIndex;
+        if (connectionSectionsTriangles.Count > 0)
+        {
+            materials.Add(intersection.connectionSectionMaterial);
+            mesh.subMeshCount += 1;
+            mesh.SetTriangles(connectionSectionsTriangles, materialIndex);
+            materialIndex += 1;
+        }
+
         mesh.uv = uvs.ToArray();
         mesh.uv2 = uvs2.ToArray();
         mesh.RecalculateNormals();
