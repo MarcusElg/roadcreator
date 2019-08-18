@@ -250,7 +250,7 @@ public class Roundabout
             }
 
             // Vertices
-            connectionSectionsVertices.Add(vertices[vertexIndex]);
+            connectionSectionsVertices.Add(vertices[vertexIndex] + new Vector3(0, 0.01f, 0));
             connectionSectionsVertices.Add(vertices[vertexIndex + 1] + new Vector3(0, 0.01f, 0));
 
             connectionSectionsUvs.Add(new Vector2(0, (verticesLooped / (float)verticesToLoop) * textureRepeations + uvOffset));
