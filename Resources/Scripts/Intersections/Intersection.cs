@@ -21,6 +21,9 @@ public class Intersection : MonoBehaviour
     public float resolutionMultiplier = 1;
     public bool resetCurvePointsOnUpdate = true;
 
+    public Material mainRoadsMaterial;
+    public List<MainRoad> mainRoads = new List<MainRoad>();
+
     public bool generateBridge = true;
     public BridgeSettings bridgeSettings = new BridgeSettings();
 
@@ -281,6 +284,10 @@ public class Intersection : MonoBehaviour
         int vertexIndex = 0;
         Vector3 lastVertexPosition = Misc.MaxVector3;
 
+        List<Vector3> mainRoadsVertices = new List<Vector3>();
+        List<int> mainRoadsTriangles = new List<int>();
+        List<Vector2> mainRoadsUvs = new List<Vector2>();
+
         for (int i = 0; i < connections.Count; i++)
         {
             Vector3 firstPoint = connections[i].leftPoint;
@@ -373,9 +380,77 @@ public class Intersection : MonoBehaviour
 
                 vertexIndex += 2;
             }
-
-            SetupMesh(vertices, triangles, uvs);
         }
+
+        if (connections.Count > 2)
+        {
+            for (int i = 0; i < mainRoads.Count; i++)
+            {
+                Vector3 startForward = Misc.CalculateLeft(connections[mainRoads[i].startIndex].rightPoint - connections[mainRoads[i].startIndex].leftPoint);
+                Vector3 endForward = Misc.CalculateLeft(connections[mainRoads[i].endIndex].rightPoint - connections[mainRoads[i].endIndex].leftPoint);
+                Vector3 leftControlPoint = Misc.GetLineIntersection(connections[mainRoads[i].startIndex].leftPoint, startForward, connections[mainRoads[i].endIndex].rightPoint, endForward);
+                Vector3 rightControlPoint = Misc.GetLineIntersection(connections[mainRoads[i].startIndex].rightPoint, startForward, connections[mainRoads[i].endIndex].leftPoint, endForward);
+
+                if (leftControlPoint == Misc.MaxVector3)
+                {
+                    leftControlPoint = Misc.GetCenter(connections[mainRoads[i].startIndex].leftPoint, connections[mainRoads[i].endIndex].rightPoint);
+                }
+
+                if (rightControlPoint == Misc.MaxVector3)
+                {
+                    rightControlPoint = Misc.GetCenter(connections[mainRoads[i].startIndex].rightPoint, connections[mainRoads[i].endIndex].leftPoint);
+                }
+
+                float leftSegments = Misc.CalculateDistance(connections[mainRoads[i].startIndex].lastPoint, leftControlPoint, connections[mainRoads[i].endIndex].lastPoint) * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
+                float rightSegments = Misc.CalculateDistance(connections[mainRoads[i].startIndex].lastPoint, rightControlPoint, connections[mainRoads[i].endIndex].lastPoint) * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
+                float segments = Mathf.Max(leftSegments, rightSegments);
+                segments = Mathf.Max(3, segments);
+                float distancePerSegment = 1f / segments;
+                vertexIndex = vertices.Count + mainRoadsVertices.Count;
+
+                for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
+                {
+                    float modifiedT = t;
+
+                    if (t > 1)
+                    {
+                        modifiedT = 1;
+                    }
+
+                    mainRoadsVertices.Add(Misc.Lerp3(connections[mainRoads[i].startIndex].leftPoint, leftControlPoint, connections[mainRoads[i].endIndex].rightPoint, modifiedT) - transform.position + new Vector3(0, 0.03f, 0));
+                    mainRoadsVertices.Add(Misc.Lerp3(connections[mainRoads[i].startIndex].rightPoint, rightControlPoint, connections[mainRoads[i].endIndex].leftPoint, modifiedT) - transform.position + new Vector3(0, 0.03f, 0));
+
+                    if (mainRoads[i].flipTexture == true)
+                    {
+                        mainRoadsUvs.Add(new Vector2(1, modifiedT));
+                        mainRoadsUvs.Add(new Vector2(0, modifiedT));
+                    }
+                    else
+                    {
+                        mainRoadsUvs.Add(new Vector2(0, modifiedT));
+                        mainRoadsUvs.Add(new Vector2(1, modifiedT));
+                    }
+
+                    if (t < 1)
+                    {
+                        mainRoadsTriangles.Add(vertexIndex);
+                        mainRoadsTriangles.Add(vertexIndex + 2);
+                        mainRoadsTriangles.Add(vertexIndex + 1);
+
+                        mainRoadsTriangles.Add(vertexIndex + 1);
+                        mainRoadsTriangles.Add(vertexIndex + 2);
+                        mainRoadsTriangles.Add(vertexIndex + 3);
+                    }
+
+                    vertexIndex += 2;
+                }
+            }
+
+            vertices.AddRange(mainRoadsVertices.ToArray());
+            uvs.AddRange(mainRoadsUvs.ToArray());
+        }
+
+        SetupMesh(vertices, triangles, uvs, mainRoadsTriangles);
 
         float[] startWidths = new float[firstVertexIndexes.Count];
         float[] endWidths = new float[firstVertexIndexes.Count];
@@ -400,26 +475,47 @@ public class Intersection : MonoBehaviour
         CreateCurvePoints();
     }
 
-    private void SetupMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs)
+    private void SetupMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, List<int> mainRoadsTriangles)
     {
         Mesh mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
+        mesh.SetTriangles(triangles.ToArray(), 0);
+        mesh.subMeshCount = 4;
+
+        int nextIndex = 1;
+        if (overlayMaterial != null)
+        {
+            mesh.SetTriangles(triangles.ToArray(), 1);
+            nextIndex = 2;
+        }
+
+        if (mainRoadsTriangles.Count > 0)
+        {
+            mesh.SetTriangles(mainRoadsTriangles.ToArray(), nextIndex);
+            nextIndex += 1;
+        }
+
         mesh.uv = uvs.ToArray();
         mesh.RecalculateNormals();
-
+        mesh.subMeshCount = nextIndex + 1;
         GetComponent<MeshFilter>().sharedMesh = mesh;
         GetComponent<MeshCollider>().sharedMesh = mesh;
         GetComponent<MeshCollider>().sharedMaterial = physicMaterial;
 
-        if (overlayMaterial == null)
+        List<Material> materials = new List<Material>();
+        materials.Add(baseMaterial);
+
+        if (overlayMaterial != null)
         {
-            GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial };
+            materials.Add(overlayMaterial);
         }
-        else
+
+        if (mainRoadsTriangles.Count > 0)
         {
-            GetComponent<MeshRenderer>().sharedMaterials = new Material[] { baseMaterial, overlayMaterial };
+            materials.Add(mainRoadsMaterial);
         }
+
+        GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
     }
 
     private void GenerateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
@@ -550,6 +646,11 @@ public class Intersection : MonoBehaviour
         if (connectionSectionMaterial == null)
         {
             connectionSectionMaterial = (Material)settings.FindProperty("defaultRoundaboutConnectionSectionsMaterial").objectReferenceValue;
+        }
+
+        if (mainRoadsMaterial == null)
+        {
+            mainRoadsMaterial = (Material)settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue;
         }
 
         if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)

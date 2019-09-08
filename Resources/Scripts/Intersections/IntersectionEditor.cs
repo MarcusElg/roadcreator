@@ -96,6 +96,51 @@ public class IntersectionEditor : Editor
             intersection.CreateMesh();
         }
 
+        if (intersection.roundaboutMode == false && intersection.connections.Count > 2)
+        {
+            EditorGUI.BeginChangeCheck();
+            GUILayout.Space(20);
+            GUILayout.Label("Main Roads", guiStyle);
+            intersection.mainRoadsMaterial = (Material)EditorGUILayout.ObjectField("Main Roads Materila", intersection.mainRoadsMaterial, typeof(Material), false);
+
+            for (int i = 0; i < intersection.mainRoads.Count; i++)
+            {
+                intersection.mainRoads[i].open = EditorGUILayout.Foldout(intersection.mainRoads[i].open, "Main Road " + i);
+
+                if (intersection.mainRoads[i].open == true)
+                {
+                    intersection.mainRoads[i].startIndex = Mathf.Clamp(EditorGUILayout.IntField("Start Index", intersection.mainRoads[i].startIndex), 0, intersection.connections.Count - 1);
+                    intersection.mainRoads[i].endIndex = Mathf.Clamp(EditorGUILayout.IntField("End Index", intersection.mainRoads[i].endIndex), 0, intersection.connections.Count - 1);
+                    intersection.mainRoads[i].flipTexture = EditorGUILayout.Toggle("Flip Texture", intersection.mainRoads[i].flipTexture);
+
+                    if (intersection.mainRoads[i].endIndex == intersection.mainRoads[i].startIndex)
+                    {
+                        intersection.mainRoads[i].endIndex += 1;
+
+                        if (intersection.mainRoads[i].endIndex >= intersection.connections.Count)
+                        {
+                            intersection.mainRoads[i].endIndex = 0;
+                        }
+                    }
+
+                    if (GUILayout.Button("Remove Main Road"))
+                    {
+                        intersection.mainRoads.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (intersection.mainRoads.Count <= 1 && GUILayout.Button("Add Main Road"))
+            {
+                intersection.mainRoads.Add(new MainRoad(0, 1, false));
+            }
+
+            if (EditorGUI.EndChangeCheck() == true)
+            {
+                intersection.CreateMesh();
+            }
+        }
+
         EditorGUI.BeginChangeCheck();
 
         GUILayout.Space(20);

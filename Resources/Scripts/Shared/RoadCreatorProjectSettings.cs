@@ -115,6 +115,7 @@ public class RoadCreatorProjectSettings
                 settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Road Overlay Material", settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue, typeof(Material), false);
                 settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Extra Mesh Overlay Material", settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue, typeof(Material), false);
                 settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Intersection Overlay Material", settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue, typeof(Material), false);
+                settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Intersection Main Road Material", settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue, typeof(Material), false);
                 settings.FindProperty("defaultRoundaboutConnectionSectionsMaterial").objectReferenceValue = (Material)EditorGUILayout.ObjectField("Default Roundabout Connection Sections Material", settings.FindProperty("defaultRoundaboutConnectionSectionsMaterial").objectReferenceValue, typeof(Material), false);
                 EditorGUILayout.PropertyField(settings.FindProperty("defaultSimpleBridgeMaterials"), true);
                 settings.FindProperty("defaultPillarPrefab").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Default Pillar Prefab", settings.FindProperty("defaultPillarPrefab").objectReferenceValue, typeof(GameObject), false);
@@ -131,6 +132,7 @@ public class RoadCreatorProjectSettings
                     settings.FindProperty("defaultRoadOverlayMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultExtraMeshOverlayMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultIntersectionOverlayMaterial").objectReferenceValue = null;
+                    settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultRoundaboutConnectionSectionsMaterial").objectReferenceValue = null;
                     settings.FindProperty("defaultSimpleBridgeMaterials").ClearArray();
                     settings.FindProperty("defaultPillarPrefab").objectReferenceValue = null;
