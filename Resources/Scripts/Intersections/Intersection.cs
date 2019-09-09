@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Collections;
 
 [HelpURL("https://github.com/MCrafterzz/roadcreator/wiki/Intersections")]
 public class Intersection : MonoBehaviour
@@ -21,7 +22,6 @@ public class Intersection : MonoBehaviour
     public float resolutionMultiplier = 1;
     public bool resetCurvePointsOnUpdate = true;
 
-    public Material mainRoadsMaterial;
     public List<MainRoad> mainRoads = new List<MainRoad>();
 
     public bool generateBridge = true;
@@ -285,8 +285,9 @@ public class Intersection : MonoBehaviour
         Vector3 lastVertexPosition = Misc.MaxVector3;
 
         List<Vector3> mainRoadsVertices = new List<Vector3>();
-        List<int> mainRoadsTriangles = new List<int>();
+        List<List<int>> mainRoadsTriangles = new List<List<int>>();
         List<Vector2> mainRoadsUvs = new List<Vector2>();
+        List<float> lengths = new List<float>();
 
         for (int i = 0; i < connections.Count; i++)
         {
@@ -296,6 +297,7 @@ public class Intersection : MonoBehaviour
             Vector3 nextCenterPoint;
             totalLengths[i] = connections[i].length;
             firstVertexIndexes.Add(vertexIndex);
+            mainRoadsTriangles.Add(new List<int>());
 
             if (i == connections.Count - 1)
             {
@@ -401,9 +403,10 @@ public class Intersection : MonoBehaviour
                     rightControlPoint = Misc.GetCenter(connections[mainRoads[i].startIndex].rightPoint, connections[mainRoads[i].endIndex].leftPoint);
                 }
 
-                float leftSegments = Misc.CalculateDistance(connections[mainRoads[i].startIndex].lastPoint, leftControlPoint, connections[mainRoads[i].endIndex].lastPoint) * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
-                float rightSegments = Misc.CalculateDistance(connections[mainRoads[i].startIndex].lastPoint, rightControlPoint, connections[mainRoads[i].endIndex].lastPoint) * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
+                float leftSegments = Misc.CalculateDistance(connections[mainRoads[i].startIndex].leftPoint, leftControlPoint, connections[mainRoads[i].endIndex].rightPoint) * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
+                float rightSegments = Misc.CalculateDistance(connections[mainRoads[i].startIndex].rightPoint, rightControlPoint, connections[mainRoads[i].endIndex].leftPoint) * settings.FindProperty("resolution").floatValue * resolutionMultiplier * 5;
                 float segments = Mathf.Max(leftSegments, rightSegments);
+                lengths.Add(Misc.CalculateDistance(connections[mainRoads[i].startIndex].lastPoint, leftControlPoint, connections[mainRoads[i].endIndex].lastPoint));
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
                 vertexIndex = vertices.Count + mainRoadsVertices.Count;
@@ -433,13 +436,13 @@ public class Intersection : MonoBehaviour
 
                     if (t < 1)
                     {
-                        mainRoadsTriangles.Add(vertexIndex);
-                        mainRoadsTriangles.Add(vertexIndex + 2);
-                        mainRoadsTriangles.Add(vertexIndex + 1);
+                        mainRoadsTriangles[i].Add(vertexIndex);
+                        mainRoadsTriangles[i].Add(vertexIndex + 2);
+                        mainRoadsTriangles[i].Add(vertexIndex + 1);
 
-                        mainRoadsTriangles.Add(vertexIndex + 1);
-                        mainRoadsTriangles.Add(vertexIndex + 2);
-                        mainRoadsTriangles.Add(vertexIndex + 3);
+                        mainRoadsTriangles[i].Add(vertexIndex + 1);
+                        mainRoadsTriangles[i].Add(vertexIndex + 2);
+                        mainRoadsTriangles[i].Add(vertexIndex + 3);
                     }
 
                     vertexIndex += 2;
@@ -450,7 +453,7 @@ public class Intersection : MonoBehaviour
             uvs.AddRange(mainRoadsUvs.ToArray());
         }
 
-        SetupMesh(vertices, triangles, uvs, mainRoadsTriangles);
+        SetupMesh(vertices, triangles, uvs, mainRoadsTriangles, lengths);
 
         float[] startWidths = new float[firstVertexIndexes.Count];
         float[] endWidths = new float[firstVertexIndexes.Count];
@@ -475,7 +478,7 @@ public class Intersection : MonoBehaviour
         CreateCurvePoints();
     }
 
-    private void SetupMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, List<int> mainRoadsTriangles)
+    private void SetupMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, List<List<int>> mainRoadsTriangles, List<float> lengths)
     {
         Mesh mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
@@ -489,9 +492,9 @@ public class Intersection : MonoBehaviour
             nextIndex = 2;
         }
 
-        if (mainRoadsTriangles.Count > 0)
+        for (int i = 0; i < mainRoads.Count; i++)
         {
-            mesh.SetTriangles(mainRoadsTriangles.ToArray(), nextIndex);
+            mesh.SetTriangles(mainRoadsTriangles[i].ToArray(), nextIndex);
             nextIndex += 1;
         }
 
@@ -510,9 +513,33 @@ public class Intersection : MonoBehaviour
             materials.Add(overlayMaterial);
         }
 
-        if (mainRoadsTriangles.Count > 0)
+        for (int i = 0; i < mainRoads.Count; i++)
         {
-            materials.Add(mainRoadsMaterial);
+            materials.Add(mainRoads[i].material);
+
+            // texture offset
+            Material lastMaterial = null;
+            float textureRepeat = 1;
+
+            if (connections[mainRoads[i].startIndex].road.name == "End Point")
+            {
+                lastMaterial = connections[mainRoads[i].startIndex].road.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterials[1];
+                textureRepeat = lengths[i] / 4 * connections[mainRoads[i].startIndex].road.transform.parent.parent.GetComponent<RoadSegment>().textureTilingY;
+            }
+            else if (connections[mainRoads[i].endIndex].road.name == "End Point")
+            {
+                lastMaterial = connections[mainRoads[i].endIndex].road.transform.parent.parent.GetChild(1).GetChild(0).GetComponent<MeshRenderer>().sharedMaterials[1];
+                textureRepeat = lengths[i] / 4 * connections[mainRoads[i].endIndex].road.transform.parent.parent.GetComponent<RoadSegment>().textureTilingY;
+            }
+
+            if (lastMaterial != null)
+            {
+                float lastTextureRepeat = lastMaterial.GetVector("_Tiling").y;
+                float lastTextureOffset = lastMaterial.GetVector("_Offset").y;
+
+                mainRoads[i].material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
+                mainRoads[i].material.SetTextureOffset("_BaseMap", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+            }
         }
 
         GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
@@ -648,9 +675,12 @@ public class Intersection : MonoBehaviour
             connectionSectionMaterial = (Material)settings.FindProperty("defaultRoundaboutConnectionSectionsMaterial").objectReferenceValue;
         }
 
-        if (mainRoadsMaterial == null)
+        for (int i = 0; i < mainRoads.Count; i++)
         {
-            mainRoadsMaterial = (Material)settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue;
+            if (mainRoads[i].material == null)
+            {
+                mainRoads[i].material = (Material)settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue;
+            }
         }
 
         if (bridgeSettings.bridgeMaterials == null || bridgeSettings.bridgeMaterials.Length == 0 || bridgeSettings.bridgeMaterials[0] == null)

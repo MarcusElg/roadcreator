@@ -101,7 +101,6 @@ public class IntersectionEditor : Editor
             EditorGUI.BeginChangeCheck();
             GUILayout.Space(20);
             GUILayout.Label("Main Roads", guiStyle);
-            intersection.mainRoadsMaterial = (Material)EditorGUILayout.ObjectField("Main Roads Materila", intersection.mainRoadsMaterial, typeof(Material), false);
 
             for (int i = 0; i < intersection.mainRoads.Count; i++)
             {
@@ -111,6 +110,7 @@ public class IntersectionEditor : Editor
                 {
                     intersection.mainRoads[i].startIndex = Mathf.Clamp(EditorGUILayout.IntField("Start Index", intersection.mainRoads[i].startIndex), 0, intersection.connections.Count - 1);
                     intersection.mainRoads[i].endIndex = Mathf.Clamp(EditorGUILayout.IntField("End Index", intersection.mainRoads[i].endIndex), 0, intersection.connections.Count - 1);
+                    intersection.mainRoads[i].material = (Material)EditorGUILayout.ObjectField("Material", intersection.mainRoads[i].material, typeof(Material), false);
                     intersection.mainRoads[i].flipTexture = EditorGUILayout.Toggle("Flip Texture", intersection.mainRoads[i].flipTexture);
 
                     if (intersection.mainRoads[i].endIndex == intersection.mainRoads[i].startIndex)
@@ -132,7 +132,7 @@ public class IntersectionEditor : Editor
 
             if (intersection.mainRoads.Count <= 1 && GUILayout.Button("Add Main Road"))
             {
-                intersection.mainRoads.Add(new MainRoad(0, 1, false));
+                intersection.mainRoads.Add(new MainRoad(0, 1, (Material)intersection.settings.FindProperty("defaultIntersectionMainRoadMaterial").objectReferenceValue, false));
             }
 
             if (EditorGUI.EndChangeCheck() == true)
