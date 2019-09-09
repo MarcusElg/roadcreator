@@ -537,8 +537,12 @@ public class Intersection : MonoBehaviour
                 float lastTextureRepeat = lastMaterial.GetVector("_Tiling").y;
                 float lastTextureOffset = lastMaterial.GetVector("_Offset").y;
 
-                mainRoads[i].material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
-                mainRoads[i].material.SetTextureOffset("_BaseMap", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                Material material = Instantiate(mainRoads[i].material);
+                material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
+                material.SetTextureOffset("_BaseMap", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                material.mainTextureScale = new Vector2(1, textureRepeat);
+                material.mainTextureOffset = new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset);
+                mainRoads[i].material = material;
             }
         }
 
@@ -606,6 +610,19 @@ public class Intersection : MonoBehaviour
                 }
 
                 lastPosition = vertices[j + 1];
+            }
+
+            Material material = Instantiate(extraMeshes[i].baseMaterial);
+            material.SetVector("_Tiling", new Vector2(1, exactLengths[extraMeshes[i].index] / 2));
+            material.mainTextureScale = new Vector2(1, exactLengths[extraMeshes[i].index] / 2);
+            extraMeshes[i].baseMaterial = material;
+
+            if (extraMeshes[i].overlayMaterial != null)
+            {
+                material = Instantiate(extraMeshes[i].overlayMaterial);
+                material.SetVector("_Tiling", new Vector2(1, exactLengths[extraMeshes[i].index] / 2));
+                material.mainTextureScale = new Vector2(1, exactLengths[extraMeshes[i].index] / 2);
+                extraMeshes[i].baseMaterial = overlayMaterial;
             }
 
             Mesh mesh = new Mesh();
