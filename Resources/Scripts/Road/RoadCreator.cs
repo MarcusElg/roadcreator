@@ -66,6 +66,18 @@ public class RoadCreator : MonoBehaviour
             {
                 if (transform.GetChild(0).GetChild(i).GetChild(0).childCount == 3)
                 {
+                    if ((transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().leftStartYOffset != 0 || transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().rightStartYOffset != 0) && i == 0 && startIntersection != null)
+                    {
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().leftStartYOffset = 0;
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().rightStartYOffset = 0;
+                    }
+
+                    if ((transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().leftEndYOffset != 0 || transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().rightEndYOffset != 0) && i == transform.GetChild(0).childCount - 1 && endIntersection != null)
+                    {
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().leftEndYOffset = 0;
+                        transform.GetChild(0).GetChild(i).GetComponent<RoadSegment>().rightEndYOffset = 0;
+                    }
+
                     Vector3 previousPoint = Misc.MaxVector3;
 
                     if (i == 0)
@@ -382,6 +394,10 @@ public class RoadCreator : MonoBehaviour
         segment.flipped = oldLastSegment.flipped;
         segment.textureTilingY = oldLastSegment.textureTilingY;
         segment.terrainOption = oldLastSegment.terrainOption;
+        segment.leftStartYOffset = oldLastSegment.leftEndYOffset;
+        segment.leftEndYOffset = oldLastSegment.leftEndYOffset;
+        segment.rightStartYOffset = oldLastSegment.rightEndYOffset;
+        segment.rightEndYOffset = oldLastSegment.rightEndYOffset;
 
         segment.generateSimpleBridge = oldLastSegment.generateSimpleBridge;
         segment.generateCustomBridge = oldLastSegment.generateCustomBridge;

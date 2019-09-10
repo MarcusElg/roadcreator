@@ -86,6 +86,19 @@ public class RoadSegmentEditor : Editor
         if (serializedObject.FindProperty("generateSimpleBridge").boolValue == false && serializedObject.FindProperty("generateCustomBridge").boolValue == false)
         {
             serializedObject.FindProperty("terrainOption").enumValueIndex = (int)(RoadSegment.TerrainOption)EditorGUILayout.EnumPopup("Terrain Option", (RoadSegment.TerrainOption)Enum.GetValues(typeof(RoadSegment.TerrainOption)).GetValue(serializedObject.FindProperty("terrainOption").enumValueIndex));
+
+            if (serializedObject.FindProperty("terrainOption").enumValueIndex == (int)RoadSegment.TerrainOption.ignore)
+            {
+                GUIStyle style = new GUIStyle();
+                style.fontStyle = FontStyle.Bold;
+
+                GUILayout.Space(20);
+                GUILayout.Label("Y Offsets", style);
+                serializedObject.FindProperty("leftStartYOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Left Start Y Offset", serializedObject.FindProperty("leftStartYOffset").floatValue), -10, 10);
+                serializedObject.FindProperty("leftEndYOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Left End Y Offset", serializedObject.FindProperty("leftEndYOffset").floatValue), -10, 10);
+                serializedObject.FindProperty("rightStartYOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Right Start Y Offset", serializedObject.FindProperty("rightStartYOffset").floatValue), -10, 10);
+                serializedObject.FindProperty("rightEndYOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Right End Y Offset", serializedObject.FindProperty("rightEndYOffset").floatValue), -10, 10);
+            }
         }
 
         GUIStyle guiStyle = new GUIStyle();

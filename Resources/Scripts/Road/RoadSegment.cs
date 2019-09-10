@@ -15,6 +15,10 @@ public class RoadSegment : MonoBehaviour
     public bool flipped = false;
     public float textureTilingY = 1;
     public bool curved = true;
+    public float leftStartYOffset = 0;
+    public float leftEndYOffset = 0;
+    public float rightStartYOffset = 0;
+    public float rightEndYOffset = 0;
 
     public enum TerrainOption { adapt, deform, ignore };
     public TerrainOption terrainOption;
@@ -289,6 +293,15 @@ public class RoadSegment : MonoBehaviour
         for (int i = 0; i < points.Length; i++)
         {
             Vector3 left = Misc.CalculateLeft(points, nextSegmentPoints, previousPoint, i);
+
+            float leftYExtraOffset = 0;
+            float rightYExtraOffset = 0;
+            if (terrainOption == TerrainOption.ignore && generateCustomBridge == false && generateSimpleBridge == false)
+            {
+                leftYExtraOffset = Mathf.Lerp(leftStartYOffset, leftEndYOffset, (float)i / points.Length);
+                rightYExtraOffset = Mathf.Lerp(rightStartYOffset, rightEndYOffset, (float)i / points.Length);
+            }
+
             float correctedHeightOffset = heightOffset;
 
             if (i > 0)
@@ -314,9 +327,9 @@ public class RoadSegment : MonoBehaviour
             if (name == "Road")
             {
                 vertices.Add((points[i] + left * roadWidth) - segment.position);
-                vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, correctedHeightOffset + points[i].y - segment.position.y, vertices[verticeIndex].z);
+                vertices[verticeIndex] = new Vector3(vertices[verticeIndex].x, correctedHeightOffset + points[i].y - segment.position.y + leftYExtraOffset, vertices[verticeIndex].z);
                 vertices.Add((points[i] - left * roadWidth) - segment.position);
-                vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, correctedHeightOffset + points[i].y - segment.position.y, vertices[verticeIndex + 1].z);
+                vertices[verticeIndex + 1] = new Vector3(vertices[verticeIndex + 1].x, correctedHeightOffset + points[i].y - segment.position.y + rightYExtraOffset, vertices[verticeIndex + 1].z);
             }
             else
             {
