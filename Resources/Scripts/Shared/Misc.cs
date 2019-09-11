@@ -355,13 +355,13 @@ public static class Misc
         //is coplanar, and not parrallel
         if (Mathf.Abs(planarFactor) < 0.01f && crossVector1and2.sqrMagnitude > 0.01f)
         {
-            float s = Vector3.Dot(crossVector3and2, crossVector1and2) / crossVector1and2.sqrMagnitude;
-            Vector3 point = point1 + (direction1 * s);
+            float distance = Vector3.Dot(crossVector3and2, crossVector1and2) / crossVector1and2.sqrMagnitude;
+            Vector3 point = point1 + (direction1 * distance);
+            distance = Vector3.Distance(point, point1);
+            float distance2 = Vector3.Distance(point, point2);
 
             // Check if they intersection in front of the points and not behind
-            float dotProduct = Vector3.Dot(direction2, (point - point2).normalized);
-
-            if (dotProduct > 0)
+            if (point2 + distance2 * direction2 == point && point1 + distance * direction1 == point)
             {
                 return new Vector3(point.x, originalY, point.z);
             }
