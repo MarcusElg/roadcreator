@@ -26,6 +26,7 @@ public class RoadSegment : MonoBehaviour
     public bool generateSimpleBridge = false;
     public bool generateCustomBridge = false;
     public BridgeSettings bridgeSettings = new BridgeSettings();
+    public float bridgeOffset = 0;
 
     public bool placePillars = true;
     public GameObject pillarPrefab;
@@ -71,6 +72,12 @@ public class RoadSegment : MonoBehaviour
         else
         {
             SetGuidelines(points, nextSegmentPoints, false);
+        }
+
+        if (generateCustomBridge == true && segment.GetSiblingIndex() > 0 && segment.transform.parent.GetChild(segment.GetSiblingIndex()).GetComponent<RoadSegment>().generateCustomBridge == true)
+        {
+            bridgeOffset = 0;
+            bridgeOffset = segment.transform.parent.GetChild(segment.GetSiblingIndex() - 1).GetComponent<RoadSegment>().bridgeOffset + segment.transform.parent.GetChild(segment.GetSiblingIndex()).GetComponent<RoadSegment>().bridgeSettings.sections % 1.0f;
         }
 
         GenerateMesh(points, nextSegmentPoints, previousPoint, previousVertices, heightOffset, segment, previousSegment, transform.GetChild(1).GetChild(0), "Road", baseRoadMaterial, overlayRoadMaterial, roadPhysicsMaterial);

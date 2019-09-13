@@ -132,7 +132,7 @@ public class RoadSegmentEditor : Editor
         if (serializedObject.FindProperty("generateCustomBridge").boolValue == true)
         {
             bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue = (GameObject)EditorGUILayout.ObjectField("Bridge Mesh", bridgeSettings.FindPropertyRelative("bridgeMesh").objectReferenceValue, typeof(GameObject), false);
-            bridgeSettings.FindPropertyRelative("sections").intValue = Mathf.Clamp(EditorGUILayout.IntField("Sections", bridgeSettings.FindPropertyRelative("sections").intValue), 1, 20);
+            bridgeSettings.FindPropertyRelative("sections").floatValue = (int)Mathf.Clamp(EditorGUILayout.FloatField("Sections", bridgeSettings.FindPropertyRelative("sections").floatValue), 1, 20);
             bridgeSettings.FindPropertyRelative("yScale").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("Y Scale", bridgeSettings.FindPropertyRelative("yScale").floatValue), 0.1f, 10);
             bridgeSettings.FindPropertyRelative("xOffset").floatValue = Mathf.Clamp(EditorGUILayout.FloatField("X Offset", bridgeSettings.FindPropertyRelative("xOffset").floatValue), -2, 2);
             bridgeSettings.FindPropertyRelative("adaptToTerrain").boolValue = EditorGUILayout.Toggle("Adapt Bridge To Terrain", bridgeSettings.FindPropertyRelative("adaptToTerrain").boolValue);

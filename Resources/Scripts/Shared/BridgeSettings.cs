@@ -15,9 +15,29 @@ public class BridgeSettings
 
     // Custom mesh
     public GameObject bridgeMesh;
-    public int sections = 1;
+    public float sections = 1;
     public float yScale = 1;
     public float xOffset = 0;
     public bool adaptToTerrain = false;
 
+    public BridgeSettings()
+    {
+
+    }
+
+    public BridgeSettings(BridgeSettings bridgeSettings)
+    {
+        bridgeMaterials = bridgeSettings.bridgeMaterials;
+        yOffsetFirstStep = bridgeSettings.yOffsetFirstStep;
+        yOffsetSecondStep = bridgeSettings.yOffsetSecondStep;
+        widthPercentageFirstStep = bridgeSettings.widthPercentageFirstStep;
+        widthPercentageSecondStep = bridgeSettings.widthPercentageSecondStep;
+        extraWidth = bridgeSettings.extraWidth;
+
+        bridgeMesh = bridgeSettings.bridgeMesh;
+        sections = bridgeSettings.sections;
+        yScale = bridgeSettings.yScale;
+        xOffset = bridgeSettings.xOffset;
+        adaptToTerrain = bridgeSettings.adaptToTerrain;
+    }
 }

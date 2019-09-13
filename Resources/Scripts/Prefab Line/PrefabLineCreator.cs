@@ -32,6 +32,7 @@ public class PrefabLineCreator : MonoBehaviour
     // Bridges
     public bool bridgeMode = false;
     public BridgeSettings bridgeSettings;
+    public float bridgeOffset;
     public float startWidthLeft;
     public float startWidthRight;
     public float endWidthLeft;
@@ -239,6 +240,17 @@ public class PrefabLineCreator : MonoBehaviour
             PointPackage currentPoints = CalculatePoints();
             for (int j = 0; j < currentPoints.prefabPoints.Length; j++)
             {
+                float cutoff = 1;
+                if (j == currentPoints.prefabPoints.Length - 1)
+                {
+                    cutoff = (bridgeSettings.sections + bridgeOffset) % 1.0f;
+
+                    if (cutoff == 0)
+                    {
+                        cutoff = 1;
+                    }
+                }
+
                 GameObject placedPrefab;
 
                 if (j == 0 && startPrefab != null)
@@ -284,7 +296,7 @@ public class PrefabLineCreator : MonoBehaviour
                 Vector3 forward = new Vector3(left.z, 0, -left.x);
 
                 RotatePrefabs(placedPrefab, forward, left);
-                BendPrefabs(placedPrefab, currentPoints, j);
+                BendPrefabs(placedPrefab, currentPoints, j, cutoff);
                 YModifyPrefabs(placedPrefab, currentPoints, j);
                 FillGapsBetweenPrefabs(placedPrefab, j);
             }
@@ -314,7 +326,7 @@ public class PrefabLineCreator : MonoBehaviour
         }
     }
 
-    private void BendPrefabs(GameObject placedPrefab, PointPackage currentPoints, int j)
+    private void BendPrefabs(GameObject placedPrefab, PointPackage currentPoints, int j, float cutoff)
     {
         if (bendObjects == true)
         {
@@ -331,12 +343,12 @@ public class PrefabLineCreator : MonoBehaviour
                     distanceCovered = 1 - distanceCovered;
                 }
 
-                float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], distanceCovered);
-                int pointIndex = Mathf.FloorToInt(currentTime);
+                float unclampedTime = (distanceCovered)/* * (1 / (cutoff - bridgeOffset)) - bridgeOffset*/;
+                float currentTime = Mathf.Lerp(currentPoints.startTimes[j], currentPoints.endTimes[j], unclampedTime);
 
                 if (bridgeMode == true)
                 {
-                    Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
+                    Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[0], currentPoints.lerpPoints[1], currentPoints.lerpPoints[2], currentTime);
 
                     float currentWidth;
                     if (vertices[i].z > 0)
@@ -351,18 +363,26 @@ public class PrefabLineCreator : MonoBehaviour
                     Vector3 right = Misc.MaxVector3;
                     if (currentTime <= 0.99f)
                     {
-                        right = Misc.CalculateLeft(lerpedPoint, Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime + 0.01f));
+                        right = Misc.CalculateLeft(lerpedPoint, Misc.Lerp3CenterHeight(currentPoints.lerpPoints[0], currentPoints.lerpPoints[1], currentPoints.lerpPoints[2], currentTime + 0.01f));
                     }
                     else
                     {
-                        right = Misc.CalculateLeft(Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - 0.01f), lerpedPoint);
+                        right = Misc.CalculateLeft(Misc.Lerp3CenterHeight(currentPoints.lerpPoints[0], currentPoints.lerpPoints[1], currentPoints.lerpPoints[2], currentTime - 0.01f), lerpedPoint);
                     }
 
                     Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position + right * (vertices[i].z + currentWidth));
-                    vertices[i] = new Vector3(rotatedPoint.x / xScale, rotatedPoint.y / yScale, rotatedPoint.z / zScale) + new Vector3(0, vertices[i].y, 0);
+                    float y = rotatedPoint.y / yScale;
+
+                    /*if (unclampedTime > 1.1f)
+                    {
+                        y = -vertices[i].y;
+                    }*/
+
+                    vertices[i] = new Vector3(rotatedPoint.x / xScale, y, rotatedPoint.z / zScale) + new Vector3(0, vertices[i].y, 0);
                 }
                 else if (distanceCovered > 0 && distanceCovered < 1)
                 {
+                    int pointIndex = Mathf.FloorToInt(currentTime);
                     Vector3 lerpedPoint = Misc.Lerp3CenterHeight(currentPoints.lerpPoints[pointIndex * 3], currentPoints.lerpPoints[pointIndex * 3 + 1], currentPoints.lerpPoints[pointIndex * 3 + 2], currentTime - pointIndex);
                     float y = vertices[i].y;
                     Vector3 rotatedPoint = Quaternion.Euler(0, -(placedPrefab.transform.rotation.eulerAngles.y), 0) * (lerpedPoint - placedPrefab.transform.position);
@@ -594,14 +614,14 @@ public class PrefabLineCreator : MonoBehaviour
                 currentPoint = Misc.Lerp3CenterHeight(firstPoint, controlPoint, endPoint, t);
                 float currentDistance = Vector3.Distance(new Vector3(lastPoint.x, 0, lastPoint.z), new Vector3(currentPoint.x, 0, currentPoint.z));
 
-                if (currentDistance > spacing / 2 && endPointAdded == false)
+                if ((currentDistance > spacing / 2) && endPointAdded == false)
                 {
                     endTimes.Add(i / 2 + t);
                     startTimes.Add(i / 2 + t);
                     endPointAdded = true;
                 }
 
-                if (endPointAdded == true && ((currentDistance > spacing) || (startTimes.Count == 1 && currentDistance > spacing / 2)))
+                if (endPointAdded == true && (currentDistance > spacing || (startTimes.Count == 1 && currentDistance > spacing / 2)/* || (t + distancePerDivision > 1 && bridgeMode == true)*/))
                 {
                     prefabPoints.Add(currentPoint);
                     lastPoint = currentPoint;

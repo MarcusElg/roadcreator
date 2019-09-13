@@ -401,7 +401,7 @@ public class RoadCreator : MonoBehaviour
 
         segment.generateSimpleBridge = oldLastSegment.generateSimpleBridge;
         segment.generateCustomBridge = oldLastSegment.generateCustomBridge;
-        segment.bridgeSettings = oldLastSegment.bridgeSettings;
+        segment.bridgeSettings = new BridgeSettings(oldLastSegment.bridgeSettings);
 
         segment.placePillars = oldLastSegment.placePillars;
         segment.pillarPrefab = oldLastSegment.pillarPrefab;
