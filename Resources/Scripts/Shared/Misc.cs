@@ -338,7 +338,7 @@ public static class Misc
         return start + heading * dotProduct;
     }
 
-    public static Vector3 GetLineIntersection(Vector3 point1, Vector3 direction1, Vector3 point2, Vector3 direction2)
+    public static Vector3 GetLineIntersection(Vector3 point1, Vector3 direction1, Vector3 point2, Vector3 direction2, float length1 = float.MaxValue, float lenght2 = float.MaxValue)
     {
         float originalY = point1.y;
         point1.y = 0;
@@ -361,7 +361,7 @@ public static class Misc
             float distance2 = Vector3.Distance(point, point2);
 
             // Check if they intersection in front of the points and not behind
-            if (point2 + distance2 * direction2 == point && point1 + distance * direction1 == point)
+            if (point2 + distance2 * direction2 == point && point1 + distance * direction1 == point && distance < length1 && distance2 < lenght2)
             {
                 return new Vector3(point.x, originalY, point.z);
             }

@@ -573,18 +573,31 @@ public class Intersection : MonoBehaviour
                 endVertexIndex = vertices.Count;
             }
 
+            int startIndex = firstVertexIndexes[extraMeshes[i].index];
+            Vector3 startLeft = (vertices[firstVertexIndexes[extraMeshes[i].index]] - vertices[firstVertexIndexes[extraMeshes[i].index] + 1]).normalized;
+            Vector3 endLeft = (vertices[endVertexIndex - 2] - vertices[endVertexIndex - 1]).normalized;
+            Vector3 overlapPosition = Misc.GetLineIntersection(vertices[startIndex] + transform.position, startLeft, vertices[endVertexIndex - 2] + transform.position, endLeft, extraMeshes[i].startWidth, extraMeshes[i].endWidth);
+
             List<Vector3> extraMeshVertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
             List<Vector2> uvs2 = new List<Vector2>();
             int vertexIndex = 0;
 
-            for (int j = firstVertexIndexes[extraMeshes[i].index]; j < endVertexIndex; j += 2)
+            for (int j = startIndex; j < endVertexIndex; j += 2)
             {
                 currentLength += Vector3.Distance(lastPosition, vertices[j + 1]);
 
                 Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
-                extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index])));
+                if (overlapPosition != Misc.MaxVector3)
+                {
+                    extraMeshVertices.Add(overlapPosition - transform.position);
+                }
+                else
+                {
+                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index])));
+                }
+
                 extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshes[i].yOffset + heights[extraMeshes[i].index], 0);
                 extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index]));
                 extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshes[i].index], 0);
