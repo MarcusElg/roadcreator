@@ -8,6 +8,7 @@ A free road creation tool for unity.
 - Customizable shoulders(extra meshes), possible to have multiple on each side
 - Options are changed per-segment which allows for more control like the road having a extra lane before a intersection
 - Terrain deformation to make the terrain adjust to the road
+- Offset one side of the road in the y axis to create curved roads which is useful for racing track corners
 - Easly make a road into a bridge with automatic pillar placement (see bridge section)
 
 ### Prefab Line Tool
@@ -28,6 +29,7 @@ A free road creation tool for unity.
 - Move the connected road points when the intersection is selected to have full control over the intersection mesh
 - Customizable shoulders(extra meshes), possible to have multiple on each side
 - Easly generate nice looking turn markings automaticlly by changing few options
+- Main roads feature which makes it so that it looks like the road continues through the intersection
 - Bridge support including pillar placement
 - Procedural roundabouts with changable radius etc. Has the same smooth connections and customizability as normal intersections, including extra mesh and bridge support
 
