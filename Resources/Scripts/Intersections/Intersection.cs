@@ -853,11 +853,14 @@ public class Intersection : MonoBehaviour
     {
         if (gameObject != null)
         {
-            for (int i = transform.childCount - 1; i >= 0; i--)
+            if (transform.childCount > 0)
             {
-                if (transform.GetChild(i).name == "Connection Point")
+                for (int i = transform.childCount - 1; i >= 0; i--)
                 {
-                    DestroyImmediate(transform.GetChild(i).gameObject);
+                    if (transform.GetChild(i).name == "Connection Point")
+                    {
+                        DestroyImmediate(transform.GetChild(i).gameObject);
+                    }
                 }
             }
         }
