@@ -268,8 +268,12 @@ public class PrefabLineCreator : MonoBehaviour
 
                 placedPrefab.transform.SetParent(transform.GetChild(1));
                 placedPrefab.name = "Prefab";
-                placedPrefab.layer = LayerMask.NameToLayer("Prefab Line");
                 placedPrefab.transform.localScale = new Vector3(xScale, yScale, zScale);
+
+                if (placedPrefab.layer == LayerMask.NameToLayer("Default"))
+                {
+                    placedPrefab.layer = LayerMask.NameToLayer("Prefab Line");
+                }
 
                 if (settings.FindProperty("hideNonEditableChildren").boolValue == true)
                 {
