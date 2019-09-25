@@ -538,10 +538,17 @@ public class Intersection : MonoBehaviour
                 float lastTextureOffset = lastMaterial.GetVector("_Offset").y;
 
                 Material material = Instantiate(mainRoads[i].material);
-                material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
-                material.SetTextureOffset("_BaseMap", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
-                material.mainTextureScale = new Vector2(1, textureRepeat);
-                material.mainTextureOffset = new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset);
+                if (material.HasProperty("_BaseMap"))
+                {
+                    material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
+                    material.SetTextureOffset("_BaseMap", new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset));
+                }
+                else
+                {
+                    material.mainTextureScale = new Vector2(1, textureRepeat);
+                    material.mainTextureOffset = new Vector2(0, (lastTextureRepeat % 1.0f) + lastTextureOffset);
+                }
+
                 mainRoads[i].material = material;
             }
         }
@@ -614,7 +621,8 @@ public class Intersection : MonoBehaviour
                             extraMeshVertices.Add(vertex);
                         }
                     }
-                } else
+                }
+                else
                 {
                     extraMeshVertices.Add(vertex);
                 }
