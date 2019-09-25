@@ -213,7 +213,7 @@ public class RoadSystem : MonoBehaviour
     private void Start()
     {
         // Fix intersection connection points not being removed correctly and ruining games
-        GameObject[] gameObjects = GameObject.FindObjectsOfType<GameObject>();
+        GameObject[] gameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
         for (int i = 0; i < gameObjects.Length; i++)
         {
             if (gameObjects[i].name == "Connection Point")

@@ -589,13 +589,34 @@ public class Intersection : MonoBehaviour
                 currentLength += Vector3.Distance(lastPosition, vertices[j + 1]);
 
                 Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
+                Vector3 vertex = vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index]));
                 if (overlapPosition != Misc.MaxVector3)
                 {
                     extraMeshVertices.Add(overlapPosition - transform.position);
                 }
-                else
+                else if (j > startIndex && j < endVertexIndex - 1)
                 {
-                    extraMeshVertices.Add(vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index])));
+                    float currentWidth = Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]);
+                    Vector3 localOverlapPosition = Misc.GetLineIntersection(vertex + transform.position, forward, vertices[startIndex] + transform.position, startLeft, currentWidth, extraMeshes[i].startWidth);
+                    if (localOverlapPosition != Misc.MaxVector3)
+                    {
+                        extraMeshVertices.Add(localOverlapPosition - transform.position);
+                    }
+                    else
+                    {
+                        localOverlapPosition = Misc.GetLineIntersection(vertex + transform.position, forward, vertices[endVertexIndex - 2] + transform.position, endLeft, currentWidth, extraMeshes[i].endWidth);
+                        if (localOverlapPosition != Misc.MaxVector3)
+                        {
+                            extraMeshVertices.Add(localOverlapPosition - transform.position);
+                        }
+                        else
+                        {
+                            extraMeshVertices.Add(vertex);
+                        }
+                    }
+                } else
+                {
+                    extraMeshVertices.Add(vertex);
                 }
 
                 extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshes[i].yOffset + heights[extraMeshes[i].index], 0);
