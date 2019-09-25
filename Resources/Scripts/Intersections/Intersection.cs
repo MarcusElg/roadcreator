@@ -420,8 +420,8 @@ public class Intersection : MonoBehaviour
                         modifiedT = 1;
                     }
 
-                    mainRoadsVertices.Add(Misc.Lerp3(connections[mainRoads[i].startIndex].leftPoint, leftControlPoint, connections[mainRoads[i].endIndex].rightPoint, modifiedT) - transform.position + new Vector3(0, 0.03f, 0));
-                    mainRoadsVertices.Add(Misc.Lerp3(connections[mainRoads[i].startIndex].rightPoint, rightControlPoint, connections[mainRoads[i].endIndex].leftPoint, modifiedT) - transform.position + new Vector3(0, 0.03f, 0));
+                    mainRoadsVertices.Add(Misc.Lerp3(connections[mainRoads[i].startIndex].leftPoint, leftControlPoint, connections[mainRoads[i].endIndex].rightPoint, modifiedT) - transform.position + new Vector3(0, 0.01f + yOffset, 0));
+                    mainRoadsVertices.Add(Misc.Lerp3(connections[mainRoads[i].startIndex].rightPoint, rightControlPoint, connections[mainRoads[i].endIndex].leftPoint, modifiedT) - transform.position + new Vector3(0, 0.01f + yOffset, 0));
 
                     if (mainRoads[i].flipTexture == true)
                     {
