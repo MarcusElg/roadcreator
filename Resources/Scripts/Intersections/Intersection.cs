@@ -281,13 +281,43 @@ public class Intersection : MonoBehaviour
         List<int> firstVertexIndexes = new List<int>();
         float[] totalLengths = new float[connections.Count];
         float[] exactLengths = new float[connections.Count];
-        int vertexIndex = 0;
-        Vector3 lastVertexPosition = Misc.MaxVector3;
 
         List<Vector3> mainRoadsVertices = new List<Vector3>();
         List<List<int>> mainRoadsTriangles = new List<List<int>>();
         List<Vector2> mainRoadsUvs = new List<Vector2>();
         List<float> lengths = new List<float>();
+
+        CreateMainMesh(ref vertices, ref triangles, ref uvs, ref totalLengths, ref exactLengths, ref firstVertexIndexes);
+
+        float[] startWidths = new float[firstVertexIndexes.Count];
+        float[] endWidths = new float[firstVertexIndexes.Count];
+        float[] heights = new float[firstVertexIndexes.Count];
+
+        CreateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
+        CreateMainRoadsMeshes(ref mainRoadsVertices, ref mainRoadsTriangles, ref mainRoadsUvs, ref vertices, ref uvs, ref lengths);
+        SetupMesh(vertices, triangles, uvs, mainRoadsTriangles, lengths);
+
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            if (transform.GetChild(i).name == "Bridge")
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+                break;
+            }
+        }
+
+        if (generateBridge == true)
+        {
+            BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeSettings.bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
+        }
+
+        CreateCurvePoints();
+    }
+
+    private void CreateMainMesh(ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector2> uvs, ref float[] totalLengths, ref float[] exactLengths, ref List<int> firstVertexIndexes)
+    {
+        int vertexIndex = 0;
+        Vector3 lastVertexPosition = Misc.MaxVector3;
 
         for (int i = 0; i < connections.Count; i++)
         {
@@ -297,7 +327,6 @@ public class Intersection : MonoBehaviour
             Vector3 nextCenterPoint;
             totalLengths[i] = connections[i].length;
             firstVertexIndexes.Add(vertexIndex);
-            mainRoadsTriangles.Add(new List<int>());
 
             if (i == connections.Count - 1)
             {
@@ -383,11 +412,16 @@ public class Intersection : MonoBehaviour
                 vertexIndex += 2;
             }
         }
+    }
 
+    private void CreateMainRoadsMeshes(ref List<Vector3> mainRoadsVertices, ref List<List<int>> mainRoadsTriangles, ref List<Vector2> mainRoadsUvs, ref List<Vector3> vertices, ref List<Vector2> uvs, ref List<float> lengths)
+    {
         if (connections.Count > 2)
         {
             for (int i = 0; i < mainRoads.Count; i++)
             {
+                mainRoadsTriangles.Add(new List<int>());
+
                 Vector3 startForward = Misc.CalculateLeft(connections[mainRoads[i].startIndex].rightPoint - connections[mainRoads[i].startIndex].leftPoint);
                 Vector3 endForward = Misc.CalculateLeft(connections[mainRoads[i].endIndex].rightPoint - connections[mainRoads[i].endIndex].leftPoint);
                 Vector3 leftControlPoint = Misc.GetLineIntersection(connections[mainRoads[i].startIndex].leftPoint, startForward, connections[mainRoads[i].endIndex].rightPoint, endForward);
@@ -409,7 +443,7 @@ public class Intersection : MonoBehaviour
                 lengths.Add(Misc.CalculateDistance(connections[mainRoads[i].startIndex].lastPoint, leftControlPoint, connections[mainRoads[i].endIndex].lastPoint));
                 segments = Mathf.Max(3, segments);
                 float distancePerSegment = 1f / segments;
-                vertexIndex = vertices.Count + mainRoadsVertices.Count;
+                int vertexIndex = vertices.Count + mainRoadsVertices.Count;
 
                 for (float t = 0; t <= 1 + distancePerSegment; t += distancePerSegment)
                 {
@@ -452,30 +486,6 @@ public class Intersection : MonoBehaviour
             vertices.AddRange(mainRoadsVertices.ToArray());
             uvs.AddRange(mainRoadsUvs.ToArray());
         }
-
-        SetupMesh(vertices, triangles, uvs, mainRoadsTriangles, lengths);
-
-        float[] startWidths = new float[firstVertexIndexes.Count];
-        float[] endWidths = new float[firstVertexIndexes.Count];
-        float[] heights = new float[firstVertexIndexes.Count];
-
-        GenerateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
-
-        for (int i = transform.childCount - 1; i >= 0; i--)
-        {
-            if (transform.GetChild(i).name == "Bridge")
-            {
-                DestroyImmediate(transform.GetChild(i).gameObject);
-                break;
-            }
-        }
-
-        if (generateBridge == true)
-        {
-            BridgeGeneration.GenerateSimpleBridgeIntersection(GetComponent<MeshFilter>().sharedMesh.vertices, this, bridgeSettings.bridgeMaterials, startWidths, endWidths, firstVertexIndexes.ToArray());
-        }
-
-        CreateCurvePoints();
     }
 
     private void SetupMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, List<List<int>> mainRoadsTriangles, List<float> lengths)
@@ -556,7 +566,7 @@ public class Intersection : MonoBehaviour
         GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
     }
 
-    private void GenerateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
+    private void CreateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
     {
         for (int i = 0; i < extraMeshes.Count; i++)
         {
