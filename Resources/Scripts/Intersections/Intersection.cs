@@ -563,6 +563,7 @@ public class Intersection : MonoBehaviour
             } else
             {
                 Material material = Instantiate(mainRoads[i].material);
+                textureRepeat = lengths[i] / 4;
                 if (material.HasProperty("_BaseMap"))
                 {
                     material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
