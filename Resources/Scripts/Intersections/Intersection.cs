@@ -560,6 +560,21 @@ public class Intersection : MonoBehaviour
                 }
 
                 mainRoads[i].material = material;
+            } else
+            {
+                Material material = Instantiate(mainRoads[i].material);
+                if (material.HasProperty("_BaseMap"))
+                {
+                    material.SetTextureScale("_BaseMap", new Vector2(1, textureRepeat));
+                    material.SetTextureOffset("_BaseMap", Vector2.zero);
+                }
+                else
+                {
+                    material.mainTextureScale = new Vector2(1, textureRepeat);
+                    material.mainTextureOffset = Vector2.zero;
+                }
+
+                mainRoads[i].material = material;
             }
         }
 
