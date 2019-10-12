@@ -47,9 +47,7 @@ public class RoadSegment : MonoBehaviour
     public RoadGuideline centerGuidelinePoints;
     public RoadGuideline endGuidelinePoints;
 
-#if UNITY_EDITOR
     public SerializedObject settings;
-#endif
 
     public void CreateRoadMesh(Vector3[] points, Vector3[] nextSegmentPoints, Vector3 previousPoint, Vector3[] previousVertices, float heightOffset, Transform segment, Transform previousSegment, RoadCreator roadCreator)
     {

@@ -279,21 +279,19 @@ public class Intersection : MonoBehaviour
         List<int> triangles = new List<int>();
         List<Vector2> uvs = new List<Vector2>();
         List<int> firstVertexIndexes = new List<int>();
-        float[] totalLengths = new float[connections.Count];
-        float[] exactLengths = new float[connections.Count];
 
         List<Vector3> mainRoadsVertices = new List<Vector3>();
         List<List<int>> mainRoadsTriangles = new List<List<int>>();
         List<Vector2> mainRoadsUvs = new List<Vector2>();
         List<float> lengths = new List<float>();
 
-        CreateMainMesh(ref vertices, ref triangles, ref uvs, ref totalLengths, ref exactLengths, ref firstVertexIndexes);
+        CreateMainMesh(ref vertices, ref triangles, ref uvs, ref firstVertexIndexes);
 
         float[] startWidths = new float[firstVertexIndexes.Count];
         float[] endWidths = new float[firstVertexIndexes.Count];
         float[] heights = new float[firstVertexIndexes.Count];
 
-        CreateExtraMeshes(firstVertexIndexes, vertices, exactLengths, totalLengths, ref startWidths, ref endWidths, ref heights);
+        CreateExtraMeshes(firstVertexIndexes, vertices, ref startWidths, ref endWidths, ref heights);
         CreateMainRoadsMeshes(ref mainRoadsVertices, ref mainRoadsTriangles, ref mainRoadsUvs, ref vertices, ref uvs, ref lengths);
         SetupMesh(vertices, triangles, uvs, mainRoadsTriangles, lengths);
 
@@ -314,10 +312,11 @@ public class Intersection : MonoBehaviour
         CreateCurvePoints();
     }
 
-    private void CreateMainMesh(ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector2> uvs, ref float[] totalLengths, ref float[] exactLengths, ref List<int> firstVertexIndexes)
+    private void CreateMainMesh(ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector2> uvs, ref List<int> firstVertexIndexes)
     {
         int vertexIndex = 0;
         Vector3 lastVertexPosition = Misc.MaxVector3;
+        float[] totalLengths = new float[connections.Count];
 
         for (int i = 0; i < connections.Count; i++)
         {
@@ -369,16 +368,7 @@ public class Intersection : MonoBehaviour
                 }
 
                 vertices.Add(Misc.Lerp3CenterHeight(firstPoint, connections[i].curvePoint, nextPoint, modifiedT) + new Vector3(0, yOffset, 0) - transform.position);
-
-                if (t > 0)
-                {
-                    exactLengths[i] += Vector3.Distance(lastVertexPosition, vertices[vertices.Count - 1]);
-                    lastVertexPosition = vertices[vertices.Count - 1];
-                }
-                else
-                {
-                    lastVertexPosition = vertices[vertices.Count - 1];
-                }
+                lastVertexPosition = vertices[vertices.Count - 1];
 
                 if (modifiedT < 0.5f)
                 {
@@ -560,7 +550,8 @@ public class Intersection : MonoBehaviour
                 }
 
                 mainRoads[i].material = material;
-            } else
+            }
+            else
             {
                 Material material = Instantiate(mainRoads[i].material);
                 textureRepeat = lengths[i] / 4;
@@ -582,7 +573,7 @@ public class Intersection : MonoBehaviour
         GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();
     }
 
-    private void CreateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, float[] exactLengths, float[] totalLengths, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
+    private void CreateExtraMeshes(List<int> firstVertexIndexes, List<Vector3> vertices, ref float[] startWidths, ref float[] endWidths, ref float[] heights)
     {
         for (int i = 0; i < extraMeshes.Count; i++)
         {
@@ -594,8 +585,7 @@ public class Intersection : MonoBehaviour
             }
 
             int endVertexIndex;
-            float currentLength = 0f;
-            Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index] + 1];
+            Vector3 lastPosition = vertices[firstVertexIndexes[extraMeshes[i].index]];
 
             if (extraMeshes[i].index < firstVertexIndexes.Count - 1)
             {
@@ -617,19 +607,26 @@ public class Intersection : MonoBehaviour
             List<Vector2> uvs2 = new List<Vector2>();
             int vertexIndex = 0;
 
+            float currentLength = 0f;
+            float totalLength = 0;
+            for (int j = startIndex + 2; j < endVertexIndex; j += 2)
+            {
+                totalLength += Vector3.Distance(vertices[j - 2], vertices[j]);
+            }
+
             for (int j = startIndex; j < endVertexIndex; j += 2)
             {
-                currentLength += Vector3.Distance(lastPosition, vertices[j + 1]);
+                currentLength += Vector3.Distance(lastPosition, vertices[j]);
 
                 Vector3 forward = (vertices[j + 1] - vertices[j]).normalized;
-                Vector3 vertex = vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index]));
+                Vector3 vertex = vertices[j] - forward * (Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLength) + Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength));
                 if (overlapPosition != Misc.MaxVector3)
                 {
                     extraMeshVertices.Add(overlapPosition - transform.position);
                 }
                 else if (j > startIndex && j < endVertexIndex - 1)
                 {
-                    float currentWidth = Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLengths[extraMeshes[i].index]);
+                    float currentWidth = Mathf.Lerp(extraMeshes[i].startWidth, extraMeshes[i].endWidth, currentLength / totalLength);
                     Vector3 localOverlapPosition = Misc.GetLineIntersection(vertex + transform.position, forward, vertices[startIndex] + transform.position, startLeft, currentWidth, extraMeshes[i].startWidth);
                     if (localOverlapPosition != Misc.MaxVector3)
                     {
@@ -654,18 +651,18 @@ public class Intersection : MonoBehaviour
                 }
 
                 extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, extraMeshes[i].yOffset + heights[extraMeshes[i].index], 0);
-                extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLengths[extraMeshes[i].index]));
+                extraMeshVertices.Add(vertices[j] - forward * Mathf.Lerp(startWidths[extraMeshes[i].index], endWidths[extraMeshes[i].index], currentLength / totalLength));
                 extraMeshVertices[extraMeshVertices.Count - 1] += new Vector3(0, heights[extraMeshes[i].index], 0);
 
                 if (extraMeshes[i].flipped == false)
                 {
-                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
-                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
+                    uvs.Add(new Vector2(0, currentLength / totalLength));
+                    uvs.Add(new Vector2(1, currentLength / totalLength));
                 }
                 else
                 {
-                    uvs.Add(new Vector2(1, (currentLength / exactLengths[extraMeshes[i].index])));
-                    uvs.Add(new Vector2(0, (currentLength / exactLengths[extraMeshes[i].index])));
+                    uvs.Add(new Vector2(1, currentLength / totalLength));
+                    uvs.Add(new Vector2(0, currentLength / totalLength));
                 }
 
                 uvs2.Add(Vector2.one);
@@ -677,19 +674,19 @@ public class Intersection : MonoBehaviour
                     vertexIndex += 2;
                 }
 
-                lastPosition = vertices[j + 1];
+                lastPosition = vertices[j];
             }
 
             Material material = Instantiate(extraMeshes[i].baseMaterial);
-            material.SetVector("_Tiling", new Vector2(1, exactLengths[extraMeshes[i].index] / 2));
-            material.mainTextureScale = new Vector2(1, exactLengths[extraMeshes[i].index] / 2);
+            material.SetVector("_Tiling", new Vector2(1, totalLength / 4));
+            material.mainTextureScale = new Vector2(1, totalLength / 4);
             extraMeshes[i].baseMaterial = material;
 
             if (extraMeshes[i].overlayMaterial != null)
             {
                 material = Instantiate(extraMeshes[i].overlayMaterial);
-                material.SetVector("_Tiling", new Vector2(1, exactLengths[extraMeshes[i].index] / 2));
-                material.mainTextureScale = new Vector2(1, exactLengths[extraMeshes[i].index] / 2);
+                material.SetVector("_Tiling", new Vector2(1, totalLength / 4));
+                material.mainTextureScale = new Vector2(1, totalLength / 4);
                 extraMeshes[i].baseMaterial = overlayMaterial;
             }
 
