@@ -834,7 +834,7 @@ public class Roundabout
             List<Vector2> uvs2 = new List<Vector2>();
             int vertexIndex = 0;
 
-            if (centerExtraMeshes[i].startWidth > 0 || centerExtraMeshes[i].yOffset > 0)
+            if (centerExtraMeshes[i].startWidth != 0 || centerExtraMeshes[i].yOffset > 0)
             {
                 for (float f = 0; f < 1 + degreesPerSegment; f += degreesPerSegment)
                 {
